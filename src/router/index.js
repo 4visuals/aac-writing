@@ -1,11 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
+import LevelView from "../views/level/LevelView.vue";
+import QuizPanel from "../components/quiz/QuizPanel.vue";
 
 const routes = [
   {
     path: "/",
     name: "Home",
     component: Home,
+  },
+  {
+    path: "/level",
+    name: "LevelView",
+    component: LevelView,
+  },
+  {
+    path: "/quiz/:seq",
+    name: "QuizPanel",
+    props: true,
+    component: QuizPanel,
   },
   {
     path: "/about",
