@@ -18,23 +18,32 @@
       </transition>
     </router-view>
   </div>
+  <LeftMenu v-if="menuVisible" />
+  <!-- <Transition name="left">
+  </Transition> -->
 </template>
 <script>
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
+import { computed } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
+import LeftMenu from "./views/LeftMenu.vue";
 export default {
   components: {
     Nav,
     Background,
+    LeftMenu,
   },
   setup() {
+    const store = useStore();
+    let menuVisible = computed(() => store.getters["ui/leftVisible"]);
     const route = useRoute();
     console.log(route.path, route.params);
     const tr = {
       name: "route",
     };
-    return { route, tr };
+    return { route, tr, menuVisible };
   },
 };
 </script>

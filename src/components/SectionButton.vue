@@ -1,6 +1,5 @@
 <template>
   <div class="section" @click="$emit('itemClicked', item)">
-    <!-- <img :src="boxImg" class="bg" /> -->
     <h1 :class="theme">{{ idx + 1 }}</h1>
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
@@ -11,26 +10,33 @@
 </template>
 
 <script>
-import boxImg from "@/assets/box01.svg";
 export default {
   props: ["idx", "item", "theme"],
-  setup() {
-    const emit = () => {};
-    const style = {
-      "background-image": `url(${boxImg})`,
-    };
-    return { emit, boxImg, style };
-  },
+  setup() {},
 };
 </script>
 
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
 
+@include mobile {
+  .section {
+    margin-top: 2rem;
+  }
+}
+@include tablet {
+  .section {
+    margin-top: 3rem;
+  }
+}
+@include desktop {
+  .section {
+    margin-top: 4rem;
+  }
+}
 .section {
   user-select: none;
   position: relative;
-  margin-top: 4rem;
   h1 {
     font-family: "Rowdies", cursive;
     position: absolute;

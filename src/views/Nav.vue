@@ -1,26 +1,29 @@
 <template>
   <div class="red nav-bar">
-    <ActionIcon icon="arrow_circle_left" @click="moveBack" />
+    <ActionIcon icon="arrow_circle_left" @click="openMenu" />
     <h3>단계별 받아쓰기</h3>
     <div class="user">김똘똘</div>
   </div>
 </template>
 
 <script>
+import { useStore } from "vuex";
 import { ActionIcon } from "@/components/form";
-import router from "@/router";
+// import router from "@/router";
 
 export default {
   components: {
     ActionIcon,
   },
   setup() {
-    const moveBack = () => {
+    const store = useStore();
+    const openMenu = () => {
       // console.log("[back]", router);
-      router.back();
+      // router.back();
+      store.commit("ui/showMenu");
     };
     return {
-      moveBack,
+      openMenu,
     };
   },
 };
@@ -38,7 +41,7 @@ export default {
   z-index: 100;
   box-shadow: 0 2px 3px #0000004d;
   &.red {
-    background-color: red;
+    background-color: #ff7b2d;
     color: white;
   }
   h3 {
