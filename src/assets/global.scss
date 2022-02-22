@@ -1,3 +1,12 @@
+$paragraph-margin-bottom: 0;
+$headings-margin-bottom: 0;
+
+@import "../../node_modules//bootstrap/scss/mixins";
+@import "../../node_modules/bootstrap/scss/bootstrap-grid.scss";
+@import "../../node_modules//bootstrap/scss/reboot";
+
+$paragraph-margin-bottom: 0;
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -10,4 +19,18 @@ body {
   margin: 0;
   padding: 0;
   font-size: 12px;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  left: 0;
+  opacity: 0.1;
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgb(148, 148, 148);
 }
