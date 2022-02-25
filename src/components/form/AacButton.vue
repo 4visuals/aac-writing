@@ -26,12 +26,23 @@ export default {
     border-radius: 4rem;
     padding: 1rem 2rem;
     &.pink {
-      background-color: #ff53a9;
+      background-color: var(--aac-color-pink-900);
       color: white;
+      box-shadow: 4px 4px var(--aac-color-pink-700);
+      &:active {
+        background-color: var(--aac-color-pink-700);
+      }
     }
     &.blue {
-      background-color: #3d4afa;
+      background-color: var(--aac-color-blue-900);
       color: white;
+      box-shadow: 4px 4px var(--aac-color-blue-700);
+      &:active {
+        background-color: var(--aac-color-blue-700);
+      }
+    }
+    &:active {
+      transform: translate(3px, 3px);
     }
   }
 
@@ -42,7 +53,7 @@ export default {
   }
   @include tablet {
     button {
-      font-size: 4rem;
+      font-size: 3rem;
     }
   }
   @include desktop {

@@ -1,33 +1,44 @@
 <template>
   <div class="container">
-    <div class="row group" v-for="row in rows" :key="row">
+    <div
+      class="row group"
+      v-for="(chapter, idx) in chapters"
+      :key="chapter.seq"
+      :class="idx % 2 === 0 ? 'ltr' : 'rtl'"
+    >
       <div class="col-12">
-        <h3 class="title">여기 제목</h3>
+        <h3 class="title">{{ chapter.desc }}</h3>
       </div>
-      <div
-        class="col-12 col-sm-6 col-md-4 col-lg-3"
-        v-for="(quiz, idx) in row.quiz"
-        :key="quiz.seq"
-      >
-        <SectionButton
-          :item="quiz"
-          :idx="idx"
-          @itemClicked="showDetail"
-          theme="pink"
-        />
-      </div>
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <SectionButton
-          :item="row.test[0]"
-          :idx="row.quiz.length"
-          @itemClicked="showDetail"
-          theme="green"
-        />
-      </div>
+      <transition-group name="section" appear>
+        <div
+          class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer"
+          v-for="(section, idx) in chapter.sections.filter(
+            (sec) => sec.level >= 0
+          )"
+          :key="section.seq"
+        >
+          <SectionButton
+            :item="section"
+            :idx="idx"
+            @itemClicked="(section) => showDetail(section, 'pink')"
+            theme="pink"
+          />
+        </div>
+      </transition-group>
+      <transition name="section" appear>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer">
+          <SectionButton
+            :item="chapter.sections.filter((sec) => sec.level == -1)[0]"
+            :idx="chapter.sections.length - 1"
+            @itemClicked="(section) => showDetail(section, 'green')"
+            theme="green"
+          />
+        </div>
+      </transition>
     </div>
     <teleport to="body" v-if="activeCate">
       <Modal ref="modal" @hidden="hideModal">
-        <SectionView :cate="activeCate" />
+        <SectionView :cate="activeCate" :theme="themeRef" />
       </Modal>
     </teleport>
   </div>
@@ -40,6 +51,7 @@ import SectionView from "./SectionView.vue";
 import { useStore } from "vuex";
 import { computed, ref } from "vue";
 import router from "@/router";
+
 export default {
   props: ["cate"],
   components: {
@@ -50,27 +62,36 @@ export default {
   setup() {
     const store = useStore();
     // console.log(store.state.course.cates.level);
+    store.dispatch("course/loadChapter", { origin: "L" });
     const modal = ref(null);
     let activeCate = ref(null);
-    const showDetail = (cate) => {
+    let themeRef = ref("default");
+    const showDetail = (cate, theme) => {
       activeCate.value = cate;
+      themeRef.value = theme;
     };
-    const rows = computed(() => store.state.course.cates.level);
+    const chapters = computed(() => {
+      return store.state.course.chapters.levels;
+    });
     const moveTo = (quiz) => {
       console.log(quiz);
       router.push("/quiz/" + quiz.seq);
     };
     const hideModal = () => {
-      console.log("one");
       activeCate.value = null;
+    };
+    const sectionDir = (idx) => {
+      return idx % 2 === 0 ? "ltr" : "rtl";
     };
     return {
       modal,
-      rows,
+      chapters,
       moveTo,
       showDetail,
       activeCate,
+      themeRef,
       hideModal,
+      sectionDir,
     };
   },
 };
@@ -100,6 +121,30 @@ export default {
   }
   .title {
     font-size: 4rem;
+  }
+}
+.section-outer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.ltr {
+  .section-enter-from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+.rtl {
+  .section-enter-from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.ltr,
+.rtl {
+  .section-enter-active {
+    transition: all 0.5s ease-out;
   }
 }
 </style>

@@ -1,26 +1,46 @@
 <template>
   <div class="modals">
-    <div class="back" @click="hide"></div>
-    <div class="modal-wrapper md">
-      <h3>모달창</h3>
-      <slot></slot>
-    </div>
+    <div class="back" @click="fadeOut" v-if="visible"></div>
+    <transition name="fade" @after-leave="hidden">
+      <div class="container modal-wrapper md" v-if="visible">
+        <slot></slot>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
-// import { ref } from "vue";
+import { ref, onMounted } from "vue";
 export default {
   emits: ["hidden"],
   setup(_, { emit }) {
-    const hide = () => emit("hidden");
-    return { hide };
+    const fadeOut = () => {
+      visible.value = false;
+    };
+    const hidden = () => emit("hidden");
+    const visible = ref(false);
+
+    onMounted(() => {
+      visible.value = true;
+    });
+    return { fadeOut, hidden, visible };
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .modals {
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  .fade-enter-active {
+    transition: all 0.2s cubic-bezier(0.01, 0.6, 0.58, 1) 0.2s;
+  }
+  .fade-leave-active {
+    transition: all 0.2s cubic-bezier(0.01, 0.6, 0.58, 1);
+  }
 }
 .back {
   position: absolute;
@@ -28,25 +48,24 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #0000004d;
+  background-color: #00000000;
   z-index: 1000;
 }
 .modal-wrapper {
+  $gap: 6px;
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: calc(50% - $gap);
   transform: translate(-50%, -50%);
-  max-width: calc(100% - 2rem);
+  // max-width: calc(100% - 2rem);
   background-color: white;
-  z-index: 1001;
-  &.sm {
-    width: 560px;
-  }
-  &.md {
-    width: 980px;
-  }
-  &.lg {
-    width: 1280px;
-  }
+
+  // height: 500px;
+  // background-color: #ffeb3c;
+  // box-shadow: $gap $gap 0px #f3d231;
+  width: calc(100% - 4rem);
+  padding: 0;
+  box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+  z-index: 1000;
 }
 </style>

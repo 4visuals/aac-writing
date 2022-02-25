@@ -1,3 +1,5 @@
+import api from "@/service/api";
+
 class Cate {
   /**
    *
@@ -14,6 +16,10 @@ class Cate {
     this.description = description;
     this.type = type;
     this.subs = [];
+    this.forms = {
+      cho: "ㅇㄱㄴㄷㄹㅁㅂㅅㅈ",
+      jung: "ㅏㅓㅗㅜㅡㅣ",
+    };
   }
 }
 /*
@@ -97,9 +103,10 @@ const buildTree = (elems, level, fn) => {
 };
 
 // const level = buildTree(levelCates, 0, levelToCate);
-const book = buildTree(bookCates, 0, bookToCate);
-const cates = {
-  level: [
+const books = buildTree(bookCates, 0, bookToCate);
+const chapters = {
+  levels: [
+    /*
     {
       quiz: [
         new Cate(10, "1단계", "받침 없는 글자", "받침 없는 글자 연습", "quiz"),
@@ -118,10 +125,25 @@ const cates = {
       ],
       test: [new Cate(19, "평가", "1~4단계", "받침 없는 글자 테스트", "test")],
     },
+    */
   ],
-  book,
+  books,
 };
 
 export default {
-  state: () => ({ cates }),
+  namespaced: true,
+  state: () => ({ chapters }),
+  mutations: {
+    setChapter(state, args) {
+      const { prop, data } = args;
+      state.chapters[prop] = data;
+    },
+  },
+  actions: {
+    loadChapter(ctx, args) {
+      api.chapter.list(args.origin).then((res) => {
+        ctx.commit("setChapter", { prop: "levels", data: res.chapters });
+      });
+    },
+  },
 };

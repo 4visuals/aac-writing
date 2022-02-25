@@ -58,17 +58,19 @@ export default {
   }
 
   .slider-enter-from {
+    opacity: 0;
     transform: translateX(-100%);
   }
   .slider-enter-active {
-    transition: transform 0.2s ease-out;
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
   }
 
   .slider-leave-to {
+    opacity: 0;
     transform: translateX(-100%);
   }
   .slider-leave-active {
-    transition: transform 0.2s ease-out;
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
   }
 }
 </style>

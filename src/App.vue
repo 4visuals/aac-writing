@@ -23,6 +23,7 @@
   </Transition> -->
 </template>
 <script>
+import env from "@/service/env";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { computed } from "vue";
@@ -36,6 +37,7 @@ export default {
     LeftMenu,
   },
   setup() {
+    console.log(env);
     const store = useStore();
     let menuVisible = computed(() => store.getters["ui/leftVisible"]);
     const route = useRoute();
@@ -60,9 +62,6 @@ export default {
 .app-wrapper {
   overflow-y: auto;
   height: 100%;
-  // background-image: url("~@/assets/bg00.jpg");
-  background-size: 200%;
-  background-position: 100% 100%;
 
   &.no-padding {
     padding-top: 0;

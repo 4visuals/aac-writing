@@ -3,7 +3,6 @@
     <h1 :class="theme">{{ idx + 1 }}</h1>
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
-      <h4>{{ item.subTitle }}</h4>
       <p>{{ item.description }}</p>
     </div>
   </div>
@@ -12,7 +11,9 @@
 <script>
 export default {
   props: ["idx", "item", "theme"],
-  setup() {},
+  setup(props) {
+    console.log(props.item);
+  },
 };
 </script>
 
@@ -37,6 +38,7 @@ export default {
 .section {
   user-select: none;
   position: relative;
+  flex: 1;
   h1 {
     font-family: "Rowdies", cursive;
     position: absolute;
@@ -67,8 +69,8 @@ export default {
     padding: 16px 8px 8px 24px;
     border-radius: 16px;
     position: relative;
-    margin: 8px 0;
     cursor: pointer;
+    height: 100%;
     &::after {
       content: "";
       position: absolute;
@@ -97,7 +99,7 @@ export default {
         font-size: 1.25rem;
       }
       p {
-        font-size: 0.85rem;
+        font-size: 1rem;
       }
     }
     @include tablet {
@@ -117,15 +119,15 @@ export default {
       }
     }
     &.green {
-      box-shadow: 6px 6px #d4e250;
-      background-color: #dde776;
-      color: #20450a;
+      box-shadow: 6px 6px var(--aac-color-green-700);
+      background-color: var(--aac-color-green-400);
+      color: var(--aac-color-green-900);
     }
 
     &.pink {
-      box-shadow: 6px 6px #f4abc4;
-      background-color: #f9bbd0;
-      color: #d23d70;
+      box-shadow: 6px 6px var(--aac-color-pink-700);
+      background-color: var(--aac-color-pink-400);
+      color: var(--aac-color-pink-900);
     }
 
     &.blue {

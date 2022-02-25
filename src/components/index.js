@@ -1,2 +1,3 @@
 import Modal from "./modal/Modal.vue";
-export { Modal };
+import Char from "./Char.vue";
+export { Modal, Char };

@@ -1,0 +1,4 @@
+### 단계별 학습 요청
+
+GET http://localhost:9988/dictations/level HTTP/1.1
+Content-Type: application/json

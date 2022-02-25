@@ -1,6 +1,6 @@
 $paragraph-margin-bottom: 0;
 $headings-margin-bottom: 0;
-
+@import "./theme";
 @import "../../node_modules//bootstrap/scss/mixins";
 @import "../../node_modules/bootstrap/scss/bootstrap-grid.scss";
 @import "../../node_modules//bootstrap/scss/reboot";

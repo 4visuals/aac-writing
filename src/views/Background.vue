@@ -15,7 +15,7 @@ export default {
 
 <style lang="scss" scoped>
 .bg {
-  background-size: 200%;
+  background-size: 150%;
   background-position: 10% 10%;
   height: 100%;
   position: absolute;
@@ -24,23 +24,32 @@ export default {
   width: 100%;
   z-index: -1;
   opacity: 0.6;
-  animation: bgslider 240s linear 1s infinite;
+  animation: bgslider 160s linear 0s infinite;
 }
 
 @keyframes bgslider {
   0% {
     background-position: 10% 10%;
   }
+  23% {
+    background-position: 90% 10%;
+  }
   25% {
     background-position: 90% 10%;
+  }
+  48% {
+    background-position: 90% 90%;
   }
   50% {
     background-position: 90% 90%;
   }
+  73% {
+    background-position: 10% 90%;
+  }
   75% {
     background-position: 10% 90%;
   }
-  100% {
+  98% {
     background-position: 10% 10%;
   }
 }
