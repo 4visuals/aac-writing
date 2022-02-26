@@ -2,7 +2,7 @@ import axios from "axios";
 import env from "@/service/env";
 
 const host = env.BACKEND_HOST;
-axios.defaults.baseURL = host;
+axios.defaults.baseURL = `${host}/api`;
 // axios.interceptors.request.use(jwtInjector);
 
 axios.interceptors.response.use(
