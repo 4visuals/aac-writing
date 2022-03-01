@@ -1,20 +1,29 @@
 <template>
   <div class="form-elem" :class="{ inline }">
-    <button type="button" :class="theme || 'gray'">{{ text }}</button>
+    <button type="button" :class="theme || 'gray'" @click="play">
+      {{ text }}
+    </button>
   </div>
 </template>
 
 <script>
+import clickSound from "@/assets/click.wav";
 export default {
   props: ["text", "inline", "theme"],
-  setup(props) {
-    console.log(props);
+  setup() {
+    // console.log(props);
+    const play = () => {
+      const audio = new Audio(clickSound);
+      audio.play();
+    };
+    return { play };
   },
 };
 </script>
 
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
+@import "~@/assets/theme";
 .form-elem {
   &.inline {
     flex: 0 0 auto;
@@ -26,20 +35,13 @@ export default {
     border-radius: 4rem;
     padding: 1rem 2rem;
     &.pink {
-      background-color: var(--aac-color-pink-900);
-      color: white;
-      box-shadow: 4px 4px var(--aac-color-pink-700);
-      &:active {
-        background-color: var(--aac-color-pink-700);
-      }
+      @include pink($shadow: true);
+    }
+    &.orange {
+      @include orange($shadow: true);
     }
     &.blue {
-      background-color: var(--aac-color-blue-900);
-      color: white;
-      box-shadow: 4px 4px var(--aac-color-blue-700);
-      &:active {
-        background-color: var(--aac-color-blue-700);
-      }
+      @include blue($shadow: true);
     }
     &:active {
       transform: translate(3px, 3px);
@@ -53,12 +55,12 @@ export default {
   }
   @include tablet {
     button {
-      font-size: 3rem;
+      font-size: 2.5rem;
     }
   }
   @include desktop {
     button {
-      font-size: 4rem;
+      font-size: 3rem;
     }
   }
 }

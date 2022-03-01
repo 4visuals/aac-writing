@@ -12,14 +12,12 @@
       <transition-group name="section" appear>
         <div
           class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer"
-          v-for="(section, idx) in chapter.sections.filter(
-            (sec) => sec.level >= 0
-          )"
+          v-for="section in chapter.sections.filter((sec) => sec.level >= 0)"
           :key="section.seq"
         >
           <SectionButton
             :item="section"
-            :idx="idx"
+            :idx="section.level"
             @itemClicked="(section) => showDetail(section, 'pink')"
             theme="pink"
           />
@@ -29,7 +27,7 @@
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer">
           <SectionButton
             :item="chapter.sections.filter((sec) => sec.level == -1)[0]"
-            :idx="chapter.sections.length - 1"
+            :idx="'TEST'"
             @itemClicked="(section) => showDetail(section, 'green')"
             theme="green"
           />
@@ -45,6 +43,7 @@
 </template>
 
 <script>
+import sound from "@/service/sound";
 import SectionButton from "@/components/SectionButton.vue";
 import { Modal } from "@/components";
 import SectionView from "./SectionView.vue";
@@ -69,6 +68,7 @@ export default {
     const showDetail = (cate, theme) => {
       activeCate.value = cate;
       themeRef.value = theme;
+      sound.playSound();
     };
     const chapters = computed(() => {
       return store.state.course.chapters.levels;

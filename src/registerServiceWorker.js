@@ -1,6 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 
 import { register } from "register-service-worker";
+// import { registerRoute } from "workbox-routing";
+// import { StaleWhileRevalidate } from "workbox-strategies";
 
 if (process.env.NODE_ENV === "production") {
   register(`${process.env.BASE_URL}service-worker.js`, {
@@ -31,4 +34,11 @@ if (process.env.NODE_ENV === "production") {
       console.error("Error during service worker registration:", error);
     },
   });
+
+  const aacDictRequest = ({ req, event }) => {
+    console.log(req.url);
+    console.log(event);
+    return true;
+  };
+  // registerRoute(aacDictRequest, new StaleWhileRevalidate());
 }

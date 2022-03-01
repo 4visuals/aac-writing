@@ -1,11 +1,18 @@
 <template>
   <div class="section-detail" :class="theme">
     <div class="jumbo">
-      <h3>{{ title() }}</h3>
+      <div class="title">
+        <h3>{{ title() }}</h3>
+        <SwitchButton
+          v-model:selected="quizMode"
+          onText="퀴즈"
+          offText="학습"
+        />
+      </div>
     </div>
     <div class="body">
       <div class="ko-char-view">
-        <p>{{ cate.description }}</p>
+        <ParaText>{{ cate.description }}</ParaText>
         <!--         
         <div class="chars">
           <div class="char-body">
@@ -42,22 +49,41 @@
       </div>
     </div>
     <div class="footer">
-      <AacButton text="어휘학습" theme="pink" />
-      <AacButton text="문장학습" theme="blue" />
+      <div class="choose">
+        <AacButton
+          text="어절학습"
+          theme="orange"
+          @click="startSentenceQuiz('EJ')"
+        />
+        <AacButton
+          text="문장학습"
+          theme="blue"
+          @click="startSentenceQuiz('SEN')"
+        />
+        <AacButton text="낱말학습" theme="blue" @click="startWordQuiz('W')" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ref } from "vue";
+import router from "@/router";
+import { ParaText } from "@/components/text";
+import { SwitchButton } from "@/components/form";
 // import { Char } from "@/components";
 import { AacButton } from "@/components/form";
+import api from "@/service/api";
 export default {
   props: ["cate", "theme"],
   components: {
     AacButton,
+    ParaText,
+    SwitchButton,
     // Char,
   },
   setup(props) {
+    const quizMode = ref(true);
     console.log("[cate]", props.cate, props.theme);
     // const chosung = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㄲㄸㅃㅆㅉ ".split("");
     // const jungsung = "ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣㅐㅒㅔㅖㅘㅙㅚㅝㅞㅟㅢ   ".split("");
@@ -71,8 +97,21 @@ export default {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
     };
+    const startSentenceQuiz = (type) => {
+      console.log("[MODE]", quizMode.value ? "QUIZ" : "LEARNING", type);
+      api.section.sentences(props.cate.seq, "S").then((res) => {
+        router.push(`/quiz/${props.cate.seq}`);
+        console.log(res);
+      });
+    };
+    const changeMode = (checked) => {
+      console.log("[CHECKED]", checked);
+    };
     return {
       title,
+      quizMode,
+      startSentenceQuiz,
+      changeMode,
       // chosung,
       // jungsung,
       // jongsung,
@@ -92,31 +131,27 @@ $padding: 16px;
   .body {
     flex: 1 1 auto;
   }
-  h3 {
-    padding-bottom: 12px;
+  .jumbo {
+    .title {
+      display: flex;
+      h3 {
+        flex: 1 1 auto;
+      }
+    }
   }
   @include mobile {
     h3 {
       font-size: 1.5rem;
-    }
-    p {
-      font-size: 1rem;
     }
   }
   @include tablet {
     h3 {
       font-size: 3rem;
     }
-    p {
-      font-size: 2rem;
-    }
   }
   @include desktop {
     h3 {
       font-size: 4rem;
-    }
-    p {
-      font-size: 2.5rem;
     }
   }
   &.pink {
@@ -154,9 +189,15 @@ $padding: 16px;
     }
   }
   .footer {
-    display: flex;
-    justify-content: space-evenly;
-    padding: $padding;
+    .choose {
+      display: flex;
+      justify-content: space-evenly;
+      padding: $padding;
+      column-gap: 1rem;
+      h4 {
+        flex: 1 1 auto;
+      }
+    }
   }
 }
 </style>

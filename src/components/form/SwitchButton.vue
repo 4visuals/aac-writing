@@ -1,0 +1,104 @@
+<template>
+  <div class="switch-button" :class="{ on: selected, off: !selected }">
+    <label
+      ><input
+        type="checkbox"
+        :checked="selected"
+        @change="$emit('update:selected', $event.target.checked)" />
+      <div class="slider"></div
+    ></label>
+    <SpanText class="label on">{{ onText }}</SpanText>
+    <SpanText class="label off">{{ offText }}</SpanText>
+  </div>
+</template>
+
+<script>
+import { SpanText } from "@/components/text";
+export default {
+  props: ["selected", "onText", "offText"],
+  emits: ["update:selected"],
+  components: {
+    SpanText,
+  },
+  setup(_, { emit }) {
+    const changed = (e) => {
+      console.log(e.target.checked);
+      emit("checked", e.target.checked);
+    };
+    return {
+      changed,
+    };
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+@import "~@/assets/theme";
+.switch-button {
+  background: rgba(255, 255, 255, 0.56) !important;
+  border-radius: 30px;
+  overflow: hidden;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  &.pink {
+    @include pink($shadow: false);
+  }
+  &.orange {
+    @include orange($shadow: false);
+  }
+  &.blue {
+    @include blue($shadow: false);
+  }
+  .label {
+    flex: 1 1 auto;
+    position: relative;
+    pointer-events: none;
+    padding: 0.5rem 1.2rem;
+  }
+  label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    input {
+      opacity: 0;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      background-color: white;
+      border-radius: 30px;
+      transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+  }
+  &.on {
+    label::before {
+      transform: translateX(0);
+    }
+    .label.on {
+      font-weight: 500;
+    }
+    .label.off {
+      color: #898989;
+    }
+  }
+  &.off {
+    label::before {
+      transform: translateX(100%);
+    }
+    .label.off {
+      font-weight: 500;
+    }
+    .label.on {
+      color: #898989;
+    }
+  }
+}
+</style>

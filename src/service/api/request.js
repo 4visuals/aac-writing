@@ -3,14 +3,10 @@ import env from "@/service/env";
 
 const host = env.BACKEND_HOST;
 axios.defaults.baseURL = `${host}/api`;
-// axios.interceptors.request.use(jwtInjector);
 
 axios.interceptors.response.use(
   (res) => res,
   (e) => {
-    // console.log(e)
-    // const res = e.response.data
-    // const handler = errorHandlers(res.cause)
     return Promise.reject(e);
   }
 );

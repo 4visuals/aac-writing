@@ -12,4 +12,16 @@ module.exports = {
         "webpack:///[resource-path]?[hash]";
     }
   },
+  pwa: {
+    name: "Aac Dictation",
+    themeColor: "#4DBA87",
+    msTileColor: "#000000",
+    appleMobileWebAppCapable: "yes",
+    appleMobileWebAppStatusBarStyle: "black",
+
+    workboxPluginMode: "InjectManifest",
+    workboxOptions: {
+      swSrc: "src/service-worker.js",
+    },
+  },
 };

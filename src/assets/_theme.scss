@@ -6,6 +6,7 @@
 */
 :root {
   --aac-color-pink-100: #a16a7e;
+  --aac-color-pink-200: #ffe3f7;
   --aac-color-pink-400: #f9bbd0;
   --aac-color-pink-700: #f4abc4;
   --aac-color-pink-900: #d23d70;
@@ -16,7 +17,57 @@
   --aac-color-green-900: #20450a;
 
   --aac-color-blue-100: #6e7199;
-  --aac-color-blue-400: #c5d5ff;
-  --aac-color-blue-700: #7499ff;
-  --aac-color-blue-900: #2e3cff;
+  --aac-color-blue-400: #b4d1fe;
+  --aac-color-blue-700: #5d9eff;
+  --aac-color-blue-900: #123f94;
+
+  --aac-color-orange-100: #cfc1a1;
+  --aac-color-orange-200: #ffe3a6;
+  --aac-color-orange-400: #ffc850;
+  --aac-color-orange-700: #f5b11f;
+  --aac-color-orange-900: #774901;
+}
+
+@mixin pink($shadow: true) {
+  background-color: var(--aac-color-pink-400);
+  color: var(--aac-color-pink-900);
+  @if $shadow {
+    box-shadow: 4px 4px var(--aac-color-pink-700);
+  }
+  &:active {
+    background-color: var(--aac-color-pink-700);
+  }
+}
+
+@mixin blue($shadow: true) {
+  background-color: var(--aac-color-blue-400);
+  color: var(--aac-color-blue-900);
+  @if $shadow {
+    box-shadow: 4px 4px var(--aac-color-blue-700);
+  }
+  &:active {
+    background-color: var(--aac-color-blue-700);
+  }
+}
+
+@mixin orange($shadow: true) {
+  background-color: var(--aac-color-orange-400);
+  color: var(--aac-color-orange-900);
+  @if $shadow {
+    box-shadow: 4px 4px var(--aac-color-orange-700);
+  }
+  &:active {
+    background-color: var(--aac-color-orange-700);
+  }
+}
+
+@mixin blue($shadow) {
+  background-color: var(--aac-color-blue-400);
+  color: var(--aac-color-blue-900);
+  @if $shadow {
+    box-shadow: 4px 4px var(--aac-color-blue-700);
+  }
+  &:active($hover) {
+    background-color: var(--aac-color-blue-700);
+  }
 }

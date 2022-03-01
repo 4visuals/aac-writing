@@ -2,8 +2,6 @@
   <div class="home">
     <h3 class="sub title">그림한글</h3>
     <h1 class="main title">받아쓰기</h1>
-    <!-- <input type="text" /> -->
-    <TextField value="이름" />
     <div class="menu">
       <AacButton
         text="단계별 받아쓰기"
@@ -21,13 +19,12 @@
 <script>
 import router from "@/router";
 import { useStore } from "vuex";
-import { AacButton, TextField } from "@/components/form";
+import { AacButton } from "@/components/form";
 
 export default {
   name: "Home",
   components: {
     AacButton,
-    TextField,
   },
   setup() {
     const store = useStore();

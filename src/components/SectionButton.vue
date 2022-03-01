@@ -1,18 +1,22 @@
 <template>
   <div class="section" @click="$emit('itemClicked', item)">
-    <h1 :class="theme">{{ idx + 1 }}</h1>
+    <h1 :class="theme">{{ idx }}</h1>
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
-      <p>{{ item.description }}</p>
+      <ParaText :small="true">{{ item.description }}</ParaText>
     </div>
   </div>
 </template>
 
 <script>
+import { ParaText } from "@/components/text";
 export default {
+  components: {
+    ParaText,
+  },
   props: ["idx", "item", "theme"],
-  setup(props) {
-    console.log(props.item);
+  setup() {
+    // console.log(props.item);
   },
 };
 </script>
@@ -98,24 +102,15 @@ export default {
       h4 {
         font-size: 1.25rem;
       }
-      p {
-        font-size: 1rem;
-      }
     }
     @include tablet {
       h4 {
         font-size: 2.5rem;
       }
-      p {
-        font-size: 1.5rem;
-      }
     }
     @include desktop {
       h4 {
         font-size: 3rem;
-      }
-      p {
-        font-size: 2rem;
       }
     }
     &.green {
