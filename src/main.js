@@ -5,4 +5,9 @@ import router from "./router";
 import store from "./store";
 import "./assets/global.scss";
 
-createApp(App).use(store).use(router).mount("#app");
+const app = createApp(App);
+app.use(store).use(router).mount("#app");
+app.config.errorHandler = (err, instance) => {
+  alert(err);
+  alert(instance);
+};

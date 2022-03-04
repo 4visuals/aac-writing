@@ -1,12 +1,20 @@
 <template>
-  <div class="bg" :style="{ 'background-image': `url(${path})` }"></div>
+  <div
+    v-if="visible"
+    class="bg"
+    :style="{ 'background-image': `url(${path})` }"
+  ></div>
 </template>
 
 <script>
+import { computed } from "@vue/runtime-core";
+import { useStore } from "vuex";
 export default {
   setup() {
-    console.log(require("@/assets/bg00.jpg"));
+    const store = useStore();
+    const visible = computed(() => store.getters["ui/backgroundVisible"]);
     return {
+      visible,
       path: require("@/assets/bg00.jpg"),
     };
   },

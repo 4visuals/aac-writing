@@ -12,6 +12,9 @@ module.exports = {
         "webpack:///[resource-path]?[hash]";
     }
   },
+  devServer: {
+    port: 5000,
+  },
   pwa: {
     name: "Aac Dictation",
     themeColor: "#4DBA87",

@@ -5,4 +5,5 @@ const playSound = () => {
   // audio.play();
   console.log(audio);
 };
+
 export default { playSound };

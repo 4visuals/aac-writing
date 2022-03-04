@@ -73,7 +73,8 @@ import { ParaText } from "@/components/text";
 import { SwitchButton } from "@/components/form";
 // import { Char } from "@/components";
 import { AacButton } from "@/components/form";
-import api from "@/service/api";
+// import api from "@/service/api";
+import quiz from "@/views/quiz";
 export default {
   props: ["cate", "theme"],
   components: {
@@ -97,12 +98,29 @@ export default {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
     };
-    const startSentenceQuiz = (type) => {
-      console.log("[MODE]", quizMode.value ? "QUIZ" : "LEARNING", type);
+    const startSentenceQuiz = (answerType) => {
+      console.log("[MODE]", quizMode.value ? "QUIZ" : "LEARNING", answerType);
+
+      const mode = quizMode.value ? "QUIZ" : "LEARNING";
+      const sectionSeq = props.cate.seq;
+      const quizResource = "S";
+      quiz
+        .loadSentenceQuiz({
+          quizMode: mode,
+          answerType,
+          section: sectionSeq,
+          quizResource,
+        })
+        .then((ctx) => {
+          console.log("[LOADED]", ctx);
+          router.push(`/quiz/${props.cate.seq}`);
+        });
+      /*
       api.section.sentences(props.cate.seq, "S").then((res) => {
         router.push(`/quiz/${props.cate.seq}`);
         console.log(res);
       });
+      */
     };
     const changeMode = (checked) => {
       console.log("[CHECKED]", checked);

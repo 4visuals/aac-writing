@@ -16,6 +16,15 @@ class Menu {
 class UI {
   constructor() {
     this.navHeight = 0;
+    this.bg = {
+      visible: true,
+    };
+  }
+  get backgroundVisible() {
+    return this.bg.visible;
+  }
+  setBackgroundVisible(visible) {
+    this.bg.visible = visible;
   }
 }
 
@@ -28,6 +37,9 @@ export default {
     leftVisible(state) {
       return state.leftMenu.isVisible;
     },
+    backgroundVisible(state) {
+      return state.ui.backgroundVisible;
+    },
   },
   mutations: {
     showMenu(state) {
@@ -35,6 +47,9 @@ export default {
     },
     hideMenu(state) {
       state.leftMenu.hide();
+    },
+    setBackgroundVisible(state, visible) {
+      state.ui.setBackgroundVisible(visible);
     },
   },
 };

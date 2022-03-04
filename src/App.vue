@@ -18,7 +18,7 @@
       </transition>
     </router-view>
   </div>
-  <LeftMenu v-if="menuVisible" />
+  <MenuWrapper v-if="menuVisible" />
   <!-- <Transition name="left">
   </Transition> -->
 </template>
@@ -29,12 +29,12 @@ import { useStore } from "vuex";
 import { computed } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
-import LeftMenu from "./views/LeftMenu.vue";
+import MenuWrapper from "./views/menu/MenuWrapper.vue";
 export default {
   components: {
     Nav,
     Background,
-    LeftMenu,
+    MenuWrapper,
   },
   setup() {
     console.log(env);
