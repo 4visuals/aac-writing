@@ -1,5 +1,6 @@
 <template>
   <div class="quiz-wrapper">
+    <Numbering />
     <div class="question">
       <component
         :is="questionComponent"
@@ -36,8 +37,9 @@ import { useRoute } from "vue-router";
 import quizStore from "./quizStore";
 import { useStore } from "vuex";
 import ActionIcon from "@/components/form/ActionIcon.vue";
+import Numbering from "@/views/quiz/Numbering.vue";
 export default {
-  components: { ActionIcon },
+  components: { ActionIcon, Numbering },
   setup() {
     const route = useRoute();
     console.log("[QUIZ]", route.params.seq);
@@ -45,6 +47,7 @@ export default {
     console.log(quizContext);
     const { questionComponent, answerComponent } = quizContext.options;
     const moveQuiz = (dir) => {
+      // FIXME index에 접근하는 코드, 너무 구체적임. quizStore의 메소드를 호출해서 변경하도록 수정해야함
       const index = quizContext.currentQuestion.index + dir;
       quizStore.setQuestionAt(index);
     };

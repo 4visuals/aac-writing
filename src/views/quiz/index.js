@@ -92,7 +92,7 @@ class QuizConfig {
   문제마다 정답을 맞췄을때 제공되는 이미지
 
   ### rewardForWrong:boolean
-  문제마다 정답을 맞췄을때 보상으로 제공되는 이미지
+  문제마다 틀렸을때 보상으로 제공되는 이미지
 
   ### rememberAnswer:boolean(default false)
   문제를 앞뒤로 이동할때 이전에 입력한 답을 유지할 것인지. true이면 유지함. false이면 초기화함.

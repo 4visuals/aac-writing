@@ -9,7 +9,6 @@ export default {
   props: ["lang", "width"],
   setup(props) {
     const flag = require(`@/assets/flags/${props.lang.replace("_", "-")}.png`);
-    alert(flag);
     return { flag };
   },
 };
