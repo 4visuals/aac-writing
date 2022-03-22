@@ -18,13 +18,11 @@ export default {
   props: ["quizContext", "fillHeight"],
   setup() {
     const store = useStore();
-    let question = computed(() => store.getters["quiz/currentQuestion"]);
+    let question = computed(() => store.getters["quiz/currentPara"]);
     console.log(question);
     // https://kr.object.ncloudstorage.com/aacweb/scenes/ec281e4a-fc10-4f07-aee1-ab16f85837b5.png
     const prefix = "https://kr.object.ncloudstorage.com/aacweb/scenes/";
-    const scenePath = () => {
-      return prefix + "738b7599-fd16-4d0a-b72e-6fea9d1ed0dc.jpeg";
-    };
+    const scenePath = () => prefix + question.value.data.scenePicture;
     const speak = () => {
       console.log(question.value.data);
       tts.speak(question.value.data.sentence);

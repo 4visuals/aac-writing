@@ -8,6 +8,7 @@ import "./assets/global.scss";
 const app = createApp(App);
 app.use(store).use(router).mount("#app");
 app.config.errorHandler = (err, instance) => {
-  alert(err);
-  alert(instance);
+  console.error(err);
+  console.error(instance);
 };
+store.dispatch("course/loadChapter", { origin: "L" });

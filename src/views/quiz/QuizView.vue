@@ -1,68 +1,70 @@
 <template>
   <div class="quiz-wrapper">
-    <Numbering />
-    <div class="question">
-      <component
-        :is="questionComponent"
-        :quizContext="ctx"
-        :fillHeight="true"
-      />
-      <ActionIcon
-        v-if="ctx.currentQuestion.hasPrevQuiz()"
-        class="icon left"
-        icon="chevron_left"
-        @click="moveQuiz(-1)"
-      />
-      <ActionIcon
-        v-if="ctx.currentQuestion.hasNextQuiz()"
-        class="icon right"
-        icon="chevron_right"
-        @click="moveQuiz(1)"
-      />
-    </div>
-    <div class="answer">
-      <component
-        :is="answerComponent"
-        :quizContext="ctx"
-        :question="question"
-        :fillHeight="false"
-      />
-    </div>
+    <template v-if="ctx">
+      <Numbering />
+      <div class="question">
+        <component
+          :is="ctx.options.questionComponent"
+          :quizContext="ctx"
+          :fillHeight="true"
+        />
+        <ActionIcon
+          v-if="ctx.currentQuestion.hasPrevQuiz()"
+          class="icon left"
+          icon="chevron_left"
+          @click="moveQuiz(-1)"
+        />
+        <ActionIcon
+          v-if="ctx.currentQuestion.hasNextQuiz()"
+          class="icon right"
+          icon="chevron_right"
+          @click="moveQuiz(1)"
+        />
+      </div>
+      <div class="answer">
+        <component
+          :is="ctx.options.answerComponent"
+          :quizContext="ctx"
+          :question="ctx.currentQuestion"
+          :fillHeight="false"
+        />
+      </div>
+    </template>
+    <div class="none" v-else>NONE</div>
   </div>
 </template>
 
 <script>
-import { onMounted, onUnmounted } from "@vue/runtime-core";
+import { computed, onMounted, onUnmounted } from "@vue/runtime-core";
 import { useRoute } from "vue-router";
 import quizStore from "./quizStore";
+import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 import ActionIcon from "@/components/form/ActionIcon.vue";
 import Numbering from "@/views/quiz/Numbering.vue";
 export default {
   components: { ActionIcon, Numbering },
   setup() {
+    const store = useStore();
+    const ctx = computed(() => store.state.quiz.quizContext);
+
     const route = useRoute();
     console.log("[QUIZ]", route.params.seq);
-    const quizContext = quizStore.getQuizContext();
-    console.log(quizContext);
-    const { questionComponent, answerComponent } = quizContext.options;
-    const moveQuiz = (dir) => {
-      // FIXME index에 접근하는 코드, 너무 구체적임. quizStore의 메소드를 호출해서 변경하도록 수정해야함
-      const index = quizContext.currentQuestion.index + dir;
-      quizStore.setQuestionAt(index);
-    };
-    const store = useStore();
+    quiz.loadQuiz();
     onMounted(() => {
       store.commit("ui/setBackgroundVisible", false);
     });
     onUnmounted(() => {
       store.commit("ui/setBackgroundVisible", true);
     });
+
+    const moveQuiz = (dir) => {
+      // FIXME index에 접근하는 코드, 너무 구체적임. quizStore의 메소드를 호출해서 변경하도록 수정해야함
+      const index = ctx.value.currentQuestion.index + dir;
+      quizStore.setQuestionAt(index);
+    };
     return {
-      questionComponent,
-      answerComponent,
-      ctx: quizContext,
-      question: quizContext.currentQuestion,
+      ctx,
       moveQuiz,
     };
   },

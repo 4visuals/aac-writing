@@ -18,7 +18,7 @@
 
 <script>
 import router from "@/router";
-import { useStore } from "vuex";
+// import { useStore } from "vuex";
 import { AacButton } from "@/components/form";
 
 export default {
@@ -27,8 +27,8 @@ export default {
     AacButton,
   },
   setup() {
-    const store = useStore();
-    console.log(store.state.course);
+    // const store = useStore();
+    // store.dispatch("course/loadChapter", { origin: "L" });
     const moveTo = (url) => {
       console.log("move to ", url);
       router.push(url);

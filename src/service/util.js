@@ -9,13 +9,18 @@ const key = {
 };
 
 const path = {
-  aacweb: (picPath) => {
-    return `https://kr.object.ncloudstorage.com/aacweb/symbols/after${picPath}`;
+  aacweb: {
+    symbol: (picPath) => {
+      return `https://kr.object.ncloudstorage.com/aacweb/symbols/after${picPath}`;
+    },
+    scene: (path) =>
+      `https://kr.object.ncloudstorage.com/aacweb/dictation/${path}`,
   },
+  // https://kr.object.ncloudstorage.com/aacweb/scenes/a229b38f-3438-410c-afb3-5ad057323bf8.png
   resolveUrl: (picPath) => {
     // 일단 이렇게만...
     const uri = picPath.substring("aacweb:".length);
-    return path.aacweb(uri);
+    return path.aacweb.symbol(uri);
   },
 };
 export { key, path };

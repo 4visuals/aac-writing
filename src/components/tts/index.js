@@ -6,7 +6,6 @@ class TTS {
   constructor() {
     ttsStore.init().then(() => {
       const voices = ttsStore.getVoicesByLang("ko-KR");
-      alert("[ko]", voices);
       ttsStore.setActiveVoice(voices[0]);
     });
   }

@@ -3,18 +3,29 @@ import quizStore from "./quizStore";
 import ScenePicView from "./question/ScenePicView.vue";
 import EojelInput from "./answer/EojelInput.vue";
 import SentenceInput from "./answer/SentenceInput.vue";
-import { shallowRef } from "vue";
-import api from "@/service/api";
+import { shallowRef, watch } from "vue";
+// import api from "@/service/api";
+import store from "@/store";
+import storage from "@/service/storage";
 
 const answerComponents = new Map();
 answerComponents.set("EJ", shallowRef(EojelInput));
 answerComponents.set("SEN", shallowRef(SentenceInput));
+/**
+ * 주어진 질문(Sentence에서 문장 또는 단어를 필터링함
+ * 어절이 1개이면 단어 질문으로 판정함
+ */
+const sentenceFilters = {
+  S: (sen) => sen.eojeols.length > 1,
+  W: (sen) => sen.eojeols.length === 0,
+};
 /**
  * 퀴즈 질문
  */
 class Question {
   constructor(quizConfig, index, question) {
     this.config = quizConfig;
+    this.solved = false;
     /**
      * 문제 순서
      */
@@ -54,6 +65,9 @@ class Question {
   }
   isLast() {
     return this.index + 1 === this.config.quizLength;
+  }
+  get text() {
+    return this.data.sentence.trim();
   }
 }
 class QuizConfig {
@@ -123,13 +137,48 @@ class QuizContext {
  * quizMode - 학습('LEARNING') OR 테스트('QUIZ') 모드
  * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
  * section - secion seq
- * @param {{quizMode,  answerType, section }} quiz 옵션
+ * quizResource - 'S(sentence)' or 'W(word)'
+ *
+ * @param {{quizMode,  answerType, section, quizResource }} quiz 옵션
  */
-const loadSentenceQuiz = ({ quizMode, answerType, section }) => {
-  const quizResource = "S"; // 문장들
-  // console.log(quizMode);
+const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
   const questionComponent = shallowRef(ScenePicView);
   const answerComponent = answerComponents.get(answerType);
+
+  return new Promise((resolve) => {
+    watch(
+      () => store.getters["course/sections"],
+      (sections) => {
+        const sec = sections.find((sec) => sec.seq === section);
+        if (!sec) {
+          return;
+        }
+
+        const sentences = sec.sentences.filter(sentenceFilters[quizResource]);
+        const config = new QuizConfig(sentences);
+        const questions = sentences.map(
+          (sen, index) => new Question(config, index, sen)
+        );
+
+        const ctx = new QuizContext(questions, {
+          questionComponent,
+          answerComponent,
+          maxTrials: quizMode === "LEARNING" ? -1 : 0,
+          autoSlide: false,
+          rewardForCorrect: quizMode === "LEARNING",
+          rewardForWrong: quizMode === "LEARNING",
+          rememberAnswer: true,
+        });
+        quizStore.startQuiz(ctx);
+        resolve(ctx);
+      },
+      {
+        immediate: true,
+      }
+    );
+  });
+
+  /*
   return api.section.sentences(section, quizResource).then((res) => {
     const config = new QuizConfig(res.sentences);
     const questions = res.sentences.map(
@@ -143,13 +192,28 @@ const loadSentenceQuiz = ({ quizMode, answerType, section }) => {
       autoSlide: false,
       rewardForCorrect: quizMode === "LEARNING",
       rewardForWrong: quizMode === "LEARNING",
-      rememberAnswer: false,
+      rememberAnswer: true,
     });
     quizStore.startQuiz(ctx);
     return ctx;
+  });
+  */
+};
+const loadQuiz = () => {
+  const quizSpec = storage.session.read("quizSpec");
+  return loadSentenceQuiz(quizSpec);
+};
+const prepareQuiz = ({ quizMode, answerType, section, quizResource }) => {
+  storage.session.write("quizSpec", {
+    quizMode,
+    answerType,
+    section,
+    quizResource,
   });
 };
 export { Question, QuizContext, QuizView };
 export default {
   loadSentenceQuiz,
+  prepareQuiz,
+  loadQuiz,
 };

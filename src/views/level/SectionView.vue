@@ -4,15 +4,21 @@
       <div class="title">
         <h3>{{ title() }}</h3>
         <SwitchButton
-          v-model:selected="quizMode"
-          onText="퀴즈"
-          offText="학습"
+          v-model:selected="wordMode"
+          onText="낱말"
+          offText="문장"
         />
       </div>
     </div>
     <div class="body">
       <div class="ko-char-view">
-        <ParaText>{{ cate.description }}</ParaText>
+        <ParaText class="desc">{{ cate.description }}</ParaText>
+        <Slide
+          :resources="cate.notes.map((n) => n.text)"
+          :width="400"
+          :height="300"
+          :resolveUrl="(rss) => path.aacweb.scene(rss)"
+        />
         <!--         
         <div class="chars">
           <div class="char-body">
@@ -50,29 +56,32 @@
     </div>
     <div class="footer">
       <div class="choose">
+        <AacButton :text="`${sourceText()} 읽기`" theme="orange" />
         <AacButton
-          text="어절학습"
-          theme="orange"
-          @click="startSentenceQuiz('EJ')"
-        />
-        <AacButton
-          text="문장학습"
+          :text="`${sourceText()} 쓰기`"
           theme="blue"
-          @click="startSentenceQuiz('SEN')"
+          @click="startSentenceQuiz('LEARNING', 'EJ')"
         />
-        <AacButton text="낱말학습" theme="blue" @click="startWordQuiz('W')" />
+        <AacButton
+          :text="`${sourceText()} 퀴즈`"
+          theme="red"
+          @click="startSentenceQuiz('QUIZ', 'SEN')"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { path } from "@/service/util";
 import { ref } from "vue";
 import router from "@/router";
 import { ParaText } from "@/components/text";
 import { SwitchButton } from "@/components/form";
 // import { Char } from "@/components";
 import { AacButton } from "@/components/form";
+import { Slide } from "@/components/slide";
+
 // import api from "@/service/api";
 import quiz from "@/views/quiz";
 export default {
@@ -81,55 +90,56 @@ export default {
     AacButton,
     ParaText,
     SwitchButton,
+    Slide,
     // Char,
   },
   setup(props) {
-    const quizMode = ref(true);
+    const wordMode = ref(true);
     console.log("[cate]", props.cate, props.theme);
-    // const chosung = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㄲㄸㅃㅆㅉ ".split("");
-    // const jungsung = "ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣㅐㅒㅔㅖㅘㅙㅚㅝㅞㅟㅢ   ".split("");
-    // const jongsung = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㄲㄸㅃㅆㅉ ".split("");
-
-    // const isSelected = (type, ch) => {
-    //   const chars = props.cate.forms[type]; //  'ㄱㄴㄷ...'
-    //   return chars.includes(ch);
-    // };
     const title = () => {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
     };
-    const startSentenceQuiz = (answerType) => {
-      console.log("[MODE]", quizMode.value ? "QUIZ" : "LEARNING", answerType);
-
-      const mode = quizMode.value ? "QUIZ" : "LEARNING";
+    /**
+     * @param quizMode 학습모드('LEARNING') 또는 시험모드('QUIZ')
+     * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
+     */
+    const startSentenceQuiz = (quizMode, answerType) => {
+      console.log(wordMode.value);
       const sectionSeq = props.cate.seq;
       const quizResource = "S";
+      /*
       quiz
         .loadSentenceQuiz({
-          quizMode: mode,
+          quizMode,
           answerType,
           section: sectionSeq,
           quizResource,
         })
         .then((ctx) => {
           console.log("[LOADED]", ctx);
-          router.push(`/quiz/${props.cate.seq}`);
+          router.push(`/quiz/${sectionSeq}`);
         });
-      /*
-      api.section.sentences(props.cate.seq, "S").then((res) => {
-        router.push(`/quiz/${props.cate.seq}`);
-        console.log(res);
-      });
       */
+      quiz.prepareQuiz({
+        quizMode,
+        answerType,
+        section: sectionSeq,
+        quizResource,
+      });
+      router.push(`/quiz/${sectionSeq}`);
     };
     const changeMode = (checked) => {
       console.log("[CHECKED]", checked);
     };
+    const sourceText = () => (wordMode.value ? "낱말" : "문장");
     return {
+      path,
       title,
-      quizMode,
+      wordMode,
       startSentenceQuiz,
       changeMode,
+      sourceText,
       // chosung,
       // jungsung,
       // jongsung,
@@ -189,8 +199,12 @@ $padding: 16px;
   .body {
     .ko-char-view {
       display: flex;
-      align-items: flex-start;
+      // align-items: flex-start;
       padding: $padding;
+      flex-direction: column;
+      .desc {
+        padding-bottom: 16px;
+      }
       .chars {
         flex: 1;
         display: flex;

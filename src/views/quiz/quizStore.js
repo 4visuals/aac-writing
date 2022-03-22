@@ -7,7 +7,7 @@ store.registerModule("quiz", {
     quizContext: null,
   }),
   getters: {
-    currentQuestion: (state) => state.quizContext.currentQuestion,
+    currentPara: (state) => state.quizContext.currentQuestion,
   },
   actions: {
     loadQuizReouces: (ctx, args) => {

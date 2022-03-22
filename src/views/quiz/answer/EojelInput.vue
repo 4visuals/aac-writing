@@ -59,7 +59,7 @@ export default {
   props: ["quizContext"],
   setup(props) {
     const store = useStore();
-    const question = computed(() => store.getters["quiz/currentQuestion"]);
+    const question = computed(() => store.getters["quiz/currentPara"]);
     const createEojeolWrapper = (ej, i) => {
       if (!props.quizContext.rememberAnswer) {
         ej.solved = false;

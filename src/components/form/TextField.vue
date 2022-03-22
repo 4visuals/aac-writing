@@ -11,9 +11,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .form-elem {
   input {
     font-size: inherit;
+  }
+  @include mobile {
+    input {
+      padding: 1vmin;
+      font-size: 3vmin;
+    }
+  }
+  @include tablet {
+    input {
+      padding: 1vmin;
+      font-size: 4vmin;
+    }
+  }
+  @include desktop {
+    input {
+      padding: 1vmin;
+      font-size: 4vmin;
+    }
   }
 }
 </style>

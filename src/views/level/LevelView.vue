@@ -61,7 +61,6 @@ export default {
   setup() {
     const store = useStore();
     // console.log(store.state.course.cates.level);
-    store.dispatch("course/loadChapter", { origin: "L" });
     const modal = ref(null);
     let activeCate = ref(null);
     let themeRef = ref("default");

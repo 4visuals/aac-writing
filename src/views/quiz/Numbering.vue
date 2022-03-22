@@ -39,9 +39,7 @@ export default {
     console.log("[cur quiz]", quizContext.currentQuestion);
     const { questions } = quizContext;
     const store = useStore();
-    const currentQuestion = computed(
-      () => store.getters["quiz/currentQuestion"]
-    );
+    const currentQuestion = computed(() => store.getters["quiz/currentPara"]);
     return {
       currentQuestion,
       questions,

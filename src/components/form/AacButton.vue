@@ -43,6 +43,9 @@ export default {
     &.blue {
       @include blue($shadow: true);
     }
+    &.red {
+      @include red($shadow: true);
+    }
     &:active {
       transform: translate(3px, 3px);
     }
@@ -50,17 +53,17 @@ export default {
 
   @include mobile {
     button {
-      font-size: 1rem;
+      font-size: 3vmin;
     }
   }
   @include tablet {
     button {
-      font-size: 2.5rem;
+      font-size: 3vmin;
     }
   }
   @include desktop {
     button {
-      font-size: 3rem;
+      font-size: 3vmin;
     }
   }
 }
