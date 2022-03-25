@@ -1,8 +1,6 @@
 <template>
   <div class="red nav-bar">
-    <ActionIcon icon="arrow_circle_left" @click="openMenu" />
-    <h3>단계별 받아쓰기</h3>
-    <div class="user">김똘똘</div>
+    <ActionIcon class="btn-menu" icon="menu" @click="openMenu" />
   </div>
 </template>
 
@@ -35,43 +33,31 @@ export default {
 .nav-bar {
   display: flex;
   align-items: center;
-  position: fixed;
-  top: 0;
   width: 100%;
   z-index: 100;
-  box-shadow: 0 2px 3px #0000004d;
-  &.red {
-    background-color: #ff7b2d;
-    color: white;
-  }
-  h3 {
-    font-size: inherit;
-    flex: 1 1 auto;
-    display: block;
-  }
-  .user {
-    font-size: 2rem;
+  // box-shadow: 0 2px 3px #0000004d;
+  .btn-menu {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 75;
   }
 }
 @include mobile {
   .nav-bar {
     font-size: 1.5rem;
-    padding: 8px;
     column-gap: 8px;
-    margin-bottom: 1rem;
   }
 }
 @include tablet {
   .nav-bar {
-    font-size: 4rem;
-    padding: 16px;
+    font-size: 2rem;
     column-gap: 16px;
   }
 }
 @include desktop {
   .nav-bar {
-    font-size: 4rem;
-    padding: 16px;
+    font-size: 2rem;
     column-gap: 16px;
   }
 }

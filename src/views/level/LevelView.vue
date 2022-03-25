@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <BrandPanel theme="pink" text="단계별 받아쓰기" path="level" />
     <div
       class="row group"
       v-for="(chapter, idx) in chapters"
@@ -11,7 +12,7 @@
       </div>
       <transition-group name="section" appear>
         <div
-          class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer"
+          class="col-6 col-sm-6 col-md-4 col-lg-3 section-outer"
           v-for="section in chapter.sections.filter((sec) => sec.level >= 0)"
           :key="section.seq"
         >
@@ -45,6 +46,8 @@
 <script>
 import sound from "@/service/sound";
 import SectionButton from "@/components/SectionButton.vue";
+import { BrandPanel } from "@/components/brand";
+
 import { Modal } from "@/components";
 import SectionView from "./SectionView.vue";
 import { useStore } from "vuex";
@@ -57,18 +60,21 @@ export default {
     SectionButton,
     SectionView,
     Modal,
+    BrandPanel,
   },
   setup() {
     const store = useStore();
     // console.log(store.state.course.cates.level);
     const modal = ref(null);
-    let activeCate = ref(null);
-    let themeRef = ref("default");
+
+    const activeCate = ref(null);
+    const themeRef = ref("default");
     const showDetail = (cate, theme) => {
       activeCate.value = cate;
       themeRef.value = theme;
       sound.playSound();
     };
+
     const chapters = computed(() => {
       return store.state.course.chapters.levels;
     });
@@ -82,6 +88,7 @@ export default {
     const sectionDir = (idx) => {
       return idx % 2 === 0 ? "ltr" : "rtl";
     };
+
     return {
       modal,
       chapters,
@@ -98,6 +105,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
+
 @include mobile {
   .group {
     margin-bottom: 2rem;
@@ -111,7 +119,7 @@ export default {
     margin-bottom: 4rem;
   }
   .title {
-    font-size: 4rem;
+    font-size: 3vmin;
   }
 }
 @include desktop {
@@ -119,7 +127,7 @@ export default {
     margin-bottom: 4rem;
   }
   .title {
-    font-size: 4rem;
+    font-size: 3vmin;
   }
 }
 .section-outer {

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import LevelView from "../views/level/LevelView.vue";
+import BookShelfView from "../views/book/BookShelfView.vue";
 import { QuizView } from "../views/quiz";
 
 const routes = [
@@ -13,6 +14,11 @@ const routes = [
     path: "/level",
     name: "LevelView",
     component: LevelView,
+  },
+  {
+    path: "/book",
+    name: "BookShelfView",
+    component: BookShelfView,
   },
   {
     path: "/quiz/:seq",

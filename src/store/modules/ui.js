@@ -15,9 +15,10 @@ class Menu {
 }
 class UI {
   constructor() {
-    this.navHeight = 0;
+    this.nav = { height: 120, expanded: true };
+    this.topPadding = 120;
     this.bg = {
-      visible: true,
+      visible: false,
     };
   }
   get backgroundVisible() {
@@ -37,9 +38,11 @@ export default {
     leftVisible(state) {
       return state.leftMenu.isVisible;
     },
+    nav: (state) => state.ui.nav,
     backgroundVisible(state) {
       return state.ui.backgroundVisible;
     },
+    topPadding: (state) => state.ui.topPadding,
   },
   mutations: {
     showMenu(state) {
@@ -50,6 +53,13 @@ export default {
     },
     setBackgroundVisible(state, visible) {
       state.ui.setBackgroundVisible(visible);
+    },
+    setNavSize(state, { expanded, topPadding }) {
+      state.ui.nav.expanded = expanded;
+      state.ui.nav.height = expanded ? 120 : 56;
+      if (topPadding) {
+        state.ui.topPadding = topPadding;
+      }
     },
   },
 };

@@ -3,7 +3,8 @@
     <h3 class="sub title">그림한글</h3>
     <h1 class="main title">받아쓰기</h1>
     <div class="menu">
-      <AacButton
+      <AacButton text="시작" theme="pink" @click="moveTo('/book')" />
+      <!-- <AacButton
         text="단계별 받아쓰기"
         theme="pink"
         @click="moveTo('/level')"
@@ -11,7 +12,7 @@
         text="교과서 받아쓰기"
         theme="blue"
         @click="moveTo('/book')"
-      />
+      /> -->
     </div>
   </div>
 </template>

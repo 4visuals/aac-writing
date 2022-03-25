@@ -27,16 +27,25 @@ export default {
 @include mobile {
   .section {
     margin-top: 2rem;
+    h1 {
+      font-size: 1.8rem;
+    }
   }
 }
 @include tablet {
   .section {
-    margin-top: 3rem;
+    margin-top: 2.2rem;
+    h1 {
+      font-size: 2.2rem;
+    }
   }
 }
 @include desktop {
   .section {
-    margin-top: 4rem;
+    margin-top: 2.2rem;
+    h1 {
+      font-size: 2.2rem;
+    }
   }
 }
 .section {
@@ -49,7 +58,6 @@ export default {
     left: 24px;
     transform: translateY(-60%);
     z-index: 10;
-    font-size: 3rem;
     border-radius: 24px;
     line-height: 1;
     display: block;

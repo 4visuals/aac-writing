@@ -11,7 +11,8 @@
   --aac-color-pink-700: #f4abc4;
   --aac-color-pink-900: #d23d70;
 
-  --aac-color-red-400: #ffe0db;
+  --aac-color-red-200: #fff3f1;
+  --aac-color-red-400: #ffcdc5;
   --aac-color-red-700: #f53c20;
   --aac-color-red-900: #881200;
 
@@ -21,57 +22,61 @@
   --aac-color-green-900: #20450a;
 
   --aac-color-blue-100: #6e7199;
-  --aac-color-blue-400: #b0d9ff;
+  --aac-color-blue-200: #f0f8ff;
+  --aac-color-blue-400: #dff0ff;
   --aac-color-blue-700: #1a82e2;
   --aac-color-blue-900: #123f94;
 
   --aac-color-orange-100: #cfc1a1;
-  --aac-color-orange-200: #ffe3a6;
-  --aac-color-orange-400: #ffc850;
-  --aac-color-orange-700: #f5b11f;
-  --aac-color-orange-900: #774901;
+  --aac-color-orange-200: #fff8e8;
+  --aac-color-orange-400: #ffedd5;
+  --aac-color-orange-700: #ff7700;
+  --aac-color-orange-900: #a74e00;
+
+  --aac-color-gold-400: gold;
+  --aac-color-gold-900: #865900;
 }
 
 @mixin pink($shadow: true) {
-  background-color: var(--aac-color-pink-400);
-  color: var(--aac-color-pink-900);
+  background-color: var(--aac-color-pink-200);
+  color: var(--aac-color-pink-700);
   @if $shadow {
-    box-shadow: 4px 4px var(--aac-color-pink-700);
+    box-shadow: 0 0 0 2px var(--aac-color-pink-700);
   }
   &:active {
-    background-color: var(--aac-color-pink-700);
+    background-color: var(--aac-color-pink-400);
   }
 }
 
 @mixin blue($shadow: true) {
-  background-color: var(--aac-color-blue-400);
-  color: var(--aac-color-blue-900);
+  background-color: var(--aac-color-blue-200);
+  color: var(--aac-color-blue-700);
   @if $shadow {
-    box-shadow: 4px 4px var(--aac-color-blue-700);
+    box-shadow: 0 0 0 2px var(--aac-color-blue-700);
   }
   &:active {
-    background-color: var(--aac-color-blue-700);
+    background-color: var(--aac-color-blue-400);
   }
 }
 
 @mixin orange($shadow: true) {
-  background-color: var(--aac-color-orange-400);
-  color: var(--aac-color-orange-900);
+  background-color: var(--aac-color-orange-200);
+  color: var(--aac-color-orange-700);
   @if $shadow {
-    box-shadow: 4px 4px var(--aac-color-orange-700);
+    box-shadow: 0 0 0 2px var(--aac-color-orange-700);
   }
   &:active {
-    background-color: var(--aac-color-orange-700);
+    background-color: var(--aac-color-orange-400);
   }
 }
 
 @mixin red($shadow: true) {
-  background-color: var(--aac-color-red-400);
-  color: var(--aac-color-red-900);
+  background-color: var(--aac-color-red-200);
+  color: var(--aac-color-red-700);
   @if $shadow {
-    box-shadow: 4px 4px var(--aac-color-red-700);
+    box-shadow: 0 0 0 2px var(--aac-color-red-700);
   }
-  &:active($hover) {
-    background-color: var(--aac-color-red-700);
+  &:active {
+    background-color: var(--aac-color-red-400);
   }
 }

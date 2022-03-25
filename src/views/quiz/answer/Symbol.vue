@@ -24,15 +24,19 @@ import { tts } from "@/components/tts";
 import { key, path } from "@/service/util";
 import { ref, watch } from "@vue/runtime-core";
 export default {
-  props: ["ej"],
+  props: ["ej", "pumsaType"],
   setup(props, { emit }) {
     const pumsaImg = () => {
       if (props.ej.isSolved) {
         return path.resolveUrl(props.ej.picturePath);
       } else {
-        const pumsa = props.ej.pumsa.startsWith("hada")
-          ? "hada"
-          : props.ej.pumsa;
+        const { pumsaType } = props;
+        let pumsa = "";
+        if (pumsaType === "follow") {
+          pumsa = props.ej.pumsa.startsWith("hada") ? "hada" : props.ej.pumsa;
+        } else {
+          pumsa = pumsaType;
+        }
         return require(`@/assets/s-${pumsa}.png`);
       }
     };

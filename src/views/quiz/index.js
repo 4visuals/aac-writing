@@ -18,6 +18,7 @@ answerComponents.set("SEN", shallowRef(SentenceInput));
 const sentenceFilters = {
   S: (sen) => sen.eojeols.length > 1,
   W: (sen) => sen.eojeols.length === 0,
+  A: () => true,
 };
 /**
  * 퀴즈 질문
@@ -82,6 +83,7 @@ class QuizConfig {
  * new QuizContext(questions, {
       questionComponent,
       answerComponent,
+      answerType,
       maxTrials: quizMode === "LEARNING" ? -1 : 0,
       autoSlide: false,
       showPenguin: quizMode === "LEARNING",
@@ -94,6 +96,11 @@ class QuizConfig {
   ### answerCompoent:VueComponent
   사용자가 정답을 입력하는 컴포넌트
   
+  ### symbolConfig.pumsa
+  문장 학습에서 어절의 품사를 그리는 방식
+  * 'follow' - 어절의 품사 타입(what, who 등)에 맞는 그림을 선택
+  * 기타 - 'what', 'who'등 지정한 그림을 선택
+
   ### maxTrials:int(-1, 0, positive)
   정답을 입력할때까지 시도할 수 있는 횟수.
   -1이면 정답을 입력할때까지 계속 시도해야 함.
@@ -115,7 +122,7 @@ class QuizContext {
   /**
    *
    * @param {[Question]} questions
-   * @param {{questionComponent, answerCompoent, maxTrials, autoSlide, rewardForCorrect, rewardForWrong}} options
+   * @param {{questionComponent, answerCompoent, symbolConfig, maxTrials, autoSlide, rewardForCorrect, rewardForWrong}} options
    */
   constructor(questions, options) {
     this.questions = questions;
@@ -124,6 +131,9 @@ class QuizContext {
   }
   get rememberAnswer() {
     return this.options.rememberAnswer;
+  }
+  get pumsaType() {
+    return this.options.symbolConfig.pumsa;
   }
   // get currentQuestion() {
   //   return this.currentQuestion;
@@ -137,13 +147,18 @@ class QuizContext {
  * quizMode - 학습('LEARNING') OR 테스트('QUIZ') 모드
  * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
  * section - secion seq
- * quizResource - 'S(sentence)' or 'W(word)'
+ * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
  *
  * @param {{quizMode,  answerType, section, quizResource }} quiz 옵션
  */
 const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
   const questionComponent = shallowRef(ScenePicView);
-  const answerComponent = answerComponents.get(answerType);
+  const answerCompName =
+    typeof answerType === "string" ? answerType : answerType.comp;
+  const answerComponent = answerComponents.get(answerCompName);
+  const symbolConfig = {
+    pumsa: answerType === "string" ? "follow" : answerType.pumsa,
+  };
 
   return new Promise((resolve) => {
     watch(
@@ -153,8 +168,13 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
         if (!sec) {
           return;
         }
-
-        const sentences = sec.sentences.filter(sentenceFilters[quizResource]);
+        /*
+         * 문장 또는 단어만 필터링하는 함수
+         * 단계별 학습에서는 [단어, 문장]을 따로 구분함,
+         * 교과서 학습에서는 단어가 따로 없고 모두 문장으로 처리함
+         */
+        const senFilter = sentenceFilters[quizResource];
+        const sentences = sec.sentences.filter(senFilter);
         const config = new QuizConfig(sentences);
         const questions = sentences.map(
           (sen, index) => new Question(config, index, sen)
@@ -163,6 +183,7 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
         const ctx = new QuizContext(questions, {
           questionComponent,
           answerComponent,
+          symbolConfig,
           maxTrials: quizMode === "LEARNING" ? -1 : 0,
           autoSlide: false,
           rewardForCorrect: quizMode === "LEARNING",

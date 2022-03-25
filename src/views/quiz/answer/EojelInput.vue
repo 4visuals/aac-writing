@@ -1,7 +1,11 @@
 <template>
   <div class="eojeol-list">
     <div class="ej" v-for="ej in eojeols" :key="ej.order">
-      <Symbol :ej="ej" @typed="validateAnswer" />
+      <Symbol
+        :ej="ej"
+        :pumsaType="quizContext.pumsaType"
+        @typed="validateAnswer"
+      />
     </div>
   </div>
 </template>

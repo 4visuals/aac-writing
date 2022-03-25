@@ -13,12 +13,11 @@ find dist/ -type f -name "*.html" -exec cp {} $DST_ROOT/templates \; \
   && cp dist/favicon.ico $DST_ROOT/static/ \
   && cp -R dist/js $DST_ROOT/static \
   && cp -R dist/css $DST_ROOT/static \
-  && cp -R dist/img $DST_ROOT/static
-
-# service-workers
-cp dist/*.js $DST_ROOT/static/
-cp dist/manifest.json $DST_ROOT/static/
-cp dist/robots.txt $DST_ROOT/static/
+  && cp -R dist/img $DST_ROOT/static \
+  && cp -R dist/media $DST_ROOT/static \
+  && cp dist/*.js $DST_ROOT/static/ \
+  && cp dist/manifest.json $DST_ROOT/static/ \
+  && cp dist/robots.txt $DST_ROOT/static/
 
 if [ $? -eq 0 ]; then
   rm -rf $DST_ROOT/templates_$PREFIX

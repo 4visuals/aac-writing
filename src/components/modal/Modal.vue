@@ -2,7 +2,11 @@
   <div class="modals">
     <div class="back" @click="fadeOut" v-if="visible"></div>
     <transition name="fade" @after-leave="hidden">
-      <div class="container modal-wrapper md" v-if="visible">
+      <div
+        class="container modal-wrapper"
+        :class="{ sm: width === 'sm' }"
+        v-if="visible"
+      >
         <slot></slot>
       </div>
     </transition>
@@ -13,13 +17,14 @@
 import { ref, onMounted } from "vue";
 export default {
   emits: ["hidden"],
-  setup(_, { emit }) {
+  props: ["width"],
+  setup(props, { emit }) {
     const fadeOut = () => {
       visible.value = false;
     };
     const hidden = () => emit("hidden");
     const visible = ref(false);
-
+    console.log(props);
     onMounted(() => {
       visible.value = true;
     });
@@ -69,5 +74,8 @@ export default {
   z-index: 1000;
   border-radius: 2vmin;
   overflow: hidden;
+  &.sm {
+    max-width: 560px;
+  }
 }
 </style>

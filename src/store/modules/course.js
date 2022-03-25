@@ -57,13 +57,15 @@ export default {
     levels: (state) => state.chapters["levels"],
     books: (state) => state.chapters["books"],
     sections: (state) => {
-      return state.chapters.levels.flatMap((chapter) => chapter.sections);
+      const courses = [...state.chapters.levels, ...state.chapters.books];
+      return courses.flatMap((chapter) => chapter.sections);
     },
   },
   mutations: {
     setChapter(state, args) {
-      const { prop, data } = args;
-      state.chapters[prop] = data;
+      const { data } = args;
+      state.chapters.levels = data.filter((chapter) => chapter.origin === "L");
+      state.chapters.books = data.filter((chapter) => chapter.origin === "B");
     },
   },
   actions: {

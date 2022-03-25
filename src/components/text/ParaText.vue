@@ -1,10 +1,10 @@
 <template>
-  <p :class="{ small: small }"><slot /></p>
+  <p :class="{ small: small, lg: lg }"><slot /></p>
 </template>
 
 <script>
 export default {
-  props: ["small"],
+  props: ["small", "lg"],
 };
 </script>
 
@@ -16,21 +16,30 @@ export default {
     &.small {
       font-size: 0.85rem;
     }
+    &.lg {
+      font-size: 1.25rem;
+    }
   }
 }
 @include tablet {
   p {
-    font-size: 2rem;
+    font-size: 2vmin;
     &.small {
-      font-size: 1.5rem;
+      font-size: 1.8vmin;
+    }
+    &.lg {
+      font-size: 2.5vmin;
     }
   }
 }
 @include desktop {
   p {
-    font-size: 2.5rem;
+    font-size: 2vmin;
     &.small {
-      font-size: 2rem;
+      font-size: 1.8vmin;
+    }
+    &.lg {
+      font-size: 2.5vmin;
     }
   }
 }

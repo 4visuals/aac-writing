@@ -1,10 +1,11 @@
 <template>
-  <div
-    class="scene"
-    :class="{ fillH: fillHeight }"
-    :style="{ 'background-image': `url(${scenePath()})` }"
-    @click="speak"
-  ></div>
+  <div class="scene" :class="{ fillH: fillHeight }">
+    <div
+      class="bg"
+      :style="{ 'background-image': `url(${scenePath()})` }"
+      @click="speak"
+    ></div>
+  </div>
 </template>
 
 <script>
@@ -19,12 +20,15 @@ export default {
   setup() {
     const store = useStore();
     let question = computed(() => store.getters["quiz/currentPara"]);
-    console.log(question);
-    // https://kr.object.ncloudstorage.com/aacweb/scenes/ec281e4a-fc10-4f07-aee1-ab16f85837b5.png
+    // console.log(question);
     const prefix = "https://kr.object.ncloudstorage.com/aacweb/scenes/";
-    const scenePath = () => prefix + question.value.data.scenePicture;
+    const scenePath = () => {
+      const path = question.value.data.scenePicture;
+      return path
+        ? prefix + question.value.data.scenePicture
+        : require("@/assets/volume-up.svg");
+    };
     const speak = () => {
-      console.log(question.value.data);
       tts.speak(question.value.data.sentence);
     };
     return {
@@ -38,11 +42,18 @@ export default {
 
 <style lang="scss" scoped>
 .scene {
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
   &.fillH {
     flex: 1 1 auto;
+  }
+  .bg {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex: 1 1 auto;
+    max-width: 400px;
   }
 }
 </style>

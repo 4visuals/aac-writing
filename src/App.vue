@@ -1,10 +1,10 @@
 <template>
-  <!-- <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div> -->
   <Background />
-  <div class="app-wrapper">
+  <div
+    class="app-wrapper"
+    ref="wrapperEl"
+    :style="`padding-top: ${topPadding}px`"
+  >
     <transition name="nav">
       <Nav v-if="route.path !== '/'" ref="nav" />
     </transition>
@@ -19,14 +19,12 @@
     </router-view>
   </div>
   <MenuWrapper v-if="menuVisible" />
-  <!-- <Transition name="left">
-  </Transition> -->
 </template>
 <script>
 import env from "@/service/env";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted, shallowRef } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
@@ -39,13 +37,32 @@ export default {
   setup() {
     console.log(env);
     const store = useStore();
-    let menuVisible = computed(() => store.getters["ui/leftVisible"]);
+    const menuVisible = computed(() => store.getters["ui/leftVisible"]);
+    const topPadding = computed(() => store.getters["ui/topPadding"]);
+
     const route = useRoute();
-    console.log(route.path, route.params);
+    console.log(route.path, route.params, topPadding);
     const tr = {
       name: "route",
     };
-    return { route, tr, menuVisible };
+
+    const wrapperEl = shallowRef(null);
+    const scrolling = (e) => {
+      const expanded = e.target.scrollTop < 40;
+      store.commit("ui/setNavSize", { expanded });
+    };
+    const option = {
+      passive: true,
+    };
+    onMounted(() => {
+      const el = wrapperEl.value;
+      el.addEventListener("scroll", scrolling, option);
+    });
+    onUnmounted(() => {
+      const el = wrapperEl.value;
+      el.removeEventListener("scroll", scrolling, option);
+    });
+    return { wrapperEl, route, tr, menuVisible, topPadding };
   },
 };
 </script>
@@ -100,17 +117,17 @@ export default {
 
 @include mobile {
   .app-wrapper {
-    padding-top: 5rem;
+    padding-top: 120px;
   }
 }
 @include tablet {
   .app-wrapper {
-    padding-top: 9rem;
+    padding-top: 120px;
   }
 }
 @include desktop {
   .app-wrapper {
-    padding-top: 8rem;
+    padding-top: 120px;
   }
 }
 </style>
