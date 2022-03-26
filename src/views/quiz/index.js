@@ -157,7 +157,7 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
     typeof answerType === "string" ? answerType : answerType.comp;
   const answerComponent = answerComponents.get(answerCompName);
   const symbolConfig = {
-    pumsa: answerType === "string" ? "follow" : answerType.pumsa,
+    pumsa: typeof answerType === "string" ? "follow" : answerType.pumsa,
   };
 
   return new Promise((resolve) => {
