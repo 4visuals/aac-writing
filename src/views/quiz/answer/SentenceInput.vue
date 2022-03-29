@@ -1,35 +1,40 @@
 <template>
   <div class="text-input">
     <AnswerField
+      ref="field"
       v-model:inputText="trial"
       :hiddenText="question.text"
       :inputVisible="!correct"
       @commit="checkAnswer"
+      @rest="() => (inputText = '')"
     />
-    <button class="btn-submit" @click="checkAnswer">
+    <button class="btn-submit" @click="checkAnswer" v-if="!question.isSolved">
       <SpanText>제출</SpanText>
     </button>
   </div>
 </template>
 
 <script>
-import storage from "@/service/storage";
+import { tts } from "@/components/tts";
 import { SpanText } from "@/components/text";
 import AnswerField from "@/components/quiz/AnswerField.vue";
 import { computed, ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
+import quizStore from "../quizStore";
 
 class SentenceQuestion {
   constructor(para) {
     this.para = para;
-    this.trials = storage.session.read(`para-${para.seq}`, []);
+    // this.trials = storage.session.read(`para-${para.seq}`, []);
   }
   get text() {
     return this.para.text;
   }
-  tryAnswer(trial) {
-    this.para.solved = this.para.text === trial;
-    this.trials.push(trial);
+  get isSolved() {
+    return this.para.solved;
+  }
+  tryAnswer(trial, elapsedTime) {
+    return this.para.addTrial(trial, elapsedTime);
   }
 }
 /**
@@ -42,8 +47,8 @@ export default {
   },
   props: ["quizContext"],
   setup(props) {
-    // const { quizContext } = props;
     const store = useStore();
+    const field = ref(null);
     const source = computed(() => store.getters["quiz/currentPara"]);
     /**
      * 학생이 입력한 문장
@@ -54,11 +59,37 @@ export default {
      */
     const question = ref(new SentenceQuestion(source.value));
     const correct = ref(false);
-    const checkAnswer = () => {
-      correct.value = question.value.text === trial.value;
-      // question.value.solved = correct.value;
-      question.value.tryAnswer(trial.value);
-      console.log(props.quizContext);
+
+    const showReward = (name) => {
+      store.commit("ui/showReward", {
+        name,
+        onClose: (passed) => {
+          if (passed) {
+            quizStore.moveNext();
+          } else {
+            field.value.focus();
+          }
+        },
+      });
+      new Audio(require(`@/assets/reward/${name}.mp3`)).play();
+    };
+    const checkAnswer = (e) => {
+      const { elapsedTime } = e;
+      const learngingMode = props.quizContext.isLearningMode();
+      const passed = question.value.tryAnswer(trial.value, elapsedTime);
+      correct.value = learngingMode ? passed : false;
+      if (learngingMode) {
+        if (passed) {
+          tts.speak(trial.value).then(() => {
+            showReward("passed");
+          });
+        } else {
+          showReward("failed");
+        }
+      } else {
+        // 퀴즈모드에서는 정답 상관없이 바로 다음 문제로 넘어감
+        quizStore.moveNext();
+      }
     };
     watch(
       () => source.value,
@@ -69,6 +100,7 @@ export default {
       }
     );
     return {
+      field,
       trial,
       correct,
       question,

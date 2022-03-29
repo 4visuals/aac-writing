@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { tts } from "@/components/tts";
 import Symbol from "./Symbol.vue";
 /**
  * 어절을 렌더링함 사용자는 어절에 정답을 입력함
@@ -70,16 +71,24 @@ export default {
       }
       return new Ej(ej, i);
     };
+
     const eojeols = ref(question.value.data.eojeols.map(createEojeolWrapper));
+    const moveToNextEojeol = (ej) => {
+      const nextEj = eojeols.value.find((elem) => elem.index === ej.index + 1);
+      ej.active = false;
+      if (nextEj) {
+        nextEj.active = true;
+      }
+    };
     const validateAnswer = (e) => {
       const { ej, value } = e;
       if (ej.tryAnswer(value)) {
-        const nextEj = eojeols.value.find(
-          (elem) => elem.index === ej.index + 1
-        );
-        ej.active = false;
-        if (nextEj) {
-          nextEj.active = true;
+        if (props.quizContext.isLearningMode()) {
+          tts.speak(ej.text).then(() => {
+            moveToNextEojeol(ej);
+          });
+        } else {
+          moveToNextEojeol(ej);
         }
       }
       console.log(ej.isSolved);

@@ -13,12 +13,20 @@ class Menu {
     this.visible = false;
   }
 }
+const rewards = {
+  passed: "passed",
+  failed: "failed",
+};
 class UI {
   constructor() {
     this.nav = { height: 120, expanded: true };
     this.topPadding = 120;
     this.bg = {
-      visible: false,
+      visible: true,
+    };
+    this.reward = {
+      name: false,
+      onClose: null,
     };
   }
   get backgroundVisible() {
@@ -26,6 +34,19 @@ class UI {
   }
   setBackgroundVisible(visible) {
     this.bg.visible = visible;
+  }
+  showReward(rewardSpec) {
+    const reward = rewards[rewardSpec.name];
+    this.reward.name = reward;
+    this.reward.onClose = rewardSpec.onClose;
+  }
+  hideReward() {
+    const { name, onClose } = this.reward;
+    if (onClose) {
+      onClose(name === "passed");
+    }
+    this.reward.name = null;
+    this.reward.onClose = null;
   }
 }
 
@@ -43,6 +64,7 @@ export default {
       return state.ui.backgroundVisible;
     },
     topPadding: (state) => state.ui.topPadding,
+    reward: (state) => state.ui.reward.name,
   },
   mutations: {
     showMenu(state) {
@@ -60,6 +82,12 @@ export default {
       if (topPadding) {
         state.ui.topPadding = topPadding;
       }
+    },
+    showReward(state, spec) {
+      state.ui.showReward(spec);
+    },
+    hideReward(state) {
+      state.ui.hideReward();
     },
   },
 };

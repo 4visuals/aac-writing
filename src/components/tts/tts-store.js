@@ -10,10 +10,12 @@ store.registerModule("tts", {
       pitch: 1,
       volume: 0.5,
     },
+    speaking: false,
   }),
   getters: {
     voiceKR: (state) => state.voices.get("ko-KR"),
     activeVoice: (state) => state.activeVoice,
+    speaking: (state) => state.speaking,
   },
   mutations: {
     installVoices: (state, { voices, index }) => {
@@ -30,6 +32,9 @@ store.registerModule("tts", {
     },
     setActiveVoice: (state, voice) => {
       state.activeVoice = voice;
+    },
+    speaking: (state, on) => {
+      state.speaking = on;
     },
   },
 });
@@ -67,6 +72,7 @@ const getVoiceConfig = () => {
 const setActiveVoice = (voice) => {
   store.commit("tts/setActiveVoice", voice);
 };
+const setSpeaking = (on) => store.commit("tts/speaking", on);
 const getVoicesByLang = (lang) => store.state.tts.voices.get(lang);
 const activeVoice = store.getters["tts/activeVoice"];
 export default {
@@ -75,4 +81,5 @@ export default {
   setActiveVoice,
   getVoicesByLang,
   activeVoice,
+  setSpeaking,
 };

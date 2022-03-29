@@ -31,6 +31,10 @@
       </div>
     </template>
     <div class="none" v-else>NONE</div>
+    <RewardView v-if="reward" />
+    <transition name="pop">
+      <TtsView v-if="speaking" />
+    </transition>
   </div>
 </template>
 
@@ -42,12 +46,15 @@ import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 import ActionIcon from "@/components/form/ActionIcon.vue";
 import Numbering from "@/views/quiz/Numbering.vue";
+import RewardView from "./RewardView.vue";
+import TtsView from "./TtsView.vue";
 export default {
-  components: { ActionIcon, Numbering },
+  components: { ActionIcon, Numbering, RewardView, TtsView },
   setup() {
     const store = useStore();
     const ctx = computed(() => store.state.quiz.quizContext);
-
+    const reward = computed(() => store.getters["ui/reward"]);
+    const speaking = computed(() => store.state.tts.speaking);
     const route = useRoute();
     console.log("[QUIZ]", route.params.seq);
     quiz.loadQuiz();
@@ -61,12 +68,16 @@ export default {
     });
 
     const moveQuiz = (dir) => {
-      // FIXME index에 접근하는 코드, 너무 구체적임. quizStore의 메소드를 호출해서 변경하도록 수정해야함
-      const index = ctx.value.currentQuestion.index + dir;
-      quizStore.setQuestionAt(index);
+      if (dir > 0) {
+        quizStore.moveNext();
+      } else {
+        quizStore.movePrev();
+      }
     };
     return {
       ctx,
+      reward,
+      speaking,
       moveQuiz,
     };
   },
@@ -78,6 +89,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
   .question {
     flex: 3 3;
     display: flex;
@@ -103,6 +115,14 @@ export default {
     // padding: 16px;
     justify-content: center;
     // overflow-x: auto;
+  }
+  .pop-enter-from,
+  .pop-leave-to {
+    opacity: 0;
+  }
+  .pop-enter-active,
+  .pop-leave-active {
+    transition: opacity 0.2s cubic-bezier(0, 0, 0.3, 1.33);
   }
 }
 </style>

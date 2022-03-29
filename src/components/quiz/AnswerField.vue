@@ -7,6 +7,7 @@
       @keydown.enter.stop="flush"
       @keydown.tab.stop.prevent="flush"
       @input="$emit('update:inputText', $event.target.value)"
+      @click="resetTime"
       ref="inputEl"
       :value="inputText"
     />
@@ -14,15 +15,30 @@
 </template>
 
 <script>
+import { ref } from "@vue/reactivity";
 export default {
   props: ["inputVisible", "hiddenText", "inputText"],
-  emits: ["commit", "update:inputText"],
-  setup(_, { emit }) {
+  emits: ["commit", "update:inputText", "reset"],
+  setup(props, { emit }) {
+    let startTime;
+    const inputEl = ref(null);
+    const focus = () => {
+      inputEl.value.focus();
+      inputEl.value.select();
+    };
     const flush = (e) => {
-      emit("commit", { e, value: e.target.value });
+      emit("commit", {
+        e,
+        value: e.target.value,
+        elapsedTime: new Date().getTime() - startTime,
+      });
+    };
+    const resetTime = () => {
+      startTime = new Date().getTime();
+      emit("update:inputText", "");
     };
 
-    return { flush };
+    return { inputEl, flush, focus, resetTime };
   },
 };
 </script>

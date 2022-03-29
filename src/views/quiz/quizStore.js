@@ -34,8 +34,14 @@ const startQuiz = (quizContext) => {
 };
 const getQuizContext = () => store.state.quiz.quizContext;
 const setQuestionAt = (index) => store.commit("quiz/setQuestion", index);
+const shiftBy = (offset) => {
+  const ctx = store.state.quiz.quizContext;
+  setQuestionAt(ctx.currentQuestion.index + offset);
+};
 export default {
   startQuiz,
   getQuizContext,
   setQuestionAt,
+  moveNext: () => shiftBy(1),
+  movePrev: () => shiftBy(-1),
 };

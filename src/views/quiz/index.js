@@ -17,14 +17,14 @@ answerComponents.set("SEN", shallowRef(SentenceInput));
  */
 const sentenceFilters = {
   S: (sen) => sen.eojeols.length > 1,
-  W: (sen) => sen.eojeols.length === 0,
+  W: (sen) => sen.eojeols.length === 1,
   A: () => true,
 };
 /**
  * 퀴즈 질문
  */
 class Question {
-  constructor(quizConfig, index, question) {
+  constructor(quizConfig, index, sentence) {
     this.config = quizConfig;
     this.solved = false;
     /**
@@ -34,11 +34,11 @@ class Question {
     /**
      * 질문 리소스(문장 단어 등)
      */
-    this.data = question;
+    this.data = sentence;
     /**
      * 답변 리소스. 정답이 가장 마지막 element에 해당함
      */
-    this.responses = [];
+    this.trials = [];
     this.data.eojeols.forEach((ej) => {
       // trials: 시도한 입력들
       // solved: 풀었는지를 나타냄
@@ -67,8 +67,30 @@ class Question {
   isLast() {
     return this.index + 1 === this.config.quizLength;
   }
+  isWord() {
+    return this.data.type === "W";
+  }
+  isSentence() {
+    return this.data.type === "S";
+  }
+  addTrial(value, elapsedTime) {
+    // 사용자가 입력한 값
+    const correct = this.text === value;
+    this.trials.push({
+      type: "sen",
+      seq: this.data.seq,
+      correct,
+      value,
+      elapsedTime,
+    });
+    this.solved = correct;
+    return correct;
+  }
   get text() {
     return this.data.sentence.trim();
+  }
+  get eojeols() {
+    return this.data.eojeols;
   }
 }
 class QuizConfig {
@@ -80,16 +102,7 @@ class QuizConfig {
   }
 }
 /**
- * new QuizContext(questions, {
-      questionComponent,
-      answerComponent,
-      answerType,
-      maxTrials: quizMode === "LEARNING" ? -1 : 0,
-      autoSlide: false,
-      showPenguin: quizMode === "LEARNING",
-    });
-  
-    [OPTIONS]
+  [OPTIONS]
   ### questionComponent:VueComponent
   질문을 렌더링하는 컴포넌트
   
@@ -100,6 +113,8 @@ class QuizConfig {
   문장 학습에서 어절의 품사를 그리는 방식
   * 'follow' - 어절의 품사 타입(what, who 등)에 맞는 그림을 선택
   * 기타 - 'what', 'who'등 지정한 그림을 선택
+
+  ### mode:string('LEARNGING', 'QUIZ')
 
   ### maxTrials:int(-1, 0, positive)
   정답을 입력할때까지 시도할 수 있는 횟수.
@@ -134,6 +149,12 @@ class QuizContext {
   }
   get pumsaType() {
     return this.options.symbolConfig.pumsa;
+  }
+  isLearningMode() {
+    return this.options.mode === "LEARNING";
+  }
+  isQuizMode() {
+    return (this.options.mode = "QUIZ");
   }
   // get currentQuestion() {
   //   return this.currentQuestion;
@@ -184,6 +205,7 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
           questionComponent,
           answerComponent,
           symbolConfig,
+          mode: quizMode,
           maxTrials: quizMode === "LEARNING" ? -1 : 0,
           autoSlide: false,
           rewardForCorrect: quizMode === "LEARNING",

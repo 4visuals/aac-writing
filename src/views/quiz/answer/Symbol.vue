@@ -78,6 +78,8 @@ export default {
     width: 80px;
     height: 80px;
     background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
   }
   .desc {
     font-size: 2.5rem;
@@ -94,6 +96,7 @@ export default {
       left: 0;
       right: 0;
       bottom: 0;
+      width: 100%; // 없으면 firefox에서 깨짐
       color: black;
       position: absolute;
       padding: 3px;

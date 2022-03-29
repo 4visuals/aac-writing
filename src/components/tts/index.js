@@ -17,22 +17,33 @@ class TTS {
     syn.pitch = config.pitch;
     syn.volume = config.volume;
     syn.voice = config.activeVoice;
-    syn.onstart = (e) => {
-      console.log("[SPEECH] START", e);
-    };
-    syn.on;
-    syn.onend = (e) => {
-      console.log("[SPEECH] DONE", e);
-    };
-    syn.onboundary = (e) => {
-      const { charIndex, currentTarget } = e;
-      const { text } = currentTarget;
-      console.log("[BOUND]", text.substring(charIndex), e);
-    };
-    syn.onmark = (e) => {
-      console.log("[MARK]", e);
-    };
-    speechSynthesis.speak(syn);
+    return new Promise((done, failed) => {
+      syn.onstart = () => {
+        ttsStore.setSpeaking(true);
+        // console.log("[SPEECH] START", e);
+      };
+      syn.on;
+      syn.onend = (e) => {
+        ttsStore.setSpeaking(false);
+        // console.log("[SPEECH] DONE", e);
+        done(text, e);
+      };
+      /*
+      syn.onboundary = (e) => {
+        const { charIndex, currentTarget } = e;
+        const { text } = currentTarget;
+        // console.log("[BOUND]", text.substring(charIndex), e);
+      };
+      syn.onmark = (e) => {
+        console.log("[MARK]", e);
+      };
+      */
+      syn.onerror = (e) => {
+        ttsStore.setSpeaking(false);
+        failed(e);
+      };
+      speechSynthesis.speak(syn);
+    });
   }
 }
 const tts = new TTS();

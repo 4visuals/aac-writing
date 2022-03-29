@@ -107,7 +107,11 @@ export default {
     const startSentenceQuiz = (quizMode, answerType) => {
       console.log(wordMode.value);
       const sectionSeq = props.cate.seq;
-      const quizResource = "S";
+      const quizResource = wordMode.value ? "W" : "S";
+      /*
+       * 단어 학습인 경우 무조건 받아쓰기 모드
+       */
+      answerType = quizResource === "W" ? "SEN" : answerType;
       /*
       quiz
         .loadSentenceQuiz({
