@@ -19,39 +19,6 @@
           :height="300"
           :resolveUrl="(rss) => path.aacweb.scene(rss)"
         />
-        <!--         
-        <div class="chars">
-          <div class="char-body">
-            <Char
-              type="chosung"
-              :active="isSelected('cho', c)"
-              :ch="c"
-              v-for="(c, idx) in chosung"
-              :key="idx"
-            />
-          </div>
-        </div>
-        <div class="chars">
-          <div class="char-body">
-            <Char
-              type="jungsung"
-              :active="isSelected('jung', c)"
-              :ch="c"
-              v-for="(c, idx) in jungsung"
-              :key="idx"
-            />
-          </div>
-        </div>
-        <div class="chars">
-          <div class="char-body">
-            <Char
-              type="jongsung"
-              :ch="c"
-              v-for="(c, idx) in jongsung"
-              :key="idx"
-            />
-          </div>
-        </div> -->
       </div>
     </div>
     <div class="footer">
@@ -95,7 +62,6 @@ export default {
   },
   setup(props) {
     const wordMode = ref(true);
-    console.log("[cate]", props.cate, props.theme);
     const title = () => {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
@@ -105,44 +71,35 @@ export default {
      * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
     const startSentenceQuiz = (quizMode, answerType) => {
-      console.log(wordMode.value);
       const sectionSeq = props.cate.seq;
       const quizResource = wordMode.value ? "W" : "S";
       /*
        * 단어 학습인 경우 무조건 받아쓰기 모드
        */
       answerType = quizResource === "W" ? "SEN" : answerType;
-      /*
+
       quiz
-        .loadSentenceQuiz({
+        .prepareQuiz({
           quizMode,
           answerType,
           section: sectionSeq,
           quizResource,
         })
-        .then((ctx) => {
-          console.log("[LOADED]", ctx);
+        .then(() => {
           router.push(`/quiz/${sectionSeq}`);
+        })
+        .catch((e) => {
+          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
         });
-      */
-      quiz.prepareQuiz({
-        quizMode,
-        answerType,
-        section: sectionSeq,
-        quizResource,
-      });
-      router.push(`/quiz/${sectionSeq}`);
     };
-    const changeMode = (checked) => {
-      console.log("[CHECKED]", checked);
-    };
+
     const sourceText = () => (wordMode.value ? "낱말" : "문장");
+
     return {
       path,
       title,
       wordMode,
       startSentenceQuiz,
-      changeMode,
       sourceText,
       // chosung,
       // jungsung,

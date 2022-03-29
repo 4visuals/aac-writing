@@ -247,11 +247,26 @@ const loadQuiz = () => {
   return loadSentenceQuiz(quizSpec);
 };
 const prepareQuiz = ({ quizMode, answerType, section, quizResource }) => {
-  storage.session.write("quizSpec", {
-    quizMode,
-    answerType,
-    section,
-    quizResource,
+  const sections = store.getters["course/sections"];
+  const sec = sections.find((sec) => sec.seq === section);
+  return new Promise((resolve, reject) => {
+    if (!sec) {
+      reject("NO_SECTION");
+      return;
+    }
+    const senFilter = sentenceFilters[quizResource];
+    const sentences = sec.sentences.filter(senFilter);
+    if (sentences.length === 0) {
+      reject({ cause: "NO_QUIZ", resource: quizResource });
+      return;
+    }
+    storage.session.write("quizSpec", {
+      quizMode,
+      answerType,
+      section,
+      quizResource,
+    });
+    resolve();
   });
 };
 export { Question, QuizContext, QuizView };
