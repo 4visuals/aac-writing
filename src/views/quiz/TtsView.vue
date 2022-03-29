@@ -47,7 +47,7 @@ export default {
 
 <style lang="scss" scoped>
 .tts-wrapper {
-  background-color: #dfdfdf4d;
+  background-color: #ffffff4d;
   position: absolute;
   top: 0;
   left: 0;
