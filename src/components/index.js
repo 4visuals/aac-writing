@@ -1,3 +1,4 @@
 import Modal from "./modal/Modal.vue";
 import Char from "./Char.vue";
-export { Modal, Char };
+import Loading from "./Loading.vue";
+export { Modal, Char, Loading };

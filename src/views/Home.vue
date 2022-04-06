@@ -4,6 +4,7 @@
     <h1 class="main title">받아쓰기</h1>
     <div class="menu">
       <AacButton text="시작" theme="pink" @click="moveTo('/book')" />
+      <!-- <OAuthButton /> -->
       <!-- <AacButton
         text="단계별 받아쓰기"
         theme="pink"

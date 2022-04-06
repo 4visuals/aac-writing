@@ -1,5 +1,11 @@
-import { GET } from "./request";
+import { GET, POST } from "./request";
 
+const user = {
+  membership: (vendor, type, token) =>
+    POST(`/user/membership`, { vendor, type, token }),
+  join: () => POST(`/user/join`),
+  login: () => POST(`/user/login`),
+};
 const chapter = {
   list: (origin) => GET(`/chapters/origin/${origin}`),
 };
@@ -16,4 +22,4 @@ const section = {
 
 export { section };
 
-export default { chapter, section };
+export default { user, chapter, section };

@@ -1,9 +1,17 @@
 import axios from "axios";
 import env from "@/service/env";
+import store from "@/store";
 
 const host = env.BACKEND_HOST;
 axios.defaults.baseURL = `${host}/api`;
 
+axios.interceptors.request.use((config) => {
+  const token = store.state.user.jwt;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 axios.interceptors.response.use(
   (res) => res,
   (e) => {

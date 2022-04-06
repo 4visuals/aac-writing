@@ -1,20 +1,30 @@
 <template>
   <div class="red nav-bar">
-    <ActionIcon class="btn-menu" icon="menu" @click="openMenu" />
+    <ActionIcon class="btn-menu left" icon="menu" @click="openMenu" />
+    <Logo
+      class="btn-menu right"
+      :imagePath="membership && membership.image"
+      :vendor="membership ? membership.vendor : 'guest'"
+      size="sm"
+    />
   </div>
 </template>
 
 <script>
+import Logo from "@/components/oauth/Logo.vue";
 import { useStore } from "vuex";
 import { ActionIcon } from "@/components/form";
+import { computed } from "@vue/runtime-core";
 // import router from "@/router";
 
 export default {
   components: {
     ActionIcon,
+    Logo,
   },
   setup() {
     const store = useStore();
+    const membership = computed(() => store.state.user.membership);
     const openMenu = () => {
       // console.log("[back]", router);
       // router.back();
@@ -22,6 +32,7 @@ export default {
     };
     return {
       openMenu,
+      membership,
     };
   },
 };
@@ -39,8 +50,13 @@ export default {
   .btn-menu {
     position: fixed;
     top: 16px;
-    left: 16px;
     z-index: 75;
+    &.left {
+      left: 16px;
+    }
+    &.right {
+      right: 16px;
+    }
   }
 }
 @include mobile {

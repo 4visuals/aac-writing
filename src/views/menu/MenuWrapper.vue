@@ -5,9 +5,15 @@
     </Transition>
     <Transition name="slider" @after-leave="store.commit('ui/hideMenu')">
       <div class="menu-body" v-if="slider">
+        <MenuSection>
+          <div class="menu-item">
+            <UserProfile />
+          </div>
+        </MenuSection>
         <MenuSection title="목소리">
-          <div class="menu-item" @click="showTtsConfig"></div>
-          <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
+          <div class="menu-item">
+            <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
+          </div>
         </MenuSection>
       </div>
     </Transition>
@@ -21,22 +27,26 @@
 
 <script>
 import { useStore } from "vuex";
-import { computed, ref, shallowRef } from "vue";
+import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
 import Flag from "@/components/Flag.vue";
 import { TtsConfig, VoiceElem } from "@/components/tts";
 import { Modal } from "@/components";
+// import OAuthButton2 from "@/components/oauth/OAuthButton2.vue";
+import UserProfile from "./UserProfile.vue";
 export default {
   components: {
     Flag,
     MenuSection,
     VoiceElem,
     Modal,
+    UserProfile,
   },
   setup() {
     const store = useStore();
     const slider = ref(false);
     const modalComponent = shallowRef(null);
+    // const loginButton = shallowRef(null);
     const hide = () => {
       // store.commit("ui/hideMenu");
       slider.value = false;
@@ -52,6 +62,10 @@ export default {
     const hideModal = () => {
       modalComponent.value = null;
     };
+    const showLoginButton = () => {};
+    onMounted(() => {
+      // loginButton.value = OAuthButton;
+    });
     return {
       store,
       hide,
@@ -60,6 +74,7 @@ export default {
       showTtsConfig,
       hideModal,
       modalComponent,
+      showLoginButton,
     };
   },
 };
@@ -84,7 +99,7 @@ export default {
   }
   .menu-body {
     height: 100%;
-    width: 200px;
+    width: 240px;
     background-color: white;
     position: relative;
     box-shadow: 2px 0 6px #0000004d;

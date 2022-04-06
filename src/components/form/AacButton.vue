@@ -1,6 +1,6 @@
 <template>
   <div class="form-elem" :class="{ inline }">
-    <button type="button" :class="theme || 'gray'" @click="play">
+    <button type="button" :class="`${themeValue()} ${size}`" @click="play">
       {{ text }}
     </button>
   </div>
@@ -9,14 +9,16 @@
 <script>
 import clickSound from "@/assets/click.wav";
 export default {
-  props: ["text", "inline", "theme"],
-  setup() {
+  props: ["text", "inline", "theme", "size"],
+  setup(props) {
     // console.log(props);
     const play = () => {
       const audio = new Audio(clickSound);
       audio.play();
     };
-    return { play };
+    const themeValue = () => props.theme || "gray";
+
+    return { play, themeValue };
   },
 };
 </script>
@@ -33,7 +35,7 @@ export default {
     background-color: transparent;
     border: none;
     border-radius: 4rem;
-    padding: 1rem 2rem;
+
     &.pink {
       @include pink($shadow: true);
     }
@@ -53,17 +55,29 @@ export default {
 
   @include mobile {
     button {
-      font-size: 3vmin;
+      font-size: 3.2vmin;
+      padding: 0.6rem 1.2rem;
+      &.sm {
+        font-size: 2.4vmin;
+      }
     }
   }
   @include tablet {
     button {
-      font-size: 3vmin;
+      font-size: 2.6vmin;
+      padding: 0.6rem 1.2rem;
+      &.sm {
+        font-size: 2.4vmin;
+      }
     }
   }
   @include desktop {
     button {
-      font-size: 3vmin;
+      font-size: 2.6vmin;
+      padding: 0.6rem 1.2rem;
+      &.sm {
+        font-size: 2.4vmin;
+      }
     }
   }
 }
