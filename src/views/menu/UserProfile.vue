@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import env from "@/service/env";
 import Logo from "@/components/oauth/Logo.vue";
 import JoinView from "@/views/user/JoinView.vue";
 import { ParaText } from "@/components/text";
@@ -51,8 +52,7 @@ export default {
 
     const { google } = window;
     const client = google.accounts.oauth2.initTokenClient({
-      client_id:
-        "482880627778-rt7oi0of0fppg08opa0ob8fgqiuepain.apps.googleusercontent.com",
+      client_id: env.GOOGLE_CLIENT_ID,
       scope:
         "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
       ux_mode: "popup",

@@ -51,8 +51,7 @@ export default {
     onMounted(() => {
       const { google } = window;
       google.accounts.id.initialize({
-        client_id:
-          "482880627778-rt7oi0of0fppg08opa0ob8fgqiuepain.apps.googleusercontent.com",
+        client_id: env.GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,
       });
       renderGoogleButton();
