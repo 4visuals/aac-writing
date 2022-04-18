@@ -14,5 +14,9 @@ export default {
 <style lang="scss" scoped>
 .menu-section {
   padding: 8px 16px;
+  > h3 {
+    font-size: 1.2rem;
+    user-select: none;
+  }
 }
 </style>

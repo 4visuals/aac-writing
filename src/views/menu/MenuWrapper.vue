@@ -10,6 +10,16 @@
             <UserProfile />
           </div>
         </MenuSection>
+        <MenuSection v-if="isTeacher" title="수강증">
+          <div class="menu-item">
+            <LicenseMenu @clicked="showLicenseConfig" />
+          </div>
+        </MenuSection>
+        <MenuSection v-if="isTeacher" title="학생">
+          <div class="menu-item">
+            <StudentMenu />
+          </div>
+        </MenuSection>
         <MenuSection title="목소리">
           <div class="menu-item">
             <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
@@ -19,7 +29,7 @@
     </Transition>
     <teleport to="body" v-if="modalComponent">
       <Modal ref="modal" @hidden="hideModal">
-        <component :is="modalComponent" />
+        <component :is="modalComponent" v-bind="{ ...modalArgs }" />
       </Modal>
     </teleport>
   </div>
@@ -29,8 +39,11 @@
 import { useStore } from "vuex";
 import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
+import LicenseMenu from "./LicenseMenu.vue";
+import StudentMenu from "./StudentMenu.vue";
 import Flag from "@/components/Flag.vue";
 import { TtsConfig, VoiceElem } from "@/components/tts";
+import { LicenseConfigView } from "@/components/admin";
 import { Modal } from "@/components";
 // import OAuthButton2 from "@/components/oauth/OAuthButton2.vue";
 import UserProfile from "./UserProfile.vue";
@@ -41,11 +54,17 @@ export default {
     VoiceElem,
     Modal,
     UserProfile,
+    LicenseMenu,
+    StudentMenu,
+    LicenseConfigView,
   },
   setup() {
     const store = useStore();
     const slider = ref(false);
     const modalComponent = shallowRef(null);
+    const modalArgs = ref(null);
+    const activeVoice = computed(() => store.getters["tts/activeVoice"]);
+    const isTeacher = computed(() => store.getters["user/isTeacher"]);
     // const loginButton = shallowRef(null);
     const hide = () => {
       // store.commit("ui/hideMenu");
@@ -55,12 +74,16 @@ export default {
       slider.value = true;
     }, 0);
 
-    const activeVoice = computed(() => store.getters["tts/activeVoice"]);
     const showTtsConfig = () => {
       modalComponent.value = TtsConfig;
     };
     const hideModal = () => {
       modalComponent.value = null;
+      modalArgs.value = null;
+    };
+    const showLicenseConfig = (license) => {
+      modalComponent.value = LicenseConfigView;
+      modalArgs.value = { license };
     };
     const showLoginButton = () => {};
     onMounted(() => {
@@ -68,12 +91,15 @@ export default {
     });
     return {
       store,
+      isTeacher,
       hide,
       slider,
       activeVoice,
       showTtsConfig,
+      showLicenseConfig,
       hideModal,
       modalComponent,
+      modalArgs,
       showLoginButton,
     };
   },

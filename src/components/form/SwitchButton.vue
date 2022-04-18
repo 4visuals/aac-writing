@@ -55,7 +55,7 @@ export default {
     flex: 1 1 auto;
     position: relative;
     pointer-events: none;
-    padding: 0.5rem 1.2rem;
+    padding: 0.5rem 1rem;
   }
   label {
     position: absolute;

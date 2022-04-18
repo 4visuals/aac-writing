@@ -2,19 +2,28 @@
 /* eslint-disable no-console */
 
 import { register } from "register-service-worker";
+import store from "./store";
+
 // import { registerRoute } from "workbox-routing";
 // import { StaleWhileRevalidate } from "workbox-strategies";
-
-if (process.env.NODE_ENV === "production") {
+console.log(
+  "[SW] regsiter: ",
+  process.env.NODE_ENV,
+  `${process.env.BASE_URL}service-worker.js`
+);
+if (process.env.NODE_ENV !== "development") {
   register(`${process.env.BASE_URL}service-worker.js`, {
     ready() {
       console.log(
-        "App is being served from cache by a service worker.\n" +
+        "[SW:ready] App is being served from cache by a service worker.\n" +
           "For more details, visit https://goo.gl/AFskqB"
       );
+      // load data here
+      store.dispatch("course/loadChapter", { origin: "L" });
+      store.dispatch("user/autoLogin");
     },
     registered() {
-      console.log("Service worker has been registered.");
+      console.log("[SW:registered] Service worker has been registered.");
     },
     cached() {
       console.log("Content has been cached for offline use.");
@@ -27,11 +36,14 @@ if (process.env.NODE_ENV === "production") {
     },
     offline() {
       console.log(
-        "No internet connection found. App is running in offline mode."
+        "[SW:offline] No internet connection found. App is running in offline mode."
       );
     },
     error(error) {
-      console.error("Error during service worker registration:", error);
+      console.error(
+        "[SW:error] Error during service worker registration:",
+        error
+      );
     },
   });
 
@@ -41,4 +53,7 @@ if (process.env.NODE_ENV === "production") {
     return true;
   };
   // registerRoute(aacDictRequest, new StaleWhileRevalidate());
+} else {
+  store.dispatch("course/loadChapter", { origin: "L" });
+  store.dispatch("user/autoLogin");
 }

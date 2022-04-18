@@ -3,6 +3,7 @@
     <div class="jumbo">
       <div class="title">
         <h3>{{ title() }}</h3>
+        <LicenseComboBox />
         <SwitchButton
           v-model:selected="wordMode"
           onText="낱말"
@@ -41,16 +42,18 @@
 
 <script>
 import { path } from "@/service/util";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import router from "@/router";
 import { ParaText } from "@/components/text";
 import { SwitchButton } from "@/components/form";
 // import { Char } from "@/components";
 import { AacButton } from "@/components/form";
 import { Slide } from "@/components/slide";
+import { LicenseComboBox } from "@/components/admin";
 
 // import api from "@/service/api";
 import quiz from "@/views/quiz";
+import { useStore } from "vuex";
 export default {
   props: ["cate", "theme"],
   components: {
@@ -58,9 +61,12 @@ export default {
     ParaText,
     SwitchButton,
     Slide,
+    LicenseComboBox,
     // Char,
   },
   setup(props) {
+    const store = useStore();
+    const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const wordMode = ref(true);
     const title = () => {
       const { level } = props.cate;
@@ -71,6 +77,10 @@ export default {
      * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
     const startSentenceQuiz = (quizMode, answerType) => {
+      if (!activeLicense.value) {
+        alert("학생을 선택해주세요");
+        return;
+      }
       const sectionSeq = props.cate.seq;
       const quizResource = wordMode.value ? "W" : "S";
       /*
@@ -84,6 +94,7 @@ export default {
           answerType,
           section: sectionSeq,
           quizResource,
+          license: activeLicense.value.seq,
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
@@ -101,10 +112,6 @@ export default {
       wordMode,
       startSentenceQuiz,
       sourceText,
-      // chosung,
-      // jungsung,
-      // jongsung,
-      // isSelected,
     };
   },
 };
@@ -123,6 +130,7 @@ $padding: 16px;
   .jumbo {
     .title {
       display: flex;
+      column-gap: 8px;
       h3 {
         flex: 1 1 auto;
       }
@@ -135,26 +143,26 @@ $padding: 16px;
   }
   @include tablet {
     h3 {
-      font-size: 3rem;
+      font-size: 2.5rem;
     }
   }
   @include desktop {
     h3 {
-      font-size: 4rem;
+      font-size: 2.5rem;
     }
   }
   &.pink {
     .jumbo {
       background-color: var(--aac-color-pink-400);
       color: var(--aac-color-pink-900);
-      padding: 24px $padding;
+      padding: 16px $padding;
     }
   }
   &.green {
     .jumbo {
       background-color: var(--aac-color-green-400);
       color: var(--aac-color-green-900);
-      padding: 24px $padding;
+      padding: 16px $padding;
     }
   }
   .body {

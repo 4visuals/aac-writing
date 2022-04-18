@@ -17,7 +17,11 @@
       <AacButton text="가입" theme="blue" @click="doJoin" />
       <AacButton text="닫기" theme="gray" />
     </div>
-    <Loading v-if="pending" />
+    <Loading
+      v-if="pending"
+      :pending="pending"
+      @close="() => (pending = null)"
+    />
   </div>
 </template>
 
@@ -40,14 +44,15 @@ export default {
     const store = useStore();
     const pending = ref(null);
     const doJoin = () => {
-      pending.value = "LOADING";
+      pending.value = { state: "LOADING" };
       store
         .dispatch("user/join")
         .then(() => {
           pending.value = null;
         })
-        .catch(() => {
-          pending.value = "ERROR";
+        .catch((err) => {
+          pending.value = { state: "ERROR", error: true, msg: err.desc };
+          console.log("[error", err);
         });
     };
     return {

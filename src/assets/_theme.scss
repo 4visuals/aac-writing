@@ -16,15 +16,20 @@
   --aac-color-red-700: #f53c20;
   --aac-color-red-900: #881200;
 
+  --aac-color-gray-200: #efefef;
+  --aac-color-gray-400: #bdbdbd;
+  --aac-color-gray-700: #707070;
+  --aac-color-gray-900: #202020;
+
   --aac-color-green-100: #7d805d;
   --aac-color-green-400: #dde776;
   --aac-color-green-700: #d4e250;
   --aac-color-green-900: #20450a;
 
   --aac-color-blue-100: #6e7199;
-  --aac-color-blue-200: #f0f8ff;
+  --aac-color-blue-200: rgba(47, 137, 255, 0.1);
   --aac-color-blue-400: #dff0ff;
-  --aac-color-blue-700: #1a82e2;
+  --aac-color-blue-700: #1a73e8; // #1a82e2;
   --aac-color-blue-900: #123f94;
 
   --aac-color-orange-100: #cfc1a1;
@@ -41,7 +46,18 @@
   background-color: var(--aac-color-pink-200);
   color: var(--aac-color-pink-700);
   @if $shadow {
-    box-shadow: 0 0 0 2px var(--aac-color-pink-700);
+    // box-shadow: 0 0 0 2px var(--aac-color-pink-700);
+    border: 1px solid var(--aac-color-pink-700);
+  }
+  &:active {
+    background-color: var(--aac-color-pink-400);
+  }
+}
+@mixin pink2($shadow: true) {
+  background-color: var(--aac-color-pink-400);
+  color: var(--aac-color-pink-900);
+  @if $shadow {
+    border: 1px solid var(--aac-color-pink-700);
   }
   &:active {
     background-color: var(--aac-color-pink-400);
@@ -52,7 +68,7 @@
   background-color: var(--aac-color-blue-200);
   color: var(--aac-color-blue-700);
   @if $shadow {
-    box-shadow: 0 0 0 2px var(--aac-color-blue-700);
+    border: 1px solid var(--aac-color-blue-700);
   }
   &:active {
     background-color: var(--aac-color-blue-400);
@@ -63,7 +79,7 @@
   background-color: var(--aac-color-orange-200);
   color: var(--aac-color-orange-700);
   @if $shadow {
-    box-shadow: 0 0 0 2px var(--aac-color-orange-700);
+    border: 1px solid var(--aac-color-orange-700);
   }
   &:active {
     background-color: var(--aac-color-orange-400);
@@ -74,9 +90,19 @@
   background-color: var(--aac-color-red-200);
   color: var(--aac-color-red-700);
   @if $shadow {
-    box-shadow: 0 0 0 2px var(--aac-color-red-700);
+    border: 1px solid var(--aac-color-red-700);
   }
   &:active {
     background-color: var(--aac-color-red-400);
+  }
+}
+@mixin gray($shadow: true) {
+  background-color: var(--aac-color-gray-200);
+  color: var(--aac-color-gray-700);
+  @if $shadow {
+    border: 1px solid var(--aac-color-gray-700);
+  }
+  &:active {
+    background-color: var(--aac-color-gray-400);
   }
 }

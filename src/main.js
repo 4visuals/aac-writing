@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import { Modal, ModalHeader } from "./components";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
@@ -13,11 +14,18 @@ app.use(store).use(router).use(GooglgAuth, {
   scope: "profile email",
   prompt: "consent",
 });
+/**
+ * installing global components
+ */
+app.component("Modal", Modal).component("ModalHeader", ModalHeader);
+/**
+ * inject google oauth helper
+ */
 app.provide("$gAuth", app.config.globalProperties.$gAuth);
 app.mount("#app");
 app.config.errorHandler = (err, instance) => {
   console.error(err);
   console.error(instance);
 };
-store.dispatch("course/loadChapter", { origin: "L" });
-store.dispatch("user/autoLogin");
+// store.dispatch("course/loadChapter", { origin: "L" });
+// store.dispatch("user/autoLogin");

@@ -4,10 +4,10 @@
     :style="`--bname-bgc: ${theme.bgc}; --bname-fgc: ${theme.color}`"
     @click="showCourseMenu"
   >
-    <h3 @click="showCourseMenu">
+    <h5 @click="showCourseMenu">
       <span>{{ text }}</span
       ><ActionIcon icon="expand_more" />
-    </h3>
+    </h5>
   </div>
   <teleport to="body" v-if="modalVisible">
     <Modal :width="'sm'" @hidden="hideModal">
@@ -75,7 +75,7 @@ export default {
 
 <style lang="scss" scoped>
 .brand-name {
-  h3 {
+  h5 {
     display: inline-flex;
     align-items: center;
     background-color: var(--bname-bgc);

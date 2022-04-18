@@ -10,6 +10,7 @@ console.log("[WORKBOX]", workbox.routing);
 workbox.core.setCacheNameDetails({ prefix: "aac-write-test" });
 
 console.log("[SW] ready");
+self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
@@ -38,8 +39,34 @@ workbox.routing.registerNavigationRoute(
 // ref: https://gaute.app/dev-blog/workbox-in-vue
 console.log("registering route");
 workbox.routing.registerRoute(
-  /.+\/chapters.+/,
+  /\/api\/chapters\/origin\/L/,
   new workbox.strategies.StaleWhileRevalidate({
     cachName: "aac-write-test",
+  })
+);
+workbox.routing.registerRoute(
+  /\/api\/user\/membership/,
+  new workbox.strategies.StaleWhileRevalidate({
+    cachName: "aac-write-test",
+  })
+);
+// workbox.routing.registerRoute(
+//   /\/api\/user\/login/,
+//   new workbox.strategies.StaleWhileRevalidate({
+//     cachName: "aac-write-test",
+//   }),
+//   "POST"
+// );
+
+workbox.routing.registerRoute(
+  (v) => {
+    console.log("[v]", v);
+    return (
+      v.url.origin === "https://fonts.googleapis.com" ||
+      v.url.origin === "https://fonts.gstatic.com"
+    );
+  },
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: "google-fonts",
   })
 );

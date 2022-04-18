@@ -33,3 +33,25 @@ body {
   border-radius: 4px;
   background-color: rgb(148, 148, 148);
 }
+
+button {
+  &.nude {
+    border: none;
+    background-color: transparent;
+    outline: none;
+  }
+}
+
+.effect {
+  &.pressed {
+    &:active {
+      transform: translate(1px, 1px);
+    }
+  }
+}
+.mgt-8px {
+  margin-top: 8px;
+}
+.mgb-8px {
+  margin-bottom: 8px;
+}

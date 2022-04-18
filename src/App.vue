@@ -5,9 +5,8 @@
     ref="wrapperEl"
     :style="`padding-top: ${topPadding}px`"
   >
-    <transition name="nav">
-      <Nav v-if="route.path !== '/'" ref="nav" />
-    </transition>
+    <Nav v-if="route.path !== '/'" ref="nav" />
+
     <router-view v-slot="{ Component }">
       <transition
         :name="tr.name"
@@ -100,7 +99,7 @@ export default {
 
   .nav-enter-from {
     opacity: 0;
-    transform: translateY(-200px);
+    transform: translateY(0px);
   }
   .nav-enter-active {
     transition: all $dur ease-out;
@@ -108,7 +107,7 @@ export default {
 
   .nav-leave-to {
     opacity: 0;
-    transform: translateY(-200px);
+    transform: translateY(0px);
   }
   .nav.leave-active {
     transition: tranform $dur ease-in;
