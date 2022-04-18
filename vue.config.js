@@ -16,12 +16,16 @@ module.exports = {
     port: 5000,
   },
   pwa: {
-    name: "Aac Dictation",
+    name: "그림한글 받아쓰기",
     themeColor: "#4DBA87",
     msTileColor: "#000000",
     appleMobileWebAppCapable: "yes",
     appleMobileWebAppStatusBarStyle: "black",
-
+    manifestOptions: {
+      background_color: "#ffffff",
+      lang: "ko-KR",
+      categories: ["education", "kids"],
+    },
     workboxPluginMode: "InjectManifest",
     workboxOptions: {
       swSrc: "src/service-worker.js",
