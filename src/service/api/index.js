@@ -29,9 +29,22 @@ const license = {
 };
 
 const exam = {
-  submit: (exam) => POST(`/exam`, exam),
+  submitExam: (exam) => POST(`/exam/quiz`, exam),
+  submitLearning: (exam) => POST(`/exam/learning`, exam),
+};
+/**
+ * 통계 관련 요청
+ */
+const stats = {
+  /**
+   *
+   * @param {string} type 기준: ['student']
+   * @param {object} value type에 대한 값(type이 'student'인 경우 seq)
+   * @returns
+   */
+  sections: (type, value) => GET(`/stats/sections/${type}/${value}`),
 };
 
 export { section };
 
-export default { user, student, chapter, license, section, exam };
+export default { user, student, chapter, license, section, exam, stats };

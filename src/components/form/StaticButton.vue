@@ -2,7 +2,7 @@
   <div class="form-elem" :class="{ inline: inline === '' }">
     <button
       type="button"
-      :class="`${themeValue()} ${size} ${outlined ? 'outlined' : ''}`"
+      :class="`${themeValue()} ${size} ${outlined === '' ? 'outlined' : ''}`"
       @click="play"
     >
       {{ text }}

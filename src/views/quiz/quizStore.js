@@ -4,10 +4,18 @@ import api from "@/service/api";
 store.registerModule("quiz", {
   namespaced: true,
   state: () => ({
+    /**
+     * 퀴즈 종료 여부를 나타냄. true이면 결과 화면을 보여줌
+     */
+    finished: false,
+    /**
+     * 현재 풀고 있는 퀴즈 정보
+     */
     quizContext: null,
   }),
   getters: {
-    currentPara: (state) => state.quizContext.currentQuestion,
+    currentPara: (state) =>
+      state.quizContext ? state.quizContext.currentQuestion : null,
   },
   actions: {
     loadQuizReouces: (ctx, args) => {
@@ -26,6 +34,16 @@ store.registerModule("quiz", {
       // const question = state.quizContext.questions[index];
       state.quizContext.setQuestionAt(index);
     },
+    showResultView(state) {
+      state.finished = true;
+    },
+    hideResultView(state) {
+      state.finished = false;
+    },
+    closeQuiz(state) {
+      state.finished = false;
+      state.quizContext = null;
+    },
   },
 });
 
@@ -36,7 +54,14 @@ const getQuizContext = () => store.state.quiz.quizContext;
 const setQuestionAt = (index) => store.commit("quiz/setQuestion", index);
 const shiftBy = (offset) => {
   const ctx = store.state.quiz.quizContext;
-  setQuestionAt(ctx.currentQuestion.index + offset);
+  const nextQuizIndex = ctx.currentQuestion.index + offset;
+  if (nextQuizIndex === ctx.quizLength) {
+    store.commit("quiz/showResultView");
+  } else if (ctx.currentQuestion.hasNextQuiz()) {
+    setQuestionAt(ctx.currentQuestion.index + offset);
+  } else {
+    alert("no more quiz");
+  }
 };
 export default {
   startQuiz,

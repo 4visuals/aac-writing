@@ -1,9 +1,11 @@
 <template>
-  <span><slot /></span>
+  <span :class="{ small: small }"><slot /></span>
 </template>
 
 <script>
-export default {};
+export default {
+  props: ["small"],
+};
 </script>
 
 <style lang="scss" scoped>
@@ -11,16 +13,25 @@ export default {};
 @include mobile {
   span {
     font-size: 1rem;
+    &.small {
+      font-size: 0.85rem;
+    }
   }
 }
 @include tablet {
   span {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    &.small {
+      font-size: 1.5rem;
+    }
   }
 }
 @include desktop {
   span {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
+    &.small {
+      font-size: 1.5rem;
+    }
   }
 }
 </style>

@@ -60,6 +60,9 @@ export default {
       const courses = [...state.chapters.levels, ...state.chapters.books];
       return courses.flatMap((chapter) => chapter.sections);
     },
+    section: (_, getters) => (sectionSeq) => {
+      return getters.sections.find((sec) => sec.seq === sectionSeq);
+    },
   },
   mutations: {
     setChapter(state, args) {

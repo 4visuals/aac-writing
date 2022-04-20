@@ -20,7 +20,7 @@ export default {
     ImageView,
   },
   props: ["quizContext", "fillHeight"],
-  setup() {
+  setup(_, { emit }) {
     const store = useStore();
     let question = computed(() => store.getters["quiz/currentPara"]);
     const prefix = {
@@ -48,6 +48,7 @@ export default {
 
     const speak = () => {
       tts.speak(question.value.data.sentence);
+      emit("speaking");
     };
     return {
       question,

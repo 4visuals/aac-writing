@@ -25,7 +25,7 @@ class Ej {
   constructor(ej, index) {
     this.data = ej;
     this.index = index;
-    this.solved = false;
+    this.solved = ej.solved;
     this.active = false;
   }
   get order() {
@@ -43,15 +43,22 @@ class Ej {
   get isSolved() {
     return this.data.solved;
   }
-  addTrial(value) {
-    this.data.trials.push({ value, time: new Date() });
+  addTrial(value, elapsedTimeMillis, correct) {
+    this.data.trials.push({
+      eojeolRef: this.data.eojeolRef,
+      correct,
+      value,
+      elapsedTimeMillis,
+    });
   }
   markAsSolved() {
     this.data.solved = true;
+    this.solved = true;
   }
-  tryAnswer(value) {
-    this.addTrial(value);
-    if (this.data.text === value) {
+  tryAnswer(value, elapsedTime) {
+    const correct = this.data.text === value;
+    this.addTrial(value, elapsedTime, correct);
+    if (correct) {
       this.markAsSolved();
     }
     return this.isSolved;
@@ -81,8 +88,8 @@ export default {
       }
     };
     const validateAnswer = (e) => {
-      const { ej, value } = e;
-      if (ej.tryAnswer(value)) {
+      const { ej, value, elapsedTime } = e;
+      if (ej.tryAnswer(value, elapsedTime)) {
         if (props.quizContext.isLearningMode()) {
           tts.speak(ej.text).then(() => {
             moveToNextEojeol(ej);

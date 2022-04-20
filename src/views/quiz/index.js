@@ -73,15 +73,14 @@ class Question {
   isSentence() {
     return this.data.type === "S";
   }
-  addTrial(value, elapsedTime) {
+  addTrial(value, elapsedTimeMillis) {
     // 사용자가 입력한 값
     const correct = this.text === value;
     this.trials.push({
-      type: "sen",
-      seq: this.data.seq,
+      sentenceRef: this.data.seq,
       correct,
       value,
-      elapsedTime,
+      elapsedTimeMillis,
     });
     this.solved = correct;
     return correct;
@@ -94,8 +93,19 @@ class Question {
   }
 }
 class QuizConfig {
-  constructor(resources) {
+  /**
+   *
+   * @param {Array[sentence]} resources
+   * @param {{
+          quizMode,
+          answerType,
+          section,
+          quizResource,
+        }} options
+   */
+  constructor(resources, options) {
     this.resources = resources;
+    this.options = options;
   }
   get quizLength() {
     return this.resources.length;
@@ -137,12 +147,17 @@ class QuizContext {
   /**
    *
    * @param {[Question]} questions
-   * @param {{questionComponent, answerCompoent, symbolConfig, maxTrials, autoSlide, rewardForCorrect, rewardForWrong}} options
+   * @param {{questionComponent, answerCompoent, symbolConfig, maxTrials, autoSlide, rewardForCorrect, rewardForWrong, config}} options
    */
-  constructor(questions, options) {
+  constructor(config, questions, options) {
+    this.config = config;
     this.questions = questions;
     this.options = options;
     this.setQuestionAt(0);
+    this.startTime = new Date().getTime();
+  }
+  get quizLength() {
+    return this.questions.length;
   }
   get rememberAnswer() {
     return this.options.rememberAnswer;
@@ -150,11 +165,24 @@ class QuizContext {
   get pumsaType() {
     return this.options.symbolConfig.pumsa;
   }
+  get license() {
+    return this.options.license;
+  }
+  get sectionSeq() {
+    return this.config.options.section;
+  }
   isLearningMode() {
     return this.options.mode === "LEARNING";
   }
   isQuizMode() {
-    return (this.options.mode = "QUIZ");
+    return this.options.mode === "QUIZ";
+  }
+  isWord() {
+    return this.config.options.quizResource === "W";
+  }
+  isSentence() {
+    // sentence(S) or all(A)인 경우
+    return this.config.options.quizResource !== "W";
   }
   // get currentQuestion() {
   //   return this.currentQuestion;
@@ -169,8 +197,9 @@ class QuizContext {
  * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
  * section - secion seq
  * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
+ * license - 퀴즈 결과를 저장할 수강증 SEQ
  *
- * @param {{quizMode,  answerType, section, quizResource }} quiz 옵션
+ * @param {{quizMode,  answerType, section, quizResource, license }} quiz 옵션
  */
 const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
   const questionComponent = shallowRef(ScenePicView);
@@ -180,6 +209,7 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
   const symbolConfig = {
     pumsa: typeof answerType === "string" ? "follow" : answerType.pumsa,
   };
+  const license = store.getters["exam/activeLicense"];
 
   return new Promise((resolve) => {
     watch(
@@ -196,12 +226,17 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
          */
         const senFilter = sentenceFilters[quizResource];
         const sentences = sec.sentences.filter(senFilter);
-        const config = new QuizConfig(sentences);
+        const config = new QuizConfig(sentences, {
+          quizMode,
+          answerType,
+          section,
+          quizResource,
+        });
         const questions = sentences.map(
           (sen, index) => new Question(config, index, sen)
         );
 
-        const ctx = new QuizContext(questions, {
+        const ctx = new QuizContext(config, questions, {
           questionComponent,
           answerComponent,
           symbolConfig,
@@ -211,6 +246,7 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
           rewardForCorrect: quizMode === "LEARNING",
           rewardForWrong: quizMode === "LEARNING",
           rememberAnswer: true,
+          license,
         });
         quizStore.startQuiz(ctx);
         resolve(ctx);
@@ -246,7 +282,13 @@ const loadQuiz = () => {
   const quizSpec = storage.session.read("quizSpec");
   return loadSentenceQuiz(quizSpec);
 };
-const prepareQuiz = ({ quizMode, answerType, section, quizResource }) => {
+const prepareQuiz = ({
+  quizMode,
+  answerType,
+  section,
+  quizResource,
+  license,
+}) => {
   const sections = store.getters["course/sections"];
   const sec = sections.find((sec) => sec.seq === section);
   return new Promise((resolve, reject) => {
@@ -265,6 +307,7 @@ const prepareQuiz = ({ quizMode, answerType, section, quizResource }) => {
       answerType,
       section,
       quizResource,
+      license,
     });
     resolve();
   });

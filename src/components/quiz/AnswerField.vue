@@ -4,6 +4,7 @@
     <input
       type="text"
       v-if="inputVisible"
+      @keydown="markTime"
       @keydown.enter.stop="flush"
       @keydown.tab.stop.prevent="flush"
       @input="$emit('update:inputText', $event.target.value)"
@@ -20,25 +21,36 @@ export default {
   props: ["inputVisible", "hiddenText", "inputText"],
   emits: ["commit", "update:inputText", "reset"],
   setup(props, { emit }) {
-    let startTime;
+    let startTime = [];
     const inputEl = ref(null);
     const focus = () => {
       inputEl.value.focus();
       inputEl.value.select();
     };
     const flush = (e) => {
+      if (e.isComposing) {
+        return;
+      }
+      const elapsedTime = new Date().getTime() - startTime[0];
+      console.log("[ELAPSED]", elapsedTime);
+
       emit("commit", {
         e,
         value: e.target.value,
-        elapsedTime: new Date().getTime() - startTime,
+        elapsedTime,
+        done: resetTime,
       });
     };
     const resetTime = () => {
-      startTime = new Date().getTime();
+      startTime = [];
+      console.log("[RESET] " + startTime);
       emit("update:inputText", "");
     };
+    const markTime = () => {
+      startTime.push(new Date().getTime());
+    };
 
-    return { inputEl, flush, focus, resetTime };
+    return { inputEl, flush, focus, resetTime, markTime };
   },
 };
 </script>
@@ -65,6 +77,7 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
     color: black;
     position: absolute;
     padding: 1rem 1.5rem;

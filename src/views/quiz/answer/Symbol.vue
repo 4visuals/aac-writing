@@ -6,26 +6,33 @@
       @click.stop="speak"
     ></div>
     <div class="desc">
-      <div class="text">{{ ej.text }}</div>
-      <input
-        type="text"
-        v-if="!ej.isSolved"
-        @keydown.enter.stop="flush"
-        @keydown.tab.stop.prevent="flush"
+      <AnswerField
         ref="inputEl"
-        :tabindex="ej.order"
+        v-model:inputText="trial"
+        :hiddenText="ej.text"
+        :inputVisible="!correct"
+        @commit="checkAnswer"
       />
     </div>
   </div>
 </template>
 
 <script>
+import AnswerField from "@/components/quiz/AnswerField.vue";
 import { tts } from "@/components/tts";
 import { key, path } from "@/service/util";
 import { ref, watch } from "@vue/runtime-core";
 export default {
+  components: {
+    AnswerField,
+  },
   props: ["ej", "pumsaType"],
   setup(props, { emit }) {
+    /**
+     * 입력한 텍스트
+     */
+    const trial = ref("");
+    const correct = ref(false);
     const pumsaImg = () => {
       if (props.ej.isSolved) {
         return path.resolveUrl(props.ej.picturePath);
@@ -42,6 +49,14 @@ export default {
     };
     const inputEl = ref(null);
     watch(
+      () => props.ej,
+      (ej) => {
+        correct.value = ej.solved;
+        trial.value = "";
+      },
+      { immediate: true }
+    );
+    watch(
       () => props.ej.active,
       (active) => {
         if (active) {
@@ -49,6 +64,14 @@ export default {
         }
       }
     );
+    watch(
+      () => props.ej.solved,
+      (solved) => (correct.value = solved)
+    );
+    const checkAnswer = (e) => {
+      const { elapsedTime } = e;
+      emit("typed", { ej: props.ej, value: e.value, elapsedTime });
+    };
     const flush = (e) => {
       if (key.isComposing(e)) {
         return;
@@ -60,10 +83,13 @@ export default {
       tts.speak(props.ej.text);
     };
     return {
+      trial,
+      correct,
       pumsaImg,
       flush,
       inputEl,
       speak,
+      checkAnswer,
     };
   },
 };

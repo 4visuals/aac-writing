@@ -22,7 +22,7 @@ class UI {
     this.nav = { height: 120, expanded: true };
     this.topPadding = 120;
     this.bg = {
-      visible: true,
+      visible: false,
     };
     this.reward = {
       name: false,

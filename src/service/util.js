@@ -23,8 +23,52 @@ const path = {
     return path.aacweb.symbol(uri);
   },
 };
-export { key, path };
+const time = {
+  diff: (before, after) => {
+    // as millis
+    const btime = before instanceof Date ? before.getTime() : before;
+    const atime = after instanceof Date ? after.getTime() : after;
+    // const sign = atime - btime < 0 ? -1 : 1;
+    let diff = Math.abs(atime - btime); // as seconds
+    let suffix = ""; // sign < 0 ? "전" : "후";
+    const divs = [
+      { amount: 1000, text: "초" },
+      { amount: 60, text: "분" },
+      { amount: 60, text: "시간" },
+      { amount: 24, text: "일" },
+    ];
+    let i = 0;
+    while (i < divs.length && diff >= divs[i].amount) {
+      diff /= divs[i].amount;
+      suffix = divs[i].text;
+      i++;
+    }
+    // suffix += sign < 0 ? "전" : "후";
+    return `${parseInt(diff)} ${suffix}`;
+  },
+  toYMD: (epochMillis) => {
+    const D = new Date(epochMillis);
+    const mm = ("0" + (D.getMonth() + 1)).slice(-2);
+    const dd = ("0" + D.getDate()).slice(-2);
+    return `${D.getFullYear()}-${mm}-${dd}`;
+  },
+  range: (cur, format) => {
+    const fmt = format.split(" ");
+    const baseYMD = time.toYMD(cur);
+    const base = new Date(baseYMD);
+    const chunk = 24 * 60 * 60 * 1000;
+    const ranges = [];
+    const cnt = parseInt(fmt[0]);
+    for (let i = 0; i < cnt; i++) {
+      const d = new Date(base.getTime() - i * chunk);
+      ranges.push({ text: time.toYMD(d), time: d });
+    }
+    return ranges.reverse();
+  },
+};
+export { key, path, time };
 export default {
   key,
   path,
+  time,
 };

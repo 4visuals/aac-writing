@@ -5,8 +5,13 @@
       class="btn-menu right"
       :imagePath="membership && membership.image"
       :vendor="membership ? membership.vendor : 'guest'"
-      size="sm"
+      size="xs"
+      @click="showLicenseBox"
     />
+    <div class="lcs-combobox" v-if="boxVisible" @click="hideLincenseBox">
+      <div class="lcs">감자군</div>
+      <div class="lcs">양파군</div>
+    </div>
   </div>
 </template>
 
@@ -14,7 +19,7 @@
 import Logo from "@/components/oauth/Logo.vue";
 import { useStore } from "vuex";
 import { ActionIcon } from "@/components/form";
-import { computed } from "@vue/runtime-core";
+import { computed, ref } from "@vue/runtime-core";
 // import router from "@/router";
 
 export default {
@@ -25,14 +30,24 @@ export default {
   setup() {
     const store = useStore();
     const membership = computed(() => store.state.user.membership);
+    const boxVisible = ref(false);
     const openMenu = () => {
       // console.log("[back]", router);
       // router.back();
       store.commit("ui/showMenu");
     };
+    const showLicenseBox = () => {
+      boxVisible.value = true;
+    };
+    const hideLincenseBox = () => {
+      boxVisible.value = false;
+    };
     return {
+      boxVisible,
       openMenu,
       membership,
+      showLicenseBox,
+      hideLincenseBox,
     };
   },
 };
@@ -57,6 +72,12 @@ export default {
     &.right {
       right: 16px;
     }
+  }
+  .lcs-combobox {
+    position: fixed;
+    top: 10px;
+    z-index: 75;
+    right: 56px;
   }
 }
 @include mobile {

@@ -88,6 +88,7 @@ export default {
         }
       } else {
         // 퀴즈모드에서는 정답 상관없이 바로 다음 문제로 넘어감
+        e.done();
         quizStore.moveNext();
       }
     };
