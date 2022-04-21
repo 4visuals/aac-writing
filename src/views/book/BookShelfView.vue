@@ -26,7 +26,7 @@
     </div>
     <teleport to="body" v-if="activeSection">
       <Modal ref="modal" @hidden="hideModal">
-        <BookSectionView :cate="activeSection" theme="pink" />
+        <BookSectionView :cate="activeSection" theme="yellow" />
       </Modal>
     </teleport>
   </div>

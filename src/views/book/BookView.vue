@@ -13,7 +13,7 @@
         <SectionButton
           :item="section"
           :idx="idx + 1"
-          theme="pink"
+          theme="yellow"
           @itemClicked="(section) => $emit('sectionClicked', section)"
         />
       </div>

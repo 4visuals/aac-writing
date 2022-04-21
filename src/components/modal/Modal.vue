@@ -4,7 +4,8 @@
     <transition name="fade" @after-leave="hidden">
       <div
         class="container modal-wrapper"
-        :class="{ sm: width === 'sm' }"
+        :class="width === 'sm' ? 'sm' : ''"
+        :style="{ height: height ? height : 'auto' }"
         v-if="visible"
       >
         <slot></slot>
@@ -17,7 +18,7 @@
 import { ref, onMounted } from "vue";
 export default {
   emits: ["hidden"],
-  props: ["width"],
+  props: ["width", "height"],
   setup(props, { emit }) {
     const fadeOut = () => {
       visible.value = false;

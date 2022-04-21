@@ -13,15 +13,14 @@
       </div>
     </div>
     <div class="body">
-      <div class="ko-char-view">
-        <ParaText class="desc">{{ cate.description }}</ParaText>
-        <Slide
-          :resources="cate.notes.map((n) => n.text)"
-          :width="400"
-          :height="300"
-          :resolveUrl="(rss) => path.aacweb.scene(rss)"
-        />
-      </div>
+      <ParaText class="desc">{{ cate.description }}</ParaText>
+      <Slide
+        class="preview"
+        :resources="cate.notes.map((n) => n.text)"
+        :width="600"
+        height="100%"
+        :resolveUrl="(rss) => path.aacweb.scene(rss)"
+      />
     </div>
     <div class="footer">
       <div class="choose">
@@ -177,26 +176,27 @@ $padding: 16px;
     }
   }
   .body {
-    .ko-char-view {
+    display: flex;
+    // align-items: flex-start;
+    padding: $padding;
+    flex-direction: column;
+    .desc {
+      padding-bottom: 16px;
+    }
+    .preview {
+      flex: 1 1 auto;
+    }
+    .chars {
+      flex: 1;
       display: flex;
-      // align-items: flex-start;
-      padding: $padding;
-      flex-direction: column;
-      .desc {
-        padding-bottom: 16px;
-      }
-      .chars {
-        flex: 1;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      .char-body {
         display: flex;
         align-items: flex-start;
         flex-wrap: wrap;
-        justify-content: flex-start;
-        .char-body {
-          display: flex;
-          align-items: flex-start;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
+        justify-content: center;
       }
     }
   }

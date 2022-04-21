@@ -37,7 +37,7 @@ import { LicenseComboBox } from "@/components/admin";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 export default {
-  props: ["cate", "theme", "quizOnly"],
+  props: ["cate", "theme"],
   components: {
     AacButton,
     ParaText,
@@ -47,10 +47,6 @@ export default {
   setup(props) {
     const store = useStore();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
-    const wordMode = ref(true);
-    if (props.quizOnly) {
-      wordMode.value = false;
-    }
     console.log("[section]", props.cate);
     const title = () => {
       const { level } = props.cate;
@@ -91,14 +87,10 @@ export default {
         });
     };
 
-    const sourceText = () => (wordMode.value ? "낱말" : "문장");
-
     return {
       path,
       title,
-      wordMode,
       startLearning,
-      sourceText,
     };
   },
 };
@@ -138,10 +130,10 @@ $padding: 16px;
       font-size: 2.5rem;
     }
   }
-  &.pink {
+  &.yellow {
     .jumbo {
-      background-color: var(--aac-color-pink-400);
-      color: var(--aac-color-pink-900);
+      background-color: var(--aac-color-yellow-400);
+      color: var(--aac-color-yellow-900);
       padding: 16px $padding;
     }
   }

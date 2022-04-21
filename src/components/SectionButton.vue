@@ -71,6 +71,10 @@ export default {
       text-shadow: 2px 2px #f4abc4;
       color: #d23d70;
     }
+    &.yellow {
+      text-shadow: 2px 2px var(--aac-color-yellow-400);
+      color: var(--aac-color-yellow-900);
+    }
 
     &.blue {
       text-shadow: 2px 2px #6c97dc;
@@ -98,6 +102,9 @@ export default {
       left: 2px;
       &.pink {
         box-shadow: 4px 4px #f4abc4;
+      }
+      &.yellow {
+        box-shadow: 4px 4px var(--aac-color-yellow-400);
       }
       &.green {
         box-shadow: 4px 4px #d4e250;
@@ -131,6 +138,11 @@ export default {
       box-shadow: 6px 6px var(--aac-color-pink-700);
       background-color: var(--aac-color-pink-400);
       color: var(--aac-color-pink-900);
+    }
+    &.yellow {
+      box-shadow: 6px 6px var(--aac-color-yellow-700);
+      background-color: var(--aac-color-yellow-400);
+      color: var(--aac-color-yellow-900);
     }
 
     &.blue {

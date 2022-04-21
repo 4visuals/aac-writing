@@ -1,6 +1,7 @@
 <template>
   <div
     class="slide"
+    ref="viewport"
     :style="`--slide-width:${dim.w.size + dim.w.unit};--slide-height:${
       dim.h.size + dim.h.unit
     }`"
@@ -41,7 +42,7 @@
 
 <script>
 import { ActionIcon } from "@/components/form";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 const normalize = (sz, unit) => {
   let v = "" + sz;
   if (v[0] === ".") {
@@ -60,8 +61,9 @@ export default {
   props: ["resources", "width", "height", "resolveUrl"],
   setup(props) {
     const activeIdx = ref(0);
+    const viewport = ref(null);
     const dim = ref({
-      w: normalize(props.width, "px"),
+      w: normalize(0, "px"),
       h: normalize(props.height, "px"),
       offset: 0,
     });
@@ -80,7 +82,15 @@ export default {
       idx = Math.max(0, idx);
       activeIdx.value = idx;
     };
-    return { dim, activeIdx, shiftBy };
+    onMounted(() => {
+      const width = viewport.value.offsetWidth;
+      dim.value = {
+        w: normalize(width, "px"),
+        h: normalize(props.height, "px"),
+        offset: 0,
+      };
+    });
+    return { dim, viewport, activeIdx, shiftBy };
   },
 };
 </script>
@@ -107,6 +117,7 @@ export default {
   }
   .viewport {
     width: var(--slide-width);
+    max-height: 100%;
     height: var(--slide-height);
     overflow: hidden;
     display: flex;
@@ -119,7 +130,7 @@ export default {
       .elem {
         flex: 0 0 var(--slide-width);
         width: var(--slide-width);
-        height: var(--slide-height);
+        height: 100%;
         background-color: beige;
         background-position: center;
         background-repeat: no-repeat;

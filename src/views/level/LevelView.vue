@@ -36,7 +36,7 @@
       </transition>
     </div>
     <teleport to="body" v-if="activeCate">
-      <Modal ref="modal" @hidden="hideModal">
+      <Modal ref="modal" height="90%" @hidden="hideModal">
         <SectionView
           :cate="activeCate"
           :theme="themeRef"
