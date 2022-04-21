@@ -22,7 +22,7 @@ const routes = [
   },
   {
     path: "/quiz/:seq",
-    name: "QuizPanel",
+    name: "QuizView",
     props: true,
     component: QuizView,
   },

@@ -23,23 +23,23 @@ export default {
 }
 @include tablet {
   p {
-    font-size: 2vmin;
+    font-size: 1.5rem;
     &.small {
-      font-size: 1.8vmin;
+      font-size: 1.25rem;
     }
     &.lg {
-      font-size: 2.5vmin;
+      font-size: 1.75rem;
     }
   }
 }
 @include desktop {
   p {
-    font-size: 2vmin;
+    font-size: 1.5rem;
     &.small {
-      font-size: 1.8vmin;
+      font-size: 1.25rem;
     }
     &.lg {
-      font-size: 2.5vmin;
+      font-size: 1.75rem;
     }
   }
 }

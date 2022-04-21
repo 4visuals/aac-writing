@@ -12,6 +12,7 @@
         :hiddenText="ej.text"
         :inputVisible="!correct"
         @commit="checkAnswer"
+        @textClick="speak"
       />
     </div>
   </div>
@@ -26,15 +27,19 @@ export default {
   components: {
     AnswerField,
   },
-  props: ["ej", "pumsaType"],
+  props: ["ej", "pumsaType", "showAnswer"],
   setup(props, { emit }) {
     /**
      * 입력한 텍스트
      */
     const trial = ref("");
     const correct = ref(false);
+    if (props.showAnswer) {
+      // 문장 읽기 모드 - 입력 필드가 필요없다.
+      correct.value = true;
+    }
     const pumsaImg = () => {
-      if (props.ej.isSolved) {
+      if (props.ej.isSolved || props.showAnswer) {
         return path.resolveUrl(props.ej.picturePath);
       } else {
         const { pumsaType } = props;
@@ -52,6 +57,9 @@ export default {
       () => props.ej,
       (ej) => {
         correct.value = ej.solved;
+        if (props.showAnswer) {
+          correct.value = true;
+        }
         trial.value = "";
       },
       { immediate: true }

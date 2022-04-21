@@ -4,6 +4,7 @@
       <Symbol
         :ej="ej"
         :pumsaType="quizContext.pumsaType"
+        :showAnswer="quizContext.isReadingMode()"
         @typed="validateAnswer"
       />
     </div>

@@ -21,7 +21,7 @@ const sentenceFilters = {
   A: () => true,
 };
 /**
- * 퀴즈 질문
+ * 퀴즈 질문과 학생이 입력한 답안을 기록
  */
 class Question {
   constructor(quizConfig, index, sentence) {
@@ -171,9 +171,24 @@ class QuizContext {
   get sectionSeq() {
     return this.config.options.section;
   }
+  /**
+   * 낱말읽기, 문장읽기
+   * @returns boolean
+   */
+  isReadingMode() {
+    return this.options.mode === "READING";
+  }
+  /**
+   * 낱말쓰기, 문장쓰기
+   * @returns boolean
+   */
   isLearningMode() {
     return this.options.mode === "LEARNING";
   }
+  /**
+   * 낱말퀴즈, 문장퀴즈
+   * @returns boolean
+   */
   isQuizMode() {
     return this.options.mode === "QUIZ";
   }
@@ -193,7 +208,7 @@ class QuizContext {
   }
 }
 /**
- * quizMode - 학습('LEARNING') OR 테스트('QUIZ') 모드
+ * quizMode - 읽기('READING') 학습('LEARNING') OR 테스트('QUIZ') 모드
  * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
  * section - secion seq
  * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
@@ -205,7 +220,8 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
   const questionComponent = shallowRef(ScenePicView);
   const answerCompName =
     typeof answerType === "string" ? answerType : answerType.comp;
-  const answerComponent = answerComponents.get(answerCompName);
+  const answerComponent =
+    quizMode === "READING" ? null : answerComponents.get(answerCompName);
   const symbolConfig = {
     pumsa: typeof answerType === "string" ? "follow" : answerType.pumsa,
   };

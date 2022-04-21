@@ -1,6 +1,8 @@
 <template>
   <div class="desc">
-    <div class="text">{{ hiddenText }}</div>
+    <div class="text" @click="$emit('textClick', hiddenText)">
+      {{ hiddenText }}
+    </div>
     <input
       type="text"
       v-if="inputVisible"
@@ -18,7 +20,7 @@
 <script>
 import { ref } from "@vue/reactivity";
 export default {
-  props: ["inputVisible", "hiddenText", "inputText"],
+  props: ["inputVisible", "hiddenText", "inputText", "textClick"],
   emits: ["commit", "update:inputText", "reset"],
   setup(props, { emit }) {
     let startTime = [];

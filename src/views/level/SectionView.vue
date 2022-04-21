@@ -29,6 +29,7 @@
           :text="`${sourceText()} 읽기`"
           theme="orange"
           :disabled="quizOnly === '' || quizOnly === true"
+          @click="startSentenceQuiz('READING', 'EJ')"
         />
         <AacButton
           :text="`${sourceText()} 쓰기`"
