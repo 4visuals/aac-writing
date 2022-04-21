@@ -171,6 +171,9 @@ class QuizContext {
   get sectionSeq() {
     return this.config.options.section;
   }
+  get prevPage() {
+    return this.config.options.prevPage;
+  }
   /**
    * 낱말읽기, 문장읽기
    * @returns boolean
@@ -214,9 +217,15 @@ class QuizContext {
  * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
  * license - 퀴즈 결과를 저장할 수강증 SEQ
  *
- * @param {{quizMode,  answerType, section, quizResource, license }} quiz 옵션
+ * @param {{quizMode,  answerType, section, quizResource, license, prevPage }} quiz 옵션
  */
-const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
+const loadSentenceQuiz = ({
+  quizMode,
+  answerType,
+  section,
+  quizResource,
+  prevPage,
+}) => {
   const questionComponent = shallowRef(ScenePicView);
   const answerCompName =
     typeof answerType === "string" ? answerType : answerType.comp;
@@ -247,6 +256,7 @@ const loadSentenceQuiz = ({ quizMode, answerType, section, quizResource }) => {
           answerType,
           section,
           quizResource,
+          prevPage,
         });
         const questions = sentences.map(
           (sen, index) => new Question(config, index, sen)
@@ -304,6 +314,7 @@ const prepareQuiz = ({
   section,
   quizResource,
   license,
+  prevPage,
 }) => {
   const sections = store.getters["course/sections"];
   const sec = sections.find((sec) => sec.seq === section);
@@ -324,6 +335,7 @@ const prepareQuiz = ({
       section,
       quizResource,
       license,
+      prevPage,
     });
     resolve();
   });

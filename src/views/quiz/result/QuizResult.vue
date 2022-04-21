@@ -137,7 +137,7 @@ export default {
     };
     const closeQuiz = () => {
       router.replace({
-        name: "LevelView",
+        name: ctx.prevPage,
       });
       nextTick().then(() => {
         store.commit("quiz/closeQuiz");

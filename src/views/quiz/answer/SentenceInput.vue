@@ -96,7 +96,7 @@ export default {
       () => source.value,
       () => {
         trial.value = "";
-        correct.value = source.value.solved;
+        correct.value = source.value && source.value.solved;
         question.value = new SentenceQuestion(source.value);
       }
     );

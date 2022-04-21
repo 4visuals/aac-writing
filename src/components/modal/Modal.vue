@@ -24,7 +24,6 @@ export default {
     };
     const hidden = () => emit("hidden");
     const visible = ref(false);
-    console.log(props);
     onMounted(() => {
       visible.value = true;
     });

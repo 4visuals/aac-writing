@@ -14,7 +14,7 @@
           :item="section"
           :idx="idx + 1"
           theme="pink"
-          @itemClicked="(section) => startBookQuiz(section)"
+          @itemClicked="(section) => $emit('sectionClicked', section)"
         />
       </div>
     </transition-group>
@@ -30,6 +30,8 @@ import SectionButton from "@/components/SectionButton.vue";
 import { ActionIcon } from "@/components/form";
 import quiz from "@/views/quiz";
 import router from "@/router";
+import { useStore } from "vuex";
+import { computed } from "@vue/runtime-core";
 export default {
   components: {
     SectionButton,
@@ -37,6 +39,8 @@ export default {
   },
   props: ["book"],
   setup() {
+    const store = useStore();
+    const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const startBookQuiz = (section) => {
       const quizMode = "LEARNING";
       const answerType = { comp: "EJ", pumsa: "what" };
@@ -50,6 +54,8 @@ export default {
         answerType,
         section: sectionSeq,
         quizResource,
+        license: activeLicense.value.seq,
+        prevPage: "BookShelfView",
       });
       router.push(`/quiz/${sectionSeq}`);
     };

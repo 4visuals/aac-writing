@@ -4,6 +4,7 @@
     <BookView
       :book="activeBook"
       v-if="activeBook"
+      @sectionClicked="showDetail"
       @back="() => (activeBook = null)"
     />
     <div class="row group" v-else>
@@ -23,11 +24,17 @@
         </div>
       </transition-group>
     </div>
+    <teleport to="body" v-if="activeSection">
+      <Modal ref="modal" @hidden="hideModal">
+        <BookSectionView :cate="activeSection" theme="pink" />
+      </Modal>
+    </teleport>
   </div>
 </template>
 
 <script>
 import { BrandPanel } from "@/components/brand";
+import BookSectionView from "./BookSectionView.vue";
 import { ParaText } from "@/components/text";
 import BookView from "./BookView.vue";
 import TextBook from "@/views/book/TextBook.vue";
@@ -39,11 +46,14 @@ export default {
     TextBook,
     ParaText,
     BookView,
+    BookSectionView,
   },
   setup() {
     const store = useStore();
 
     const activeBook = ref(null);
+    const activeSection = ref(null);
+    const theme = "yellow";
     const chapters = computed(() => {
       return store.state.course.chapters.books;
     });
@@ -61,8 +71,23 @@ export default {
     const openBook = (book) => {
       activeBook.value = book;
     };
+    const showDetail = (section) => {
+      activeSection.value = section;
+    };
+    const hideModal = () => {
+      activeSection.value = null;
+    };
 
-    return { chapters, front, activeBook, openBook };
+    return {
+      chapters,
+      front,
+      activeBook,
+      activeSection,
+      theme,
+      openBook,
+      showDetail,
+      hideModal,
+    };
   },
 };
 </script>

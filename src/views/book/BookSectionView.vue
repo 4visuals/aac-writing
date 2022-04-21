@@ -4,44 +4,22 @@
       <div class="title">
         <h3>{{ title() }}</h3>
         <LicenseComboBox />
-        <SwitchButton
-          v-model:selected="wordMode"
-          :disabled="quizOnly === '' || quizOnly === true"
-          onText="낱말"
-          offText="문장"
-        />
       </div>
     </div>
     <div class="body">
       <div class="ko-char-view">
         <ParaText class="desc">{{ cate.description }}</ParaText>
-        <Slide
-          :resources="cate.notes.map((n) => n.text)"
-          :width="400"
-          :height="300"
-          :resolveUrl="(rss) => path.aacweb.scene(rss)"
-        />
+        <div class="steps">
+          <h3>[1]</h3>
+          <h3>[2]</h3>
+          <h3>[3]</h3>
+          <h3>[종합]</h3>
+        </div>
       </div>
     </div>
     <div class="footer">
       <div class="choose">
-        <AacButton
-          :text="`${sourceText()} 읽기`"
-          theme="orange"
-          :disabled="quizOnly === '' || quizOnly === true"
-          @click="startSentenceQuiz('READING', 'EJ')"
-        />
-        <AacButton
-          :text="`${sourceText()} 쓰기`"
-          theme="blue"
-          :disabled="quizOnly === '' || quizOnly === true"
-          @click="startSentenceQuiz('LEARNING', 'EJ')"
-        />
-        <AacButton
-          :text="`${sourceText()} 퀴즈`"
-          theme="red"
-          @click="startSentenceQuiz('QUIZ', 'SEN')"
-        />
+        <AacButton :text="`문장 쓰기`" theme="blue" @click="startLearning()" />
       </div>
     </div>
   </div>
@@ -52,10 +30,7 @@ import { path } from "@/service/util";
 import { computed, ref } from "vue";
 import router from "@/router";
 import { ParaText } from "@/components/text";
-import { SwitchButton } from "@/components/form";
-// import { Char } from "@/components";
 import { AacButton } from "@/components/form";
-import { Slide } from "@/components/slide";
 import { LicenseComboBox } from "@/components/admin";
 
 // import api from "@/service/api";
@@ -66,8 +41,6 @@ export default {
   components: {
     AacButton,
     ParaText,
-    SwitchButton,
-    Slide,
     LicenseComboBox,
     // Char,
   },
@@ -78,6 +51,7 @@ export default {
     if (props.quizOnly) {
       wordMode.value = false;
     }
+    console.log("[section]", props.cate);
     const title = () => {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
@@ -86,26 +60,28 @@ export default {
      * @param quizMode 학습모드('LEARNING') 또는 시험모드('QUIZ')
      * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
-    const startSentenceQuiz = (quizMode, answerType) => {
+    const startLearning = () => {
       if (!activeLicense.value) {
         alert("학생을 선택해주세요");
         return;
       }
       const sectionSeq = props.cate.seq;
-      const quizResource = wordMode.value ? "W" : "S";
+      const range = ref(null);
+      // const quizResource = "S";
       /*
        * 단어 학습인 경우 무조건 받아쓰기 모드
        */
-      answerType = quizResource === "W" ? "SEN" : answerType;
+      // answerType = quizResource === "W" ? "SEN" : answerType;
 
       quiz
         .prepareQuiz({
-          quizMode,
-          answerType,
+          quizMode: "LEARNING",
+          answerType: { comp: "EJ", pumsa: "what" },
           section: sectionSeq,
-          quizResource,
+          range: range.value,
+          quizResource: "A",
           license: activeLicense.value.seq,
-          prevPage: "LevelView",
+          prevPage: "BookShelfView",
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
@@ -121,7 +97,7 @@ export default {
       path,
       title,
       wordMode,
-      startSentenceQuiz,
+      startLearning,
       sourceText,
     };
   },
@@ -197,6 +173,11 @@ $padding: 16px;
           flex-wrap: wrap;
           justify-content: center;
         }
+      }
+      .steps {
+        display: flex;
+        column-gap: 16px;
+        justify-content: center;
       }
     }
   }

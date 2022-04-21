@@ -25,6 +25,8 @@ export default {
 .cell {
   padding: 0.25rem 0.6rem;
   user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
   &.even {
     background-color: #f8f8f9;
   }
