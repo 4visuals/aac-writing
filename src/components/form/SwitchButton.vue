@@ -1,10 +1,14 @@
 <template>
-  <div class="switch-button" :class="{ on: selected, off: !selected }">
+  <div
+    class="switch-button"
+    :class="{
+      on: selected,
+      off: !selected,
+      disabled: disabled === true || disabled === '',
+    }"
+  >
     <label
-      ><input
-        type="checkbox"
-        :checked="selected"
-        @change="$emit('update:selected', $event.target.checked)" />
+      ><input type="checkbox" :checked="selected" @change="changed" />
       <div class="slider"></div
     ></label>
     <SpanText class="label on">{{ onText }}</SpanText>
@@ -15,15 +19,19 @@
 <script>
 import { SpanText } from "@/components/text";
 export default {
-  props: ["selected", "onText", "offText"],
+  props: ["selected", "onText", "offText", "disabled"],
   emits: ["update:selected"],
   components: {
     SpanText,
   },
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const changed = (e) => {
+      if (props.disabled === "" || props.disabled === true) {
+        return;
+      }
+      // $emit('update:selected', $event.target.checked)
       console.log(e.target.checked);
-      emit("checked", e.target.checked);
+      emit("update:selected", e.target.checked);
     };
     return {
       changed,
@@ -42,6 +50,7 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
+  cursor: pointer;
   &.pink {
     @include pink($shadow: false);
   }
@@ -50,6 +59,12 @@ export default {
   }
   &.blue {
     @include blue($shadow: false);
+  }
+  &.disabled {
+    color: #ababab;
+    label {
+      cursor: not-allowed;
+    }
   }
   .label {
     flex: 1 1 auto;

@@ -6,6 +6,7 @@
         <LicenseComboBox />
         <SwitchButton
           v-model:selected="wordMode"
+          :disabled="quizOnly === '' || quizOnly === true"
           onText="낱말"
           offText="문장"
         />
@@ -24,10 +25,15 @@
     </div>
     <div class="footer">
       <div class="choose">
-        <AacButton :text="`${sourceText()} 읽기`" theme="orange" />
+        <AacButton
+          :text="`${sourceText()} 읽기`"
+          theme="orange"
+          :disabled="quizOnly === '' || quizOnly === true"
+        />
         <AacButton
           :text="`${sourceText()} 쓰기`"
           theme="blue"
+          :disabled="quizOnly === '' || quizOnly === true"
           @click="startSentenceQuiz('LEARNING', 'EJ')"
         />
         <AacButton
@@ -55,7 +61,7 @@ import { LicenseComboBox } from "@/components/admin";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 export default {
-  props: ["cate", "theme"],
+  props: ["cate", "theme", "quizOnly"],
   components: {
     AacButton,
     ParaText,
@@ -68,6 +74,9 @@ export default {
     const store = useStore();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const wordMode = ref(true);
+    if (props.quizOnly) {
+      wordMode.value = false;
+    }
     const title = () => {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";

@@ -37,7 +37,11 @@
     </div>
     <teleport to="body" v-if="activeCate">
       <Modal ref="modal" @hidden="hideModal">
-        <SectionView :cate="activeCate" :theme="themeRef" />
+        <SectionView
+          :cate="activeCate"
+          :theme="themeRef"
+          :quizOnly="activeCate.level === -1"
+        />
       </Modal>
     </teleport>
   </div>

@@ -1,6 +1,16 @@
 <template>
-  <div class="form-elem" :class="{ inline }">
-    <button type="button" :class="`${themeValue()} ${size}`" @click="play">
+  <div
+    class="form-elem"
+    :class="{ inline }"
+    @click="() => console.log('[STOP]')"
+  >
+    <button
+      type="button"
+      :class="`${themeValue()} ${size} ${
+        disabled === '' || disabled === true ? 'disabled' : ''
+      }`"
+      @click.stop="clicked"
+    >
       {{ text }}
     </button>
   </div>
@@ -9,16 +19,20 @@
 <script>
 import clickSound from "@/assets/click.wav";
 export default {
-  props: ["text", "inline", "theme", "size"],
-  setup(props) {
+  props: ["text", "inline", "theme", "size", "disabled"],
+  setup(props, { emit }) {
     // console.log(props);
-    const play = () => {
+    const clicked = () => {
+      if (props.disabled === "" || props.disabled === true) {
+        return;
+      }
       const audio = new Audio(clickSound);
       audio.play();
+      emit("click");
     };
     const themeValue = () => props.theme || "gray";
 
-    return { play, themeValue };
+    return { clicked, themeValue };
   },
 };
 </script>
@@ -50,6 +64,19 @@ export default {
     }
     &:active {
       transform: translate(3px, 3px);
+    }
+    &.disabled {
+      background-color: #d9d9d966;
+      color: #a3a3a3bd;
+      border-color: #a3a3a3bd;
+      &:hover {
+        cursor: not-allowed;
+      }
+      &:active {
+        background-color: #d9d9d966;
+        transform: translate(0, 0);
+        cursor: not-allowed;
+      }
     }
   }
 
