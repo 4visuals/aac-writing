@@ -1,5 +1,6 @@
 <template>
   <div class="text-input">
+    <input type="text" class="dummy" ref="dummy" />
     <AnswerField
       ref="field"
       v-model:inputText="trial"
@@ -18,7 +19,7 @@
 import { tts } from "@/components/tts";
 import { SpanText } from "@/components/text";
 import AnswerField from "@/components/quiz/AnswerField.vue";
-import { computed, ref, watch } from "@vue/runtime-core";
+import { computed, onMounted, ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
 import quizStore from "../quizStore";
 
@@ -49,6 +50,7 @@ export default {
   setup(props) {
     const store = useStore();
     const field = ref(null);
+    const dummy = ref(null);
     const source = computed(() => store.getters["quiz/currentPara"]);
     /**
      * 학생이 입력한 문장
@@ -63,6 +65,7 @@ export default {
     const showReward = (name) => {
       store.commit("ui/showReward", {
         name,
+        field: dummy,
         onClose: (passed) => {
           if (passed) {
             quizStore.moveNext();
@@ -73,11 +76,18 @@ export default {
       });
       new Audio(require(`@/assets/reward/${name}.mp3`)).play();
     };
+    const speackAndFocus = (delay) => {
+      dummy.value.focus();
+      setTimeout(() => {
+        tts.speak(question.value.text).then(() => field.value.focus());
+      }, delay);
+    };
     const checkAnswer = (e) => {
       const { elapsedTime } = e;
       const learngingMode = props.quizContext.isLearningMode();
       const passed = question.value.tryAnswer(trial.value, elapsedTime);
       correct.value = learngingMode ? passed : false;
+      dummy.value.focus();
       if (learngingMode) {
         if (passed) {
           tts.speak(trial.value).then(() => {
@@ -98,10 +108,17 @@ export default {
         trial.value = "";
         correct.value = source.value && source.value.solved;
         question.value = new SentenceQuestion(source.value);
+        dummy.value.focus();
+        speackAndFocus(500);
       }
     );
+    onMounted(() => {
+      speackAndFocus(500);
+      //speackAndFocus();
+    });
     return {
       field,
+      dummy,
       trial,
       correct,
       question,
@@ -116,6 +133,15 @@ export default {
   display: flex;
   column-gap: 1rem;
   padding-bottom: 2rem;
+  position: relative;
+  input.dummy {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
   .btn-submit {
     background-color: #a2ec9c;
     padding: 1rem 2rem;

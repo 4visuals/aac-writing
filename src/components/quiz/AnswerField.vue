@@ -10,7 +10,7 @@
       @keydown.enter.stop="flush"
       @keydown.tab.stop.prevent="flush"
       @input="$emit('update:inputText', $event.target.value)"
-      @click="resetTime"
+      @click="clicked"
       ref="inputEl"
       :value="inputText"
     />
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { tts } from "@/components/tts";
 import { ref } from "@vue/reactivity";
 export default {
   props: ["inputVisible", "hiddenText", "inputText", "textClick"],
@@ -45,14 +46,17 @@ export default {
     };
     const resetTime = () => {
       startTime = [];
-      console.log("[RESET] " + startTime);
       emit("update:inputText", "");
+    };
+    const clicked = () => {
+      tts.speak(props.hiddenText);
+      resetTime();
     };
     const markTime = () => {
       startTime.push(new Date().getTime());
     };
 
-    return { inputEl, flush, focus, resetTime, markTime };
+    return { inputEl, flush, focus, resetTime, markTime, clicked };
   },
 };
 </script>

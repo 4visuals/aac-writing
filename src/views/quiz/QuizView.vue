@@ -88,18 +88,13 @@ export default {
     const route = useRoute();
     console.log("[QUIZ]", route.params.seq);
     quiz.loadQuiz();
-    onMounted(() => {
-      store.commit("ui/setBackgroundVisible", false);
-      store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
-    });
-    onUnmounted(() => {
-      store.commit("ui/setBackgroundVisible", true);
-      store.commit("ui/setNavSize", { expanded: true, topPadding: 120 });
-    });
+
     const holdSoftKeyboard = () => focusing.value.focus();
 
     const moveQuiz = (dir) => {
-      holdSoftKeyboard();
+      if (!ctx.value.isReadingMode()) {
+        holdSoftKeyboard();
+      }
       if (dir > 0) {
         quizStore.moveNext();
       } else {
@@ -112,16 +107,24 @@ export default {
       }
     };
     const speak = () => {
-      tts.speak(ctx.value.currentQuestion.text);
+      return tts.speak(ctx.value.currentQuestion.text);
     };
     const sceneClicked = () => {
-      holdSoftKeyboard();
-      console.log("done");
+      if (!ctx.value.isReadingMode()) {
+        holdSoftKeyboard();
+      }
       if (ctx.value.isReadingMode()) {
         wordDecomposing.value = true;
       }
     };
-
+    onMounted(() => {
+      store.commit("ui/setBackgroundVisible", false);
+      store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
+    });
+    onUnmounted(() => {
+      store.commit("ui/setBackgroundVisible", true);
+      store.commit("ui/setNavSize", { expanded: true, topPadding: 120 });
+    });
     return {
       ctx,
       reward,

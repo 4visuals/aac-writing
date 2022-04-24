@@ -3,7 +3,7 @@
     <div
       class="pic-holder"
       :style="{ 'background-image': `url('${pumsaImg()}')` }"
-      @click.stop="speak"
+      @click.stop="$emit('clicked')"
     ></div>
     <div class="desc">
       <AnswerField
