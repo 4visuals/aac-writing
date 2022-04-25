@@ -56,8 +56,14 @@
 </template>
 
 <script>
-import { computed, onMounted, onUnmounted, ref } from "@vue/runtime-core";
-import { onBeforeRouteLeave, useRoute } from "vue-router";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+} from "@vue/runtime-core";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 import quizStore from "./quizStore";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
@@ -85,8 +91,8 @@ export default {
     const focusing = ref(null);
     const wordDecomposing = ref(false);
     const quizFinished = computed(() => store.state.quiz.finished);
-    const route = useRoute();
-    console.log("[QUIZ]", route.params.seq);
+    const router = useRouter();
+    // console.log("[QUIZ]", route.params.seq);
     quiz.loadQuiz();
 
     const holdSoftKeyboard = () => focusing.value.focus();
@@ -102,8 +108,17 @@ export default {
       }
     };
     const alertForResult = () => {
-      if (window.confirm("결과 화면으로 이동합니까?")) {
-        moveQuiz(1);
+      if (ctx.value.isReadingMode()) {
+        nextTick().then(() =>
+          router.replace({
+            name: ctx.value.prevPage,
+          })
+        );
+      } else {
+        const yes = window.confirm("결과 화면으로 이동합니까?");
+        if (yes) {
+          moveQuiz(1);
+        }
       }
     };
     const speak = () => {
