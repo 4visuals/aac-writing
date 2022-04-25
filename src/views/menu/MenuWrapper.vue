@@ -106,6 +106,7 @@ export default {
     background-color: white;
     position: relative;
     box-shadow: 2px 0 6px #0000004d;
+    overflow-y: auto;
   }
 
   .dimmer-leave-to,
