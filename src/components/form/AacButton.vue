@@ -1,14 +1,10 @@
 <template>
-  <div
-    class="form-elem"
-    :class="{ inline }"
-    @click="() => console.log('[STOP]')"
-  >
+  <div class="form-elem" :class="{ inline }">
     <button
       type="button"
       :class="`${themeValue()} ${size} ${
         disabled === '' || disabled === true ? 'disabled' : ''
-      }`"
+      } ${fill === '' ? 'filled' : ''}`"
       @click.stop="clicked"
     >
       {{ text }}
@@ -19,7 +15,7 @@
 <script>
 import clickSound from "@/assets/click.wav";
 export default {
-  props: ["text", "inline", "theme", "size", "disabled"],
+  props: ["text", "inline", "theme", "size", "disabled", "fill"],
   setup(props, { emit }) {
     // console.log(props);
     const clicked = () => {
@@ -65,6 +61,9 @@ export default {
     &:active {
       transform: translate(3px, 3px);
     }
+    &.filled {
+      width: 100%;
+    }
     &.disabled {
       background-color: #d9d9d966;
       color: #a3a3a3bd;
@@ -82,28 +81,32 @@ export default {
 
   @include mobile {
     button {
-      font-size: 3.2vmin;
-      padding: 0.6rem 1.2rem;
+      font-size: 1.15rem;
+      padding: 0.4rem 0.8rem;
       &.sm {
-        font-size: 2.4vmin;
+        font-size: 0.85rem;
       }
     }
   }
   @include tablet {
     button {
-      font-size: 2.6vmin;
-      padding: 0.6rem 1.2rem;
+      font-size: 1.35rem;
+      padding: 0.5rem 1rem;
+      &.xs {
+        font-size: 1.1rem;
+        padding: 0.35rem 0.7rem;
+      }
       &.sm {
-        font-size: 2.4vmin;
+        font-size: 1.25rem;
       }
     }
   }
   @include desktop {
     button {
-      font-size: 2.6vmin;
-      padding: 0.6rem 1.2rem;
+      font-size: 1.35rem;
+      padding: 0.4rem 0.8rem;
       &.sm {
-        font-size: 2.4vmin;
+        font-size: 1.25rem;
       }
     }
   }

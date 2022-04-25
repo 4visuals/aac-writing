@@ -29,10 +29,8 @@ export default {
     AacButton,
   },
   setup() {
-    // const store = useStore();
-    // store.dispatch("course/loadChapter", { origin: "L" });
     const moveTo = (url) => {
-      console.log("move to ", url);
+      // console.log("move to ", url);
       router.push(url);
     };
     return {

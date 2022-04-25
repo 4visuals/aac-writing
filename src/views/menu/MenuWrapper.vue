@@ -6,25 +6,12 @@
     <Transition name="slider" @after-leave="store.commit('ui/hideMenu')">
       <div class="menu-body" v-if="slider">
         <MenuSection>
-          <div class="menu-item">
-            <UserProfile />
-          </div>
-        </MenuSection>
-        <MenuSection v-if="isTeacher" title="수강증">
-          <div class="menu-item">
-            <LicenseMenu @clicked="showLicenseConfig" />
-          </div>
-        </MenuSection>
-        <MenuSection v-if="isTeacher" title="학생">
-          <div class="menu-item">
-            <StudentMenu />
-          </div>
+          <UserProfile />
         </MenuSection>
         <MenuSection title="목소리">
-          <div class="menu-item">
-            <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
-          </div>
+          <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
         </MenuSection>
+        <TeacherSectionMenu v-if="isTeacher" />
       </div>
     </Transition>
     <teleport to="body" v-if="modalComponent">
@@ -39,12 +26,9 @@
 import { useStore } from "vuex";
 import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
-import LicenseMenu from "./LicenseMenu.vue";
-import StudentMenu from "./StudentMenu.vue";
+import TeacherSectionMenu from "./TeacherSectionMenu.vue";
 import Flag from "@/components/Flag.vue";
 import { TtsConfig, VoiceElem } from "@/components/tts";
-import { LicenseConfigView } from "@/components/admin";
-import { Modal } from "@/components";
 // import OAuthButton2 from "@/components/oauth/OAuthButton2.vue";
 import UserProfile from "./UserProfile.vue";
 export default {
@@ -52,11 +36,9 @@ export default {
     Flag,
     MenuSection,
     VoiceElem,
-    Modal,
+
     UserProfile,
-    LicenseMenu,
-    StudentMenu,
-    LicenseConfigView,
+    TeacherSectionMenu,
   },
   setup() {
     const store = useStore();
@@ -81,10 +63,6 @@ export default {
       modalComponent.value = null;
       modalArgs.value = null;
     };
-    const showLicenseConfig = (license) => {
-      modalComponent.value = LicenseConfigView;
-      modalArgs.value = { license };
-    };
     const showLoginButton = () => {};
     onMounted(() => {
       // loginButton.value = OAuthButton;
@@ -96,7 +74,6 @@ export default {
       slider,
       activeVoice,
       showTtsConfig,
-      showLicenseConfig,
       hideModal,
       modalComponent,
       modalArgs,
@@ -129,14 +106,6 @@ export default {
     background-color: white;
     position: relative;
     box-shadow: 2px 0 6px #0000004d;
-    .menu-item {
-      display: flex;
-      align-items: center;
-      dl,
-      dd {
-        margin: 0;
-      }
-    }
   }
 
   .dimmer-leave-to,

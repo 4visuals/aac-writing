@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  props: ["imagePath", "size"],
+  props: ["imagePath", "size", "vendor"],
   setup() {},
 };
 </script>

@@ -60,7 +60,7 @@ export default {
     ];
 
     const changeCourse = (course) => {
-      router.push(course.path);
+      router.replace(course.path);
     };
     return {
       modalVisible,

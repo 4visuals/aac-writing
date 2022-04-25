@@ -14,6 +14,8 @@ store.registerModule("quiz", {
     quizContext: null,
   }),
   getters: {
+    quizPage: (state) => !!state.quizContext, // 퀴즈화면인지 나타냄
+    currentSection: (state) => state.quizContext && state.quizContext.section,
     currentPara: (state) =>
       state.quizContext ? state.quizContext.currentQuestion : null,
   },

@@ -40,7 +40,7 @@ export default {
     const topPadding = computed(() => store.getters["ui/topPadding"]);
 
     const route = useRoute();
-    console.log(route.path, route.params, topPadding);
+    // console.log(route.path, route.params, topPadding);
     const tr = {
       name: "route",
     };

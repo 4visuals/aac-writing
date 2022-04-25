@@ -57,7 +57,7 @@
 
 <script>
 import { computed, onMounted, onUnmounted, ref } from "@vue/runtime-core";
-import { useRoute } from "vue-router";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 import quizStore from "./quizStore";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
@@ -117,6 +117,19 @@ export default {
         wordDecomposing.value = true;
       }
     };
+    onBeforeRouteLeave(() => {
+      // console.log(`${from.fullPath} -> ${to.fullPath}`);
+      if (!quizFinished.value) {
+        const exitQuiz = confirm("퀴즈를 종료합나까?");
+        if (exitQuiz) {
+          store.commit("quiz/closeQuiz");
+        }
+        return exitQuiz;
+      } else {
+        store.commit("quiz/closeQuiz");
+        return true;
+      }
+    });
     onMounted(() => {
       store.commit("ui/setBackgroundVisible", false);
       store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });

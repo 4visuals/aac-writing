@@ -47,7 +47,6 @@ export default {
   setup(props) {
     const store = useStore();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
-    console.log("[section]", props.cate);
     const title = () => {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";

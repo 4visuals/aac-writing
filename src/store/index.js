@@ -4,6 +4,9 @@ import course from "./modules/course";
 import ui from "./modules/ui";
 import exam from "./modules/exam";
 
-export default createStore({
+const store = createStore({
   modules: { user, course, ui, exam },
 });
+
+store.commit("exam/initLicense");
+export default store;

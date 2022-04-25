@@ -1,7 +1,9 @@
 <template>
   <div class="menu-section">
     <h3>{{ title }}</h3>
-    <slot />
+    <div class="menu-item">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -17,6 +19,14 @@ export default {
   > h3 {
     font-size: 1.2rem;
     user-select: none;
+  }
+  > .menu-item {
+    display: flex;
+    align-items: center;
+    dl,
+    dd {
+      margin: 0;
+    }
   }
 }
 </style>

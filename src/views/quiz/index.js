@@ -169,10 +169,19 @@ class QuizContext {
     return this.options.license;
   }
   get sectionSeq() {
+    return this.config.options.section.seq;
+  }
+  get section() {
     return this.config.options.section;
   }
   get prevPage() {
     return this.config.options.prevPage;
+  }
+  get mode() {
+    return this.options.mode;
+  }
+  get resourceType() {
+    return this.config.options.quizResource;
   }
   /**
    * 낱말읽기, 문장읽기
@@ -254,7 +263,7 @@ const loadSentenceQuiz = ({
         const config = new QuizConfig(sentences, {
           quizMode,
           answerType,
-          section,
+          section: sec,
           quizResource,
           prevPage,
         });

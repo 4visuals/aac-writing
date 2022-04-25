@@ -1,9 +1,16 @@
 <template>
-  <div class="section" @click="$emit('itemClicked', item)">
+  <div
+    class="section"
+    :class="{ compact: compact === '' }"
+    @click="$emit('itemClicked', item)"
+  >
     <h1 :class="theme">{{ idx }}</h1>
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
       <ParaText :small="true">{{ item.description }}</ParaText>
+      <ParaText class="sub" :class="theme" :small="true" v-if="desc">{{
+        desc
+      }}</ParaText>
     </div>
   </div>
 </template>
@@ -14,10 +21,8 @@ export default {
   components: {
     ParaText,
   },
-  props: ["idx", "item", "theme"],
-  setup() {
-    // console.log(props.item);
-  },
+  props: ["idx", "item", "theme", "compact", "desc"],
+  setup() {},
 };
 </script>
 
@@ -87,6 +92,9 @@ export default {
     position: relative;
     cursor: pointer;
     height: 100%;
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
     &::after {
       content: "";
       position: absolute;
@@ -149,6 +157,59 @@ export default {
       box-shadow: 6px 6px #6c97dc;
       background-color: #7ca2e0;
       color: #0b0a45;
+    }
+  }
+  &.compact {
+    margin: 0;
+    display: inline-flex;
+    white-space: nowrap;
+    > h1 {
+      left: 14px;
+      top: 50%;
+      font-size: 1.5rem;
+      transform: translateY(-50%);
+    }
+    .desc {
+      padding: 8px 16px 8px 32px;
+      box-shadow: none;
+      &:after {
+        display: none;
+      }
+      &:active {
+        top: 0px;
+        left: 0px;
+        box-shadow: none;
+      }
+      .sub {
+        position: relative;
+        &::before {
+          content: "";
+          display: block;
+          height: 4px;
+          width: 4px;
+          border-radius: 2px;
+          position: absolute;
+          top: 50%;
+          left: -10px;
+          transform: translateY(-50%);
+        }
+        &.green {
+          &::before {
+            background-color: #20450a;
+          }
+        }
+
+        &.pink {
+          &::before {
+            background-color: #d23d70;
+          }
+        }
+        &.yellow {
+          &::before {
+            background-color: var(--aac-color-yellow-900);
+          }
+        }
+      }
     }
   }
 }
