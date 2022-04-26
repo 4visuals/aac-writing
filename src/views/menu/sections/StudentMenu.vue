@@ -10,7 +10,12 @@
     <template v-else>
       <p>{{ students.length }}명</p>
       <div class="stud-list">
-        <StudentItem v-for="s in students" :key="s.seq" :student="s" />
+        <StudentItem
+          v-for="s in students"
+          :key="s.seq"
+          :student="s"
+          @clicked="showStudentDetailView"
+        />
       </div>
       <div class="ctrl-stud">
         <StaticButton
@@ -23,18 +28,24 @@
       </div>
     </template>
 
-    <teleport to="body" v-if="modalVisible">
-      <Modal ref="modal" @hidden="hideModal">
-        <StudentRegForm @student="createStudent" />
+    <teleport to="body" v-if="modal">
+      <Modal @hidden="hideModal" height="80%">
+        <component
+          :is="modal.comp"
+          v-bind="{ ...modal.args }"
+          v-on="{ ...modal.events }"
+        />
       </Modal>
     </teleport>
   </div>
 </template>
 
 <script>
+// import QuizStatsView from "@/components/stats/QuizStatsView.vue";
+import { StudentDetailView } from "@/components/user";
 import { StudentRegForm, StudentItem } from "@/components/admin";
 import { StaticButton } from "@/components/form";
-import { ref } from "@vue/reactivity";
+import { shallowRef } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { computed } from "@vue/runtime-core";
 export default {
@@ -46,18 +57,32 @@ export default {
   setup() {
     const store = useStore();
     const students = computed(() => store.getters["user/students"]);
-    const modalVisible = ref(false);
+    const modal = shallowRef(null);
     const showStudentRegForm = () => {
-      modalVisible.value = true;
+      modal.value = {
+        comp: StudentRegForm,
+        args: {},
+        events: { student: "createStudent" },
+      };
     };
-    const hideModal = () => (modalVisible.value = false);
+    const showStudentDetailView = (student) => {
+      modal.value = {
+        comp: StudentDetailView,
+        args: { student },
+        events: {},
+      };
+    };
+    const hideModal = () => {
+      modal.value = null;
+    };
     const createStudent = (student) => {
       console.log(student);
     };
     return {
-      modalVisible,
+      modal,
       students,
       showStudentRegForm,
+      showStudentDetailView,
       createStudent,
       hideModal,
     };

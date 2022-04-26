@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import { Modal, ModalHeader } from "./components";
+import AacButton from "./components/form/AacButton.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
@@ -17,7 +18,10 @@ app.use(store).use(router).use(GooglgAuth, {
 /**
  * installing global components
  */
-app.component("Modal", Modal).component("ModalHeader", ModalHeader);
+app
+  .component("AacButton", AacButton)
+  .component("Modal", Modal)
+  .component("ModalHeader", ModalHeader);
 /**
  * inject google oauth helper
  */
