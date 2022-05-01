@@ -7,6 +7,7 @@
       type="text"
       v-if="inputVisible"
       @keydown="markTime"
+      @keyup.space="commitForSpace"
       @keydown.enter.stop="flush"
       @keydown.tab.stop.prevent="flush"
       @input="$emit('update:inputText', $event.target.value)"
@@ -21,7 +22,13 @@
 import { tts } from "@/components/tts";
 import { ref } from "@vue/reactivity";
 export default {
-  props: ["inputVisible", "hiddenText", "inputText", "textClick"],
+  props: [
+    "inputVisible",
+    "hiddenText",
+    "inputText",
+    "textClick",
+    "spaceCommit",
+  ],
   emits: ["commit", "update:inputText", "reset"],
   setup(props, { emit }) {
     let startTime = [];
@@ -39,7 +46,7 @@ export default {
 
       emit("commit", {
         e,
-        value: e.target.value,
+        value: e.target.value.trim(),
         elapsedTime,
         done: resetTime,
       });
@@ -55,8 +62,20 @@ export default {
     const markTime = () => {
       startTime.push(new Date().getTime());
     };
-
-    return { inputEl, flush, focus, resetTime, markTime, clicked };
+    const commitForSpace = (e) => {
+      if (props.spaceCommit) {
+        flush(e);
+      }
+    };
+    return {
+      inputEl,
+      flush,
+      focus,
+      resetTime,
+      markTime,
+      commitForSpace,
+      clicked,
+    };
   },
 };
 </script>

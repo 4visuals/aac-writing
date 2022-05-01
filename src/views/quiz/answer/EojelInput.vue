@@ -6,6 +6,7 @@
         :ej="ej"
         :pumsaType="quizContext.pumsaType"
         :showAnswer="quizContext.isReadingMode()"
+        :spaceCommit="true"
         @typed="validateAnswer"
         @clicked="() => holdAndSpeak(ej)"
       />

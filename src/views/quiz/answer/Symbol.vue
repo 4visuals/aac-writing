@@ -13,6 +13,7 @@
         :inputVisible="!correct"
         @commit="checkAnswer"
         @textClick="speak"
+        :spaceCommit="true"
       />
     </div>
   </div>

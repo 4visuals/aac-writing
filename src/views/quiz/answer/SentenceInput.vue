@@ -6,6 +6,7 @@
       v-model:inputText="trial"
       :hiddenText="question.text"
       :inputVisible="!correct"
+      :spaceCommit="quizContext.isWord()"
       @commit="checkAnswer"
       @rest="() => (inputText = '')"
     />
@@ -85,7 +86,7 @@ export default {
     const checkAnswer = (e) => {
       const { elapsedTime } = e;
       const learngingMode = props.quizContext.isLearningMode();
-      const passed = question.value.tryAnswer(trial.value, elapsedTime);
+      const passed = question.value.tryAnswer(e.value, elapsedTime);
       correct.value = learngingMode ? passed : false;
       dummy.value.focus();
       if (learngingMode) {
