@@ -77,10 +77,19 @@ export default {
       });
       new Audio(require(`@/assets/reward/${name}.mp3`)).play();
     };
+    let pendingSpeakId = null;
     const speackAndFocus = (delay) => {
+      if (pendingSpeakId) {
+        clearTimeout(pendingSpeakId);
+      }
       dummy.value.focus();
-      setTimeout(() => {
-        tts.speak(question.value.text).then(() => field.value.focus());
+      pendingSpeakId = setTimeout(() => {
+        tts
+          .speak(question.value.text, { clearPending: true })
+          .then(() => field.value.focus())
+          .catch((e) => {
+            console.log("[stop tts]", e);
+          });
       }, delay);
     };
     const checkAnswer = (e) => {

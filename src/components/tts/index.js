@@ -1,7 +1,12 @@
 import ttsStore from "./tts-store";
 import TtsConfig from "./TtsConfig.vue";
 import VoiceElem from "./VoiceElem.vue";
-
+const DEFAULT_SPEAK_OPTION = {
+  clearPending: false,
+};
+const clearPendings = () => {
+  window.speechSynthesis.cancel();
+};
 class TTS {
   constructor() {
     ttsStore.init().then(() => {
@@ -9,7 +14,11 @@ class TTS {
       ttsStore.setActiveVoice(voices[0]);
     });
   }
-  speak(text) {
+  speak(text, option) {
+    option = option || DEFAULT_SPEAK_OPTION;
+    if (option.clearPending) {
+      clearPendings();
+    }
     const config = ttsStore.getVoiceConfig();
     var syn = new SpeechSynthesisUtterance(text);
     syn.lang = config.lang;

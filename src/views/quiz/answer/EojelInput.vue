@@ -110,9 +110,17 @@ export default {
       }
       console.log(ej.isSolved);
     };
+    let pendingSpeakId = null;
     const speackAndMoveFocus = () => {
+      if (pendingSpeakId) {
+        clearTimeout(pendingSpeakId);
+      }
       dummy.value.focus();
-      tts.speak(question.value.text).then(() => moveToNextEojeol(null));
+      pendingSpeakId = setTimeout(() => {
+        tts
+          .speak(question.value.text, { clearPending: true })
+          .then(() => moveToNextEojeol(null));
+      }, 500);
     };
     const holdAndSpeak = (ej) => {
       dummy.value.focus();

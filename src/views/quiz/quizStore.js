@@ -59,10 +59,10 @@ const shiftBy = (offset) => {
   const nextQuizIndex = ctx.currentQuestion.index + offset;
   if (nextQuizIndex === ctx.quizLength) {
     store.commit("quiz/showResultView");
-  } else if (ctx.currentQuestion.hasNextQuiz()) {
-    setQuestionAt(ctx.currentQuestion.index + offset);
-  } else {
+  } else if (nextQuizIndex < 0) {
     alert("no more quiz");
+  } else {
+    setQuestionAt(nextQuizIndex);
   }
 };
 export default {
