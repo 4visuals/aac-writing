@@ -5,7 +5,7 @@
     ref="wrapperEl"
     :style="`padding-top: ${topPadding}px`"
   >
-    <Nav v-if="route.path !== '/'" ref="nav" />
+    <Nav v-if="route.path !== '/' && route.path !== '/console'" ref="nav" />
 
     <router-view v-slot="{ Component }">
       <transition

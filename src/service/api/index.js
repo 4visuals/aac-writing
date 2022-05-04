@@ -45,6 +45,8 @@ const stats = {
   sections: (type, value) => GET(`/stats/sections/${type}/${value}`),
 };
 
+const tts = {};
+
 export { section };
 
-export default { user, student, chapter, license, section, exam, stats };
+export default { user, student, chapter, license, section, exam, stats, tts };

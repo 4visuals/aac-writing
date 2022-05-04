@@ -79,7 +79,7 @@ export default {
     setNavSize(state, { expanded, topPadding }) {
       state.ui.nav.expanded = expanded;
       state.ui.nav.height = expanded ? 120 : 56;
-      if (topPadding) {
+      if (Number.isInteger(topPadding)) {
         state.ui.topPadding = topPadding;
       }
     },

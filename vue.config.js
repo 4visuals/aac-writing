@@ -50,6 +50,7 @@ module.exports = {
     workboxPluginMode: "InjectManifest",
     workboxOptions: {
       swSrc: "src/service-worker.js",
+      excludeChunks: ["admin-module"],
     },
   },
 };

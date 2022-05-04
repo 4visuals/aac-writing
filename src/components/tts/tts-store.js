@@ -4,6 +4,7 @@ store.registerModule("tts", {
   namespaced: true,
   state: () => ({
     voices: new Map(),
+    ttsMode: "browser",
     activeVoice: null,
     option: {
       rate: 0.8,
@@ -75,6 +76,9 @@ const setActiveVoice = (voice) => {
 const setSpeaking = (on) => store.commit("tts/speaking", on);
 const getVoicesByLang = (lang) => store.state.tts.voices.get(lang);
 const activeVoice = store.getters["tts/activeVoice"];
+
+const setTtsMode = (mode) => (store.state.tts.ttsMode = mode);
+const getTtsMode = () => store.state.tts.ttsMode;
 export default {
   init,
   getVoiceConfig,
@@ -82,4 +86,6 @@ export default {
   getVoicesByLang,
   activeVoice,
   setSpeaking,
+  setTtsMode,
+  getTtsMode,
 };

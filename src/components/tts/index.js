@@ -1,6 +1,7 @@
 import ttsStore from "./tts-store";
 import TtsConfig from "./TtsConfig.vue";
 import VoiceElem from "./VoiceElem.vue";
+import md5 from "crypto-js/md5";
 const DEFAULT_SPEAK_OPTION = {
   clearPending: false,
 };
@@ -31,7 +32,6 @@ class TTS {
         ttsStore.setSpeaking(true);
         // console.log("[SPEECH] START", e);
       };
-      syn.on;
       syn.onend = (e) => {
         ttsStore.setSpeaking(false);
         // console.log("[SPEECH] DONE", e);
@@ -55,6 +55,40 @@ class TTS {
     });
   }
 }
-const tts = new TTS();
+const browser = new TTS();
 
+class PollyTts {
+  speak(text) {
+    const textHash = md5(text.trim()).toString();
+    const url = `https://kr.object.ncloudstorage.com/yeori-voice-bucket/voices/${textHash}.mp3`;
+
+    const audio = new Audio(url);
+    ttsStore.setSpeaking(true);
+    return new Promise((done, failed) => {
+      audio.onended = (e) => {
+        console.log("[end]", e);
+        ttsStore.setSpeaking(false);
+        done(text, e);
+      };
+      audio.onerror = (e) => {
+        console.log(e);
+        ttsStore.setSpeaking(false);
+        failed(e);
+      };
+      audio.play();
+    });
+  }
+}
+const polly = new PollyTts();
+
+const ttsSet = {
+  browser,
+  polly,
+};
+const tts = {
+  speak(text) {
+    const mode = ttsStore.getTtsMode();
+    return ttsSet[mode].speak(text);
+  },
+};
 export { tts, ttsStore, TtsConfig, VoiceElem };

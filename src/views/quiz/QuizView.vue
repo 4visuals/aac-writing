@@ -88,7 +88,10 @@ export default {
     const router = useRouter();
     // console.log("[QUIZ]", route.params.seq);
     quiz.loadQuiz();
-
+    /**
+     * 모바일에서 soft keyboard가 내려갔다 올라가는 불편을 방지하기 위해서
+     * dummy로 집어넣은 inpupt[type=text]에 포커스를 옮겨둠.
+     */
     const holdSoftKeyboard = () => focusing.value.focus();
 
     const moveQuiz = (dir) => {
