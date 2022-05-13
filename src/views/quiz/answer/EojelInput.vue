@@ -1,6 +1,6 @@
 <template>
   <div class="eojeol-list">
-    <input type="text" class="dummy" ref="dummy" />
+    <input type="text" class="dummy" ref="dummy" tabindex="-1" />
     <div class="ej" v-for="ej in eojeols" :key="ej.order">
       <Symbol
         :ej="ej"

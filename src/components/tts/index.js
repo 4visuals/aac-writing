@@ -2,6 +2,7 @@ import ttsStore from "./tts-store";
 import TtsConfig from "./TtsConfig.vue";
 import VoiceElem from "./VoiceElem.vue";
 import md5 from "crypto-js/md5";
+import env from "@/service/env";
 const DEFAULT_SPEAK_OPTION = {
   clearPending: false,
 };
@@ -60,7 +61,7 @@ const browser = new TTS();
 class PollyTts {
   speak(text) {
     const textHash = md5(text.trim()).toString();
-    const url = `https://kr.object.ncloudstorage.com/yeori-voice-bucket/voices/${textHash}.mp3`;
+    const url = `${env.TTS_POLLY_PATH}/voices/${textHash}.mp3`;
 
     const audio = new Audio(url);
     ttsStore.setSpeaking(true);

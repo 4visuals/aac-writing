@@ -73,7 +73,7 @@ export default {
   box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
   z-index: 1000;
   border-radius: 2vmin;
-  overflow: hidden;
+  // overflow: hidden;
   &.sm {
     max-width: 560px;
   }

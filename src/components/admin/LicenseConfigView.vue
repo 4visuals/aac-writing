@@ -16,8 +16,30 @@
       <div class="stud-list" v-if="studentInUse">
         <StudentItem :student="studentInUse" />
       </div>
-      <p v-else>등록된 학생이 없습니다.</p>
-      <h5>학생들</h5>
+      <div v-else class="reg">
+        <p>등록된 학생이 없습니다.</p>
+        <h5>학생 등록</h5>
+        <DatePicker
+          :visible="studentReg.visible"
+          @cur-date="setBirthday"
+          @toggle="(visible) => (studentReg.visible = !visible)"
+        />
+        <TextField v-model:value="studentReg.name" placeholder="이름 입력" />
+        <TextField
+          v-model:value="studentReg.password"
+          type="password"
+          placeholder="비밀번호"
+        />
+        <AacButton
+          size="xs"
+          inline
+          theme="blue"
+          text="학생 등록"
+          @click="registerStudent"
+        ></AacButton>
+      </div>
+
+      <!-- <h5>학생들</h5>
       <div class="stud-list">
         <StudentItem
           v-for="s in assignables"
@@ -25,7 +47,7 @@
           :student="s"
           @clicked="bindStudent"
         />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -33,6 +55,9 @@
 <script>
 import LicenseItem from "./LicenseItem.vue";
 import StudentItem from "./StudentItem.vue";
+import DatePicker from "@/components/DatePicker.vue";
+import { TextField } from "@/components/form";
+// import api from "@/service/api";
 import { computed, ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
 export default {
@@ -40,6 +65,8 @@ export default {
   components: {
     LicenseItem,
     StudentItem,
+    DatePicker,
+    TextField,
   },
   setup(props) {
     const store = useStore();
@@ -50,6 +77,13 @@ export default {
     const assignables = ref(null);
     const current = ref(new Date().getTime());
 
+    const studentReg = ref({
+      name: "",
+      password: "",
+      birthday: "",
+      visible: false,
+    });
+
     const updateUse = () => {
       const license = active.value;
       if (!license) {
@@ -58,6 +92,7 @@ export default {
       const idx = students.value.findIndex(
         (s) => license && license.studentRef === s.seq
       );
+      studentReg.value.visible = false;
       studentInUse.value = students.value[idx];
       assignables.value = students.value.filter(
         (s) =>
@@ -78,13 +113,47 @@ export default {
           updateUse();
         });
     };
+    const registerStudent = () => {
+      const { name, birthday, password } = studentReg.value;
+      console.log(name, birthday);
+      store
+        .dispatch("user/createStudent", {
+          name,
+          birthday,
+          password,
+          license: active.value,
+        })
+        .then(() => {
+          updateUse();
+        });
+      // api.student
+      //   .register(name, birthday, password, active.value.uuid)
+      //   .then((res) => {
+      //     console.log(res);
+      //     store.dispatch("user/autoLogin");
+      //     active.value.studentRef = res.lcs.curStud;
+      //     updateUse();
+      //   })
+      //   .catch((err) => {
+      //     alert("학생 추가 실패: " + err.cause);
+      //   });
+    };
+    const setBirthday = (e) => {
+      studentReg.value.birthday = `${e.year}-${e.month}-${e.date}`;
+      if (e.changed === "month") {
+        studentReg.value.visible = false;
+      }
+    };
     return {
       current,
       active,
       studentInUse,
       licenses,
       assignables,
+      studentReg,
       bindStudent,
+      setBirthday,
+      registerStudent,
     };
   },
 };
@@ -110,6 +179,11 @@ export default {
       column-gap: 4px;
       flex-wrap: wrap;
       margin: 0.6rem 0;
+    }
+    .reg {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 }

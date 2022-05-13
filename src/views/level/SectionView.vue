@@ -134,6 +134,9 @@ $padding: 16px;
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-top-left-radius: 2vmin;
+  border-top-right-radius: 2vmin;
+  overflow: hidden;
   .body {
     flex: 1 1 auto;
   }

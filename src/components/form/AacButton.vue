@@ -45,6 +45,7 @@ export default {
     background-color: transparent;
     border: none;
     border-radius: 4rem;
+    color: inherit;
 
     &.pink {
       @include pink($shadow: true);

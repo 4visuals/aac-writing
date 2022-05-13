@@ -1,8 +1,9 @@
 <template>
   <div class="form-elem" :style="style">
     <input
-      type="text"
+      :type="type || 'text'"
       :value="value"
+      :placeholder="placeholder"
       @input="changed"
       @keydown.enter.stop="onEnterDown"
       @keyup.enter="onEnterUp"
@@ -12,7 +13,13 @@
 
 <script>
 export default {
-  props: { value: String, style: Object, trim: Boolean },
+  props: {
+    type: String,
+    value: String,
+    style: Object,
+    trim: Boolean,
+    placeholder: String,
+  },
   emits: ["enter", "update:value"],
   setup(props, { emit }) {
     /*

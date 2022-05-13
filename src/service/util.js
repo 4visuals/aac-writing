@@ -52,6 +52,14 @@ const time = {
     const dd = ("0" + D.getDate()).slice(-2);
     return `${D.getFullYear()}-${mm}-${dd}`;
   },
+  toYMD2: (epochMillis) => {
+    const D = new Date(epochMillis);
+    return {
+      year: D.getFullYear(),
+      month: D.getMonth() + 1,
+      date: D.getDate(),
+    };
+  },
   range: (cur, format) => {
     const fmt = format.split(" ");
     const baseYMD = time.toYMD(cur);

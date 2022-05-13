@@ -7,7 +7,8 @@ const user = {
   login: () => POST(`/user/login`),
 };
 const student = {
-  register: (name, birth) => POST(`/student`, { name, birth }),
+  register: (name, birth, password, license) =>
+    POST(`/student`, { name, birth, password, license }),
 };
 const chapter = {
   list: (origin) => GET(`/chapters/origin/${origin}`),

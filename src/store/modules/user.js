@@ -49,6 +49,12 @@ export default {
       // }
       return jwt;
     },
+    applyStudent(state, args) {
+      const { student, license } = args;
+      const mm = state.membership;
+      mm.user.students.push(student);
+      license.studentRef = student.seq;
+    },
   },
 
   actions: {
@@ -86,6 +92,19 @@ export default {
         ctx.commit("showWelcome");
         return res.membership;
       });
+    },
+    createStudent(ctx, args) {
+      const { name, birthday, password, license } = args;
+      return api.student
+        .register(name, birthday, password, license?.uuid)
+        .then((res) => {
+          console.log(res);
+          ctx.commit("applyStudent", { student: res.student, license });
+          return res;
+        })
+        .catch((err) => {
+          alert("학생 추가 실패: " + err.cause);
+        });
     },
     bindStudent(ctx, args) {
       const { license, student } = args;
