@@ -10,7 +10,7 @@
       @commit="checkAnswer"
       @rest="() => (inputText = '')"
     />
-    <button class="btn-submit" @click="checkAnswer" v-if="!question.isSolved">
+    <button class="btn-submit" @click="checkByClick" v-if="!question.isSolved">
       <SpanText>제출</SpanText>
     </button>
   </div>
@@ -95,12 +95,12 @@ export default {
     const checkAnswer = (e) => {
       const { elapsedTime } = e;
       const learngingMode = props.quizContext.isLearningMode();
-      const passed = question.value.tryAnswer(e.value, elapsedTime);
+      const passed = question.value.tryAnswer(trial.value.trim(), elapsedTime);
       correct.value = learngingMode ? passed : false;
       dummy.value.focus();
       if (learngingMode) {
         if (passed) {
-          tts.speak(trial.value).then(() => {
+          tts.speak(trial.value.trim()).then(() => {
             showReward("passed");
           });
         } else {
@@ -111,6 +111,13 @@ export default {
         e.done();
         quizStore.moveNext();
       }
+    };
+    const checkByClick = () => {
+      const e = {
+        value: trial.value,
+        done: () => {},
+      };
+      checkAnswer(e);
     };
     watch(
       () => source.value,
@@ -133,6 +140,7 @@ export default {
       correct,
       question,
       checkAnswer,
+      checkByClick,
     };
   },
 };

@@ -63,7 +63,6 @@ export default {
       startTime.push(new Date().getTime());
     };
     const commitForSpace = (e) => {
-      alert(props.spaceCommit);
       if (props.spaceCommit) {
         flush(e);
       }

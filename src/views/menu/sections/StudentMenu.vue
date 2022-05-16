@@ -17,7 +17,7 @@
           @clicked="showStudentDetailView"
         />
       </div>
-      <div class="ctrl-stud">
+      <!-- <div class="ctrl-stud">
         <StaticButton
           text="추가"
           size="sm"
@@ -25,7 +25,7 @@
           inline
           @click="showStudentRegForm"
         ></StaticButton>
-      </div>
+      </div> -->
     </template>
 
     <teleport to="body" v-if="modal">
