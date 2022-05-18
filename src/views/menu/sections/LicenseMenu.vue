@@ -5,6 +5,7 @@
       v-for="lcs in licenses"
       :key="lcs.seq"
       :lcs="lcs"
+      :students="students"
       :current="current"
       @click="$emit('clicked', lcs)"
     />
@@ -20,9 +21,10 @@ export default {
   setup() {
     const store = useStore();
     const licenses = computed(() => store.state.user.membership.licenses);
+    const students = computed(() => store.getters["user/students"]);
     const current = new Date().getTime();
 
-    return { licenses, current };
+    return { licenses, students, current };
   },
 };
 </script>

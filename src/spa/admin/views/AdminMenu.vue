@@ -5,22 +5,15 @@
       <div class="secion">
         <button class="exit">나가기</button>
       </div>
-      <div class="section">
+      <div
+        class="section"
+        v-for="menu in menus"
+        :key="menu.id"
+        @click="$emit('menuClicked', menu)"
+      >
         <div class="section-body">
-          <span class="icon material-icons-outlined">account_balance</span>
-          <span class="desc">문제은행</span>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-body">
-          <span class="icon material-icons-outlined">badge</span>
-          <span class="desc">수강증</span>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-body">
-          <span class="icon material-icons-outlined">insights</span>
-          <span class="desc">통계</span>
+          <span class="icon material-icons-outlined">{{ menu.icon }}</span>
+          <span class="desc">{{ menu.title }}</span>
         </div>
       </div>
     </div>
@@ -28,7 +21,20 @@
 </template>
 
 <script>
-export default {};
+import { shallowRef } from "@vue/reactivity";
+
+export default {
+  props: ["menus"],
+  setup() {
+    const bodyComponent = shallowRef(null);
+    const showAdminBody = (menu) => {
+      bodyComponent.value = menu.comp;
+    };
+    return {
+      showAdminBody,
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -37,6 +43,8 @@ export default {};
   .menu-body {
     .section {
       padding: 0.75rem 1rem;
+      user-select: none;
+      cursor: pointer;
       .section-body {
         display: flex;
         column-gap: 8px;

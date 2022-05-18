@@ -4,7 +4,9 @@
       type="button"
       :class="`${themeValue()} ${size} ${
         disabled === '' || disabled === true ? 'disabled' : ''
-      } ${fill === '' ? 'filled' : ''}`"
+      }${fill === '' ? 'filled' : ' '} ${rect === '' ? 'no-rounded' : ''} ${
+        borderless === '' ? 'borderless' : ''
+      }`"
       @click.stop="clicked"
     >
       {{ text }}
@@ -15,15 +17,27 @@
 <script>
 import clickSound from "@/assets/click.wav";
 export default {
-  props: ["text", "inline", "theme", "size", "disabled", "fill"],
+  props: [
+    "text",
+    "inline",
+    "theme",
+    "size",
+    "disabled",
+    "fill",
+    "rect",
+    "borderless",
+    "muted",
+  ],
   setup(props, { emit }) {
     // console.log(props);
     const clicked = () => {
       if (props.disabled === "" || props.disabled === true) {
         return;
       }
-      const audio = new Audio(clickSound);
-      audio.play();
+      if (props.muted !== "") {
+        const audio = new Audio(clickSound);
+        audio.play();
+      }
       emit("click");
     };
     const themeValue = () => props.theme || "gray";
@@ -46,6 +60,12 @@ export default {
     border: none;
     border-radius: 4rem;
     color: inherit;
+    &.no-rounded {
+      border-radius: 0;
+    }
+    &.borderless {
+      border-width: 0 !important;
+    }
 
     &.pink {
       @include pink($shadow: true);
@@ -82,7 +102,7 @@ export default {
 
   @include mobile {
     button {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       padding: 0.4rem 0.8rem;
       &.sm {
         font-size: 0.85rem;
@@ -94,7 +114,7 @@ export default {
       font-size: 1.35rem;
       padding: 0.5rem 1rem;
       &.xs {
-        font-size: 1.1rem;
+        font-size: 1rem;
         padding: 0.35rem 0.7rem;
       }
       &.sm {

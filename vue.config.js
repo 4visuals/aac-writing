@@ -35,6 +35,7 @@ module.exports = {
   },
   devServer: {
     port: 5000,
+    allowedHosts: [".aacdict.kr"],
   },
   pwa: {
     name: "그림한글 받아쓰기",

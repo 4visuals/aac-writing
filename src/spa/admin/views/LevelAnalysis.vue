@@ -96,7 +96,8 @@ export default {
           chapters: store.getters["course/books"],
         });
         currentCourse.value = courses[0];
-      }
+      },
+      { immediate: true }
     );
     return {
       chapterLoaded,

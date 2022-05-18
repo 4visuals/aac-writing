@@ -1,8 +1,8 @@
 <template>
   <div class="license normal effect pressed" :class="{ active }">
     <div class="remaining" v-if="vMode === 'normal'">
-      <span class="ticket material-icons-outlined">schedule </span
-      ><span>{{ remaining(lcs) }}</span>
+      <!--<span class="ticket material-icons-outlined">schedule </span
+      >--><span>{{ remaining(lcs) }}</span>
     </div>
     <div class="progress-bar" v-if="vMode === 'normal'">
       <div class="bar" :style="`width:${resolveWidth(lcs)}`"></div>
@@ -16,17 +16,14 @@
 
 <script>
 import { time } from "@/service/util";
-import { useStore } from "vuex";
-import { computed, ref, watch } from "@vue/runtime-core";
+import { ref, watch } from "@vue/runtime-core";
 export default {
-  props: ["lcs", "current", "active", "mode"],
+  props: ["lcs", "students", "current", "active", "mode"],
   setup(props) {
-    const store = useStore();
-    const students = computed(() => store.getters["user/students"]);
     const assignee = ref(null);
     const vMode = ref(props.mode || "normal");
     const updateAssignee = () => {
-      assignee.value = students.value.find(
+      assignee.value = props.students.find(
         (s) => s.seq === props.lcs.studentRef
       );
     };
@@ -67,6 +64,9 @@ export default {
     display: flex;
     align-items: center;
     user-select: none;
+    > span {
+      padding: 4px 8px;
+    }
   }
   .ticket {
     font-size: 16px;
@@ -74,7 +74,7 @@ export default {
   }
   .progress-bar {
     height: 3px;
-    margin: 2px 8px 2px 32px;
+    margin: 2px 8px;
     border-radius: 2px;
     .bar {
       height: 3px;

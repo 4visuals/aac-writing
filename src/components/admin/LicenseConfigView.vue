@@ -4,6 +4,7 @@
       <LicenseItem
         @click="active = lcs"
         v-for="lcs in licenses"
+        :students="students"
         :lcs="lcs"
         :current="current"
         :active="active === lcs"
@@ -58,10 +59,10 @@ import StudentItem from "./StudentItem.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { TextField } from "@/components/form";
 // import api from "@/service/api";
-import { computed, ref, watch } from "@vue/runtime-core";
+import { ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
 export default {
-  props: ["license"],
+  props: ["license", "licenses", "students"],
   components: {
     LicenseItem,
     StudentItem,
@@ -70,9 +71,7 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const students = computed(() => store.getters["user/students"]);
-    const licenses = computed(() => store.state.user.membership.licenses);
-    const active = ref(props.license);
+    const active = ref(props.license || props.licenses[0]);
     const studentInUse = ref(null);
     const assignables = ref(null);
     const current = ref(new Date().getTime());
@@ -89,15 +88,15 @@ export default {
       if (!license) {
         return;
       }
-      const idx = students.value.findIndex(
+      const idx = props.students.findIndex(
         (s) => license && license.studentRef === s.seq
       );
       studentReg.value.visible = false;
-      studentInUse.value = students.value[idx];
-      assignables.value = students.value.filter(
+      studentInUse.value = props.students[idx];
+      assignables.value = props.students.filter(
         (s) =>
           s !== studentInUse.value &&
-          !licenses.value.find((lcs) => lcs.studentRef === s.seq)
+          !props.licenses.find((lcs) => lcs.studentRef === s.seq)
       );
     };
     watch(() => active.value, updateUse, { immediate: true });
@@ -126,17 +125,6 @@ export default {
         .then(() => {
           updateUse();
         });
-      // api.student
-      //   .register(name, birthday, password, active.value.uuid)
-      //   .then((res) => {
-      //     console.log(res);
-      //     store.dispatch("user/autoLogin");
-      //     active.value.studentRef = res.lcs.curStud;
-      //     updateUse();
-      //   })
-      //   .catch((err) => {
-      //     alert("학생 추가 실패: " + err.cause);
-      //   });
     };
     const setBirthday = (e) => {
       studentReg.value.birthday = `${e.year}-${e.month}-${e.date}`;
@@ -148,7 +136,6 @@ export default {
       current,
       active,
       studentInUse,
-      licenses,
       assignables,
       studentReg,
       bindStudent,

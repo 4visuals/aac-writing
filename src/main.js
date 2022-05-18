@@ -31,5 +31,3 @@ app.config.errorHandler = (err, instance) => {
   console.error(err);
   console.error(instance);
 };
-// store.dispatch("course/loadChapter", { origin: "L" });
-// store.dispatch("user/autoLogin");
