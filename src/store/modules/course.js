@@ -23,6 +23,7 @@ export default {
     section: (_, getters) => (sectionSeq) => {
       return getters.sections.find((sec) => sec.seq === sectionSeq);
     },
+    ready: (state) => state.chapters.levels.length > 0,
   },
   mutations: {
     setChapter(state, args) {

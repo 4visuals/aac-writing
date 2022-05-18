@@ -33,7 +33,7 @@ export default {};
 
 <style lang="scss" scoped>
 .menu-wrapper {
-  flex: 0 0 200px;
+  flex: 0 0 140px;
   .menu-body {
     .section {
       padding: 0.75rem 1rem;

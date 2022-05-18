@@ -2,7 +2,6 @@
   <div class="admin-wrapper">
     <admin-menu />
     <div class="admin-body">
-      <h3>여기에 내용 표시</h3>
       <level-analysis />
     </div>
   </div>
@@ -31,5 +30,8 @@ export default {
 .admin-wrapper {
   height: 100%;
   display: flex;
+  .admin-body {
+    flex: 1 1 auto;
+  }
 }
 </style>
