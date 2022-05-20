@@ -1,15 +1,12 @@
 <template>
   <div class="license normal effect pressed" :class="{ active }">
-    <div class="remaining" v-if="vMode === 'normal'">
-      <!--<span class="ticket material-icons-outlined">schedule </span
-      >--><span>{{ remaining(lcs) }}</span>
-    </div>
     <div class="progress-bar" v-if="vMode === 'normal'">
       <div class="bar" :style="`width:${resolveWidth(lcs)}`"></div>
     </div>
     <div class="assigned">
-      <span v-if="assignee">{{ assignee.name }}</span
-      ><span v-else>학생 없음</span>
+      <span class="student" v-if="assignee">{{ assignee.name }}</span
+      ><span class="student" v-else>없음</span>
+      <span class="remaining">{{ remaining(lcs) }}</span>
     </div>
   </div>
 </template>
@@ -60,46 +57,58 @@ export default {
   border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
-  .remaining {
-    display: flex;
-    align-items: center;
-    user-select: none;
-    > span {
-      padding: 4px 8px;
-    }
-  }
+  position: relative;
+  color: #4d3d06;
+
   .ticket {
     font-size: 16px;
     padding: 4px 8px;
   }
   .progress-bar {
-    height: 3px;
-    margin: 2px 8px;
-    border-radius: 2px;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
     .bar {
-      height: 3px;
-      width: 100%;
-      border-radius: 2px;
+      background-color: #ffe546;
+      flex: 1 1 auto;
+      border-radius: 4px;
     }
   }
   .assigned {
-    text-align: right;
     padding: 4px 8px;
     user-select: none;
+    position: relative;
+    display: flex;
+    .remaining {
+      flex: 0 0;
+      white-space: nowrap;
+    }
+    .student {
+      flex: 1 1 auto;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
   &.normal {
-    background-color: #dbf6fd;
-    color: #096c86;
-    border: 1px solid #dbf6fd;
+    background-color: #fff9ac;
+
+    border: 1px solid transparent;
     .progress-bar {
-      background-color: #b2d3dd;
+      // background-color: #b2d3dd;
       .bar {
-        background-color: #096c86;
+        background-color: #ffe546;
       }
     }
   }
   &.active {
-    border-color: #096c86;
+    border-color: #4d3d06; // #096c86;
   }
 }
 </style>
