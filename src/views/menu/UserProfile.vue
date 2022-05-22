@@ -1,7 +1,14 @@
 <template>
   <div class="user-profile" @click="resolveClick">
     <div class="blocked chip rounded border">
+      <StudentLogo
+        :student="membership.user"
+        size="sm"
+        class="btn-menu right s32"
+        v-if="isStudent"
+      />
       <Logo
+        v-else
         class="logo"
         :imagePath="
           membership
@@ -31,6 +38,7 @@
 <script>
 import env from "@/service/env";
 import Logo from "@/components/oauth/Logo.vue";
+import StudentLogo from "@/components/StudentLogo.vue";
 import JoinView from "@/views/user/JoinView.vue";
 import WelcomeJoin from "@/views/user/WelcomeJoin.vue";
 import { Modal } from "@/components";
@@ -40,6 +48,7 @@ import { computed, ref } from "@vue/runtime-core";
 export default {
   components: {
     Logo,
+    StudentLogo,
     Modal,
     JoinView,
     ActionIcon,
@@ -91,6 +100,7 @@ export default {
       modalVisible.value = false;
     };
     return {
+      isStudent: computed(() => store.getters["user/isStudent"]),
       membership,
       modalVisible,
       showWelcome,

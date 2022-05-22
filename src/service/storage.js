@@ -12,8 +12,10 @@ class Storage {
     }
   }
   write(key, value) {
-    const { storage } = this;
-    storage.setItem(key, JSON.stringify(value));
+    this.storage.setItem(key, JSON.stringify(value));
+  }
+  remove(key) {
+    this.storage.removeItem(key);
   }
   clear() {
     this.storage.clear();

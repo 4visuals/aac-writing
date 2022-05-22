@@ -2,31 +2,30 @@
   <div class="home">
     <h3 class="sub title">그림한글</h3>
     <h1 class="main title">받아쓰기</h1>
-    <div class="menu">
+    <p></p>
+    <div class="menu" v-if="host.isPwaMode()">
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
-      <!-- <OAuthButton /> -->
-      <!-- <AacButton
-        text="단계별 받아쓰기"
-        theme="pink"
-        @click="moveTo('/level')"
-      /><AacButton
-        text="교과서 받아쓰기"
-        theme="blue"
-        @click="moveTo('/book')"
-      /> -->
+    </div>
+    <div class="menu" v-else-if="host.isStudentMode()">
+      <StudentLoginForm />
+    </div>
+    <div class="menu" v-else>
+      <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
     </div>
   </div>
 </template>
 
 <script>
+import { host } from "@/service/util";
 import router from "@/router";
-// import { useStore } from "vuex";
+import StudentLoginForm from "./StudentLoginForm.vue";
 import { AacButton } from "@/components/form";
 
 export default {
   name: "Home",
   components: {
     AacButton,
+    StudentLoginForm,
   },
   setup() {
     const moveTo = (url) => {
@@ -35,6 +34,7 @@ export default {
     };
     return {
       moveTo,
+      host,
     };
   },
 };
@@ -48,12 +48,12 @@ export default {
 }
 @include tablet {
   .home {
-    font-size: 6rem;
+    font-size: 2.5rem;
   }
 }
 @include desktop {
   .home {
-    font-size: 6rem;
+    font-size: 2.5rem;
   }
 }
 .home {

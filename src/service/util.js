@@ -1,3 +1,4 @@
+import env from "./env";
 const key = {
   /**
    * macOS 크롬에서 한글 입력상태에서 enter를 누르면 key event가 두 번 발생한다.
@@ -74,9 +75,31 @@ const time = {
     return ranges.reverse();
   },
 };
-export { key, path, time };
+const host = {
+  isPwaMode: () => {
+    const { hostname } = document.location;
+    return `pwa.${env.HOST}` === hostname;
+  },
+  isStudentMode: () => {
+    const { hostname } = document.location;
+    return `student.${env.HOST}` === hostname;
+  },
+};
+const logger = {
+  log: (msg, title) => {
+    if (env.devMode) {
+      console.log(`[${title || ""}]`, msg);
+    }
+  },
+};
+
+logger.log("[HOST_]", env.HOST);
+
+export { key, path, time, host, logger };
 export default {
   key,
   path,
   time,
+  host,
+  logger,
 };

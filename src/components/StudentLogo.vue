@@ -1,12 +1,12 @@
 <template>
   <div class="stud-logo-wrapper">
-    <div class="chr logo">{{ char() }}</div>
+    <div class="chr logo" :class="size || ''">{{ char() }}</div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["student"],
+  props: ["student", "size"],
   setup(props) {
     const char = () => {
       return props.student.name
@@ -39,6 +39,11 @@ export default {
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
+    &.sm {
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+    }
   }
 }
 </style>

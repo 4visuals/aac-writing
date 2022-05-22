@@ -51,15 +51,16 @@ export default {
 @import "~@/assets/resizer";
 @import "~@/assets/theme";
 .form-elem {
+  display: flex;
   &.inline {
     flex: 0 0 auto;
   }
   button {
-    font-size: inherit;
     background-color: transparent;
     border: none;
     border-radius: 4rem;
     color: inherit;
+    outline: 0;
     &.no-rounded {
       border-radius: 0;
     }
@@ -103,7 +104,7 @@ export default {
   @include mobile {
     button {
       font-size: 1.1rem;
-      padding: 0.4rem 0.8rem;
+      padding: 12px 0.8rem;
       &.sm {
         font-size: 0.85rem;
       }
@@ -112,7 +113,7 @@ export default {
   @include tablet {
     button {
       font-size: 1.35rem;
-      padding: 0.5rem 1rem;
+      padding: 15px 1rem;
       &.xs {
         font-size: 1rem;
         padding: 0.35rem 0.7rem;
@@ -125,7 +126,7 @@ export default {
   @include desktop {
     button {
       font-size: 1.35rem;
-      padding: 0.4rem 0.8rem;
+      padding: 15px 0.8rem;
       &.sm {
         font-size: 1.25rem;
       }

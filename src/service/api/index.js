@@ -7,6 +7,8 @@ const user = {
   login: () => POST(`/user/login`),
 };
 const student = {
+  login: (id, password) =>
+    POST(`/student/login`, { id, password, role: "STUDENT" }),
   register: (name, birth, password, license) =>
     POST(`/student`, { name, birth, password, license }),
 };

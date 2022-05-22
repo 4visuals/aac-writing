@@ -39,5 +39,9 @@ export default {
       const license = storage.local.read("active_license");
       state.activeLicense = license;
     },
+    clear(state) {
+      state.activeLicense = null;
+      storage.local.remove("active_license");
+    },
   },
 };

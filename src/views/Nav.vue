@@ -1,7 +1,7 @@
 <template>
   <div class="red nav-bar">
     <ActionIcon class="btn-menu left" icon="menu" @click="openMenu" />
-    <div class="btn-menu center quiz-status" v-if="ctx">
+    <div class="btn-menu center quiz-status" v-if="quizPage">
       <SectionButton
         :item="section"
         :idx="sectionSpec.idx"
@@ -10,7 +10,16 @@
         compact
       />
     </div>
-    <StudentLogo :student="student" class="btn-menu right s32" v-if="ctx" />
+    <StudentLogo
+      :student="loginUser"
+      class="btn-menu right s32"
+      v-if="isStudent"
+    />
+    <StudentLogo
+      :student="student"
+      class="btn-menu right s32"
+      v-else-if="quizPage"
+    />
     <Logo
       v-else
       class="btn-menu right"
@@ -53,7 +62,9 @@ export default {
   },
   setup() {
     const store = useStore();
+    const loginUser = computed(() => store.getters["user/currentUser"]);
     const membership = computed(() => store.state.user.membership);
+    const isStudent = computed(() => store.getters["user/isStudent"]);
     const ctx = computed(() => store.state.quiz.quizContext);
     const boxVisible = ref(false);
     const topPadding = computed(() => store.getters["ui/topPadding"]);
@@ -101,7 +112,9 @@ export default {
     };
     return {
       ctx,
-      student,
+      loginUser, // 로그인 사용자(학생, 선생님)
+      student, // 현재 시험을 보는 학생을 나타냄
+      isStudent, // 로그인한 사람이 학생인지를 나타냄
       boxVisible,
       topPadding,
       sectionSpec,

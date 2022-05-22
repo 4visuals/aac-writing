@@ -12,6 +12,7 @@
           <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
         </MenuSection>
         <TeacherSectionMenu v-if="isTeacher" />
+        <StudentSectionMenu v-else />
       </div>
     </Transition>
     <teleport to="body" v-if="modalComponent">
@@ -27,6 +28,7 @@ import { useStore } from "vuex";
 import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
 import TeacherSectionMenu from "./TeacherSectionMenu.vue";
+import StudentSectionMenu from "./StudentSectionMenu.vue";
 import Flag from "@/components/Flag.vue";
 import { TtsConfig, VoiceElem } from "@/components/tts";
 // import OAuthButton2 from "@/components/oauth/OAuthButton2.vue";
@@ -36,9 +38,9 @@ export default {
     Flag,
     MenuSection,
     VoiceElem,
-
     UserProfile,
     TeacherSectionMenu,
+    StudentSectionMenu,
   },
   setup() {
     const store = useStore();

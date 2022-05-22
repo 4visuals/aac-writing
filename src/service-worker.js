@@ -60,7 +60,7 @@ workbox.routing.registerRoute(
 
 workbox.routing.registerRoute(
   (v) => {
-    console.log("[v]", v);
+    // console.log("[v]", v);
     return (
       v.url.origin === "https://fonts.googleapis.com" ||
       v.url.origin === "https://fonts.gstatic.com"

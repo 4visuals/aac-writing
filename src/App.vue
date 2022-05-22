@@ -21,6 +21,7 @@
 </template>
 <script>
 import env from "@/service/env";
+import { logger } from "@/service/util";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { computed, onMounted, onUnmounted, shallowRef } from "vue";
@@ -34,7 +35,7 @@ export default {
     MenuWrapper,
   },
   setup() {
-    console.log(env);
+    logger.log(env);
     const store = useStore();
     const menuVisible = computed(() => store.getters["ui/leftVisible"]);
     const topPadding = computed(() => store.getters["ui/topPadding"]);

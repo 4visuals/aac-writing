@@ -100,9 +100,10 @@ export default {
       dummy.value.focus();
       if (learngingMode) {
         if (passed) {
-          tts.speak(trial.value.trim()).then(() => {
-            showReward("passed");
-          });
+          showReward("passed");
+          // tts.speak(trial.value.trim()).then(() => {
+          //   showReward("passed");
+          // });
         } else {
           showReward("failed");
         }

@@ -29,8 +29,6 @@ export default {
       if (props.disabled === "" || props.disabled === true) {
         return;
       }
-      // $emit('update:selected', $event.target.checked)
-      console.log(e.target.checked);
       emit("update:selected", e.target.checked);
     };
     return {

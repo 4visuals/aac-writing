@@ -1,6 +1,8 @@
 <template>
   <div class="form-elem" :style="style">
+    <span class="icon material-icons-outlined" v-if="icon">{{ icon }}</span>
     <input
+      :class="{ 'left-icon': icon }"
       :type="type || 'text'"
       :value="value"
       :placeholder="placeholder"
@@ -15,6 +17,7 @@
 export default {
   props: {
     type: String,
+    icon: String,
     value: String,
     style: Object,
     trim: Boolean,
@@ -70,27 +73,52 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
 .form-elem {
+  position: relative;
+  display: flex;
   input {
     font-size: inherit;
     width: 100%;
     height: 100%;
+    border: 0;
+    outline: 0;
+    background-color: #f2f2f2;
+  }
+  .icon {
+    position: absolute;
+    color: #acacac;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    user-select: none;
   }
   @include mobile {
     input {
-      padding: 0.4rem 0.6rem;
+      padding: 12px;
       font-size: 1rem;
+      &.left-icon {
+        padding-left: calc(36px);
+      }
+    }
+    .icon {
+      font-size: 20px;
     }
   }
   @include tablet {
     input {
-      padding: 0.4rem 0.6rem;
-      font-size: 1.5rem;
+      padding: 15px;
+      font-size: 1.35rem;
+      &.left-icon {
+        padding-left: 40px;
+      }
     }
   }
   @include desktop {
     input {
-      padding: 0.4rem 0.6rem;
-      font-size: 1.5rem;
+      padding: 15px;
+      font-size: 1.35rem;
+      &.left-icon {
+        padding-left: 40px;
+      }
     }
   }
 }
