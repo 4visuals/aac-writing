@@ -61,6 +61,13 @@ const time = {
       date: D.getDate(),
     };
   },
+  birthToDate([year, month, date]) {
+    const d = new Date();
+    d.setFullYear(year);
+    d.setMonth(month - 1);
+    d.setDate(date);
+    return d;
+  },
   range: (cur, format) => {
     const fmt = format.split(" ");
     const baseYMD = time.toYMD(cur);

@@ -9,8 +9,9 @@ const user = {
 const student = {
   login: (id, password) =>
     POST(`/student/login`, { id, password, role: "STUDENT" }),
-  register: (name, birth, password, license) =>
-    POST(`/student`, { name, birth, password, license }),
+  register: (name, birth, userId, pass, license) =>
+    POST(`/student`, { name, birth, userId, pass, license }),
+  update: (studentSeq, props) => PUT(`/student/${studentSeq}`, props),
 };
 const chapter = {
   list: (origin) => GET(`/chapters/origin/${origin}`),

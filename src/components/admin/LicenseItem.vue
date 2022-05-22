@@ -45,7 +45,12 @@ export default {
       }
     };
     watch(() => props.lcs.studentRef, updateAssignee, { immediate: true });
-
+    watch(
+      () => props.students,
+      () => {
+        updateAssignee();
+      }
+    );
     return { vMode, assignee, remaining, resolveWidth };
   },
 };

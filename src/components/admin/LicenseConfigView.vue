@@ -13,51 +13,28 @@
       </LicenseItem>
     </div>
     <div class="stud-view">
-      <h5>등록된 학생</h5>
       <div class="stud-list" v-if="studentInUse">
-        <StudentItem :student="studentInUse" />
+        <StudentItem :student="studentInUse" @click="openStudenEditor" />
       </div>
       <div v-else class="reg">
-        <p>등록된 학생이 없습니다.</p>
-        <h5>학생 등록</h5>
-        <DatePicker
-          :visible="studentReg.visible"
-          @cur-date="setBirthday"
-          @toggle="(visible) => (studentReg.visible = !visible)"
-        />
-        <TextField v-model:value="studentReg.name" placeholder="이름 입력" />
-        <TextField
-          v-model:value="studentReg.password"
-          type="password"
-          placeholder="비밀번호"
-        />
-        <AacButton
-          size="xs"
-          inline
-          theme="blue"
-          text="학생 등록"
-          @click="registerStudent"
-        ></AacButton>
+        <p>새로운 학생을 추가할 수 있습니다.</p>
+        <!-- <StudentRegForm @student="registerStudent" /> -->
       </div>
-
-      <!-- <h5>학생들</h5>
-      <div class="stud-list">
-        <StudentItem
-          v-for="s in assignables"
-          :key="s.eq"
-          :student="s"
-          @clicked="bindStudent"
-        />
-      </div> -->
+      <StudentRegForm
+        class="stud-form"
+        @editing="error = null"
+        @commit="registerStudent"
+        :student="studentInUse"
+        :error="error"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import LicenseItem from "./LicenseItem.vue";
+import StudentRegForm from "./StudentRegForm.vue";
 import StudentItem from "./StudentItem.vue";
-import DatePicker from "@/components/DatePicker.vue";
-import { TextField } from "@/components/form";
 // import api from "@/service/api";
 import { ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
@@ -66,18 +43,21 @@ export default {
   components: {
     LicenseItem,
     StudentItem,
-    DatePicker,
-    TextField,
+    // DatePicker,
+    // TextField,
+    StudentRegForm,
   },
   setup(props) {
     const store = useStore();
     const active = ref(props.license || props.licenses[0]);
     const studentInUse = ref(null);
+    const error = ref(null);
     const assignables = ref(null);
     const current = ref(new Date().getTime());
 
     const studentReg = ref({
       name: "",
+      id: "",
       password: "",
       birthday: "",
       visible: false,
@@ -112,35 +92,35 @@ export default {
           updateUse();
         });
     };
-    const registerStudent = () => {
-      const { name, birthday, password } = studentReg.value;
-      console.log(name, birthday);
+    const registerStudent = (student) => {
+      const { name, userId, birth, pass, editing } = student; // studentReg.value;
+      console.log(name, userId, birth, pass, editing);
+      const method = editing ? "user/updateStudent" : "user/createStudent";
+      const args = editing
+        ? { student, props: { name, userId, birth, pass } }
+        : { name, userId, birth, pass, license: active.value };
       store
-        .dispatch("user/createStudent", {
-          name,
-          birthday,
-          password,
-          license: active.value,
-        })
-        .then(() => {
-          updateUse();
+        .dispatch(method, args)
+        .then(() => updateUse())
+        .catch((e) => {
+          console.log("[error]", e);
+          error.value = e.cause;
         });
     };
-    const setBirthday = (e) => {
-      studentReg.value.birthday = `${e.year}-${e.month}-${e.date}`;
-      if (e.changed === "month") {
-        studentReg.value.visible = false;
-      }
+
+    const openStudenEditor = () => {
+      console.log("done");
     };
     return {
       current,
       active,
+      error,
       studentInUse,
       assignables,
       studentReg,
       bindStudent,
-      setBirthday,
       registerStudent,
+      openStudenEditor,
     };
   },
 };
@@ -161,14 +141,16 @@ export default {
 
     .stud-list {
       display: flex;
-      align-items: center;
-      row-gap: 4px;
-      column-gap: 4px;
-      flex-wrap: wrap;
+      // align-items: center;
+      // row-gap: 4px;
+      // column-gap: 4px;
+      // flex-wrap: wrap;
       margin: 0.6rem 0;
     }
-    .reg {
-      display: inline-flex;
+    .stud-form {
+      max-width: 400px;
+      display: flex;
+      row-gap: 8px;
       flex-direction: column;
       align-items: flex-start;
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="form-elem" :style="style">
+  <div class="form-elem" :class="size ? size : ''" :style="style">
     <span class="icon material-icons-outlined" v-if="icon">{{ icon }}</span>
     <input
       :class="{ 'left-icon': icon }"
@@ -22,6 +22,7 @@ export default {
     style: Object,
     trim: Boolean,
     placeholder: String,
+    size: String,
   },
   emits: ["enter", "update:value"],
   setup(props, { emit }) {
@@ -109,6 +110,18 @@ export default {
       font-size: 1.35rem;
       &.left-icon {
         padding-left: 40px;
+      }
+    }
+    &.sm {
+      input {
+        padding: 12px;
+        font-size: 1.2rem;
+        &.left-icon {
+          padding-left: calc(36px);
+        }
+      }
+      .icon {
+        font-size: 20px;
       }
     }
   }

@@ -1,12 +1,17 @@
 import api from "@/service/api";
 import storage from "@/service/storage";
-
+import { time } from "@/service/util";
 const installLoginData = (store, { membership, licenses, jwt }) => {
   membership.licenses = licenses;
   store.commit("setMembership", membership);
   store.commit("updateJwt", jwt);
   if (store.getters.isStudent) {
     store.commit("exam/setActiveLicense", licenses[0], { root: true });
+  } else if (store.getters.isTeacher) {
+    store.getters.students.forEach((student) => {
+      student.userId = student.userId || null;
+      student.birth = time.birthToDate(student.birth);
+    });
   }
   return membership;
 };
@@ -63,9 +68,17 @@ export default {
     },
     applyStudent(state, args) {
       const { student, license } = args;
+      student.birth = time.birthToDate(student.birth);
       const mm = state.membership;
       mm.user.students.push(student);
       license.studentRef = student.seq;
+    },
+    updateStudent(state, student) {
+      student.birth = time.birthToDate(student.birth);
+      const { students } = state.membership.user;
+      const pos = students.findIndex((stud) => stud.seq === student.seq);
+      students[pos] = student;
+      state.membership.user.students = [...students];
     },
   },
 
@@ -74,13 +87,7 @@ export default {
       ctx.commit("initUser");
       if (ctx.state.jwt) {
         return api.user.login().then((res) => {
-          const { licenses } = res;
-          res.membership.licenses = licenses;
-          ctx.commit("setMembership", res.membership);
-          ctx.commit("updateJwt", res.jwt);
-          if (ctx.getters.isStudent) {
-            ctx.commit("exam/setActiveLicense", licenses[0], { root: true });
-          }
+          return installLoginData(ctx, res);
         });
       }
     },
@@ -94,39 +101,24 @@ export default {
       return api.user
         .membership(args.vendor, args.type, args.token)
         .then((res) => {
-          // res.membership.licenses = res.licenses;
-          // ctx.commit("setMembership", res.membership);
-          // ctx.commit("updateJwt", res.jwt);
-          // return res.membership;
           return installLoginData(ctx, res);
         });
     },
     loginStudent(ctx, args) {
       return api.student.login(args.id, args.password).then((res) => {
-        // res.membership.licenses = res.licenses;
-        // ctx.commit("setMembership", res.membership);
-        // ctx.commit("updateJwt", res.jwt);
-        // if (ctx.getters.isStudent) {
-        //   ctx.commit("exam/setActiveLicense", res.licenses[0], { root: true });
-        // }
-        // return res;
         return installLoginData(ctx, res);
       });
     },
     join(ctx) {
       return api.user.join().then((res) => {
         ctx.commit("showWelcome");
-        // res.membership.licenses = res.licenses;
-        // ctx.commit("setMembership", res.membership);
-        // ctx.commit("updateJwt", res.jwt);
-        // return res.membership;
         return installLoginData(ctx, res);
       });
     },
     createStudent(ctx, args) {
-      const { name, birthday, password, license } = args;
+      const { name, birth, userId, pass, license } = args;
       return api.student
-        .register(name, birthday, password, license?.uuid)
+        .register(name, birth, userId, pass, license?.uuid)
         .then((res) => {
           console.log(res);
           ctx.commit("applyStudent", { student: res.student, license });
@@ -135,6 +127,14 @@ export default {
         .catch((err) => {
           alert("학생 추가 실패: " + err.cause);
         });
+    },
+    updateStudent(ctx, args) {
+      const { student, props } = args;
+      props.seq = student.seq;
+      return api.student.update(student.seq, props).then((res) => {
+        args.user = args.student;
+        ctx.commit("updateStudent", res.student);
+      });
     },
     bindStudent(ctx, args) {
       const { license, student } = args;

@@ -56,6 +56,7 @@ import NewLicenseForm from "./NewLicenseForm.vue";
 import { DropDown } from "@/components/form";
 import { ref, shallowRef } from "@vue/reactivity";
 import adminApi from "../../service/admin-api";
+import { time } from "@/service/util";
 /**
  * 라이선스 발급 화면
  */
@@ -74,6 +75,9 @@ export default {
     const modal = shallowRef(null);
     const userSelected = (user) => {
       adminApi.member.licenses(user.seq).then((res) => {
+        res.students.forEach((student) => {
+          student.birth = time.birthToDate(student.birth);
+        });
         licenses.value = res.licenses;
         students.value = res.students;
         activeUser.value = user;
