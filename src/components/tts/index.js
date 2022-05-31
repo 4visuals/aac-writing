@@ -64,10 +64,11 @@ class PollyTts {
     const url = `${env.TTS_POLLY_PATH}/voices/${textHash}.mp3`;
 
     const audio = new Audio(url);
+    audio.playbackRate = 1;
     ttsStore.setSpeaking(true);
     return new Promise((done, failed) => {
       audio.onended = (e) => {
-        console.log("[end]", e);
+        // console.log("[end]", e);
         ttsStore.setSpeaking(false);
         done(text, e);
       };

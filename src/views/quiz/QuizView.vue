@@ -33,6 +33,9 @@
           :word="ctx.currentQuestion.text"
           @viewClicked="wordDecomposing = false"
         />
+        <div class="sentence-view" v-if="ctx.isReadingMode()" @click="speak">
+          <h3>{{ ctx.currentQuestion.text }}</h3>
+        </div>
       </div>
       <div class="answer">
         <component
@@ -40,10 +43,8 @@
           :quizContext="ctx"
           :question="ctx.currentQuestion"
           :fillHeight="false"
+          @quizEnd="alertForResult"
         />
-      </div>
-      <div class="sentence-view" v-if="ctx.isReadingMode()" @click="speak">
-        <h3>{{ ctx.currentQuestion.text }}</h3>
       </div>
     </template>
     <div class="none" v-else>NONE</div>
@@ -130,7 +131,7 @@ export default {
     onBeforeRouteLeave(() => {
       // console.log(`${from.fullPath} -> ${to.fullPath}`);
       if (!quizFinished.value) {
-        const exitQuiz = confirm("퀴즈를 종료합나까?");
+        const exitQuiz = confirm("퀴즈를 종료합니까?");
         if (exitQuiz) {
           store.commit("quiz/closeQuiz");
         }
@@ -215,12 +216,15 @@ export default {
     // overflow-x: auto;
   }
   .sentence-view {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -16px);
     text-align: center;
     padding: 8px 16px;
     margin: 8px;
     color: #007bff;
     cursor: pointer;
-    border: 1px solid #007bff;
     h3 {
       font-size: 2.5rem;
       line-height: 1.5;

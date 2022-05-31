@@ -48,7 +48,7 @@ export default {
     AnswerField,
   },
   props: ["quizContext"],
-  setup(props) {
+  setup(props, { emit }) {
     const store = useStore();
     const field = ref(null);
     const dummy = ref(null);
@@ -69,7 +69,11 @@ export default {
         field: dummy,
         onClose: (passed) => {
           if (passed) {
-            quizStore.moveNext();
+            if (question.value.para.hasNextQuiz()) {
+              quizStore.moveNext();
+            } else {
+              emit("quizEnd");
+            }
           } else {
             field.value.focus();
           }

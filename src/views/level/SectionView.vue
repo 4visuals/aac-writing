@@ -25,13 +25,13 @@
     <div class="footer">
       <div class="choose">
         <AacButton
-          :text="`${sourceText()} 읽기`"
+          :text="`보고 쓰기`"
           theme="orange"
           :disabled="quizOnly === '' || quizOnly === true"
-          @click="startSentenceQuiz('READING', 'EJ')"
+          @click="startSentenceQuiz('READING', 'SEN')"
         />
         <AacButton
-          :text="`${sourceText()} 쓰기`"
+          :text="`${sourceText()} 학습`"
           theme="blue"
           :disabled="quizOnly === '' || quizOnly === true"
           @click="startSentenceQuiz('LEARNING', 'EJ')"

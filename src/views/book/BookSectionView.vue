@@ -19,7 +19,7 @@
     </div>
     <div class="footer">
       <div class="choose">
-        <AacButton :text="`문장 쓰기`" theme="blue" @click="startLearning()" />
+        <AacButton :text="`문장 학습`" theme="blue" @click="startLearning()" />
       </div>
     </div>
   </div>

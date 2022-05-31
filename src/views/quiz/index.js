@@ -191,11 +191,15 @@ class QuizContext {
     return this.options.mode === "READING";
   }
   /**
-   * 낱말쓰기, 문장쓰기
+   * 낱말 받아쓰기, 낱말 학습, 문장 받아쓰기, 문장학습 모두
    * @returns boolean
    */
   isLearningMode() {
-    return this.options.mode === "LEARNING";
+    // https://github.com/4visuals/aac-writing/issues/27
+    // 받아쓰기('READING')를 [그림한글/문장/장면과 문장 보고쓰기]로 교체함
+    // 맞거나 틀리면 보상 그림이 나오도록 바뀜
+    // 받아쓰기 모드는 이제 의미가 없음
+    return this.options.mode !== "QUIZ";
   }
   /**
    * 낱말퀴즈, 문장퀴즈
@@ -220,7 +224,7 @@ class QuizContext {
   }
 }
 /**
- * quizMode - 읽기('READING') 학습('LEARNING') OR 테스트('QUIZ') 모드
+ * quizMode - 받아쓰기('READING'), 학습('LEARNING') OR 테스트('QUIZ') 모드
  * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
  * section - secion seq
  * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
@@ -238,8 +242,7 @@ const loadSentenceQuiz = ({
   const questionComponent = shallowRef(ScenePicView);
   const answerCompName =
     typeof answerType === "string" ? answerType : answerType.comp;
-  const answerComponent =
-    quizMode === "READING" ? null : answerComponents.get(answerCompName);
+  const answerComponent = answerComponents.get(answerCompName);
   const symbolConfig = {
     pumsa: typeof answerType === "string" ? "follow" : answerType.pumsa,
   };
