@@ -123,9 +123,6 @@ export default {
           console.log(res);
           ctx.commit("applyStudent", { student: res.student, license });
           return res;
-        })
-        .catch((err) => {
-          alert("학생 추가 실패: " + err.cause);
         });
     },
     updateStudent(ctx, args) {

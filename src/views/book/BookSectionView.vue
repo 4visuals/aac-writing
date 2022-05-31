@@ -19,7 +19,21 @@
     </div>
     <div class="footer">
       <div class="choose">
-        <AacButton :text="`문장 학습`" theme="blue" @click="startLearning()" />
+        <AacButton
+          :text="`보고 쓰기`"
+          theme="orange"
+          @click="startLearning('READING', 'SEN')"
+        />
+        <AacButton
+          :text="`문장 학습`"
+          theme="blue"
+          @click="startLearning('LEARNING', 'EJ')"
+        />
+        <AacButton
+          :text="`문장 퀴즈`"
+          theme="red"
+          @click="startLearning('QUIZ', 'SEN')"
+        />
       </div>
     </div>
   </div>
@@ -55,26 +69,26 @@ export default {
      * @param quizMode 학습모드('LEARNING') 또는 시험모드('QUIZ')
      * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
-    const startLearning = () => {
+    const startLearning = (quizMode, componentType) => {
       if (!activeLicense.value) {
         alert("학생을 선택해주세요");
         return;
       }
       const sectionSeq = props.cate.seq;
       const range = ref(null);
-      // const quizResource = "S";
+      const quizResource = "A";
       /*
        * 단어 학습인 경우 무조건 받아쓰기 모드
        */
-      // answerType = quizResource === "W" ? "SEN" : answerType;
+      // const answerType = quizResource === "W" ? "SEN" : answerType;
 
       quiz
         .prepareQuiz({
-          quizMode: "LEARNING",
-          answerType: { comp: "EJ", pumsa: "what" },
+          quizMode,
+          answerType: { comp: componentType, pumsa: "what" },
           section: sectionSeq,
           range: range.value,
-          quizResource: "A",
+          quizResource,
           license: activeLicense.value.seq,
           prevPage: "BookShelfView",
         })
