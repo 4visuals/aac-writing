@@ -39,6 +39,7 @@ export default {
   display: flex;
   justify-content: center;
   overflow: hidden;
+  z-index: 5;
   .pop-enter-from,
   .pop-leave-to {
     transform: scale(0.1);

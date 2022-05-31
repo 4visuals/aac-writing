@@ -1,11 +1,13 @@
 <template>
   <div class="student-menu">
     <template v-if="students.length === 0">
-      <p class="mgt-8px mgb-8px">등록된 학생이 없습니다.</p>
-      <button class="nude reg effect pressed" @click="showStudentRegForm">
+      <p class="mgt-8px mgb-8px">
+        등록된 학생이 없습니다. 수강증을 클릭해서 학생을 등록해주세요.
+      </p>
+      <!-- <button class="nude reg effect pressed" @click="showStudentRegForm">
         <span class="icon material-icons-outlined"> person_add </span
         ><span>학생 등록</span>
-      </button>
+      </button> -->
     </template>
     <template v-else>
       <p>{{ students.length }}명</p>
