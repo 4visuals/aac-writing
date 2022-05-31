@@ -15,7 +15,7 @@
         placeholder="이름 입력"
       />
       <TextField
-        icon="email"
+        icon="face"
         v-model:value="form.student.userId"
         size="sm"
         placeholder="아이디 입력"
@@ -62,7 +62,7 @@ const DEFAULT_STUDENT = {
 };
 
 const codes = {
-  DUP_RESOURCE: "사용중인 아이디",
+  DUP_RESOURCE: "사용중인 아이디입니다.",
 };
 
 export default {
