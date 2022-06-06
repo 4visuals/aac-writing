@@ -28,7 +28,7 @@
           :text="`보고 쓰기`"
           theme="orange"
           :disabled="quizOnly === '' || quizOnly === true"
-          @click="startSentenceQuiz('READING', 'SEN')"
+          @click="startSentenceQuiz('READING', 'EJ')"
         />
         <AacButton
           :text="`${sourceText()} 학습`"

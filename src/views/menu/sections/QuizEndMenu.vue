@@ -1,6 +1,6 @@
 <template>
   <div class="exit">
-    <SpanText>{{ quizText() }}를 끝내려면 버튼을 클릭하세요.</SpanText>
+    <SpanText>끝내려면 버튼을 클릭하세요.</SpanText>
     <AacButton
       :text="`${quizText()} 종료`"
       theme="red"
@@ -27,11 +27,11 @@ export default {
     const ctx = store.state.quiz.quizContext;
     const quizText = () => {
       if (ctx.isReadingMode()) {
-        return "읽기";
+        return "보고 쓰기";
       } else if (ctx.isLearningMode()) {
-        return "쓰기";
+        return "학습";
       } else {
-        return "퀴즈 ";
+        return "퀴즈";
       }
     };
     const closeQuiz = () => {

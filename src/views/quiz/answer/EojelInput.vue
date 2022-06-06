@@ -5,7 +5,7 @@
       <Symbol
         :ej="ej"
         :pumsaType="quizContext.pumsaType"
-        :showAnswer="quizContext.isReadingMode()"
+        :showAnswer="false"
         :spaceCommit="true"
         @typed="validateAnswer"
         @clicked="() => holdAndSpeak(ej)"

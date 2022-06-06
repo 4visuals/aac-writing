@@ -130,16 +130,16 @@ export default {
     };
     onBeforeRouteLeave(() => {
       // console.log(`${from.fullPath} -> ${to.fullPath}`);
-      if (!quizFinished.value) {
-        const exitQuiz = confirm("퀴즈를 종료합니까?");
-        if (exitQuiz) {
-          store.commit("quiz/closeQuiz");
-        }
-        return exitQuiz;
-      } else {
-        store.commit("quiz/closeQuiz");
-        return true;
-      }
+      // if (!quizFinished.value) {
+      //   // const exitQuiz = confirm("퀴즈를 종료합니까?");
+      //   // if (exitQuiz) {
+      //   //   }
+      //   store.commit("quiz/closeQuiz");
+      //   return true;
+      // } else {
+      //   }
+      store.commit("quiz/closeQuiz");
+      return true;
     });
     onMounted(() => {
       store.commit("ui/setBackgroundVisible", false);
@@ -225,9 +225,12 @@ export default {
     margin: 8px;
     color: #007bff;
     cursor: pointer;
+    background-color: white;
+    border-radius: 3rem;
+    box-shadow: 1px 1px 4px #0000004d;
     h3 {
-      font-size: 2.5rem;
-      line-height: 1.5;
+      font-size: 2rem;
+      line-height: 1.2;
     }
   }
   .pop-enter-from,
