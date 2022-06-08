@@ -57,11 +57,11 @@ export default {
       storage.local.write("aac_jwt_token", jwt);
     },
     initUser(state) {
-      const jwt = storage.local.read("aac_jwt_token", null);
+      let jwt = storage.local.read("aac_jwt_token", null);
       state.jwt = jwt;
-      // if (location.host.startsWith("10.138") && !state.jwt) {
+      // if (location.host.startsWith("192.168") && !state.jwt) {
       //   // mobile test
-      //   state.jwt =
+      //   state.jwt = jwt =
       //     "";
       // }
       return jwt;

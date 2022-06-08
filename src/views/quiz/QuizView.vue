@@ -1,6 +1,6 @@
 <template>
   <div class="quiz-wrapper">
-    <input type="text" ref="focusing" />
+    <input type="text" tabindex="-1" ref="focusing" />
     <template v-if="ctx">
       <Numbering />
       <div class="question">

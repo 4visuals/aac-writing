@@ -107,6 +107,8 @@ export default {
         } else {
           moveToNextEojeol(ej);
         }
+      } else {
+        e.failed();
       }
       console.log(ej.isSolved);
     };

@@ -99,7 +99,7 @@ export default {
     const checkAnswer = (e) => {
       const { elapsedTime } = e;
       const learngingMode = props.quizContext.isLearningMode();
-      const passed = question.value.tryAnswer(trial.value.trim(), elapsedTime);
+      const passed = question.value.tryAnswer(e.value.trim(), elapsedTime);
       correct.value = learngingMode ? passed : false;
       dummy.value.focus();
       if (learngingMode) {

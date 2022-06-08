@@ -79,7 +79,12 @@ export default {
     );
     const checkAnswer = (e) => {
       const { elapsedTime } = e;
-      emit("typed", { ej: props.ej, value: e.value, elapsedTime });
+      emit("typed", {
+        ej: props.ej,
+        value: e.value,
+        elapsedTime,
+        failed: e.failed,
+      });
     };
     const flush = (e) => {
       if (key.isComposing(e)) {
