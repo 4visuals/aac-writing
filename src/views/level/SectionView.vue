@@ -82,6 +82,14 @@ export default {
       return level >= 0 ? level + "단계" : "종합";
     };
     /**
+     * 주어진 질문(Sentence)에서 문장 또는 단어를 필터링함
+     * 어절이 1개이면 단어 질문으로 판정함
+     */
+    const filters = {
+      S: (sen) => sen.eojeols.length > 1,
+      W: (sen) => sen.eojeols.length === 1,
+    };
+    /**
      * @param quizMode 학습모드('LEARNING') 또는 시험모드('QUIZ')
      * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
@@ -105,6 +113,8 @@ export default {
           quizResource,
           license: activeLicense.value.seq,
           prevPage: "LevelView",
+          sentenceFilter: (sentences) =>
+            sentences.filter(filters[quizResource]),
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);

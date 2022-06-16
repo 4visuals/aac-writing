@@ -50,11 +50,27 @@ class UI {
   }
 }
 
+const themes = {
+  gold: {
+    bgc: "gold",
+    button: {
+      color: "#865900",
+      bgc: "#ffec88",
+    },
+  },
+  pink: {
+    bgc: "#ff9bbd",
+    button: {
+      color: "#d23d70",
+      bgc: "#ffe1ea",
+    },
+  },
+};
 const ui = new UI();
 const leftMenu = new Menu("left");
 export default {
   namespaced: true,
-  state: () => ({ ui, leftMenu }),
+  state: () => ({ ui, leftMenu, themes }),
   getters: {
     leftVisible(state) {
       return state.leftMenu.isVisible;

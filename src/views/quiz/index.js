@@ -12,15 +12,6 @@ const answerComponents = new Map();
 answerComponents.set("EJ", shallowRef(EojelInput));
 answerComponents.set("SEN", shallowRef(SentenceInput));
 /**
- * 주어진 질문(Sentence에서 문장 또는 단어를 필터링함
- * 어절이 1개이면 단어 질문으로 판정함
- */
-const sentenceFilters = {
-  S: (sen) => sen.eojeols.length > 1,
-  W: (sen) => sen.eojeols.length === 1,
-  A: () => true,
-};
-/**
  * 퀴즈 질문과 학생이 입력한 답안을 기록
  */
 class Question {
@@ -238,6 +229,7 @@ const loadSentenceQuiz = ({
   section,
   quizResource,
   prevPage,
+  seqs, // list of sentence seq
 }) => {
   const questionComponent = shallowRef(ScenePicView);
   const answerCompName =
@@ -261,8 +253,9 @@ const loadSentenceQuiz = ({
          * 단계별 학습에서는 [단어, 문장]을 따로 구분함,
          * 교과서 학습에서는 단어가 따로 없고 모두 문장으로 처리함
          */
-        const senFilter = sentenceFilters[quizResource];
-        const sentences = sec.sentences.filter(senFilter);
+        const sentences = seqs.map((seq) =>
+          sec.sentences.find((sen) => sen.seq === seq)
+        );
         const config = new QuizConfig(sentences, {
           quizMode,
           answerType,
@@ -327,6 +320,7 @@ const prepareQuiz = ({
   quizResource,
   license,
   prevPage,
+  sentenceFilter,
 }) => {
   const sections = store.getters["course/sections"];
   const sec = sections.find((sec) => sec.seq === section);
@@ -335,12 +329,13 @@ const prepareQuiz = ({
       reject("NO_SECTION");
       return;
     }
-    const senFilter = sentenceFilters[quizResource];
-    const sentences = sec.sentences.filter(senFilter);
+    // const senFilter = sentenceFilters[quizResource];
+    const sentences = sentenceFilter(sec.sentences);
     if (sentences.length === 0) {
       reject({ cause: "NO_QUIZ", resource: quizResource });
       return;
     }
+    const seqs = sentences.map((sen) => sen.seq);
     storage.session.write("quizSpec", {
       quizMode,
       answerType,
@@ -348,6 +343,7 @@ const prepareQuiz = ({
       quizResource,
       license,
       prevPage,
+      seqs, // list of sentence seq
     });
     resolve();
   });

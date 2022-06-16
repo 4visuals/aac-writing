@@ -1,5 +1,9 @@
 <template>
-  <div class="section-detail" :class="theme">
+  <div
+    class="section-detail"
+    :class="theme.bgc"
+    :style="`--bname-bgc: ${theme.button.bgc}; --bname-fgc: ${theme.button.color}`"
+  >
     <div class="jumbo">
       <div class="title">
         <h3>{{ title() }}</h3>
@@ -10,11 +14,22 @@
       <div class="ko-char-view">
         <ParaText class="desc">{{ cate.description }}</ParaText>
         <div class="steps">
-          <h3>[1]</h3>
-          <h3>[2]</h3>
-          <h3>[3]</h3>
-          <h3>[종합]</h3>
+          <SpanText
+            class="group"
+            :class="{ active: activeGroup === group }"
+            v-for="group in groups"
+            :key="group"
+            @click="setActiveGroup(group)"
+            >{{ group.text }}</SpanText
+          >
         </div>
+        <transition name="fade" @enter="markHeight">
+          <div class="sentences" v-if="activeGroup">
+            <ParaText v-for="sen in activeGroup.sentences" :key="sen.seq">{{
+              sen.sentence
+            }}</ParaText>
+          </div>
+        </transition>
       </div>
     </div>
     <div class="footer">
@@ -22,16 +37,22 @@
         <AacButton
           :text="`보고 쓰기`"
           theme="orange"
+          :disabled="!activeGroup"
+          size="sm"
           @click="startLearning('READING', 'SEN')"
         />
         <AacButton
           :text="`문장 학습`"
           theme="blue"
+          :disabled="!activeGroup"
+          size="sm"
           @click="startLearning('LEARNING', 'EJ')"
         />
         <AacButton
           :text="`문장 퀴즈`"
           theme="red"
+          :disabled="!activeGroup"
+          size="sm"
           @click="startLearning('QUIZ', 'SEN')"
         />
       </div>
@@ -43,9 +64,10 @@
 import { path } from "@/service/util";
 import { computed, ref } from "vue";
 import router from "@/router";
-import { ParaText } from "@/components/text";
+import { ParaText, SpanText } from "@/components/text";
 import { AacButton } from "@/components/form";
 import { LicenseComboBox } from "@/components/admin";
+import util from "@/service/util";
 
 // import api from "@/service/api";
 import quiz from "@/views/quiz";
@@ -56,14 +78,46 @@ export default {
     AacButton,
     ParaText,
     LicenseComboBox,
-    // Char,
+    SpanText,
   },
   setup(props) {
+    console.log(props.theme);
     const store = useStore();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
+    // eslint-disable-next-line vue/no-setup-props-destructure
+    const { sentences } = props.cate;
+    const activeGroup = ref(null);
+    const groups = ref([]);
+    for (let k = 0; k < sentences.length; k += 10) {
+      const end = Math.min(k + 10, sentences.length);
+      const ranges = sentences.slice(k, end);
+      groups.value.push({
+        text: k / 10 + 1,
+        sentences: ranges,
+      });
+    }
+    groups.value.push({
+      text: "종합",
+      rand: true,
+      sentences: null,
+    });
+
+    const setActiveGroup = (group) => {
+      activeGroup.value = group;
+      if (group.rand) {
+        activeGroup.value.sentences = util.pick(sentences, 10);
+      }
+    };
     const title = () => {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
+    };
+    const markHeight = (e) => {
+      console.log("[h]", e.offsetHeight);
+      const height = [...e.children].reduce((h, p) => h + p.offsetHeight, 0);
+      const style = window.getComputedStyle(e);
+      const pad = parseInt(style.paddingTop) + parseInt(style.paddingBottom);
+      e.style.height = pad + height + "px";
     };
     /**
      * @param quizMode 학습모드('LEARNING') 또는 시험모드('QUIZ')
@@ -91,6 +145,7 @@ export default {
           quizResource,
           license: activeLicense.value.seq,
           prevPage: "BookShelfView",
+          sentenceFilter: () => activeGroup.value.sentences,
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
@@ -103,7 +158,11 @@ export default {
     return {
       path,
       title,
+      groups,
+      activeGroup,
       startLearning,
+      setActiveGroup,
+      markHeight,
     };
   },
 };
@@ -128,6 +187,7 @@ $padding: 16px;
       }
     }
   }
+
   @include mobile {
     h3 {
       font-size: 1.5rem;
@@ -143,7 +203,7 @@ $padding: 16px;
       font-size: 2.5rem;
     }
   }
-  &.yellow {
+  &.gold {
     .jumbo {
       background-color: var(--aac-color-yellow-400);
       color: var(--aac-color-yellow-900);
@@ -183,6 +243,43 @@ $padding: 16px;
         display: flex;
         column-gap: 16px;
         justify-content: center;
+        .group {
+          width: 40px;
+          display: inline-flex;
+          justify-content: center;
+          border-radius: 8px;
+          padding: 8px 0;
+          background-color: #ffeb3b;
+          color: #865900;
+          user-select: none;
+          cursor: pointer;
+          &.active {
+            box-shadow: 0 0 8px 1px #7865009c;
+          }
+        }
+      }
+      .sentences {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #a87d00;
+        background-color: var(--bname-bgc);
+        margin-top: 1rem;
+        border-radius: 8px;
+        padding: 8px;
+        color: var(--bname-fgc);
+        height: 270px;
+        &.fade-enter-from,
+        &.fade-leave-to {
+          height: 0px;
+        }
+        &.fade-enter-active {
+          overflow: hidden;
+          transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        &.fade-leave-active {
+          overflow: hidden;
+          transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
       }
     }
   }

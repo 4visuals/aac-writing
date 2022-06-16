@@ -26,7 +26,7 @@
     </div>
     <teleport to="body" v-if="activeSection">
       <Modal ref="modal" @hidden="hideModal">
-        <BookSectionView :cate="activeSection" theme="yellow" />
+        <BookSectionView :cate="activeSection" :theme="theme" />
       </Modal>
     </teleport>
   </div>
@@ -53,7 +53,8 @@ export default {
 
     const activeBook = ref(null);
     const activeSection = ref(null);
-    const theme = "yellow";
+    // const theme = "yellow";
+    const theme = store.state.ui.themes["gold"];
     const chapters = computed(() => {
       return store.state.course.chapters.books;
     });

@@ -17,22 +17,6 @@ import BrandName from "./BrandName.vue";
 import { computed } from "vue";
 import { useStore } from "vuex";
 
-const themes = {
-  gold: {
-    bgc: "gold",
-    button: {
-      color: "#865900",
-      bgc: "#ffec88",
-    },
-  },
-  pink: {
-    bgc: "#ff9bbd",
-    button: {
-      color: "#d23d70",
-      bgc: "#ffe1ea",
-    },
-  },
-};
 export default {
   components: {
     Wave,
@@ -42,6 +26,7 @@ export default {
   setup() {
     const store = useStore();
     const nav = computed(() => store.getters["ui/nav"]);
+    const themes = store.state.ui.themes;
     return { nav, themes };
   },
 };

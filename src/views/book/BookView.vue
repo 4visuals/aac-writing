@@ -28,41 +28,13 @@
  */
 import SectionButton from "@/components/SectionButton.vue";
 import { ActionIcon } from "@/components/form";
-import quiz from "@/views/quiz";
-import router from "@/router";
-import { useStore } from "vuex";
-import { computed } from "@vue/runtime-core";
+
 export default {
   components: {
     SectionButton,
     ActionIcon,
   },
   props: ["book"],
-  setup() {
-    const store = useStore();
-    const activeLicense = computed(() => store.getters["exam/activeLicense"]);
-    const startBookQuiz = (section) => {
-      const quizMode = "LEARNING";
-      const answerType = { comp: "EJ", pumsa: "what" };
-      const sectionSeq = section.seq;
-      /*
-       * 교과서 받아쓰기에서는 단어와 문장을 따로 구분하지 않음
-       */
-      const quizResource = "A";
-      quiz.prepareQuiz({
-        quizMode,
-        answerType,
-        section: sectionSeq,
-        quizResource,
-        license: activeLicense.value.seq,
-        prevPage: "BookShelfView",
-      });
-      router.push(`/quiz/${sectionSeq}`);
-    };
-    return {
-      startBookQuiz,
-    };
-  },
 };
 </script>
 
