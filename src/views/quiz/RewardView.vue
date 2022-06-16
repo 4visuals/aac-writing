@@ -1,5 +1,5 @@
 <template>
-  <div class="reward-wrapper">
+  <div class="reward-wrapper" ref="wrapper" tabindex="0">
     <transition name="pop" appear @after-enter="bindKeyEvent">
       <ImageView :imgPath="imgPath" @click="handleClick" />
     </transition>
@@ -8,7 +8,7 @@
 
 <script>
 import ImageView from "@/components/ImageView.vue";
-import { computed, onUnmounted } from "@vue/runtime-core";
+import { computed, ref } from "@vue/runtime-core";
 import { useStore } from "vuex";
 export default {
   components: {
@@ -16,6 +16,7 @@ export default {
   },
   setup() {
     const store = useStore();
+    const wrapper = ref(null);
     const imgPath = computed(() => {
       const name = store.getters["ui/reward"];
       return require(`@/assets/reward/${name}.png`);
@@ -25,14 +26,16 @@ export default {
     };
 
     const bindKeyEvent = () => {
-      setTimeout(() => {
-        window.addEventListener("keyup", handleClick, false);
-      }, 0);
+      try {
+        wrapper.value.focus();
+        setTimeout(() => {
+          wrapper.value.addEventListener("keyup", handleClick, false);
+        }, 0);
+      } catch (e) {
+        console.log(e);
+      }
     };
-    onUnmounted(() => {
-      window.removeEventListener("keyup", handleClick, false);
-    });
-    return { imgPath, handleClick, bindKeyEvent };
+    return { wrapper, imgPath, handleClick, bindKeyEvent };
   },
 };
 </script>
