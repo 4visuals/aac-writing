@@ -81,10 +81,17 @@ export default {
     };
     const handleInput = (e) => {
       markTime();
+      // emit("update:inputText", e.target.value);
       if (e.isComposing) {
-        console.log("[FLUSH] SKIP, COMPOSING...");
+        console.log("[COMPOSING]");
+        if (props.spaceCommit && e.data.includes(" ")) {
+          // Mac chrome에서 스페이스를 누르면 e.isComposing 상태가 해제되지 않는다.
+          // TODO window chrome에서도 확인해봐야 함
+          flush(e);
+        }
         return;
       }
+
       if (props.spaceCommit && e.data && e.data === " ") {
         console.log("[input]", e.target.value);
         flush(e);
