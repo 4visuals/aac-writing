@@ -1,14 +1,14 @@
 <template>
   <div class="reward-wrapper">
-    <transition name="pop" appear>
-      <ImageView :imgPath="imgPath" @click="handlClick" />
+    <transition name="pop" appear @after-enter="bindKeyEvent">
+      <ImageView :imgPath="imgPath" @click="handleClick" />
     </transition>
   </div>
 </template>
 
 <script>
 import ImageView from "@/components/ImageView.vue";
-import { computed } from "@vue/runtime-core";
+import { computed, onUnmounted } from "@vue/runtime-core";
 import { useStore } from "vuex";
 export default {
   components: {
@@ -20,10 +20,19 @@ export default {
       const name = store.getters["ui/reward"];
       return require(`@/assets/reward/${name}.png`);
     });
-    const handlClick = () => {
+    const handleClick = () => {
       store.commit("ui/hideReward");
     };
-    return { imgPath, handlClick };
+
+    const bindKeyEvent = () => {
+      setTimeout(() => {
+        window.addEventListener("keyup", handleClick, false);
+      }, 0);
+    };
+    onUnmounted(() => {
+      window.removeEventListener("keyup", handleClick, false);
+    });
+    return { imgPath, handleClick, bindKeyEvent };
   },
 };
 </script>
