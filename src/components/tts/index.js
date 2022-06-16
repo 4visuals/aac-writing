@@ -65,6 +65,7 @@ class PollyTts {
 
     const audio = new Audio(url);
     audio.playbackRate = 1;
+    audio.load();
     ttsStore.setSpeaking(true);
     return new Promise((done, failed) => {
       audio.onended = (e) => {
@@ -77,7 +78,10 @@ class PollyTts {
         ttsStore.setSpeaking(false);
         failed(e);
       };
-      audio.play();
+      audio.play().catch((e) => {
+        console.log(`[${e.name}]`, e);
+        ttsStore.setSpeaking(false);
+      });
     });
   }
 }

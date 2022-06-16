@@ -4,7 +4,7 @@ store.registerModule("tts", {
   namespaced: true,
   state: () => ({
     voices: new Map(),
-    ttsMode: "browser",
+    ttsMode: "polly",
     activeVoice: null,
     option: {
       rate: 0.8,
