@@ -38,6 +38,7 @@ export default {
       router.replace({
         name: ctx.prevPage,
       });
+      store.commit("ui/hideReward");
       store.commit("ui/hideMenu");
       // nextTick().then(() => {
 

@@ -68,6 +68,9 @@ export default {
         name,
         field: dummy,
         onClose: (passed) => {
+          if (!question.value.para) {
+            return;
+          }
           if (passed) {
             if (question.value.para.hasNextQuiz()) {
               quizStore.moveNext();

@@ -142,11 +142,12 @@ export default {
       return true;
     });
     onMounted(() => {
+      store.commit("ui/hideReward");
       store.commit("ui/setBackgroundVisible", false);
       store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
     });
     onUnmounted(() => {
-      store.commit("ui/setBackgroundVisible", true);
+      store.commit("ui/setBackgroundVisible", false);
       store.commit("ui/setNavSize", { expanded: true, topPadding: 120 });
     });
     return {
