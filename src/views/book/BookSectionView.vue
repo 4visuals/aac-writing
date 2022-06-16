@@ -39,7 +39,7 @@
           theme="orange"
           :disabled="!activeGroup"
           size="sm"
-          @click="startLearning('READING', 'SEN')"
+          @click="startLearning('READING', 'EJ')"
         />
         <AacButton
           :text="`문장 학습`"
