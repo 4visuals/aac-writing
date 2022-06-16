@@ -35,7 +35,7 @@ export default {
     onMounted(() => {
       const bars = wave.value.querySelectorAll(".bar");
       bars.forEach((_, index) => {
-        const height = Math.random() * 30 + 20;
+        const height = Math.random() * 10 + 10;
         heights.push({ index, height });
       });
       repaint(bars, heights);
@@ -59,20 +59,23 @@ export default {
   z-index: 100;
   .sound-wave {
     width: 80%;
-    max-width: 300px;
-    height: 300px;
+    max-width: 60px;
+    height: 80px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
+    mask-image: linear-gradient(to top, transparent 0%, #aaa 10%);
     .bar {
-      width: 10px;
-      margin: 2px;
-      background-color: #686868;
+      width: 10%;
+      margin: 1px;
+      background-color: #ffc107;
       transition: height 0.2s linear;
+      border-radius: 2px;
+      box-shadow: 0 0 1px 1px #0000004d;
     }
   }
 }
