@@ -63,18 +63,18 @@ class PollyTts {
     const textHash = md5(text.trim()).toString();
     const url = `${env.TTS_POLLY_PATH}/voices3/${textHash}.mp3`;
 
-    const audio = new Audio(url);
-    audio.playbackRate = 1;
+    let audio = new Audio(url);
+    audio.preload = "auto";
     audio.load();
+    audio.playbackRate = 0.9;
     ttsStore.setSpeaking(true);
     return new Promise((done, failed) => {
       audio.onended = (e) => {
-        // console.log("[end]", e);
         ttsStore.setSpeaking(false);
         done(text, e);
       };
       audio.onerror = (e) => {
-        console.log(e);
+        console.log("[AUDIO ERROR]", e);
         ttsStore.setSpeaking(false);
         failed(e);
       };
