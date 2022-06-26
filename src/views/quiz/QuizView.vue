@@ -28,11 +28,6 @@
           icon="last_page"
           @click.stop.prevent="alertForResult"
         />
-        <WordDecomposeView
-          v-if="wordDecomposing"
-          :word="ctx.currentQuestion.text"
-          @viewClicked="wordDecomposing = false"
-        />
         <div class="sentence-view" v-if="ctx.isReadingMode()" @click="speak">
           <h3>{{ ctx.currentQuestion.text }}</h3>
         </div>
@@ -66,7 +61,6 @@ import ActionIcon from "@/components/form/ActionIcon.vue";
 import Numbering from "@/views/quiz/Numbering.vue";
 import RewardView from "./RewardView.vue";
 import TtsView from "./TtsView.vue";
-import WordDecomposeView from "./question/WordDecomposeView.vue";
 import QuizResult from "./result/QuizResult.vue";
 import { tts } from "@/components/tts";
 export default {
@@ -75,7 +69,6 @@ export default {
     Numbering,
     RewardView,
     TtsView,
-    WordDecomposeView,
     QuizResult,
   },
   setup() {
@@ -84,7 +77,6 @@ export default {
     const reward = computed(() => store.getters["ui/reward"]);
     const speaking = computed(() => store.state.tts.speaking);
     const focusing = ref(null);
-    const wordDecomposing = ref(false);
     const quizFinished = computed(() => store.state.quiz.finished);
     const router = useRouter();
     // console.log("[QUIZ]", route.params.seq);
@@ -124,9 +116,6 @@ export default {
       if (!ctx.value.isReadingMode()) {
         holdSoftKeyboard();
       }
-      if (ctx.value.isReadingMode()) {
-        wordDecomposing.value = true;
-      }
     };
     onBeforeRouteLeave(() => {
       // console.log(`${from.fullPath} -> ${to.fullPath}`);
@@ -154,7 +143,6 @@ export default {
       ctx,
       reward,
       focusing,
-      wordDecomposing,
       quizFinished,
       speaking,
       moveQuiz,
