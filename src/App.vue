@@ -17,6 +17,7 @@
       </transition>
     </router-view>
   </div>
+  <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
 </template>
 <script>
@@ -28,18 +29,20 @@ import { computed, onMounted, onUnmounted, shallowRef } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
+import RefreshView from "./views/RefreshView.vue";
 export default {
   components: {
     Nav,
     Background,
     MenuWrapper,
+    RefreshView,
   },
   setup() {
     logger.log(env);
     const store = useStore();
     const menuVisible = computed(() => store.getters["ui/leftVisible"]);
     const topPadding = computed(() => store.getters["ui/topPadding"]);
-
+    const refreshRequired = computed(() => store.state.config.refreshing);
     const route = useRoute();
     // console.log(route.path, route.params, topPadding);
     const tr = {
@@ -54,15 +57,24 @@ export default {
     const option = {
       passive: true,
     };
+    const captureHeight = () => {
+      const h = window.visualViewport.height;
+      store.commit("ui/setAppHeight", h);
+      document.body.style.height = `${h}px`;
+    };
     onMounted(() => {
       const el = wrapperEl.value;
       el.addEventListener("scroll", scrolling, option);
+      const { visualViewport } = window;
+      if (visualViewport) {
+        visualViewport.addEventListener("resize", captureHeight);
+      }
     });
     onUnmounted(() => {
       const el = wrapperEl.value;
       el.removeEventListener("scroll", scrolling, option);
     });
-    return { wrapperEl, route, tr, menuVisible, topPadding };
+    return { refreshRequired, wrapperEl, route, tr, menuVisible, topPadding };
   },
 };
 </script>

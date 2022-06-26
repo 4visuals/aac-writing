@@ -32,8 +32,9 @@ if (process.env.NODE_ENV !== "development") {
       console.log("New content is downloading.");
     },
     updated(registration) {
-      console.log("New content is available; please refresh.");
+      console.log("[UPDATE] New content is available; please refresh.");
       console.log(registration);
+      store.commit("config/showRefreshView");
       // https://stackoverflow.com/questions/63410864/how-to-skip-waiting-service-worker-in-vue-pwa
       // registration.waiting.postMessage({ type: "SKIP_WAITING" });
     },
