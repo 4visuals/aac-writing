@@ -102,10 +102,18 @@ export default {
       console.log("[RESET]");
       flushed = false;
       emit("update:inputText", "");
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 500);
     };
     const clicked = () => {
       tts.speak(props.hiddenText);
       resetTime();
+      // iOS: input에 포커스 놓이면 가운데로 스크롤함.
+      //    : 강제로 스크롤 땡겨줌
+      setTimeout(() => {
+        console.log("[SCROLL TOP]");
+      }, 500);
     };
     const markTime = () => {
       failed.value = false;

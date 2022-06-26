@@ -15,11 +15,12 @@ $paragraph-margin-bottom: 0;
 }
 html,
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
   font-size: 12px;
+  overflow-y: hidden;
   font-family: "Noto Sans KR", sans-serif;
+  height: 100%;
 }
 ::-webkit-scrollbar {
   width: 8px;

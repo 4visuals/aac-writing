@@ -40,6 +40,9 @@ class UI {
     this.reward.name = reward;
     this.reward.onClose = rewardSpec.onClose;
   }
+  setAppHeight(height) {
+    this.appHeight = height;
+  }
   hideReward() {
     const { name, onClose } = this.reward;
     if (onClose) {
@@ -68,6 +71,7 @@ const themes = {
 };
 const ui = new UI();
 const leftMenu = new Menu("left");
+
 export default {
   namespaced: true,
   state: () => ({ ui, leftMenu, themes }),
@@ -91,6 +95,9 @@ export default {
     },
     setBackgroundVisible(state, visible) {
       state.ui.setBackgroundVisible(visible);
+    },
+    setAppHeight(state) {
+      state.ui.setAppHeight(visualViewport.height);
     },
     setNavSize(state, { expanded, topPadding }) {
       state.ui.nav.expanded = expanded;
