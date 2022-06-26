@@ -1,12 +1,19 @@
 <template>
-  <div class="license normal effect pressed" :class="{ active }">
+  <div
+    class="license normal effect pressed"
+    :class="{
+      active,
+      expired: lcs.expiredAt && lcs.expiredAt - current <= 0,
+      sm: size === 'sm',
+    }"
+  >
     <div class="progress-bar" v-if="vMode === 'normal'">
       <div class="bar" :style="`width:${resolveWidth(lcs)}`"></div>
     </div>
     <div class="assigned">
       <span class="student" v-if="assignee">{{ assignee.name }}</span
       ><span class="student" v-else>없음</span>
-      <span class="remaining">{{ remaining(lcs) }}</span>
+      <span class="remaining" v-if="size !== 'sm'">{{ remaining(lcs) }}</span>
     </div>
   </div>
 </template>
@@ -15,7 +22,7 @@
 import { time } from "@/service/util";
 import { ref, watch } from "@vue/runtime-core";
 export default {
-  props: ["lcs", "students", "current", "active", "mode"],
+  props: ["lcs", "students", "current", "active", "mode", "size"],
   setup(props) {
     const assignee = ref(null);
     const vMode = ref(props.mode || "normal");
@@ -26,8 +33,13 @@ export default {
     };
     const remaining = (lcs) => {
       const exp = lcs.expiredAt;
+
       if (exp) {
-        return time.diff(props.current, exp);
+        if (exp - props.current > 0) {
+          return time.diff(props.current, exp);
+        } else {
+          return "만료됨";
+        }
       } else {
         return "무제한";
       }
@@ -109,6 +121,17 @@ export default {
       // background-color: #b2d3dd;
       .bar {
         background-color: #ffe546;
+      }
+    }
+    &.expired {
+      .progress-bar {
+        // background-color: #b2d3dd;
+        .bar {
+          background-color: #e2e2e2;
+        }
+      }
+      .assigned {
+        color: #999;
       }
     }
   }

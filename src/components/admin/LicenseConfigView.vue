@@ -9,6 +9,7 @@
         :current="current"
         :active="active === lcs"
         :key="lcs.seq"
+        size="sm"
       >
       </LicenseItem>
     </div>
@@ -127,6 +128,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .lcs-config-view {
   display: flex;
   align-items: flex-start;
@@ -134,6 +136,11 @@ export default {
     flex: 0 0 160px;
     border-right: 1px solid #ccc;
     padding: 16px;
+  }
+  @include mobile {
+    .lcs-view {
+      flex-basis: auto;
+    }
   }
   .stud-view {
     flex: 1 1 auto;
