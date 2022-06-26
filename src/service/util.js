@@ -103,15 +103,14 @@ const logger = {
 const pick = (arr, cnt) => {
   const picked = [...arr];
   for (let k = 0; k < cnt; k++) {
-    const i = parseInt(Math.random() * cnt);
-    const j = parseInt(Math.random() * cnt);
+    const i = parseInt(Math.random() * picked.length);
+    const j = parseInt(Math.random() * picked.length);
     const tmp = picked[i];
     picked[i] = picked[j];
     picked[j] = tmp;
   }
   return picked.slice(0, cnt);
 };
-logger.log("[HOST_]", env.HOST);
 
 export { key, path, time, host, logger, pick };
 export default {
