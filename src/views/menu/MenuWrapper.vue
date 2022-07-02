@@ -8,9 +8,6 @@
         <MenuSection>
           <UserProfile />
         </MenuSection>
-        <MenuSection title="목소리">
-          <VoiceElem :voice="activeVoice" @click="showTtsConfig" />
-        </MenuSection>
         <TeacherSectionMenu v-if="isTeacher" />
         <StudentSectionMenu v-else />
       </div>
@@ -30,14 +27,12 @@ import MenuSection from "./MenuSection.vue";
 import TeacherSectionMenu from "./TeacherSectionMenu.vue";
 import StudentSectionMenu from "./StudentSectionMenu.vue";
 import Flag from "@/components/Flag.vue";
-import { TtsConfig, VoiceElem } from "@/components/tts";
 // import OAuthButton2 from "@/components/oauth/OAuthButton2.vue";
 import UserProfile from "./UserProfile.vue";
 export default {
   components: {
     Flag,
     MenuSection,
-    VoiceElem,
     UserProfile,
     TeacherSectionMenu,
     StudentSectionMenu,
@@ -57,10 +52,6 @@ export default {
     setTimeout(() => {
       slider.value = true;
     }, 0);
-
-    const showTtsConfig = () => {
-      modalComponent.value = TtsConfig;
-    };
     const hideModal = () => {
       modalComponent.value = null;
       modalArgs.value = null;
@@ -75,7 +66,6 @@ export default {
       hide,
       slider,
       activeVoice,
-      showTtsConfig,
       hideModal,
       modalComponent,
       modalArgs,
