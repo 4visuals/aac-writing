@@ -287,27 +287,6 @@ const loadSentenceQuiz = ({
       }
     );
   });
-
-  /*
-  return api.section.sentences(section, quizResource).then((res) => {
-    const config = new QuizConfig(res.sentences);
-    const questions = res.sentences.map(
-      (sen, index) => new Question(config, index, sen)
-    );
-
-    const ctx = new QuizContext(questions, {
-      questionComponent,
-      answerComponent,
-      maxTrials: quizMode === "LEARNING" ? -1 : 0,
-      autoSlide: false,
-      rewardForCorrect: quizMode === "LEARNING",
-      rewardForWrong: quizMode === "LEARNING",
-      rememberAnswer: true,
-    });
-    quizStore.startQuiz(ctx);
-    return ctx;
-  });
-  */
 };
 const loadQuiz = () => {
   const quizSpec = storage.session.read("quizSpec");

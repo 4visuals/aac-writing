@@ -1,14 +1,15 @@
 <template>
-  <div class="reward-wrapper" ref="wrapper" tabindex="0">
-    <transition name="pop" appear @after-enter="bindKeyEvent">
-      <ImageView :imgPath="imgPath" @click="handleClick" />
+  <div class="reward-wrapper">
+    <input type="search" autocomplete="off" class="close" ref="disposer" />
+    <transition name="pop" appear>
+      <ImageView :imgPath="imgPath" @click="hideReward" />
     </transition>
   </div>
 </template>
 
 <script>
 import ImageView from "@/components/ImageView.vue";
-import { computed, ref } from "@vue/runtime-core";
+import { computed, onMounted, ref } from "@vue/runtime-core";
 import { useStore } from "vuex";
 export default {
   components: {
@@ -16,26 +17,19 @@ export default {
   },
   setup() {
     const store = useStore();
-    const wrapper = ref(null);
+    const reward = store.getters["ui/reward"];
+    const disposer = ref(null);
     const imgPath = computed(() => {
-      const name = store.getters["ui/reward"];
-      return require(`@/assets/reward/${name}.png`);
+      return require(`@/assets/reward/${reward}.png`);
     });
-    const handleClick = () => {
+    const hideReward = () => {
       store.commit("ui/hideReward");
     };
-
-    const bindKeyEvent = () => {
-      try {
-        wrapper.value.focus();
-        setTimeout(() => {
-          wrapper.value.addEventListener("keyup", handleClick, false);
-        }, 0);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    return { wrapper, imgPath, handleClick, bindKeyEvent };
+    onMounted(() => {
+      disposer.value.focus();
+      // 키보드로 펭귄 닫는 코드 막아둠
+    });
+    return { reward, disposer, imgPath, hideReward };
   },
 };
 </script>
@@ -59,6 +53,14 @@ export default {
   .pop-enter-active,
   .pop-leave-active {
     transition: all 0.15s cubic-bezier(0, 0, 0.3, 1.33);
+  }
+  input.close {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 0;
+    height: 0;
+    opacity: 0;
   }
 }
 </style>

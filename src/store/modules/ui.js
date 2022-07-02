@@ -47,6 +47,7 @@ class UI {
     const { name, onClose } = this.reward;
     if (onClose) {
       onClose(name === "passed");
+      this.reward.onClose = null;
     }
     this.reward.name = null;
     this.reward.onClose = null;

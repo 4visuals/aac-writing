@@ -8,7 +8,7 @@
           :class="idx % 2 == 1 ? 'even' : 'odd'"
           w="w120"
         >
-          <SpanText :small="true">{{ q.data.sentence }}</SpanText>
+          <SpanText size="sm">{{ q.data.sentence }}</SpanText>
         </Cell>
       </template>
       <template v-slot:data>
@@ -22,7 +22,7 @@
             :key="idx"
             :class="answerClass(q, idx)"
             w="w80"
-            ><SpanText class="text" :small="true">{{
+            ><SpanText class="text" size="sm">{{
               getTrialAt(q, idx)
             }}</SpanText></Cell
           >

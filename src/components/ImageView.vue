@@ -1,23 +1,29 @@
 <template>
-  <div class="bg" :style="styleObj"></div>
+  <div class="bg" :style="styleObj" @click.stop.prevent="clicked"></div>
 </template>
 
 <script>
 import { ref, watch } from "@vue/runtime-core";
 export default {
   props: ["imgPath", "styles"],
-  setup(props) {
+  setup(props, { emit }) {
     // const maxWidth = props.maxWidth || "400px";
     const styleObj = ref({
       "background-image": `url(${props.imgPath})`,
     });
+    const clicked = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      console.log("[!!]", e);
+      emit("clicked", e);
+    };
     watch(
       () => props.imgPath,
       () => {
         styleObj.value["background-image"] = `url(${props.imgPath})`;
       }
     );
-    return { styleObj };
+    return { styleObj, clicked };
   },
 };
 </script>

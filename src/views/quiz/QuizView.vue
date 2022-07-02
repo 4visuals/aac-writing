@@ -1,6 +1,13 @@
 <template>
   <div class="quiz-wrapper">
-    <input type="text" tabindex="-1" ref="focusing" />
+    <input
+      type="search"
+      tabindex="-1"
+      ref="focusing"
+      autocomplete="off"
+      enterkeyhint="done"
+      @keyup="hideReward"
+    />
     <template v-if="ctx">
       <Numbering />
       <div class="question">
@@ -31,6 +38,7 @@
         <div class="sentence-view" v-if="ctx.isReadingMode()" @click="speak">
           <h3>{{ ctx.currentQuestion.text }}</h3>
         </div>
+        <HintView v-if="hint.visible" />
       </div>
       <div class="answer">
         <component
@@ -59,6 +67,7 @@ import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 import ActionIcon from "@/components/form/ActionIcon.vue";
 import Numbering from "@/views/quiz/Numbering.vue";
+import HintView from "./HintView.vue";
 import RewardView from "./RewardView.vue";
 import TtsView from "./TtsView.vue";
 import QuizResult from "./result/QuizResult.vue";
@@ -67,6 +76,7 @@ export default {
   components: {
     ActionIcon,
     Numbering,
+    HintView,
     RewardView,
     TtsView,
     QuizResult,
@@ -74,12 +84,14 @@ export default {
   setup() {
     const store = useStore();
     const ctx = computed(() => store.state.quiz.quizContext);
+    const hint = computed(() => store.state.quiz.hint);
     const reward = computed(() => store.getters["ui/reward"]);
     const speaking = computed(() => store.state.tts.speaking);
     const focusing = ref(null);
+    const keyConsumer = ref(null);
     const quizFinished = computed(() => store.state.quiz.finished);
     const router = useRouter();
-    // console.log("[QUIZ]", route.params.seq);
+    store.commit("quiz/hideHint");
     quiz.loadQuiz();
     /**
      * 모바일에서 soft keyboard가 내려갔다 올라가는 불편을 방지하기 위해서
@@ -88,14 +100,15 @@ export default {
     const holdSoftKeyboard = () => focusing.value.focus();
 
     const moveQuiz = (dir) => {
-      if (!ctx.value.isReadingMode()) {
-        holdSoftKeyboard();
-      }
+      // if (!ctx.value.isReadingMode()) {
+      //   holdSoftKeyboard();
+      // }
       if (dir > 0) {
         quizStore.moveNext();
       } else {
         quizStore.movePrev();
       }
+      // holdSoftKeyboard();
     };
     const alertForResult = () => {
       if (ctx.value.isReadingMode()) {
@@ -113,9 +126,9 @@ export default {
       return tts.speak(ctx.value.currentQuestion.text);
     };
     const sceneClicked = () => {
-      if (!ctx.value.isReadingMode()) {
-        holdSoftKeyboard();
-      }
+      // if (!ctx.value.isReadingMode()) {
+      //   }
+      holdSoftKeyboard();
     };
     onBeforeRouteLeave(() => {
       // console.log(`${from.fullPath} -> ${to.fullPath}`);
@@ -141,8 +154,10 @@ export default {
     });
     return {
       ctx,
+      hint,
       reward,
       focusing,
+      keyConsumer,
       quizFinished,
       speaking,
       moveQuiz,
@@ -161,7 +176,7 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
-  > input[type="text"] {
+  > input[type="search"] {
     position: absolute;
     width: 0;
     height: 0;

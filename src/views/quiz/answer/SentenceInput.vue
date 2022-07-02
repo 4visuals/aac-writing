@@ -1,6 +1,6 @@
 <template>
   <div class="text-input">
-    <input type="text" class="dummy" ref="dummy" />
+    <input type="search" autocomplete="off" class="dummy" ref="dummy" />
     <AnswerField
       ref="field"
       v-model:inputText="trial"
@@ -8,17 +8,14 @@
       :inputVisible="!correct"
       :spaceCommit="quizContext.isWord()"
       @commit="checkAnswer"
+      @clicked="speackAndFocus(0)"
       @rest="() => (inputText = '')"
     />
-    <button class="btn-submit" @click="checkByClick" v-if="!question.isSolved">
-      <SpanText>제출</SpanText>
-    </button>
   </div>
 </template>
 
 <script>
 import { tts } from "@/components/tts";
-import { SpanText } from "@/components/text";
 import AnswerField from "@/components/quiz/AnswerField.vue";
 import { computed, onMounted, ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
@@ -35,6 +32,9 @@ class SentenceQuestion {
   get isSolved() {
     return this.para.solved;
   }
+  get trials() {
+    return this.para.trials;
+  }
   tryAnswer(trial, elapsedTime) {
     return this.para.addTrial(trial, elapsedTime);
   }
@@ -44,7 +44,6 @@ class SentenceQuestion {
  */
 export default {
   components: {
-    SpanText,
     AnswerField,
   },
   props: ["quizContext"],
@@ -63,6 +62,25 @@ export default {
     const question = ref(new SentenceQuestion(source.value));
     const correct = ref(false);
 
+    const moveToNext = () => {
+      store.commit("ui/hideReward");
+      if (question.value.para.hasNextQuiz()) {
+        quizStore.moveNext();
+      } else {
+        emit("quizEnd");
+      }
+    };
+    const moveIfPassed = (e) => {
+      if (e.target !== dummy.value) {
+        console.log(dummy.value);
+        return;
+      }
+      // if (correct.value) {
+      //   moveToNext();
+      // } else {
+      //   }
+      store.commit("ui/hideReward");
+    };
     const showReward = (name) => {
       store.commit("ui/showReward", {
         name,
@@ -82,6 +100,7 @@ export default {
           }
         },
       });
+      // dummy.value.focus();
       new Audio(require(`@/assets/reward/${name}.mp3`)).play();
     };
     let pendingSpeakId = null;
@@ -102,16 +121,20 @@ export default {
     const checkAnswer = (e) => {
       const { elapsedTime } = e;
       const learngingMode = props.quizContext.isLearningMode();
+      const dictationMode = props.quizContext.isReadingMode();
       const passed = question.value.tryAnswer(e.value.trim(), elapsedTime);
       correct.value = learngingMode ? passed : false;
-      dummy.value.focus();
+
       if (learngingMode) {
         if (passed) {
           showReward("passed");
-          // tts.speak(trial.value.trim()).then(() => {
-          //   showReward("passed");
-          // });
         } else {
+          if (!dictationMode) {
+            store.commit("quiz/showHint", {
+              cnt: question.value.trials.length,
+              text: question.value.text,
+            });
+          }
           showReward("failed");
         }
       } else {
@@ -133,7 +156,7 @@ export default {
         trial.value = "";
         correct.value = source.value && source.value.solved;
         question.value = new SentenceQuestion(source.value);
-        dummy.value.focus();
+        // dummy.value.focus();
         speackAndFocus(500);
       }
     );
@@ -149,6 +172,9 @@ export default {
       question,
       checkAnswer,
       checkByClick,
+      moveToNext,
+      speackAndFocus,
+      moveIfPassed,
     };
   },
 };

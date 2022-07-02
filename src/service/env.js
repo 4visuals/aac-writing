@@ -12,4 +12,5 @@ Object.keys(process.env).forEach((key) => {
   }
 });
 envs.devMode = envs.MODE === "DEVLELOPMENT";
+envs.prodMode = envs.MODE === "PRODUCTION";
 export default envs;

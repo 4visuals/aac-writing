@@ -1,10 +1,10 @@
 <template>
-  <span :class="{ small: small }"><slot /></span>
+  <span :class="{ sm: size === 'sm', lg: size === 'lg' }"><slot /></span>
 </template>
 
 <script>
 export default {
-  props: ["small"],
+  props: ["size"],
 };
 </script>
 
@@ -13,24 +13,33 @@ export default {
 @include mobile {
   span {
     font-size: 1.15rem;
-    &.small {
+    &.sm {
       font-size: 0.85rem;
+    }
+    &.lg {
+      font-size: 1.35rem;
     }
   }
 }
 @include tablet {
   span {
     font-size: 1.35rem;
-    &.small {
-      font-size: 1.5rem;
+    &.sm {
+      font-size: 1.2rem;
+    }
+    &.lg {
+      font-size: 1.65rem;
     }
   }
 }
 @include desktop {
   span {
     font-size: 1.35rem;
-    &.small {
-      font-size: 1.5rem;
+    &.sm {
+      font-size: 1.2rem;
+    }
+    &.lg {
+      font-size: 1.65rem;
     }
   }
 }

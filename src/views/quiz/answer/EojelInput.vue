@@ -1,6 +1,13 @@
 <template>
   <div class="eojeol-list">
-    <input type="text" class="dummy" ref="dummy" tabindex="-1" />
+    <input
+      type="search"
+      class="dummy"
+      ref="dummy"
+      tabindex="-1"
+      autocomplete="off"
+      enterkeyhint="next"
+    />
     <div class="ej" v-for="ej in eojeols" :key="ej.order">
       <Symbol
         :ej="ej"
@@ -8,7 +15,7 @@
         :showAnswer="false"
         :spaceCommit="true"
         @typed="validateAnswer"
-        @clicked="() => holdAndSpeak(ej)"
+        @clicked="(e) => holdAndSpeak(ej, e)"
       />
     </div>
   </div>
@@ -47,6 +54,9 @@ class Ej {
   get isSolved() {
     return this.data.solved;
   }
+  get trials() {
+    return this.data.trials;
+  }
   addTrial(value, elapsedTimeMillis, correct) {
     this.data.trials.push({
       eojeolRef: this.data.eojeolRef,
@@ -76,6 +86,8 @@ export default {
   setup(props) {
     const store = useStore();
     const question = computed(() => store.getters["quiz/currentPara"]);
+    const learngingMode = props.quizContext.isLearningMode();
+    const dictationMode = props.quizContext.isReadingMode();
     const dummy = ref(null);
     const createEojeolWrapper = (ej, i) => {
       if (!props.quizContext.rememberAnswer) {
@@ -95,20 +107,28 @@ export default {
       if (nextEj) {
         nextEj.active = true;
       }
+      store.commit("quiz/hideHint");
     };
     const validateAnswer = (e) => {
       const { ej, value, elapsedTime } = e;
       if (ej.tryAnswer(value, elapsedTime)) {
         dummy.value.focus();
-        if (props.quizContext.isLearningMode()) {
+        if (learngingMode) {
           tts.speak(ej.text).then(() => {
             moveToNextEojeol(ej);
           });
         } else {
           moveToNextEojeol(ej);
         }
+        store.commit("quiz/hideHint");
       } else {
         e.failed();
+        if (!dictationMode) {
+          store.commit("quiz/showHint", {
+            cnt: ej.trials.length,
+            text: ej.text,
+          });
+        }
       }
       console.log(ej.isSolved);
     };
@@ -124,15 +144,19 @@ export default {
           .then(() => moveToNextEojeol(null));
       }, 500);
     };
-    const holdAndSpeak = (ej) => {
-      dummy.value.focus();
+    const holdAndSpeak = (ej, e) => {
       tts.speak(ej.text);
+      store.commit("quiz/hideHint");
+      if (e.holdKeyboard) {
+        dummy.value.focus();
+      }
     };
     watch(
       () => question.value,
       () => {
         eojeols.value = question.value.data.eojeols.map(createEojeolWrapper);
         speackAndMoveFocus();
+        store.commit("quiz/hideHint");
       }
     );
     onMounted(() => {

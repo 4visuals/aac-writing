@@ -4,24 +4,24 @@
       {{ hiddenText }}
     </div>
     <input
-      type="text"
+      type="search"
       v-if="inputVisible"
+      tabindex="-1"
+      enterkeyhint="done"
+      autocomplete="off"
       @focus="resetTime"
       @input="handleInput"
-      @keyup.enter.stop.prevent="handleEnter"
+      @keydown.enter="handleEnter"
       @keydown.tab.stop.prevent="handleTab"
       @click="clicked"
       ref="inputEl"
-      tabindex="-1"
       :value="inputText"
     />
   </div>
 </template>
 
 <script>
-import { tts } from "@/components/tts";
 import { ref } from "@vue/reactivity";
-import { nextTick } from "@vue/runtime-core";
 export default {
   props: [
     "inputVisible",
@@ -30,32 +30,38 @@ export default {
     "textClick",
     "spaceCommit",
   ],
-  emits: ["commit", "update:inputText", "reset"],
+  emits: ["commit", "update:inputText", "reset", "clicked"],
   setup(props, { emit }) {
     let startTime = [];
     const inputEl = ref(null);
     let flushed = false;
     let failed = ref(false);
     const focus = () => {
-      inputEl.value.focus();
-      inputEl.value.select();
+      if (inputEl.value) {
+        // 일부만 풀고 넘겼을때 null 일 수 있음.
+        inputEl.value.select();
+        inputEl.value.focus();
+      }
     };
     /**
      * 틀렸을때 호출됨
      */
     const retry = () => {
       const falseInput = inputEl.value.value.trim();
-      failed.value = true;
 
       setTimeout(() => {
-        // failed.value = false;
-        nextTick().then(() => {
+        /*
+         * markTime()에서 failed 를 false 로 초기화함
+         */
+        failed.value = true;
+        setTimeout(() => {
           inputEl.value.value = falseInput;
           focus();
           resetTime();
-        });
+        }, 200);
         // focus();
-      }, 200);
+      }, 0);
+      // setTimeout(() => (failed.value = false), 1000);
     };
     const flush = (e) => {
       const elapsedTime = new Date().getTime() - startTime[0];
@@ -71,7 +77,13 @@ export default {
       });
     };
     const handleEnter = (e) => {
-      console.log("[enter]", e);
+      console.log("[enter]", e.isComposing, e);
+      // CHROME: 한글 입력상태에서(composition)엔터를 누르면 이벤트가 두 번 발생함
+      //       : 첫번째는 e.isComposing이 true이고
+      //       : 뒤에 이어지는 이번트에서는 false
+      // if (e.isComposing) {
+      //   return;
+      // }
       e.stopImmediatePropagation();
       flush(e);
     };
@@ -81,12 +93,14 @@ export default {
     };
     const handleInput = (e) => {
       markTime();
+      // console.log("[INPUT]", e);
       // emit("update:inputText", e.target.value);
       if (e.isComposing) {
         console.log("[COMPOSING]");
-        if (props.spaceCommit && e.data.includes(" ")) {
+        if (props.spaceCommit && e.data && e.data.includes(" ")) {
           // Mac chrome에서 스페이스를 누르면 e.isComposing 상태가 해제되지 않는다.
           // TODO window chrome에서도 확인해봐야 함
+          console.log("[SPACE COMMIT]");
           flush(e);
         }
         return;
@@ -102,18 +116,20 @@ export default {
       console.log("[RESET]");
       flushed = false;
       emit("update:inputText", "");
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 500);
-    };
-    const clicked = () => {
-      tts.speak(props.hiddenText);
-      resetTime();
       // iOS: input에 포커스 놓이면 가운데로 스크롤함.
       //    : 강제로 스크롤 땡겨줌
       setTimeout(() => {
         console.log("[SCROLL TOP]");
+        window.scrollTo(0, 0);
       }, 500);
+    };
+    const clicked = (e) => {
+      // tts.speak(props.hiddenText);
+      console.log("[ANSWERFILED] CLICKED");
+      e.stopImmediatePropagation();
+      // resetTime();
+      emit("clicked");
+      focus();
     };
     const markTime = () => {
       failed.value = false;

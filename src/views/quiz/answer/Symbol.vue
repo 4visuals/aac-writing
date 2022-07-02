@@ -3,7 +3,7 @@
     <div
       class="pic-holder"
       :style="{ 'background-image': `url('${pumsaImg()}')` }"
-      @click.stop="$emit('clicked')"
+      @click.stop="() => $emit('clicked', { holdKeyboard: true })"
     ></div>
     <div class="desc">
       <AnswerField
@@ -13,6 +13,7 @@
         :inputVisible="!correct"
         @commit="checkAnswer"
         @textClick="speak"
+        @clicked="(e) => $emit('clicked', { holdKeyboard: false })"
         :spaceCommit="true"
       />
     </div>

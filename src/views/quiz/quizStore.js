@@ -12,6 +12,14 @@ store.registerModule("quiz", {
      * 현재 풀고 있는 퀴즈 정보
      */
     quizContext: null,
+    /**
+     * 힌트
+     */
+    hint: {
+      visible: false,
+      cnt: 0, // 현재 문제에서 연속으로 틀릿 횟수
+      text: null,
+    },
   }),
   getters: {
     quizPage: (state) => !!state.quizContext, // 퀴즈화면인지 나타냄
@@ -46,6 +54,16 @@ store.registerModule("quiz", {
       state.finished = false;
       state.quizContext = null;
     },
+    showHint(state, args) {
+      const { text, cnt } = args;
+      state.hint.visible = cnt >= 2;
+      state.hint.cnt = cnt;
+      state.hint.text = text;
+    },
+    hideHint(state) {
+      state.hint.visible = false;
+      state.hint.level = state.hint.text = null;
+    },
   },
 });
 
@@ -53,10 +71,14 @@ const startQuiz = (quizContext) => {
   store.commit("quiz/setQuiz", { quizContext });
 };
 const getQuizContext = () => store.state.quiz.quizContext;
-const setQuestionAt = (index) => store.commit("quiz/setQuestion", index);
+const setQuestionAt = (index) => {
+  store.commit("quiz/setQuestion", index);
+  store.commit("quiz/hideHint");
+};
 const shiftBy = (offset) => {
   const ctx = store.state.quiz.quizContext;
   const nextQuizIndex = ctx.currentQuestion.index + offset;
+  console.log("[Q:NEXT IDX]", nextQuizIndex);
   if (nextQuizIndex === ctx.quizLength) {
     store.commit("quiz/showResultView");
   } else if (nextQuizIndex < 0) {
