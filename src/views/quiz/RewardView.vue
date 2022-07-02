@@ -1,6 +1,12 @@
 <template>
   <div class="reward-wrapper">
-    <input type="search" autocomplete="off" class="close" ref="disposer" />
+    <input
+      type="search"
+      autocomplete="off"
+      class="close"
+      ref="disposer"
+      @keydown="moveNext"
+    />
     <transition name="pop" appear>
       <ImageView :imgPath="imgPath" @click="hideReward" />
     </transition>
@@ -25,11 +31,15 @@ export default {
     const hideReward = () => {
       store.commit("ui/hideReward");
     };
+    const moveNext = () => {
+      hideReward();
+    };
+
     onMounted(() => {
-      disposer.value.focus();
+      setTimeout(() => disposer.value.focus(), 0);
       // 키보드로 펭귄 닫는 코드 막아둠
     });
-    return { reward, disposer, imgPath, hideReward };
+    return { reward, disposer, imgPath, hideReward, moveNext };
   },
 };
 </script>
