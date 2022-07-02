@@ -7,6 +7,7 @@
       type="search"
       v-if="inputVisible"
       tabindex="-1"
+      spellcheck="false"
       enterkeyhint="done"
       autocomplete="off"
       @focus="resetTime"
