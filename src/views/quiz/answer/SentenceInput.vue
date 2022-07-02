@@ -52,6 +52,7 @@ export default {
     const field = ref(null);
     const dummy = ref(null);
     const source = computed(() => store.getters["quiz/currentPara"]);
+    const sceneClick = computed(() => store.state.quiz.sceneClick);
     /**
      * 학생이 입력한 문장
      */
@@ -158,6 +159,12 @@ export default {
         question.value = new SentenceQuestion(source.value);
         // dummy.value.focus();
         speackAndFocus(500);
+      }
+    );
+    watch(
+      () => sceneClick.value,
+      () => {
+        speackAndFocus(0);
       }
     );
     onMounted(() => {

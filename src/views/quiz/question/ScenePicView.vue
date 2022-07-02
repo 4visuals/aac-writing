@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { tts } from "@/components/tts";
 import { computed } from "vue";
 import { useStore } from "vuex";
 import ImageView from "@/components/ImageView.vue";
@@ -47,8 +46,8 @@ export default {
     };
 
     const speak = () => {
-      tts.speak(question.value.data.sentence);
       emit("speaking");
+      store.commit("quiz/sceneClicked");
     };
     return {
       question,

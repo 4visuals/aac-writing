@@ -3,7 +3,7 @@
     <div
       class="pic-holder"
       :style="{ 'background-image': `url('${pumsaImg()}')` }"
-      @click.stop="() => $emit('clicked', { holdKeyboard: true })"
+      @click.stop="symbolClicked"
     ></div>
     <div class="desc">
       <AnswerField
@@ -94,6 +94,12 @@ export default {
         emit("typed", { ej: props.ej, value: e.target.value });
       }
     };
+    const symbolClicked = () => {
+      emit("clicked", { holdKeyboard: true });
+      setTimeout(() => {
+        inputEl.value.focus();
+      }, 300);
+    };
     const speak = () => {
       tts.speak(props.ej.text);
     };
@@ -105,6 +111,7 @@ export default {
       inputEl,
       speak,
       checkAnswer,
+      symbolClicked,
     };
   },
 };

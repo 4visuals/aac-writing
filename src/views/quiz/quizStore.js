@@ -20,6 +20,10 @@ store.registerModule("quiz", {
       cnt: 0, // 현재 문제에서 연속으로 틀릿 횟수
       text: null,
     },
+    /**
+     * 장면 클릭
+     */
+    sceneClick: 0,
   }),
   getters: {
     quizPage: (state) => !!state.quizContext, // 퀴즈화면인지 나타냄
@@ -63,6 +67,9 @@ store.registerModule("quiz", {
     hideHint(state) {
       state.hint.visible = false;
       state.hint.level = state.hint.text = null;
+    },
+    sceneClicked(state) {
+      state.sceneClick = new Date().getTime();
     },
   },
 });

@@ -86,6 +86,7 @@ export default {
   setup(props) {
     const store = useStore();
     const question = computed(() => store.getters["quiz/currentPara"]);
+    const sceneClick = computed(() => store.state.quiz.sceneClick);
     const learngingMode = props.quizContext.isLearningMode();
     const dictationMode = props.quizContext.isReadingMode();
     const dummy = ref(null);
@@ -133,7 +134,7 @@ export default {
       console.log(ej.isSolved);
     };
     let pendingSpeakId = null;
-    const speackAndMoveFocus = () => {
+    const speackAndMoveFocus = (delay) => {
       if (pendingSpeakId) {
         clearTimeout(pendingSpeakId);
       }
@@ -142,7 +143,7 @@ export default {
         tts
           .speak(question.value.text, { clearPending: true })
           .then(() => moveToNextEojeol(null));
-      }, 500);
+      }, delay);
     };
     const holdAndSpeak = (ej, e) => {
       tts.speak(ej.text);
@@ -155,8 +156,14 @@ export default {
       () => question.value,
       () => {
         eojeols.value = question.value.data.eojeols.map(createEojeolWrapper);
-        speackAndMoveFocus();
+        speackAndMoveFocus(500);
         store.commit("quiz/hideHint");
+      }
+    );
+    watch(
+      () => sceneClick.value,
+      () => {
+        speackAndMoveFocus(0);
       }
     );
     onMounted(() => {
