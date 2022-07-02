@@ -254,7 +254,8 @@ $padding: 16px;
           user-select: none;
           cursor: pointer;
           &.active {
-            box-shadow: 0 0 8px 1px #7865009c;
+            outline: 3px solid;
+            background-color: #fffb00;
           }
         }
       }
