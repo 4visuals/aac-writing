@@ -95,6 +95,7 @@ export default {
         startTime: ctx.startTime / 1000,
         endTime: new Date().getTime() / 1000,
         type: ctx.isWord() ? "W" : "S",
+        numOfQuestions: ctx.quizLength,
         submissions: null,
       };
       exam.submissions = ctx.questions.flatMap((question) => {

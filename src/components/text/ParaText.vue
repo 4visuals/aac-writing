@@ -14,7 +14,7 @@ export default {
   p {
     font-size: 1rem;
     &.small {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
     &.lg {
       font-size: 1.25rem;

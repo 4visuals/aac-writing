@@ -1,6 +1,12 @@
 <template>
   <div class="container">
     <BrandPanel theme="pink" text="단계별 받아쓰기" path="level" />
+    <HistoryView
+      v-if="chapters.length > 0"
+      class="group"
+      origin="L"
+      @itemClicked="(section) => showDetail(section, 'pink')"
+    />
     <div
       class="row group"
       v-for="(chapter, idx) in chapters"
@@ -57,6 +63,7 @@ import SectionView from "./SectionView.vue";
 import { useStore } from "vuex";
 import { computed, ref } from "vue";
 import router from "@/router";
+import HistoryView from "../QuizHistoryView.vue";
 
 export default {
   props: ["cate"],
@@ -65,6 +72,7 @@ export default {
     SectionView,
     Modal,
     BrandPanel,
+    HistoryView,
   },
   setup() {
     const store = useStore();
@@ -79,9 +87,7 @@ export default {
       sound.playSound();
     };
 
-    const chapters = computed(() => {
-      return store.state.course.chapters.levels;
-    });
+    const chapters = computed(() => store.state.course.chapters.levels);
     const moveTo = (quiz) => {
       console.log(quiz);
       router.push("/quiz/" + quiz.seq);

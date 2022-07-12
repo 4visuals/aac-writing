@@ -89,7 +89,7 @@ export default {
     background-color: white;
     box-shadow: rgb(0 0 0 / 5%) 0px 0px 0px 1px,
       rgb(209 213 219) 0px 0px 0px 1px inset;
-    z-index: 5;
+    z-index: 75;
   }
 }
 </style>

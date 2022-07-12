@@ -1,10 +1,13 @@
 <template>
   <div
     class="section"
-    :class="{ compact: compact === '' }"
+    :class="{ compact: compact === '', visited }"
     @click="$emit('itemClicked', item)"
   >
-    <h1 :class="theme">{{ idx }}</h1>
+    <h1 :class="theme">
+      <span>{{ idx }}</span
+      ><span v-if="visited">+</span>
+    </h1>
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
       <ParaText :small="true">{{ item.description }}</ParaText>
@@ -17,12 +20,24 @@
 
 <script>
 import { ParaText } from "@/components/text";
+import { useStore } from "vuex";
+import { computed } from "@vue/runtime-core";
+
 export default {
   components: {
     ParaText,
   },
   props: ["idx", "item", "theme", "compact", "desc"],
-  setup() {},
+  setup(props) {
+    const store = useStore();
+    const visited = computed(() =>
+      store.getters["quizHistory/hasHistory"](props.item)
+    );
+
+    return {
+      visited,
+    };
+  },
 };
 </script>
 
@@ -67,22 +82,24 @@ export default {
     line-height: 1;
     display: block;
     color: #d23d70;
+    display: inline-flex;
+    align-items: center;
     &.green {
-      text-shadow: 2px 2px #d4e250;
+      // text-shadow: 2px 2px #d4e250;
       color: #20450a;
     }
 
     &.pink {
-      text-shadow: 2px 2px #f4abc4;
-      color: #d23d70;
+      // text-shadow: 2px 2px var(--aac-color-pink-500);
+      color: var(--aac-color-pink-900);
     }
     &.yellow {
-      text-shadow: 2px 2px var(--aac-color-yellow-400);
+      // text-shadow: 2px 2px var(--aac-color-yellow-400);
       color: var(--aac-color-yellow-900);
     }
 
     &.blue {
-      text-shadow: 2px 2px #6c97dc;
+      // text-shadow: 2px 2px #6c97dc;
       color: #0b0a45;
     }
   }
@@ -109,16 +126,16 @@ export default {
       top: 2px;
       left: 2px;
       &.pink {
-        box-shadow: 4px 4px #f4abc4;
+        box-shadow: 2px 2px var(--aac-color-pink-500);
       }
       &.yellow {
-        box-shadow: 4px 4px var(--aac-color-yellow-400);
+        box-shadow: 2px 2px var(--aac-color-yellow-400);
       }
       &.green {
-        box-shadow: 4px 4px #d4e250;
+        box-shadow: 2px 2px #d4e250;
       }
       &.blue {
-        box-shadow: 4px 4px #6c97dc;
+        box-shadow: 2px 2px #6c97dc;
       }
     }
     @include mobile {
@@ -137,24 +154,24 @@ export default {
       }
     }
     &.green {
-      box-shadow: 6px 6px var(--aac-color-green-700);
+      box-shadow: 4px 4px var(--aac-color-green-700);
       background-color: var(--aac-color-green-400);
       color: var(--aac-color-green-900);
     }
 
     &.pink {
-      box-shadow: 6px 6px var(--aac-color-pink-700);
+      box-shadow: 4px 4px var(--aac-color-pink-500);
       background-color: var(--aac-color-pink-400);
       color: var(--aac-color-pink-900);
     }
     &.yellow {
-      box-shadow: 6px 6px var(--aac-color-yellow-700);
+      box-shadow: 4px 4px var(--aac-color-yellow-700);
       background-color: var(--aac-color-yellow-400);
       color: var(--aac-color-yellow-900);
     }
 
     &.blue {
-      box-shadow: 6px 6px #6c97dc;
+      box-shadow: 4px 4px #6c97dc;
       background-color: #7ca2e0;
       color: #0b0a45;
     }

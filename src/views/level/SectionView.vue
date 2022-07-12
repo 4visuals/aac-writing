@@ -21,6 +21,14 @@
         height="100%"
         :resolveUrl="(rss) => path.aacweb.scene(rss)"
       />
+      <div class="overlay" v-if="sentencesRef.length > 0">
+        <h4>{{ examDesc }}</h4>
+        <QuestionList
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          @choosen="startSentenceQuiz"
+        />
+      </div>
     </div>
     <div class="footer">
       <div class="choose">
@@ -28,18 +36,18 @@
           :text="`보고 쓰기`"
           theme="orange"
           :disabled="quizOnly === '' || quizOnly === true"
-          @click="startSentenceQuiz('READING', 'EJ')"
+          @click="listQuestions('READING', 'EJ')"
         />
         <AacButton
           :text="`${sourceText()} 학습`"
           theme="blue"
           :disabled="quizOnly === '' || quizOnly === true"
-          @click="startSentenceQuiz('LEARNING', 'EJ')"
+          @click="listQuestions('LEARNING', 'EJ')"
         />
         <AacButton
           :text="`${sourceText()} 퀴즈`"
           theme="red"
-          @click="startSentenceQuiz('QUIZ', 'SEN')"
+          @click="listQuestions('QUIZ', 'SEN')"
         />
       </div>
     </div>
@@ -48,16 +56,15 @@
 
 <script>
 import { path } from "@/service/util";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import router from "@/router";
+import { quizDao } from "@/dao";
 import { ParaText } from "@/components/text";
 import { SwitchButton } from "@/components/form";
-// import { Char } from "@/components";
+import QuestionList from "@/components/QuestionList.vue";
 import { AacButton } from "@/components/form";
 import { Slide } from "@/components/slide";
 import { LicenseComboBox } from "@/components/admin";
-
-// import api from "@/service/api";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 export default {
@@ -68,12 +75,31 @@ export default {
     SwitchButton,
     Slide,
     LicenseComboBox,
+    QuestionList,
     // Char,
   },
   setup(props) {
     const store = useStore();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const wordMode = ref(true);
+    const sentencesRef = ref([]);
+    const examDesc = ref(null);
+    const sectionHistories = ref([]);
+
+    /**
+     * 받아쓰기("READING"), 학습모드('LEARNING') 또는 시험모드('QUIZ')
+     */
+    const quizModeRef = ref(null);
+    /**
+     * 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
+     */
+    const answerTypeRef = ref(null);
+
+    const descritions = {
+      READING: "보고 쓰기",
+      LEARNING: "학습",
+      QUIZ: "퀴즈",
+    };
     if (props.quizOnly) {
       wordMode.value = false;
     }
@@ -81,30 +107,19 @@ export default {
       const { level } = props.cate;
       return level >= 0 ? level + "단계" : "종합";
     };
-    /**
-     * 주어진 질문(Sentence)에서 문장 또는 단어를 필터링함
-     * 어절이 1개이면 단어 질문으로 판정함
-     */
-    const filters = {
-      S: (sen) => sen.eojeols.length > 1,
-      W: (sen) => sen.eojeols.length === 1,
-    };
-    /**
-     * @param quizMode 학습모드('LEARNING') 또는 시험모드('QUIZ')
-     * @param answerType 문제에 대한 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
-     */
-    const startSentenceQuiz = (quizMode, answerType) => {
+
+    const startSentenceQuiz = (e) => {
       if (!activeLicense.value) {
         alert("학생을 선택해주세요");
         return;
       }
+      const quizMode = quizModeRef.value;
       const sectionSeq = props.cate.seq;
       const quizResource = wordMode.value ? "W" : "S";
       /*
        * 단어 학습인 경우 무조건 받아쓰기 모드
        */
-      answerType = quizResource === "W" ? "SEN" : answerType;
-
+      const answerType = quizResource === "W" ? "SEN" : answerTypeRef.value;
       quiz
         .prepareQuiz({
           quizMode,
@@ -113,8 +128,8 @@ export default {
           quizResource,
           license: activeLicense.value.seq,
           prevPage: "LevelView",
-          sentenceFilter: (sentences) =>
-            sentences.filter(filters[quizResource]),
+          sentenceFilter: () => e.sentences,
+          ranges: [e.start, e.end],
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
@@ -124,13 +139,60 @@ export default {
         });
     };
 
+    const findQuizHistories = () => {
+      const quizResource = wordMode.value ? "W" : "S";
+      const mode = quizModeRef.value;
+      return quizDao.findByQuiz(
+        activeLicense.value.uuid,
+        props.cate.seq,
+        quizResource,
+        mode
+      );
+      // .then((res) => {
+      //   quizHistories.value.push(...res);
+      // });
+    };
+
+    const replace = (arrayRef, elems) => {
+      arrayRef.value.splice(0, arrayRef.value.length);
+      arrayRef.value.push(...elems);
+    };
+    /**
+     * @param quizMode 받아쓰기("READING"), 학습모드('LEARNING') 또는 시험모드('QUIZ')
+     * @param answerType 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
+     */
+    const listQuestions = (quizMode, answerType) => {
+      quizModeRef.value = quizMode;
+      answerTypeRef.value = answerType;
+      const quizResource = wordMode.value ? "W" : "S";
+      const sentences = props.cate.sentences.filter(
+        (sen) => sen.type === quizResource
+      );
+      examDesc.value = sourceText() + " " + descritions[quizMode];
+      findQuizHistories().then((histories) => {
+        replace(sectionHistories, histories);
+        replace(sentencesRef, sentences);
+      });
+    };
+
     const sourceText = () => (wordMode.value ? "낱말" : "문장");
 
+    watch(
+      () => wordMode.value,
+      () => {
+        sentencesRef.value.splice(0, sentencesRef.value.length);
+      }
+    );
     return {
       path,
       title,
       wordMode,
+      examDesc,
+      quizModeRef,
+      sentencesRef,
+      sectionHistories,
       startSentenceQuiz,
+      listQuestions,
       sourceText,
     };
   },
@@ -190,6 +252,7 @@ $padding: 16px;
   }
   .body {
     display: flex;
+    position: relative;
     // align-items: flex-start;
     padding: $padding;
     flex-direction: column;
@@ -211,6 +274,18 @@ $padding: 16px;
         flex-wrap: wrap;
         justify-content: center;
       }
+    }
+    .overlay {
+      position: absolute;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      background-color: #ffffffcc;
     }
   }
   .footer {

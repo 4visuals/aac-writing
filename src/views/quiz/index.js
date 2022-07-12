@@ -1,3 +1,4 @@
+import { quizDao } from "../../dao";
 import QuizView from "./QuizView.vue";
 import quizStore from "./quizStore";
 import ScenePicView from "./question/ScenePicView.vue";
@@ -92,6 +93,7 @@ class QuizConfig {
           answerType,
           section,
           quizResource,
+          ranges
         }} options
    */
   constructor(resources, options) {
@@ -100,6 +102,9 @@ class QuizConfig {
   }
   get quizLength() {
     return this.resources.length;
+  }
+  get ranges() {
+    return this.options.ranges;
   }
 }
 /**
@@ -174,6 +179,9 @@ class QuizContext {
   get resourceType() {
     return this.config.options.quizResource;
   }
+  get ranges() {
+    return this.config.ranges;
+  }
   /**
    * 낱말읽기, 문장읽기
    * @returns boolean
@@ -213,6 +221,12 @@ class QuizContext {
     this._currentIndex = idx;
     this.currentQuestion = this.questions[this._currentIndex];
   }
+  syncDb() {
+    console.log("[IDXDB]");
+    quizDao.sync(this).then((res) => {
+      console.log(res);
+    });
+  }
 }
 /**
  * quizMode - 받아쓰기('READING'), 학습('LEARNING') OR 테스트('QUIZ') 모드
@@ -230,6 +244,7 @@ const loadSentenceQuiz = ({
   quizResource,
   prevPage,
   seqs, // list of sentence seq
+  ranges,
 }) => {
   const questionComponent = shallowRef(ScenePicView);
   const answerCompName =
@@ -249,9 +264,7 @@ const loadSentenceQuiz = ({
           return;
         }
         /*
-         * 문장 또는 단어만 필터링하는 함수
-         * 단계별 학습에서는 [단어, 문장]을 따로 구분함,
-         * 교과서 학습에서는 단어가 따로 없고 모두 문장으로 처리함
+         * 선택한 문장들만 골라냄
          */
         const sentences = seqs.map((seq) =>
           sec.sentences.find((sen) => sen.seq === seq)
@@ -262,6 +275,7 @@ const loadSentenceQuiz = ({
           section: sec,
           quizResource,
           prevPage,
+          ranges,
         });
         const questions = sentences.map(
           (sen, index) => new Question(config, index, sen)
@@ -279,6 +293,7 @@ const loadSentenceQuiz = ({
           rememberAnswer: true,
           license,
         });
+        ctx.syncDb();
         quizStore.startQuiz(ctx);
         resolve(ctx);
       },
@@ -300,6 +315,7 @@ const prepareQuiz = ({
   license,
   prevPage,
   sentenceFilter,
+  ranges,
 }) => {
   const sections = store.getters["course/sections"];
   const sec = sections.find((sec) => sec.seq === section);
@@ -323,6 +339,7 @@ const prepareQuiz = ({
       license,
       prevPage,
       seqs, // list of sentence seq
+      ranges, // [startOffset, endOffset) in a section
     });
     resolve();
   });

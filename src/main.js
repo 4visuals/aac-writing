@@ -8,7 +8,7 @@ import store from "./store";
 import "./assets/global.scss";
 import GooglgAuth from "vue3-google-oauth2";
 import env from "@/service/env";
-
+import quizHistoryStore from "./dao/quiz-history-store";
 const app = createApp(App);
 app.use(store).use(router).use(GooglgAuth, {
   clientId: env.GOOGLE_CLIENT_ID,
@@ -26,6 +26,11 @@ app
  * inject google oauth helper
  */
 app.provide("$gAuth", app.config.globalProperties.$gAuth);
+/**
+ * inject dynamic store
+ */
+quizHistoryStore.register(store);
+
 app.mount("#app");
 app.config.errorHandler = (err, instance) => {
   console.error(err);

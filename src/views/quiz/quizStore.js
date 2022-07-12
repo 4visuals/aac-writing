@@ -1,3 +1,4 @@
+import { quizDao } from "../../dao";
 import store from "@/store";
 import api from "@/service/api";
 
@@ -55,6 +56,13 @@ store.registerModule("quiz", {
       state.finished = false;
     },
     closeQuiz(state) {
+      if (state.finished) {
+        // 현재 퀴즈를 다 풀었음. db에서 삭제
+        quizDao.deleteQuiz(state.quizContext);
+      } else {
+        // 중간에 그만둠. 상태 저장
+        quizDao.saveQuiz(state.quizContext);
+      }
       state.finished = false;
       state.quizContext = null;
     },
@@ -70,6 +78,14 @@ store.registerModule("quiz", {
     },
     sceneClicked(state) {
       state.sceneClick = new Date().getTime();
+    },
+    /**
+     * 현재 퀴즈 상태를 db에 저장함
+     * @param {VuexState} state
+     */
+    syncQuiz(state) {
+      console.log(state);
+      quizDao.saveQuiz(state.quizContext);
     },
   },
 });

@@ -57,6 +57,7 @@ export default {
     const option = {
       passive: true,
     };
+    // eslint-disable-next-line no-unused-vars
     const captureHeight = () => {
       const h = window.visualViewport.height;
       store.commit("ui/setAppHeight", h);
@@ -65,10 +66,10 @@ export default {
     onMounted(() => {
       const el = wrapperEl.value;
       el.addEventListener("scroll", scrolling, option);
-      const { visualViewport } = window;
-      if (visualViewport) {
-        visualViewport.addEventListener("resize", captureHeight);
-      }
+      // const { visualViewport } = window;
+      // if (visualViewport) {
+      //   visualViewport.addEventListener("resize", captureHeight);
+      // }
     });
     onUnmounted(() => {
       const el = wrapperEl.value;
@@ -81,7 +82,8 @@ export default {
 <style lang="scss">
 @import "~@/assets/resizer";
 #app {
-  font-family: "Noto Sans KR", Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Nanum Gothic", "Noto Sans KR", Avenir, Helvetica, Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;

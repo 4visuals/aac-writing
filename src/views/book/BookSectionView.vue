@@ -90,16 +90,17 @@ export default {
     const groups = ref([]);
     for (let k = 0; k < sentences.length; k += 10) {
       const end = Math.min(k + 10, sentences.length);
-      const ranges = sentences.slice(k, end);
       groups.value.push({
         text: k / 10 + 1,
-        sentences: ranges,
+        sentences: sentences.slice(k, end),
+        ranges: [k, end],
       });
     }
     groups.value.push({
       text: "종합",
       rand: true,
       sentences: null,
+      ranges: [0, 0],
     });
 
     const setActiveGroup = (group) => {
@@ -146,6 +147,7 @@ export default {
           license: activeLicense.value.seq,
           prevPage: "BookShelfView",
           sentenceFilter: () => activeGroup.value.sentences,
+          ranges: activeGroup.value.ranges,
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);

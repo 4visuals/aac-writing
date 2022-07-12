@@ -28,6 +28,11 @@ export default {
   mutations: {
     setChapter(state, args) {
       const { data } = args;
+      data.forEach((chapter) => {
+        chapter.sections.forEach((sec) => {
+          sec.origin = chapter.origin;
+        });
+      });
       state.chapters.levels = data.filter((chapter) => chapter.origin === "L");
       state.chapters.books = data.filter((chapter) => chapter.origin === "B");
       // 교과서는 level이 0

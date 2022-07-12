@@ -104,7 +104,7 @@ export default {
   @include mobile {
     button {
       font-size: 1.1rem;
-      padding: 12px 0.8rem;
+      padding: 6px 0.8rem;
       &.sm {
         font-size: 0.85rem;
       }
@@ -113,7 +113,7 @@ export default {
   @include tablet {
     button {
       font-size: 1.35rem;
-      padding: 15px 1rem;
+      padding: 8px 1rem;
       &.xs {
         font-size: 1rem;
         padding: 0.35rem 0.7rem;
@@ -126,7 +126,7 @@ export default {
   @include desktop {
     button {
       font-size: 1.35rem;
-      padding: 15px 0.8rem;
+      padding: 8px 0.8rem;
       &.sm {
         font-size: 1.25rem;
       }
