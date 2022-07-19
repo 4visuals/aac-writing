@@ -11,9 +11,25 @@ class QuizDao {
     this.db = db;
     this.operations = operations;
     this.operations.createTable(tableName, `[${cols.join("+")}]`);
+    this.operations
+      .createTable(tableName, `[${cols.join("+")}]`, 2)
+      .upgrade((tx) => {
+        const cur = new Date();
+        tx.table(tableName)
+          .toCollection()
+          .modify((row) => {
+            if (!row.startTime) {
+              const dummyTime = cur.getTime() - 1 * 24 * 60 * 60 * 1000;
+              row.startTime = dummyTime;
+            }
+          });
+      });
   }
   findBy() {
     return this.db[tableName].toArray();
+  }
+  findByLicense(lcsUuid) {
+    return this.db[tableName].where("license").equals([lcsUuid]).toArray();
   }
   findByQuiz(license, sectionSeq, type, mode) {
     const where = cols.slice(0, cols.length - 1);
@@ -40,6 +56,7 @@ class QuizDao {
       mode,
       ranges,
     ]);
+
     if (row) {
       console.log("[found]", row);
     } else {
@@ -50,6 +67,7 @@ class QuizDao {
         mode,
         ranges,
         questions: [],
+        startTime: quizContext.startTime,
       });
     }
     // console.log(res);
@@ -79,6 +97,10 @@ class QuizDao {
   }
   async deleteQuiz(quizContext) {
     console.log("[DELETE]", quizContext);
+  }
+  deleteBySection(props) {
+    const values = Object.values(props);
+    return this.db[tableName].where(cols.slice(0, 2)).equals(values).delete();
   }
 }
 

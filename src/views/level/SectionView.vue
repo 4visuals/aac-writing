@@ -285,7 +285,7 @@ $padding: 16px;
       right: 0;
       bottom: 0;
       z-index: 50;
-      background-color: #ffffffcc;
+      background-color: #fffffffe;
     }
   }
   .footer {

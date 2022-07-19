@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <BrandPanel theme="pink" text="단계별 받아쓰기" path="level" />
-    <HistoryView
+    <QuizHistoryView
       v-if="chapters.length > 0"
       class="group"
       origin="L"
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import sound from "@/service/sound";
+// import sound from "@/service/sound";
 import SectionButton from "@/components/SectionButton.vue";
 import { BrandPanel } from "@/components/brand";
 
@@ -63,7 +63,7 @@ import SectionView from "./SectionView.vue";
 import { useStore } from "vuex";
 import { computed, ref } from "vue";
 import router from "@/router";
-import HistoryView from "../QuizHistoryView.vue";
+import QuizHistoryView from "../QuizHistoryView.vue";
 
 export default {
   props: ["cate"],
@@ -72,7 +72,7 @@ export default {
     SectionView,
     Modal,
     BrandPanel,
-    HistoryView,
+    QuizHistoryView,
   },
   setup() {
     const store = useStore();
@@ -84,7 +84,7 @@ export default {
     const showDetail = (cate, theme) => {
       activeCate.value = cate;
       themeRef.value = theme;
-      sound.playSound();
+      // sound.playSound();
     };
 
     const chapters = computed(() => store.state.course.chapters.levels);
