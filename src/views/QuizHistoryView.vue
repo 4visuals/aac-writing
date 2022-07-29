@@ -116,7 +116,7 @@ export default {
     padding: 6px 6px 6px 12px;
     margin-bottom: 20px;
     border-radius: 8px;
-    font-family: "Rowdies", cursive;
+    font-family: "Rowdies", cursive, sans-serif;
     position: relative;
     cursor: pointer;
     .btn-close {

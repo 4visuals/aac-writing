@@ -162,6 +162,10 @@ export default {
      * @param answerType 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
     const listQuestions = (quizMode, answerType) => {
+      if (!activeLicense.value) {
+        alert("학생을 선택해주세요");
+        return;
+      }
       quizModeRef.value = quizMode;
       answerTypeRef.value = answerType;
       const quizResource = wordMode.value ? "W" : "S";

@@ -2,7 +2,7 @@
   <div class="container">
     <BrandPanel theme="pink" text="단계별 받아쓰기" path="level" />
     <QuizHistoryView
-      v-if="chapters.length > 0"
+      v-if="license && chapters.length > 0"
       class="group"
       origin="L"
       @itemClicked="(section) => showDetail(section, 'pink')"
@@ -27,6 +27,7 @@
             :idx="section.level"
             @itemClicked="(section) => showDetail(section, 'pink')"
             theme="pink"
+            :history="true"
           />
         </div>
       </transition-group>
@@ -77,6 +78,7 @@ export default {
   setup() {
     const store = useStore();
     // console.log(store.state.course.cates.level);
+    const license = computed(() => store.getters["exam/activeLicense"]);
     const modal = ref(null);
 
     const activeCate = ref(null);
@@ -101,6 +103,7 @@ export default {
 
     return {
       modal,
+      license,
       chapters,
       moveTo,
       showDetail,
