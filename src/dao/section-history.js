@@ -23,7 +23,7 @@ class SectionHistory {
     return `sec-${this.sectionSeq}-${this.type}`;
   }
   get levelText() {
-    return this.section.level < 0 ? "TEST" : this.section.level;
+    return this.section.level < 0 ? "도전" : this.section.level;
   }
   get theme() {
     return this.section.level < 0 ? "green" : "pink";

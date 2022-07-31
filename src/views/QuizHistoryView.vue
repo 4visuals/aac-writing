@@ -1,7 +1,7 @@
 <template>
   <div class="histories row" v-if="histories.length > 0">
     <div class="col-12">
-      <h3>오늘</h3>
+      <h3>학습중</h3>
     </div>
     <div
       class="col-6 col-sm-6 col-md-4 col-lg-3 section-outer"

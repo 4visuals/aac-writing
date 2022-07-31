@@ -35,7 +35,7 @@
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer">
           <SectionButton
             :item="chapter.sections.filter((sec) => sec.level == -1)[0]"
-            :idx="'TEST'"
+            :idx="'도전'"
             @itemClicked="(section) => showDetail(section, 'green')"
             theme="green"
           />
