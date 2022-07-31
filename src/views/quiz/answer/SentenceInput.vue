@@ -8,7 +8,6 @@
       :inputVisible="!correct"
       :spaceCommit="quizContext.isWord()"
       @commit="checkAnswer"
-      @clicked="speackAndFocus(0)"
       @rest="() => (inputText = '')"
     />
   </div>
@@ -169,7 +168,6 @@ export default {
     );
     onMounted(() => {
       speackAndFocus(500);
-      //speackAndFocus();
     });
     return {
       field,

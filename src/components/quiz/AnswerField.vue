@@ -40,7 +40,7 @@ export default {
     const focus = () => {
       if (inputEl.value) {
         // 일부만 풀고 넘겼을때 null 일 수 있음.
-        inputEl.value.select();
+        // inputEl.value.select();
         inputEl.value.focus();
       }
     };
