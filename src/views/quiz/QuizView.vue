@@ -18,23 +18,25 @@
           @speaking="sceneClicked"
         />
         <ActionIcon
-          v-if="ctx.currentQuestion.hasPrevQuiz()"
+          v-if="!ctx.isQuizMode() && ctx.currentQuestion.hasPrevQuiz()"
           class="icon left"
           icon="chevron_left"
           @click.stop.prevent="moveQuiz(-1)"
         />
-        <ActionIcon
-          v-if="ctx.currentQuestion.hasNextQuiz()"
-          class="icon right"
-          icon="chevron_right"
-          @click.stop.prevent="moveQuiz(1)"
-        />
-        <ActionIcon
-          v-else
-          class="icon right"
-          icon="last_page"
-          @click.stop.prevent="alertForResult"
-        />
+        <template v-if="!ctx.isQuizMode()">
+          <ActionIcon
+            v-if="ctx.currentQuestion.hasNextQuiz()"
+            class="icon right"
+            icon="chevron_right"
+            @click.stop.prevent="moveQuiz(1)"
+          />
+          <ActionIcon
+            v-else
+            class="icon right"
+            icon="last_page"
+            @click.stop.prevent="alertForResult"
+          />
+        </template>
         <div class="sentence-view" v-if="ctx.isReadingMode()" @click="speak">
           <h3>{{ ctx.currentQuestion.text }}</h3>
         </div>
