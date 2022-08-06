@@ -1,6 +1,6 @@
 <template>
   <div class="trials">
-    <TableView colsize="120px">
+    <TableView colsize="120px" :colummBased="false">
       <template v-slot:fcol>
         <Cell
           v-for="(q, idx) in ctx.questions"

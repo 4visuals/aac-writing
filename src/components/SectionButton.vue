@@ -27,7 +27,7 @@ export default {
   components: {
     ParaText,
   },
-  props: ["idx", "item", "theme", "compact", "desc"],
+  props: ["idx", "item", "theme", "compact", "desc", "history"],
   setup(props) {
     const store = useStore();
     const visited = computed(() =>

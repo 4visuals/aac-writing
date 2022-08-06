@@ -53,10 +53,12 @@
         >
       </template>
     </TableView>
+    <TimelineChart :chartData="stats" :resourceType="rssType" />
   </div>
 </template>
 
 <script>
+import TimelineChart from "./TimelineChart2.vue";
 /**
  * 결과 분석 1 화면
  *
@@ -77,6 +79,7 @@ export default {
     Row,
     Cell,
     SpanText,
+    TimelineChart,
   },
   props: ["stats"],
   setup(props) {
@@ -139,8 +142,7 @@ export default {
   }
   .tbl-stat {
     border: 1px solid #dfdfdfee;
-    padding: 4px;
-    border-radius: 4px;
+    // border-radius: 4px;
   }
 }
 </style>

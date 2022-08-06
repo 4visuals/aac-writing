@@ -13,7 +13,6 @@
         :inputVisible="!correct"
         @commit="checkAnswer"
         @textClick="speak"
-        @clicked="(e) => $emit('clicked', { holdKeyboard: false })"
         :spaceCommit="true"
       />
     </div>

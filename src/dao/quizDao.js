@@ -49,27 +49,35 @@ class QuizDao {
     const type = quizContext.isWord() ? "W" : "S";
     const mode = quizContext.mode;
     const ranges = toRangeId(quizContext);
-    const row = await this.db.quizzes.get([
+    // const row = await this.db.quizzes.get([
+    //   license.uuid,
+    //   sectionSeq,
+    //   type,
+    //   mode,
+    //   ranges,
+    // ]);
+
+    const cnt = await this.db.quizzes.delete([
       license.uuid,
       sectionSeq,
       type,
       mode,
       ranges,
     ]);
-
-    if (row) {
-      console.log("[found]", row);
-    } else {
-      this.db[tableName].put({
-        license: license.uuid,
-        sectionSeq,
-        type,
-        mode,
-        ranges,
-        questions: [],
-        startTime: quizContext.startTime,
-      });
-    }
+    console.log("deleted:", cnt);
+    // if (row) {
+    //   console.log("[found]", row);
+    // } else {
+    // }
+    this.db[tableName].put({
+      license: license.uuid,
+      sectionSeq,
+      type,
+      mode,
+      ranges,
+      questions: [],
+      startTime: quizContext.startTime,
+    });
     // console.log(res);
   }
   async saveQuiz(quizContext) {

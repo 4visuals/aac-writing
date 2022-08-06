@@ -1,4 +1,7 @@
 import env from "./env";
+
+const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
+
 const key = {
   /**
    * macOS 크롬에서 한글 입력상태에서 enter를 누르면 key event가 두 번 발생한다.
@@ -69,10 +72,13 @@ const time = {
     return d;
   },
   range: (cur, format) => {
+    if (cur instanceof Date) {
+      cur = cur.getTime();
+    }
     const fmt = format.split(" ");
     const baseYMD = time.toYMD(cur);
     const base = new Date(baseYMD);
-    const chunk = 24 * 60 * 60 * 1000;
+    const chunk = ONE_DAY_MILLIS;
     const ranges = [];
     const cnt = parseInt(fmt[0]);
     for (let i = 0; i < cnt; i++) {
@@ -80,6 +86,22 @@ const time = {
       ranges.push({ text: time.toYMD(d), time: d });
     }
     return ranges.reverse();
+  },
+  weekRange: (date) => {
+    const dow = date.getDay();
+    const satOffset = (6 - dow) * ONE_DAY_MILLIS;
+    const satMillis = date.getTime() + satOffset; // to saturday of the week
+    const saturday = new Date(satMillis);
+    return time.range(saturday, "7 day");
+  },
+  monthRange: (date) => {
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const m2 = ("0" + (m + 1)).slice(-2);
+    const nextMOnth = new Date(`${y}-${m2}-01`);
+    const lastDate = new Date(nextMOnth.getTime() - ONE_DAY_MILLIS);
+    const days = lastDate.getDate();
+    return time.range(lastDate, `${days} day`);
   },
 };
 const host = {

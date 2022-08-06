@@ -146,7 +146,7 @@ export default {
       }, delay);
     };
     const holdAndSpeak = (ej, e) => {
-      // tts.speak(ej.text);
+      tts.speak(ej.text);
       store.commit("quiz/hideHint");
       if (e.holdKeyboard) {
         dummy.value.focus();

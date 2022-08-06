@@ -35,6 +35,18 @@ const license = {
 const exam = {
   submitExam: (exam) => POST(`/exam/quiz`, exam),
   submitLearning: (exam) => POST(`/exam/learning`, exam),
+  /**
+   *
+   * @param {int} sectionSeq
+   * @param {enum} sentenceType [W|S|A]
+   * @param {string} licenseUuid
+   * @returns
+   */
+  querySectionQuiz: (sectionSeq, sentenceType, licenseUuid) =>
+    GET(`/exam/quiz/section/${sectionSeq}`, {
+      sentenceType,
+      license: licenseUuid,
+    }),
 };
 /**
  * 통계 관련 요청
@@ -47,6 +59,8 @@ const stats = {
    * @returns
    */
   sections: (type, value) => GET(`/stats/sections/${type}/${value}`),
+  bySection: (sectionSeq, licenseUuid) =>
+    GET(`/stats/section/${sectionSeq}`, { license: licenseUuid }),
 };
 
 const tts = {};

@@ -1,2 +1,3 @@
 import SectionHeatMapChart from "./SectionHeatMapChart.vue";
-export { SectionHeatMapChart };
+import SectionLineChart from "./SectionLineChart.vue";
+export { SectionHeatMapChart, SectionLineChart };

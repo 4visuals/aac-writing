@@ -5,6 +5,7 @@
         <SpanText>{{ q.text }}</SpanText>
       </p>
       <TableView colsize="0px">
+        <template v-slot:fcol>&nbsp;</template>
         <template v-slot:data>
           <template v-if="ctx.isLearningMode()">
             <!-- <Row>

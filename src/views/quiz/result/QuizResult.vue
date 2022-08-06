@@ -34,7 +34,7 @@
         :answerClass="answerClass"
       />
     </template>
-    <SectionHeatMapChart v-else-if="chart == 'SECTION'"></SectionHeatMapChart>
+    <SectionLineChart v-else-if="chart === 'SECTION'" />
     <div class="footer">
       <AacButton text="완료" theme="blue" inline @click="closeQuiz" />
     </div>
@@ -42,11 +42,9 @@
 </template>
 
 <script>
-// import { TableView, Row, Cell } from "@/components/table";
-// import { SpanText } from "@/components/text";
 import WordExamResult from "./WordExamResult.vue";
 import SentenceExamResult from "./SentenceExamResult.vue";
-import { SectionHeatMapChart } from "../chart";
+import { SectionLineChart } from "../chart";
 import { AacButton, StaticButton } from "@/components/form";
 import { useStore } from "vuex";
 import api from "@/service/api";
@@ -58,7 +56,8 @@ export default {
     WordExamResult,
     AacButton,
     StaticButton,
-    SectionHeatMapChart,
+    // SectionHeatMapChart,
+    SectionLineChart,
   },
   setup() {
     const router = useRouter();
@@ -95,6 +94,7 @@ export default {
         startTime: ctx.startTime / 1000,
         endTime: new Date().getTime() / 1000,
         type: ctx.isWord() ? "W" : "S",
+        questionOffset: ctx.ranges[0],
         numOfQuestions: ctx.quizLength,
         submissions: null,
       };

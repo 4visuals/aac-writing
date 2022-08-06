@@ -176,6 +176,9 @@ class QuizContext {
   get mode() {
     return this.options.mode;
   }
+  /**
+   * @return 'W', 'S', or 'A'
+   */
   get resourceType() {
     return this.config.options.quizResource;
   }
