@@ -5,10 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production",
-    "staging": "vue-cli-service build --mode staging",
-    "pub": "vue-cli-service build && ./scripts/cp-rss.sh",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "pub": "vue-cli-service build && ./scripts/cp-rss.sh",
+    "staging": "vue-cli-service build --mode staging"
   },
   "dependencies": {
     "apexcharts": "^3.35.0",
@@ -30,14 +30,14 @@
     "@vue/cli-plugin-eslint": "~4.5.15",
     "@vue/cli-plugin-pwa": "~4.5.15",
     "@vue/cli-plugin-router": "~4.5.15",
-    "@vue/cli-plugin-unit-mocha": "~4.5.15",
+    "@vue/cli-plugin-unit-mocha": "^5.0.8",
     "@vue/cli-plugin-vuex": "~4.5.15",
     "@vue/cli-service": "~4.5.15",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/test-utils": "^2.0.0-0",
     "babel-eslint": "^10.1.0",
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
