@@ -73,7 +73,7 @@ export default {
   position: relative;
   flex: 1;
   h1 {
-    font-family: "Rowdies", cursive;
+    font-family: "Rowdies", monospace, cursive;
     position: absolute;
     left: 24px;
     transform: translateY(-60%);
