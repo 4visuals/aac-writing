@@ -185,7 +185,8 @@ export default {
             },
             { total: 0, correct: 0, score: 0 }
           );
-          stats.score = ((100 * stats.correct) / stats.total).toFixed(1);
+          const lastExam = exams[exams.length - 1];
+          stats.score = (100 * lastExam.correct) / lastExam.total;
           stats.date = ymd;
           stats.range = `${offset + 1} ~ ${offset + 10}`;
 
