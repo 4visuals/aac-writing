@@ -86,9 +86,14 @@ const createHistories = (origin, licenseUUID, sections) => {
       const section = sections.find(
         (sec) => sec.origin === origin && sec.seq === group.sectionSeq
       );
-      group.setSection(section);
+      if (section) {
+        group.setSection(section);
+      }
     });
-    return { histories: groups };
+    // groups중에 교과서/단계별이 섞여있음
+    // 'origin'과 일치하지 않으면 section이 null이므로 걸러내야함
+    const groupsInOrigin = groups.filter((g) => !!g.section);
+    return { histories: groupsInOrigin };
   });
 };
 // export { SectionHistory, groupBySections };

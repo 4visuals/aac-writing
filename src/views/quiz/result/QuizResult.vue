@@ -1,7 +1,6 @@
 <template>
   <div class="q-result">
     <div class="result-nav">
-      <h3>{{ sectionTitle() }}</h3>
       <div class="chart-view">
         <StaticButton
           class="tab-item"
@@ -75,7 +74,7 @@ export default {
         return "-";
       }
       const trial = question.trials[index];
-      return trial ? trial.value : "";
+      return (trial && (trial.value || "미입력")) || "미입력";
     };
     const answerClass = (question, index) => {
       const trial = question.trials[index];

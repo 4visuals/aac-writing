@@ -13,7 +13,7 @@
             >(<span>{{ chartEvent.stats.range }}번</span>)</ParaText
           >
           <ParaText :small="true"
-            ><span class="score">{{ chartEvent.stats.score }}점</span
+            ><span class="score">최종 {{ chartEvent.stats.score }}점</span
             ><span class="cnt"
               >전체: {{ chartEvent.stats.total }}, 정답:
               {{ chartEvent.stats.correct }}</span
@@ -164,6 +164,10 @@ export default {
         const s = view.getSelection();
         // const v = chart.getValue()
         console.log("[select]", s);
+        if (s.length === 0) {
+          // 현재 눌린 point를 또 누름
+          return;
+        }
         if (chartEvent.value.active) {
           chartEvent.value.select = s;
           chartEvent.value.active = true;
