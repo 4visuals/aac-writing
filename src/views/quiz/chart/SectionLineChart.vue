@@ -59,6 +59,7 @@ const options = {
   hAxis: {
     title: null,
   },
+  interpolateNulls: true,
   pointSize: 8,
   theme: "material",
   tooltip: {
@@ -133,8 +134,8 @@ export default {
           }
           const acc = exams.reduce(
             (acc, exam) => {
-              acc.total += exam.total;
-              acc.correct += exam.correct;
+              acc.total = exam.total;
+              acc.correct = exam.correct;
               return acc;
             },
             { total: 0, correct: 0 }
