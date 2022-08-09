@@ -20,10 +20,11 @@
               even: idx % 2 === 0,
               odd: idx % 2 === 1,
               correct: sbm.correct,
+              empty: !sbm.value,
             }"
             nowrap
             w="inline"
-            ><SpanText size="sm">{{ sbm.value }}</SpanText></Cell
+            ><SpanText size="sm">{{ sbm.value || "미입력" }}</SpanText></Cell
           ></Col
         >
       </template>
@@ -59,6 +60,11 @@ export default {
       .correct {
         color: #27600c;
         background-color: #ccff98;
+      }
+      .empty {
+        font-size: 0.9em;
+        color: #999;
+        font-style: italic;
       }
     }
   }
