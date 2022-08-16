@@ -141,7 +141,7 @@ export default {
   padding: 0 24px;
 
   .logo {
-    background-image: url("/img/white_back_01.png");
+    background-image: url("/img/white_back_02.png");
     height: 120px;
     background-size: contain;
     background-repeat: no-repeat;

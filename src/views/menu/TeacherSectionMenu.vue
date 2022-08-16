@@ -7,9 +7,9 @@
     <MenuSection>
       <LicenseMenu @clicked="showLicenseConfig" />
     </MenuSection>
-    <MenuSection title="학생">
+    <!-- <MenuSection title="학생">
       <StudentMenu />
-    </MenuSection>
+    </MenuSection> -->
   </template>
   <teleport to="body" v-if="modal.visible">
     <Modal @hidden="hideModal">
@@ -29,7 +29,7 @@
 import { ref } from "@vue/reactivity";
 import MenuSection from "./MenuSection.vue";
 import LicenseMenu from "./sections/LicenseMenu.vue";
-import StudentMenu from "./sections/StudentMenu.vue";
+// import StudentMenu from "./sections/StudentMenu.vue";
 import QuizStateMenu from "./sections/QuizStateMenu.vue";
 import QuizEndMenu from "./sections/QuizEndMenu.vue";
 import { LicenseConfigView } from "@/components/admin";
@@ -40,7 +40,7 @@ export default {
   components: {
     MenuSection,
     LicenseMenu,
-    StudentMenu,
+    // StudentMenu,
     QuizStateMenu,
     QuizEndMenu,
     LicenseConfigView,
