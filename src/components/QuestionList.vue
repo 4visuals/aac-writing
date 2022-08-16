@@ -74,10 +74,7 @@ export default {
 
 <style lang="scss" scoped>
 .sentence-list {
-  // display: flex;
-  // flex-wrap: wrap;
-  // column-gap: 8px;
-  margin-top: 16px;
+  margin-top: 8px;
   .cell {
     display: flex;
     margin-bottom: 8px;

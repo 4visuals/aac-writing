@@ -278,15 +278,17 @@ $padding: 16px;
     }
     .overlay {
       position: absolute;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
       z-index: 50;
       background-color: #fffffffe;
+      border-radius: 8px;
+      box-shadow: rgb(14 30 37 / 12%) 0px 2px 4px 0px,
+        rgb(14 30 37 / 32%) 0px 2px 16px 0px;
+      h4 {
+        padding: 8px;
+      }
     }
   }
   .footer {
