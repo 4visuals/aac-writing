@@ -4,7 +4,7 @@
     <MenuSection title="종료"><QuizEndMenu /></MenuSection>
   </template>
   <template v-else>
-    <MenuSection title="수강증">
+    <MenuSection>
       <LicenseMenu @clicked="showLicenseConfig" />
     </MenuSection>
     <MenuSection title="학생">

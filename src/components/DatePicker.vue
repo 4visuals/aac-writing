@@ -1,6 +1,6 @@
 <template>
   <div class="date-picker">
-    <ParaText class="date-ymd" @click="toggleGrid"
+    <ParaText class="date-ymd" :lg="true" @click="toggleGrid"
       ><ActionIcon icon="calendar_month" /><span>{{
         toYmdText()
       }}</span></ParaText

@@ -1,10 +1,7 @@
 <template>
   <div class="license-menu">
-    <p>총 {{ licenses.length }}장</p>
     <LicenseItem
-      v-for="lcs in licenses"
-      :key="lcs.seq"
-      :lcs="lcs"
+      :lcs="activeLicense"
       :students="students"
       :current="current"
       @click="$emit('clicked', lcs)"
@@ -22,9 +19,11 @@ export default {
     const store = useStore();
     const licenses = computed(() => store.state.user.membership.licenses);
     const students = computed(() => store.getters["user/students"]);
+    const activeLicense = store.getters["exam/activeLicense"];
+
     const current = new Date().getTime();
 
-    return { licenses, students, current };
+    return { activeLicense, licenses, students, current };
   },
 };
 </script>

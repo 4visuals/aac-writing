@@ -3,7 +3,6 @@
     <div class="jumbo">
       <div class="title">
         <h3>{{ title() }}</h3>
-        <LicenseComboBox />
         <SwitchButton
           v-model:selected="wordMode"
           :disabled="quizOnly === '' || quizOnly === true"
@@ -64,7 +63,6 @@ import { SwitchButton } from "@/components/form";
 import QuestionList from "@/components/QuestionList.vue";
 import { AacButton } from "@/components/form";
 import { Slide } from "@/components/slide";
-import { LicenseComboBox } from "@/components/admin";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
 export default {
@@ -74,9 +72,7 @@ export default {
     ParaText,
     SwitchButton,
     Slide,
-    LicenseComboBox,
     QuestionList,
-    // Char,
   },
   setup(props) {
     const store = useStore();
@@ -220,6 +216,7 @@ $padding: 16px;
     .title {
       display: flex;
       column-gap: 8px;
+      align-items: center;
       h3 {
         flex: 1 1 auto;
       }

@@ -3,9 +3,14 @@
     <div class="back" @click="fadeOut" v-if="visible"></div>
     <transition name="fade" @after-leave="hidden">
       <div
-        class="container modal-wrapper"
-        :class="width === 'sm' ? 'sm' : ''"
-        :style="{ height: height ? height : 'auto' }"
+        class="modal-wrapper"
+        :class="{
+          container: !fill,
+          sm: width === 'sm',
+          fill: fill,
+          rect: rect,
+        }"
+        :style="{ height: fill ? '100%' : height ? height : 'auto' }"
         v-if="visible"
       >
         <slot></slot>
@@ -18,7 +23,7 @@
 import { ref, onMounted } from "vue";
 export default {
   emits: ["hidden"],
-  props: ["width", "height"],
+  props: ["width", "height", "fill", "rect"],
   setup(props, { emit }) {
     const fadeOut = () => {
       visible.value = false;
@@ -76,6 +81,13 @@ export default {
   // overflow: hidden;
   &.sm {
     max-width: 560px;
+  }
+  &.fill {
+    left: 50%;
+    width: 100%;
+  }
+  &.rect {
+    border-radius: 0;
   }
 }
 </style>

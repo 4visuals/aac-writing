@@ -1,5 +1,5 @@
 <template>
-  <div class="header pink"><slot></slot></div>
+  <div class="header"><slot></slot></div>
 </template>
 
 <script>
@@ -10,6 +10,7 @@ export default {};
 @import "~@/assets/theme";
 .header {
   padding: 12px 16px;
+  display: flex;
   &.pink {
     @include pink2($shadow: false);
   }

@@ -10,24 +10,7 @@
         compact
       />
     </div>
-    <StudentLogo
-      :student="loginUser"
-      class="btn-menu right s32"
-      v-if="isStudent"
-    />
-    <StudentLogo
-      :student="student"
-      class="btn-menu right s32"
-      v-else-if="quizPage"
-    />
-    <Logo
-      v-else
-      class="btn-menu right"
-      :imagePath="membership && membership.image"
-      :vendor="membership ? membership.vendor : 'guest'"
-      size="xs"
-      @click="showLicenseBox"
-    />
+    <StudentLogo :student="student" class="btn-menu right s32" />
     <div class="lcs-combobox" v-if="boxVisible" @click="hideLincenseBox">
       <div class="lcs">감자군</div>
       <div class="lcs">양파군</div>
@@ -36,13 +19,11 @@
 </template>
 
 <script>
-import Logo from "@/components/oauth/Logo.vue";
 import StudentLogo from "@/components/StudentLogo.vue";
 import { useStore } from "vuex";
 import { ActionIcon } from "@/components/form";
 import { computed, ref, watch } from "@vue/runtime-core";
 import SectionButton from "@/components/SectionButton.vue";
-// import router from "@/router";
 const modeText = {
   READING: "읽기",
   LEARNING: "쓰기",
@@ -56,7 +37,6 @@ const rssText = {
 export default {
   components: {
     ActionIcon,
-    Logo,
     StudentLogo,
     SectionButton,
   },

@@ -38,15 +38,15 @@ import { onMounted, ref, shallowRef } from "vue";
 import { useStore } from "vuex";
 import SubmissionView from "./SubmissionView.vue";
 
-const series = {
-  0: { color: "#5e97f6", tooltip: true },
-  1: { color: "#db4537", tooltip: true },
-  2: { color: "#f3a600", tooltip: true },
-  3: { color: "#0e9d59", tooltip: true },
-  4: { color: "#ab47bc", tooltip: true },
-  5: { color: "#00acc2", tooltip: true },
-  6: { color: "#c2ac88", tooltip: true },
-};
+const colors = [
+  "#f3a600",
+  "#00acc2",
+  "#c2ac88",
+  "#5e97f6",
+  "#db4537",
+  "#0e9d59",
+  "#ab47bc",
+];
 const options = {
   legend: { position: "top", alignment: "center" },
   aggregationTarget: "series",
@@ -54,7 +54,8 @@ const options = {
   dataOpacity: 1,
   // focusTarget: "category",
   fontSize: 12,
-  series,
+  // series,
+  colors,
   chartArea: { left: 40, top: 40, width: "95%", height: "90%" },
   hAxis: {
     title: null,
@@ -68,6 +69,9 @@ const options = {
     showColorCode: true,
     trigger: "focus", // "selection",
   },
+  // vAxes: {
+  //   0: { title: null },
+  // },
   vAxis: {
     minValue: 0,
     maxValue: 100,
@@ -75,6 +79,7 @@ const options = {
     viewWindowMode: "pretty",
     // ticks: [0, 20, 40, 60, 80, 100],
   },
+
   // height: 500,
 };
 
@@ -88,6 +93,7 @@ export default {
     const chartEl = ref(null);
     const chart = shallowRef(null);
     const EVENT_TEMPLATE = {
+      type: null,
       active: false,
       event: null,
       select: null,
@@ -112,6 +118,15 @@ export default {
       (offset) => offset * 10
     );
 
+    const hideColumns = (chart, indexes) => {
+      const { vmodel, view, columnIndexes } = chart;
+      if (indexes) {
+        vmodel.hideColumns(indexes);
+      } else {
+        vmodel.setColumns(columnIndexes);
+      }
+      view.draw(vmodel, options);
+    };
     const closeSubmissionView = () => {
       chartEvent.value = Object.assign({}, EVENT_TEMPLATE);
       chart.value.view.setSelection();
@@ -125,12 +140,12 @@ export default {
     const createTableRows = (ymdMap, ySegments, stats) => {
       // const rowMap = new Map();
       for (let ymd of ymdMap.keys()) {
-        const scores = ySegments.map((offset) => {
+        const scores = ySegments.flatMap((offset, index) => {
           const exams = stats.filter(
             (stat) => stat.ymd === ymd && stat.questionOffset === offset
           );
           if (exams.length === 0) {
-            return null;
+            return [null, `color: ${colors[index]}`];
           }
           const acc = exams.reduce(
             (acc, exam) => {
@@ -140,7 +155,8 @@ export default {
             },
             { total: 0, correct: 0 }
           );
-          return (100 * acc.correct) / acc.total;
+          const score = (100 * acc.correct) / acc.total;
+          return [score, `color: ${colors[index]}`];
         });
         const row = ymdMap.get(ymd);
         row.push(...scores);
@@ -149,14 +165,19 @@ export default {
     };
     const installListener = (chart) => {
       const { view } = chart;
-      google.visualization.events.addListener(view, "click", (e, a) => {
-        console.log("[click]", e, a);
-        if (e.targetID.startsWith("point")) {
+      google.visualization.events.addListener(view, "click", (e) => {
+        console.log("[click]", e);
+        const { targetID } = e;
+        if (targetID === "chartarea") {
+          hideColumns(chart, null);
+        } else if (targetID.startsWith("legendentry")) {
+          chartEvent.value.click = e;
+          chartEvent.value.type = "legend";
+        } else if (targetID.startsWith("point")) {
           chartEvent.value.click = e;
           chartEvent.value.active = true;
+          chartEvent.value.type = "point";
         } else {
-          // view.setSelection();
-          // chartEvent.value = Object.assign({}, EVENT_TEMPLATE);
           closeSubmissionView();
         }
       });
@@ -168,14 +189,18 @@ export default {
           // 현재 눌린 point를 또 누름
           return;
         }
-        if (chartEvent.value.active) {
-          chartEvent.value.select = s;
-          chartEvent.value.active = true;
+
+        if (chartEvent.value.type === "point") {
+          if (!chartEvent.value.active) {
+            return;
+          }
+          chartEvent.value.select = s[0];
           const { row, column } = s[0];
           const rowData = chart.rows[row]; // ['2022-09-01', 23, 45, 11]
           const ymd = rowData[0];
 
-          const offset = segments[column - 1];
+          const realColumn = chart.vmodel.getTableColumnIndex(column);
+          const offset = segments[(realColumn - 1) / 2];
           const exams = chart.stats.filter(
             (stat) => stat.ymd === ymd && stat.questionOffset === offset
           );
@@ -195,9 +220,24 @@ export default {
           stats.range = `${offset + 1} ~ ${offset + 10}`;
 
           chartEvent.value.stats = stats;
-
-          // console.log(rowData, exams, column, segments);
+        } else if (chartEvent.value.type == "legend") {
+          const { column } = s[0];
+          console.log("[legend]", column);
+          // const colsToHide = chart.columnIndexes.filter(
+          //   (idx) => idx > 0 && idx !== column
+          // );
+          // const cols = [
+          //   0,
+          //   { sourceColumn: column, type: "number", label: "dd" },
+          //   // { sourceColumn: column + 1, type: "string" },
+          // ];
+          const cols = [0, column, column + 1];
+          // chart.vmodel.hideColumns(colsToHide);
+          chart.vmodel.setColumns(cols);
+          view.draw(chart.vmodel, options);
         }
+
+        // console.log(rowData, exams, column, segments);
       });
     };
     const loadData = () => {
@@ -205,7 +245,7 @@ export default {
         .querySectionQuiz(ctx.sectionSeq, ctx.resourceType, ctx.license.uuid)
         .then((res) => {
           const stats = res.papers.map((paper) => {
-            const total = paper.submissions.length;
+            const total = paper.numOfQuestions; // paper.submissions.length;
             const correct = paper.submissions.filter(
               (submit) => submit.correct
             ).length;
@@ -221,6 +261,7 @@ export default {
       model.addColumn("string", "Date");
       segments.forEach((offset) => {
         model.addColumn("number", `${offset + 1}~${offset + 10}`);
+        model.addColumn({ type: "string", role: "style" });
       });
 
       // stats.sort(sortByYmdAndOffset);
@@ -233,10 +274,13 @@ export default {
       const rows = createTableRows(ymdMap, segments, stats);
       model.addRows(rows);
 
+      const vmodel = new google.visualization.DataView(model);
       const view = new google.visualization.LineChart(chartEl.value);
       // view.draw(model, options);
-      view.draw(model, options);
-      return { model, view, rows, stats, event: null };
+      view.draw(vmodel, options);
+      const colSize = rows[0].length;
+      const columnIndexes = [...Array(colSize).keys()];
+      return { model, vmodel, columnIndexes, view, rows, stats, event: null };
     };
 
     onMounted(() => {
