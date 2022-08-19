@@ -177,6 +177,7 @@ export default {
   .result-nav {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     h3 {
       flex: 1 1 auto;
     }

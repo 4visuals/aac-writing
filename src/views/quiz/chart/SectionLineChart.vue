@@ -1,5 +1,17 @@
 <template>
   <div class="chart-wrapper">
+    <div class="legend">
+      <div
+        class="segment"
+        v-for="seg in segments"
+        :key="seg.index"
+        :class="{ active: activeSegment && activeSegment.index === seg.index }"
+        :style="{ 'background-color': seg.color, outlineColor: seg.outColor }"
+        @click="setActiveSegment(seg)"
+      >
+        <span class="dot">{{ seg.offset + 1 }}~{{ seg.offset + 10 }}</span>
+      </div>
+    </div>
     <div class="chart" ref="chartEl"></div>
     <div v-if="chartEvent.active" class="custom-tooltip">
       <h3 class="head">
@@ -34,7 +46,7 @@ import { ParaText } from "@/components/text";
 import { ActionIcon } from "@/components/form";
 import api from "@/service/api";
 import { time } from "@/service/util";
-import { onMounted, ref, shallowRef } from "vue";
+import { onMounted, onUnmounted, ref, shallowRef, toRaw } from "vue";
 import { useStore } from "vuex";
 import SubmissionView from "./SubmissionView.vue";
 
@@ -47,21 +59,32 @@ const colors = [
   "#0e9d59",
   "#ab47bc",
 ];
+const colors2 = [
+  "#ffd57c",
+  "#95d7e0",
+  "#e2d2b7",
+  "#b9d3fe",
+  "#ffbcb6",
+  "#a1e0c2",
+];
 const options = {
-  legend: { position: "top", alignment: "center" },
+  legend: { position: "none" },
+  axisTitlesPosition: "in",
   aggregationTarget: "series",
   selectionMode: "single", // ["single", "multiple"], // 여러개의 legend를 활성화할 것인지
   dataOpacity: 1,
-  // focusTarget: "category",
-  fontSize: 12,
-  // series,
+  fontSize: 10,
   colors,
-  chartArea: { left: 40, top: 40, width: "95%", height: "90%" },
+  chartArea: {},
   hAxis: {
+    format: "M/d",
     title: null,
+    textPosition: "out", // X축 아래에 날짜 표시
+    viewWindow: null, // {min, max}
   },
   interpolateNulls: true,
   pointSize: 8,
+  slantedText: true,
   theme: "material",
   tooltip: {
     isHtml: true,
@@ -69,14 +92,12 @@ const options = {
     showColorCode: true,
     trigger: "focus", // "selection",
   },
-  // vAxes: {
-  //   0: { title: null },
-  // },
   vAxis: {
     minValue: 0,
     maxValue: 100,
     title: null,
-    viewWindowMode: "pretty",
+    // viewWindowMode: "pretty",
+    textPosition: "in",
     // ticks: [0, 20, 40, 60, 80, 100],
   },
 
@@ -115,40 +136,43 @@ export default {
     const section = findSection(ctx.sectionSeq);
     const sentences = section.sentences.filter((sen) => sen.type === type);
     const segments = [...Array(sentences.length / 10).keys()].map(
-      (offset) => offset * 10
+      (offset, index) => ({
+        offset: offset * 10,
+        index,
+        color: colors[index],
+        outColor: colors2[index],
+      })
     );
+    const activeSegment = ref(null);
+    let resizer;
 
     const hideColumns = (chart, indexes) => {
-      const { vmodel, view, columnIndexes } = chart;
+      const { vmodel, columnIndexes } = chart;
       if (indexes) {
         vmodel.hideColumns(indexes);
       } else {
         vmodel.setColumns(columnIndexes);
       }
-      view.draw(vmodel, options);
+      // view.draw(vmodel, chartOption);
+      renderChart();
     };
     const closeSubmissionView = () => {
       chartEvent.value = Object.assign({}, EVENT_TEMPLATE);
       chart.value.view.setSelection();
     };
-    // console.log(type, segments, sentences);
-
-    // const sortByYmdAndOffset = (a, b) => {
-    //   let cmp = a.ymd.localeCompare(b.ymd);
-    //   return cmp === 0 ? a.questionOffset - b.questionOffset : cmp;
-    // };
-    const createTableRows = (ymdMap, ySegments, stats) => {
+    const createTableRows = (ymdMap, segments, stats) => {
       // const rowMap = new Map();
       for (let ymd of ymdMap.keys()) {
-        const scores = ySegments.flatMap((offset, index) => {
+        const scores = segments.flatMap((seg, index) => {
           const exams = stats.filter(
-            (stat) => stat.ymd === ymd && stat.questionOffset === offset
+            (stat) => stat.ymd === ymd && stat.questionOffset === seg.offset
           );
           if (exams.length === 0) {
             return [null, `color: ${colors[index]}`];
           }
           const acc = exams.reduce(
             (acc, exam) => {
+              // 마지막 점수만 차트에 찍어줌
               acc.total = exam.total;
               acc.correct = exam.correct;
               return acc;
@@ -163,22 +187,34 @@ export default {
       }
       return [...ymdMap.values()];
     };
+    const setActiveSegment = (segment) => {
+      const active = toRaw(activeSegment.value);
+      if (active === segment) {
+        activeSegment.value = null;
+        hideColumns(chart.value, null);
+      } else {
+        activeSegment.value = segment;
+        const colIndex = 1 + 2 * segment.index;
+        const cols = [0, colIndex, colIndex + 1];
+        const { vmodel } = chart.value;
+        vmodel.setColumns(cols);
+        renderChart();
+      }
+    };
     const installListener = (chart) => {
       const { view } = chart;
       google.visualization.events.addListener(view, "click", (e) => {
         console.log("[click]", e);
         const { targetID } = e;
         if (targetID === "chartarea") {
-          hideColumns(chart, null);
-        } else if (targetID.startsWith("legendentry")) {
-          chartEvent.value.click = e;
-          chartEvent.value.type = "legend";
+          // hideColumns(chart, null);
+          closeSubmissionView();
         } else if (targetID.startsWith("point")) {
           chartEvent.value.click = e;
           chartEvent.value.active = true;
           chartEvent.value.type = "point";
         } else {
-          closeSubmissionView();
+          // closeSubmissionView();
         }
       });
       google.visualization.events.addListener(view, "select", () => {
@@ -197,12 +233,12 @@ export default {
           chartEvent.value.select = s[0];
           const { row, column } = s[0];
           const rowData = chart.rows[row]; // ['2022-09-01', 23, 45, 11]
-          const ymd = rowData[0];
+          const date = rowData[0];
 
           const realColumn = chart.vmodel.getTableColumnIndex(column);
-          const offset = segments[(realColumn - 1) / 2];
+          const { offset } = segments[(realColumn - 1) / 2];
           const exams = chart.stats.filter(
-            (stat) => stat.ymd === ymd && stat.questionOffset === offset
+            (stat) => stat.ymd === date.ymd && stat.questionOffset === offset
           );
           chartEvent.value.exams = exams;
           chartEvent.value.sentences = sentences.slice(offset, offset + 10);
@@ -216,28 +252,11 @@ export default {
           );
           const lastExam = exams[exams.length - 1];
           stats.score = (100 * lastExam.correct) / lastExam.total;
-          stats.date = ymd;
+          stats.date = date.ymd;
           stats.range = `${offset + 1} ~ ${offset + 10}`;
 
           chartEvent.value.stats = stats;
-        } else if (chartEvent.value.type == "legend") {
-          const { column } = s[0];
-          console.log("[legend]", column);
-          // const colsToHide = chart.columnIndexes.filter(
-          //   (idx) => idx > 0 && idx !== column
-          // );
-          // const cols = [
-          //   0,
-          //   { sourceColumn: column, type: "number", label: "dd" },
-          //   // { sourceColumn: column + 1, type: "string" },
-          // ];
-          const cols = [0, column, column + 1];
-          // chart.vmodel.hideColumns(colsToHide);
-          chart.vmodel.setColumns(cols);
-          view.draw(chart.vmodel, options);
         }
-
-        // console.log(rowData, exams, column, segments);
       });
     };
     const loadData = () => {
@@ -256,15 +275,38 @@ export default {
           return stats;
         });
     };
+
+    const renderChart = () => {
+      // 1. 영억 지정
+      const { offsetWidth } = chartEl.value;
+      const { vmodel, chartOption, view, rows } = chart.value;
+      chartOption.chartArea.left = 20;
+      chartOption.chartArea.top = 20;
+      chartOption.chartArea.width = offsetWidth - 40;
+      chartOption.chartArea.height = 500;
+      if (!chartOption.hAxis.viewWindow) {
+        chartOption.hAxis.viewWindow = {
+          min: rows[0][0],
+          max: rows[rows.length - 1][0],
+        };
+      }
+      view.draw(vmodel, chartOption);
+    };
+    let timer = null;
+    const debouncing = () => {
+      clearTimeout(timer);
+      timer = setTimeout(renderChart, 300);
+    };
     const buildChart = (stats) => {
+      // 1. define columns
       const model = new google.visualization.DataTable();
-      model.addColumn("string", "Date");
-      segments.forEach((offset) => {
-        model.addColumn("number", `${offset + 1}~${offset + 10}`);
+      model.addColumn("date", "Date");
+      segments.forEach((seg) => {
+        model.addColumn("number", `${seg.offset + 1}~${seg.offset + 10}`);
         model.addColumn({ type: "string", role: "style" });
       });
 
-      // stats.sort(sortByYmdAndOffset);
+      // 2. define series
       const ymdMap = stats
         .map((stat) => [stat.ymd])
         .reduce((map, row) => {
@@ -272,15 +314,32 @@ export default {
           return map;
         }, new Map());
       const rows = createTableRows(ymdMap, segments, stats);
+      rows.forEach((row) => {
+        const ymd = row[0];
+        const [y, m, d] = ymd.split("-").map((s) => parseInt(s));
+        row[0] = new Date(y, m - 1, d);
+        row[0].ymd = ymd;
+      });
       model.addRows(rows);
 
       const vmodel = new google.visualization.DataView(model);
       const view = new google.visualization.LineChart(chartEl.value);
       // view.draw(model, options);
-      view.draw(vmodel, options);
+      const chartOption = Object.assign({}, options);
+      // const { offsetWidth, offsetHeight } = chartEl.value;
+      chartOption.chartArea = {};
       const colSize = rows[0].length;
       const columnIndexes = [...Array(colSize).keys()];
-      return { model, vmodel, columnIndexes, view, rows, stats, event: null };
+      return {
+        chartOption,
+        model,
+        vmodel,
+        columnIndexes,
+        view,
+        rows,
+        stats,
+        event: null,
+      };
     };
 
     onMounted(() => {
@@ -291,15 +350,24 @@ export default {
         const chartObj = buildChart(results[1]);
         installListener(chartObj);
         chart.value = chartObj;
+
+        resizer = new ResizeObserver(debouncing);
+        resizer.observe(chartEl.value);
       });
     });
+    onUnmounted(() => {
+      resizer.disconnect();
+    });
     return {
+      activeSegment,
+      segments,
       section,
       chart,
       chartEl,
       chartEvent,
       sentences,
       closeSubmissionView,
+      setActiveSegment,
     };
   },
 };
@@ -310,8 +378,35 @@ export default {
   flex: 1 1 auto;
   overflow: auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   position: relative;
+
+  .legend {
+    display: flex;
+    column-gap: 4px;
+    padding: 6px 20px;
+
+    .segment {
+      border-radius: 16px;
+      display: flex;
+      cursor: pointer;
+      &.active {
+        outline: 4px solid transparent;
+      }
+      &:hover {
+        transform: translate(-1px, -1px);
+      }
+      &:active {
+        transform: translate(1px, 1px);
+      }
+      .dot {
+        padding: 4px 6px;
+        color: #fff;
+        font-size: 10px;
+        font-weight: bold;
+      }
+    }
+  }
   .chart {
     flex: 1 1 auto;
     width: 100%;
