@@ -151,7 +151,7 @@ export default {
       store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
     });
     onUnmounted(() => {
-      store.commit("ui/setBackgroundVisible", false);
+      store.commit("ui/setBackgroundVisible", true);
       store.commit("ui/setNavSize", { expanded: true, topPadding: 120 });
     });
     return {

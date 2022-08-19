@@ -252,7 +252,7 @@ $padding: 16px;
     display: flex;
     position: relative;
     // align-items: flex-start;
-    padding: $padding;
+    padding: 0;
     flex-direction: column;
     .desc {
       padding-bottom: 16px;

@@ -6,7 +6,7 @@
   >
     <h1 :class="theme">
       <span>{{ idx }}</span
-      ><span v-if="visited">+</span>
+      ><span v-if="compact !== '' && visited">+</span>
     </h1>
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
@@ -187,7 +187,7 @@ export default {
       transform: translateY(-50%);
     }
     .desc {
-      padding: 8px 16px 8px 32px;
+      padding: 8px 16px 8px 36px;
       box-shadow: none;
       &:after {
         display: none;

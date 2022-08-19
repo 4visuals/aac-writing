@@ -117,6 +117,7 @@ export default {
   display: flex;
   flex: 1 1 auto;
   width: 100%;
+  background-color: white;
   .detail {
     flex: 1 1 auto;
     display: flex;
