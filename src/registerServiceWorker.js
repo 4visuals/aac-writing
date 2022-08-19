@@ -6,6 +6,16 @@ import store from "./store";
 
 // import { registerRoute } from "workbox-routing";
 // import { StaleWhileRevalidate } from "workbox-strategies";
+
+const prepareAppData = () => {
+  store.dispatch("course/loadChapter", { origin: "L" });
+  store.dispatch("user/autoLogin").catch((e) => {
+    const { pathname } = location;
+    if (pathname !== "/" && e.cause === "TOKEN_EXPIRED") {
+      location.href = "/";
+    }
+  });
+};
 console.log(
   "[SW] regsiter: ",
   process.env.NODE_ENV,
@@ -19,8 +29,9 @@ if (process.env.NODE_ENV !== "development") {
           "For more details, visit https://goo.gl/AFskqB"
       );
       // load data here
-      store.dispatch("course/loadChapter", { origin: "L" });
-      store.dispatch("user/autoLogin");
+      // store.dispatch("course/loadChapter", { origin: "L" });
+      // store.dispatch("user/autoLogin");
+      prepareAppData();
     },
     registered() {
       console.log("[SW:registered] Service worker has been registered.");
@@ -58,6 +69,5 @@ if (process.env.NODE_ENV !== "development") {
   };
   // registerRoute(aacDictRequest, new StaleWhileRevalidate());
 } else {
-  store.dispatch("course/loadChapter", { origin: "L" });
-  store.dispatch("user/autoLogin");
+  prepareAppData();
 }

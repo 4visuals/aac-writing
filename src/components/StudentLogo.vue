@@ -9,12 +9,10 @@ export default {
   props: ["student", "size"],
   setup(props) {
     const char = () => {
-      return props.student.name
-        .split("")
-        .reverse()
-        .slice(0, 2)
-        .reverse()
-        .join("");
+      return (
+        props.student &&
+        props.student.name.split("").reverse().slice(0, 2).reverse().join("")
+      );
     };
     return { char };
   },

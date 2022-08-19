@@ -82,6 +82,9 @@ class QuizDao {
   }
   async saveQuiz(quizContext) {
     console.log("[save]", quizContext);
+    if (!quizContext) {
+      return;
+    }
     if (!quizContext.isQuizMode()) {
       // 일단 퀴즈일때만
       return;

@@ -78,7 +78,7 @@ export default {
 <style lang="scss" scoped>
 .login-form {
   width: 100%;
-  max-width: 360px;
+  // max-width: 360px;
   display: flex;
   flex-direction: column;
   row-gap: 8px;

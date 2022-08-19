@@ -1,3 +1,4 @@
+import storage from "@/service/storage";
 class Menu {
   constructor(name) {
     this.name = name;
@@ -22,11 +23,15 @@ class UI {
     this.nav = { height: 120, expanded: true };
     this.topPadding = 120;
     this.bg = {
-      visible: false,
+      visible: true,
     };
     this.reward = {
       name: false,
       onClose: null,
+    };
+    this.activeChapters = {
+      level: null,
+      book: null,
     };
   }
   get backgroundVisible() {
@@ -52,6 +57,19 @@ class UI {
     this.reward.name = null;
     this.reward.onClose = null;
   }
+  markChapter(name, seq) {
+    this.activeChapters[name] = seq;
+    storage.session.write("aac_dictation_ui:chapter", this.activeChapters);
+  }
+  getActiveChapter(group) {
+    return this.activeChapters[group];
+  }
+  init() {
+    this.activeChapters = storage.session.read("aac_dictation_ui:chapter", {
+      level: null,
+      book: null,
+    });
+  }
 }
 
 const themes = {
@@ -73,6 +91,8 @@ const themes = {
 const ui = new UI();
 const leftMenu = new Menu("left");
 
+ui.init();
+
 export default {
   namespaced: true,
   state: () => ({ ui, leftMenu, themes }),
@@ -86,6 +106,7 @@ export default {
     },
     topPadding: (state) => state.ui.topPadding,
     reward: (state) => state.ui.reward.name,
+    activeChapter: (state) => (group) => state.ui.getActiveChapter(group),
   },
   mutations: {
     showMenu(state) {
@@ -112,6 +133,9 @@ export default {
     },
     hideReward(state) {
       state.ui.hideReward();
+    },
+    setActiveChapter(state, { group, seq }) {
+      state.ui.markChapter(group, seq);
     },
   },
 };

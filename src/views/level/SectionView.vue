@@ -12,7 +12,6 @@
       </div>
     </div>
     <div class="body">
-      <ParaText class="desc">{{ cate.description }}</ParaText>
       <Slide
         class="preview"
         :resources="cate.notes.map((n) => n.text)"
@@ -58,7 +57,6 @@ import { path } from "@/service/util";
 import { computed, ref, watch } from "vue";
 import router from "@/router";
 import { quizDao } from "@/dao";
-import { ParaText } from "@/components/text";
 import { SwitchButton } from "@/components/form";
 import QuestionList from "@/components/QuestionList.vue";
 import { AacButton } from "@/components/form";
@@ -69,7 +67,6 @@ export default {
   props: ["cate", "theme", "quizOnly"],
   components: {
     AacButton,
-    ParaText,
     SwitchButton,
     Slide,
     QuestionList,

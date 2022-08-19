@@ -108,3 +108,13 @@
     background-color: var(--aac-color-gray-400);
   }
 }
+@mixin gold($shadow: true) {
+  background-color: #ffec88;
+  color: #865900;
+  @if $shadow {
+    border: 1px solid var(--aac-color-gray-700);
+  }
+  &:active {
+    background-color: var(--aac-color-gray-400);
+  }
+}

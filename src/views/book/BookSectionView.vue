@@ -7,7 +7,6 @@
     <div class="jumbo">
       <div class="title">
         <h3>{{ title() }}</h3>
-        <LicenseComboBox />
       </div>
     </div>
     <div class="body">
@@ -66,7 +65,6 @@ import { computed, ref } from "vue";
 import router from "@/router";
 import { ParaText, SpanText } from "@/components/text";
 import { AacButton } from "@/components/form";
-import { LicenseComboBox } from "@/components/admin";
 import util from "@/service/util";
 
 // import api from "@/service/api";
@@ -77,7 +75,6 @@ export default {
   components: {
     AacButton,
     ParaText,
-    LicenseComboBox,
     SpanText,
   },
   setup(props) {
@@ -111,7 +108,7 @@ export default {
     };
     const title = () => {
       const { level } = props.cate;
-      return level >= 0 ? level + "단계" : "종합";
+      return level >= 0 ? level + "단원" : "종합";
     };
     const markHeight = (e) => {
       console.log("[h]", e.offsetHeight);
@@ -177,6 +174,9 @@ $padding: 16px;
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-top-left-radius: 2vmin;
+  border-top-right-radius: 2vmin;
+  overflow: hidden;
   .body {
     flex: 1 1 auto;
   }

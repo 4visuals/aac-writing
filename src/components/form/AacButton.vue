@@ -80,6 +80,9 @@ export default {
     &.red {
       @include red($shadow: true);
     }
+    &.gold {
+      @include gold($shadow: true);
+    }
     &:active {
       transform: translate(3px, 3px);
     }

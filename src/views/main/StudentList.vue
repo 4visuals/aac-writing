@@ -21,7 +21,7 @@
             text="교과서"
             fill
             size="xs"
-            theme="orange"
+            theme="gold"
             @click="$emit('selected', lcs, '/book')"
           />
         </div>
@@ -93,7 +93,7 @@ export default {
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
     rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
-  max-height: 400px;
+  max-height: 300px;
   overflow-y: auto;
   .license {
     display: flex;

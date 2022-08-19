@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <div class="menu">
-      <div class="logo"></div>
+      <div class="logo main"></div>
+      <div class="logo sub"></div>
     </div>
     <!-- <h1 class="main title">받아쓰기</h1> -->
 
@@ -91,6 +92,7 @@ export default {
       // console.log("move to ", url);
       store.commit("exam/setActiveLicense", license);
       router.push(url);
+      store.commit("ui/setNavSize", { expanded: false, topPadding: 120 });
     };
     const showLicenseConfig = (lcs) => {
       modal.value.visible = true;
@@ -107,6 +109,7 @@ export default {
       },
       { immediate: true }
     );
+    store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
     return {
       modal,
       member,
@@ -124,16 +127,34 @@ export default {
 @include mobile {
   .home {
     font-size: 2rem;
+    .logo {
+      height: 75px;
+      &.sub {
+        height: 60px;
+      }
+    }
   }
 }
 @include tablet {
   .home {
     font-size: 2.5rem;
+    .logo {
+      height: 120px;
+      &.sub {
+        height: 90px;
+      }
+    }
   }
 }
 @include desktop {
   .home {
     font-size: 2.5rem;
+    .logo {
+      height: 120px;
+      &.sub {
+        height: 90px;
+      }
+    }
   }
 }
 .home {
@@ -141,12 +162,16 @@ export default {
   padding: 0 24px;
 
   .logo {
-    background-image: url("/img/white_back_02.png");
-    height: 120px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     margin-bottom: 24px;
+    &.main {
+      background-image: url("/img/white_back_02.png");
+    }
+    &.sub {
+      background-image: url("/img/badassgi.png");
+    }
   }
   .login {
     display: flex;
@@ -171,7 +196,7 @@ export default {
     margin: 0 auto;
     width: 100%;
     .students {
-      margin-top: 48px;
+      margin-top: 24px;
       .stud-reg {
         margin: 24px 0;
         display: flex;
