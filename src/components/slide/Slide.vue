@@ -6,16 +6,6 @@
       dim.h.size + dim.h.unit
     }`"
   >
-    <ActionIcon
-      class="btn prev"
-      @click="shiftBy(-1)"
-      icon="keyboard_arrow_left"
-    ></ActionIcon>
-    <ActionIcon
-      class="btn next"
-      @click="shiftBy(1)"
-      icon="keyboard_arrow_right"
-    ></ActionIcon>
     <div class="viewport">
       <div
         class="viewport-body"
@@ -41,7 +31,6 @@
 </template>
 
 <script>
-import { ActionIcon } from "@/components/form";
 import { onMounted, ref, watch } from "vue";
 const normalize = (sz, unit) => {
   let v = "" + sz;
@@ -55,9 +44,6 @@ const normalize = (sz, unit) => {
   };
 };
 export default {
-  components: {
-    ActionIcon,
-  },
   props: ["resources", "width", "height", "resolveUrl"],
   setup(props) {
     const activeIdx = ref(0);
@@ -67,6 +53,15 @@ export default {
       h: normalize(props.height, "px"),
       offset: 0,
     });
+
+    const updateViewportSize = () => {
+      const width = viewport.value.offsetWidth;
+      dim.value = {
+        w: normalize(width, "px"),
+        h: normalize(props.height, "px"),
+        offset: 0,
+      };
+    };
     watch(
       () => activeIdx.value,
       () => {
@@ -82,13 +77,12 @@ export default {
       idx = Math.max(0, idx);
       activeIdx.value = idx;
     };
+
+    let resizer;
     onMounted(() => {
-      const width = viewport.value.offsetWidth;
-      dim.value = {
-        w: normalize(width, "px"),
-        h: normalize(props.height, "px"),
-        offset: 0,
-      };
+      resizer = new ResizeObserver(updateViewportSize);
+      resizer.observe(viewport.value);
+      updateViewportSize();
     });
     return { dim, viewport, activeIdx, shiftBy };
   },
@@ -131,7 +125,6 @@ export default {
         flex: 0 0 var(--slide-width);
         width: var(--slide-width);
         height: 100%;
-        background-color: beige;
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
