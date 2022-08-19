@@ -188,11 +188,12 @@ export default {
     }
     .stats {
       display: flex;
-      flex-direction: column;
-      row-gap: 4px;
+      flex-direction: row;
+      column-gap: 8px;
       & > div {
+        flex: 1;
         display: flex;
-        column-gap: 8px;
+        column-gap: 2px;
         align-items: center;
         .progress {
           flex: 1 1 auto;
