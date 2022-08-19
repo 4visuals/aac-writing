@@ -19,14 +19,20 @@
         height="100%"
         :resolveUrl="(rss) => path.aacweb.scene(rss)"
       />
-      <div class="overlay" v-if="sentencesRef.length > 0">
-        <h4>{{ examDesc }}</h4>
-        <QuestionList
-          :histories="sectionHistories"
-          :sentences="sentencesRef"
-          @choosen="startSentenceQuiz"
-        />
-      </div>
+      <transition name="slideup">
+        <div class="overlay" v-if="sentencesRef.length > 0">
+          <ParaText class="quiz-nav"
+            ><ActionIcon icon="expand_more" @click="hideQuestionList" /><span>{{
+              examDesc
+            }}</span></ParaText
+          >
+          <QuestionList
+            :histories="sectionHistories"
+            :sentences="sentencesRef"
+            @choosen="startSentenceQuiz"
+          />
+        </div>
+      </transition>
     </div>
     <div class="footer">
       <div class="choose">
@@ -63,6 +69,8 @@ import { AacButton } from "@/components/form";
 import { Slide } from "@/components/slide";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
+import { ParaText } from "../../components/text";
+import { ActionIcon } from "../../components/form";
 export default {
   props: ["cate", "theme", "quizOnly"],
   components: {
@@ -70,6 +78,8 @@ export default {
     SwitchButton,
     Slide,
     QuestionList,
+    ParaText,
+    ActionIcon,
   },
   setup(props) {
     const store = useStore();
@@ -172,6 +182,9 @@ export default {
       });
     };
 
+    const hideQuestionList = () => {
+      sentencesRef.value.length = 0;
+    };
     const sourceText = () => (wordMode.value ? "낱말" : "문장");
 
     watch(
@@ -190,6 +203,7 @@ export default {
       sectionHistories,
       startSentenceQuiz,
       listQuestions,
+      hideQuestionList,
       sourceText,
     };
   },
@@ -198,6 +212,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
+$timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
 $padding: 16px;
 .section-detail {
   height: 100%;
@@ -254,6 +269,7 @@ $padding: 16px;
     // align-items: flex-start;
     padding: 0;
     flex-direction: column;
+    overflow-y: hidden;
     .desc {
       padding-bottom: 16px;
     }
@@ -275,16 +291,24 @@ $padding: 16px;
     }
     .overlay {
       position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
       z-index: 50;
       background-color: #fffffffe;
       border-radius: 8px;
-      box-shadow: rgb(14 30 37 / 12%) 0px 2px 4px 0px,
-        rgb(14 30 37 / 32%) 0px 2px 16px 0px;
-      h4 {
+      box-shadow: rgb(14 30 37 / 6%) 0px -4px 2px 0px,
+        rgb(14 30 37 / 16%) 0px -6px 8px 0px;
+      .quiz-nav {
         padding: 8px;
+        display: flex;
+        font-size: 2rem;
+        align-items: center;
+        column-gap: 8px;
+        & > span {
+          flex: 1;
+          font-size: 1.5rem;
+        }
       }
     }
   }
@@ -298,6 +322,15 @@ $padding: 16px;
         flex: 1 1 auto;
       }
     }
+  }
+  .slideup-enter-from,
+  .slideup-leave-to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  .slideup-enter-active,
+  .slideup-leave-active {
+    transition: transform 0.3s $timing-fn, opacity 0.3s $timing-fn;
   }
 }
 </style>
