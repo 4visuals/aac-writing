@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 const normalize = (sz, unit) => {
   let v = "" + sz;
   if (v[0] === ".") {
@@ -83,6 +83,9 @@ export default {
       resizer = new ResizeObserver(updateViewportSize);
       resizer.observe(viewport.value);
       updateViewportSize();
+    });
+    onUnmounted(() => {
+      resizer.disconnect();
     });
     return { dim, viewport, activeIdx, shiftBy };
   },
