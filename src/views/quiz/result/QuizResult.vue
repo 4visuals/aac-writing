@@ -87,6 +87,12 @@ export default {
       return section.description;
     };
     const uploadExam = () => {
+      const { resourceType, ranges } = ctx;
+      if (resourceType === "A" && ranges[1] === 0) {
+        // 교과서 종합(랜덤) 문제이므로 서버에 업로드하지 않아야 함
+        chart.value = "CUR";
+        return;
+      }
       const exam = {
         license: ctx.license.uuid,
         sectionRef: ctx.sectionSeq,
@@ -111,7 +117,12 @@ export default {
     const uploadLearning = () => {
       const exam = {
         license: ctx.license.uuid,
+        sectionRef: ctx.sectionSeq,
+        startTime: ctx.startTime / 1000,
+        endTime: new Date().getTime() / 1000,
         type: ctx.isWord() ? "W" : "S",
+        questionOffset: ctx.ranges[0],
+        numOfQuestions: ctx.quizLength,
         submissions: null,
       };
       if (ctx.isWord()) {
@@ -121,9 +132,17 @@ export default {
           const ej = q.eojeols[0];
           q.trials.forEach((trial) => {
             trial.eojeolRef = ej.eojeolRef;
-            delete trial.sentenceRef;
+            trial.sentenceRef;
           });
           q.eojeols[0].trials = q.trials;
+        });
+      } else {
+        ctx.questions.forEach((q) => {
+          q.eojeols.forEach((ej) => {
+            ej.trials.forEach((trial) => {
+              trial.sentenceRef = ej.sentenceRef;
+            });
+          });
         });
       }
 

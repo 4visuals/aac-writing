@@ -7,7 +7,7 @@
       :key="index"
       @click="tabClicked(tab)"
     >
-      <SpanText>{{ tab.text }}</SpanText>
+      <SpanText size="sm">{{ tab.text }}</SpanText>
     </div>
   </div>
 </template>

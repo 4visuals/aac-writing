@@ -1,16 +1,10 @@
 <template>
   <div class="chart-wrapper">
     <div class="legend">
-      <div
-        class="segment"
-        v-for="seg in segments"
-        :key="seg.index"
-        :class="{ active: activeSegment && activeSegment.index === seg.index }"
-        :style="{ 'background-color': seg.color, outlineColor: seg.outColor }"
-        @click="setActiveSegment(seg)"
-      >
-        <span class="dot">{{ seg.offset + 1 }}~{{ seg.offset + 10 }}</span>
-      </div>
+      <SegmentView
+        @active-segment="setActiveSegment"
+        :resourceType="ctx.resourceType"
+      />
     </div>
     <div class="chart" ref="chartEl"></div>
     <div v-if="chartEvent.active" class="custom-tooltip">
@@ -25,7 +19,8 @@
             >(<span>{{ chartEvent.stats.range }}번</span>)</ParaText
           >
           <ParaText :small="true"
-            ><span class="score">최종 {{ chartEvent.stats.score }}점</span
+            ><span class="score"
+              >최종 {{ chartEvent.stats.score.toFixed(1) }}점</span
             ><span class="cnt"
               >전체: {{ chartEvent.stats.total }}, 정답:
               {{ chartEvent.stats.correct }}</span
@@ -38,6 +33,9 @@
         />
       </div>
     </div>
+    <div class="empty-chart" v-if="chart.rows && chart.rows.length === 0">
+      데이터 없음
+    </div>
   </div>
 </template>
 
@@ -46,9 +44,10 @@ import { ParaText } from "@/components/text";
 import { ActionIcon } from "@/components/form";
 import api from "@/service/api";
 import { time } from "@/service/util";
-import { onMounted, onUnmounted, ref, shallowRef, toRaw } from "vue";
+import { onMounted, onUnmounted, ref, shallowRef } from "vue";
 import { useStore } from "vuex";
 import SubmissionView from "./SubmissionView.vue";
+import SegmentView from "@/components/quiz/SegmentView.vue";
 
 const colors = [
   "#f3a600",
@@ -57,17 +56,14 @@ const colors = [
   "#5e97f6",
   "#db4537",
   "#0e9d59",
-  "#ab47bc",
-];
-const colors2 = [
-  "#ffd57c",
-  "#95d7e0",
-  "#e2d2b7",
-  "#b9d3fe",
-  "#ffbcb6",
-  "#a1e0c2",
+  "#444444",
 ];
 const options = {
+  // animation: {
+  //   duration: 300,
+  //   easing: "linear",
+  //   startup: true,
+  // },
   legend: { position: "none" },
   axisTitlesPosition: "in",
   aggregationTarget: "series",
@@ -81,8 +77,22 @@ const options = {
     title: null,
     textPosition: "out", // X축 아래에 날짜 표시
     viewWindow: null, // {min, max}
+    minorGridlines: {
+      color: "#fff",
+    },
+  },
+  series: {
+    0: { lineWidth: 4 },
+    1: { lineWidth: 4 },
+    2: { lineWidth: 4 },
+    3: { lineWidth: 4 },
+    4: { lineWidth: 4 },
+    5: { lineWidth: 4 },
+    6: { lineWidth: 4 },
+    7: { lineWidth: 4 },
   },
   interpolateNulls: true,
+
   pointSize: 8,
   slantedText: true,
   theme: "material",
@@ -98,6 +108,9 @@ const options = {
     title: null,
     // viewWindowMode: "pretty",
     textPosition: "in",
+    minorGridlines: {
+      color: "#fff",
+    },
     // ticks: [0, 20, 40, 60, 80, 100],
   },
 
@@ -109,10 +122,11 @@ export default {
     ActionIcon,
     SubmissionView,
     ParaText,
+    SegmentView,
   },
   setup() {
     const chartEl = ref(null);
-    const chart = shallowRef(null);
+    const chart = shallowRef({});
     const EVENT_TEMPLATE = {
       type: null,
       active: false,
@@ -131,18 +145,11 @@ export default {
     const chartEvent = ref(Object.assign({}, EVENT_TEMPLATE));
     const store = useStore();
     const ctx = store.state.quiz.quizContext;
-    const type = ctx.resourceType;
+    const type = ctx.getQuestionType(); // 'W'|'S'
     const findSection = store.getters["course/section"];
     const section = findSection(ctx.sectionSeq);
     const sentences = section.sentences.filter((sen) => sen.type === type);
-    const segments = [...Array(sentences.length / 10).keys()].map(
-      (offset, index) => ({
-        offset: offset * 10,
-        index,
-        color: colors[index],
-        outColor: colors2[index],
-      })
-    );
+    const segments = ctx.getSegments(type);
     const activeSegment = ref(null);
     let resizer;
 
@@ -165,7 +172,10 @@ export default {
       for (let ymd of ymdMap.keys()) {
         const scores = segments.flatMap((seg, index) => {
           const exams = stats.filter(
-            (stat) => stat.ymd === ymd && stat.questionOffset === seg.offset
+            (stat) =>
+              stat.ymd === ymd &&
+              stat.questionOffset === seg.offset &&
+              stat.numOfQuestions === seg.size
           );
           if (exams.length === 0) {
             return [null, `color: ${colors[index]}`];
@@ -188,8 +198,8 @@ export default {
       return [...ymdMap.values()];
     };
     const setActiveSegment = (segment) => {
-      const active = toRaw(activeSegment.value);
-      if (active === segment) {
+      // const active = toRaw(activeSegment.value);
+      if (!segment) {
         activeSegment.value = null;
         hideColumns(chart.value, null);
       } else {
@@ -236,12 +246,15 @@ export default {
           const date = rowData[0];
 
           const realColumn = chart.vmodel.getTableColumnIndex(column);
-          const { offset } = segments[(realColumn - 1) / 2];
+          const { offset, size } = segments[(realColumn - 1) / 2];
           const exams = chart.stats.filter(
-            (stat) => stat.ymd === date.ymd && stat.questionOffset === offset
+            (stat) =>
+              stat.ymd === date.ymd &&
+              stat.questionOffset === offset &&
+              stat.numOfQuestions === size
           );
           chartEvent.value.exams = exams;
-          chartEvent.value.sentences = sentences.slice(offset, offset + 10);
+          chartEvent.value.sentences = sentences.slice(offset, offset + size);
           const stats = exams.reduce(
             (acc, exam) => {
               acc.total += exam.total;
@@ -260,8 +273,10 @@ export default {
       });
     };
     const loadData = () => {
+      // let type = ctx.resourceType;
+      // type = type === "A" ? "S" : type;
       return api.exam
-        .querySectionQuiz(ctx.sectionSeq, ctx.resourceType, ctx.license.uuid)
+        .querySectionQuiz(ctx.sectionSeq, type, ctx.license.uuid)
         .then((res) => {
           const stats = res.papers.map((paper) => {
             const total = paper.numOfQuestions; // paper.submissions.length;
@@ -284,11 +299,18 @@ export default {
       chartOption.chartArea.top = 20;
       chartOption.chartArea.width = offsetWidth - 40;
       chartOption.chartArea.height = 500;
-      if (!chartOption.hAxis.viewWindow) {
-        chartOption.hAxis.viewWindow = {
-          min: rows[0][0],
-          max: rows[rows.length - 1][0],
-        };
+      // if (!chartOption.hAxis.viewWindow) {
+
+      // }
+      const min = rows.length > 0 ? rows[0][0] : new Date();
+      const max = rows.length > 0 ? rows[rows.length - 1][0] : new Date();
+      chartOption.hAxis.viewWindow = {
+        min,
+        max,
+      };
+      if (!chartOption.hAxis.ticks) {
+        const ticks = rows.map((row) => row[0]);
+        chartOption.hAxis.ticks = ticks;
       }
       view.draw(vmodel, chartOption);
     };
@@ -328,7 +350,7 @@ export default {
       const chartOption = Object.assign({}, options);
       // const { offsetWidth, offsetHeight } = chartEl.value;
       chartOption.chartArea = {};
-      const colSize = rows[0].length;
+      const colSize = 1 + segments.length * 2; // rows[0].length;
       const columnIndexes = [...Array(colSize).keys()];
       return {
         chartOption,
@@ -343,7 +365,7 @@ export default {
     };
 
     onMounted(() => {
-      const p0 = google.charts.load("51", { packages: ["corechart"] });
+      const p0 = google.charts.load("50", { packages: ["corechart"] });
       const p1 = loadData();
       Promise.all([p0, p1]).then((results) => {
         console.log(results);
@@ -359,6 +381,7 @@ export default {
       resizer.disconnect();
     });
     return {
+      ctx,
       activeSegment,
       segments,
       section,
@@ -384,8 +407,7 @@ export default {
   .legend {
     display: flex;
     column-gap: 4px;
-    padding: 6px 20px;
-
+    padding: 8px 20px;
     .segment {
       border-radius: 16px;
       display: flex;
@@ -411,6 +433,16 @@ export default {
     flex: 1 1 auto;
     width: 100%;
     overflow: hidden;
+    position: relative;
+  }
+  .empty-chart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ececec;
+    padding: 8px 12px;
+    border-radius: 24px;
   }
   .custom-tooltip {
     // width: 80%;

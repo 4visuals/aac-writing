@@ -18,6 +18,9 @@ class TabModel {
     tab.active = true;
     this.activeTab.value = tab;
   }
+  hasBody() {
+    return !!this.items[0]._body;
+  }
 }
 class BodyComp {
   constructor(comp, args, events) {
@@ -48,7 +51,9 @@ TabModel.create = (items) => {
       activeIndex = index;
     }
     const { body } = item;
-    if (body.comp) {
+    if (!body) {
+      item._body = null;
+    } else if (body.comp) {
       item._body = new BodyComp(body.comp, body.args || {}, body.events || {});
     } else {
       item._body = new BodyComp(body, {}, {});

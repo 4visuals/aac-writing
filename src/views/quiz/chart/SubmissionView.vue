@@ -56,6 +56,8 @@ export default {
   .exams {
     display: flex;
     column-gap: 4px;
+    max-height: 300px;
+    overflow-y: auto;
     .exam {
       .correct {
         color: #27600c;

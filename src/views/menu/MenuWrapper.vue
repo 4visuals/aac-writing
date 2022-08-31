@@ -8,6 +8,9 @@
         <MenuSection>
           <UserProfile />
         </MenuSection>
+        <MenuSection :title="ctx.section.chapter.desc"
+          ><QuizSegmentMenu></QuizSegmentMenu
+        ></MenuSection>
         <TeacherSectionMenu v-if="isTeacher" />
         <StudentSectionMenu v-else />
       </div>
@@ -24,6 +27,7 @@
 import { useStore } from "vuex";
 import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
+import QuizSegmentMenu from "./sections/QuizSegmentMenu.vue";
 import TeacherSectionMenu from "./TeacherSectionMenu.vue";
 import StudentSectionMenu from "./StudentSectionMenu.vue";
 import Flag from "@/components/Flag.vue";
@@ -34,6 +38,7 @@ export default {
     Flag,
     MenuSection,
     UserProfile,
+    QuizSegmentMenu,
     TeacherSectionMenu,
     StudentSectionMenu,
   },
@@ -44,6 +49,7 @@ export default {
     const modalArgs = ref(null);
     const activeVoice = computed(() => store.getters["tts/activeVoice"]);
     const isTeacher = computed(() => store.getters["user/isTeacher"]);
+    const ctx = computed(() => store.state.quiz.quizContext);
     // const loginButton = shallowRef(null);
     const hide = () => {
       // store.commit("ui/hideMenu");
@@ -61,6 +67,7 @@ export default {
       // loginButton.value = OAuthButton;
     });
     return {
+      ctx,
       store,
       isTeacher,
       hide,
@@ -99,6 +106,8 @@ export default {
     position: relative;
     box-shadow: 2px 0 6px #0000004d;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .dimmer-leave-to,

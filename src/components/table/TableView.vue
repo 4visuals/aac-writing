@@ -45,11 +45,12 @@ export default {
   .fixed-column {
     position: relative;
     z-index: 2;
-    overflow: hidden;
+    // overflow: hidden;
     display: block;
     width: var(--sheet-col-width);
     background-color: white;
     border-right: 1px solid #6666664d;
+    margin-bottom: 2px;
   }
   .scrollable {
     position: absolute;

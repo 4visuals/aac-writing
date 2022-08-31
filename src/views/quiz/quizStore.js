@@ -92,6 +92,7 @@ store.registerModule("quiz", {
 });
 
 const startQuiz = (quizContext) => {
+  store.commit("quiz/hideResultView");
   store.commit("quiz/setQuiz", { quizContext });
 };
 const getQuizContext = () => store.state.quiz.quizContext;

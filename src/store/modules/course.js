@@ -31,6 +31,8 @@ export default {
       data.forEach((chapter) => {
         chapter.sections.forEach((sec) => {
           sec.origin = chapter.origin;
+          // 양방향 바인딩
+          sec.chapter = chapter;
         });
       });
       state.chapters.levels = data.filter((chapter) => chapter.origin === "L");

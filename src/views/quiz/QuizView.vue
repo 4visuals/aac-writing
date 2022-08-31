@@ -93,6 +93,7 @@ export default {
     const keyConsumer = ref(null);
     const quizFinished = computed(() => store.state.quiz.finished);
     const router = useRouter();
+    store.commit("ui/hideMenu");
     store.commit("quiz/hideHint");
     quiz.loadQuiz();
     /**

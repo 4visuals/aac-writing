@@ -1,6 +1,5 @@
 <template>
   <div class="exit">
-    <SpanText>끝내려면 버튼을 클릭하세요.</SpanText>
     <AacButton
       :text="`${quizText()} 종료`"
       theme="red"
@@ -13,13 +12,11 @@
 
 <script>
 import { AacButton } from "@/components/form";
-import { SpanText } from "@/components/text";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 export default {
   components: {
     AacButton,
-    SpanText,
   },
   setup() {
     const router = useRouter();

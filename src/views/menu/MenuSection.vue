@@ -17,7 +17,7 @@ export default {
 .menu-section {
   padding: 8px 16px;
   > h3 {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     user-select: none;
   }
   > .menu-item {

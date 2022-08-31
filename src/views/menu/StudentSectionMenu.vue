@@ -1,7 +1,6 @@
 <template>
   <template v-if="quizState">
-    <MenuSection title="진행상황"><QuizStateMenu /></MenuSection>
-    <MenuSection title="종료"><QuizEndMenu /></MenuSection>
+    <MenuSection title=""><QuizEndMenu /></MenuSection>
   </template>
   <template v-else>
     <p>학생 메뉴</p>
@@ -23,7 +22,6 @@
  */
 import { ref } from "@vue/reactivity";
 import MenuSection from "./MenuSection.vue";
-import QuizStateMenu from "./sections/QuizStateMenu.vue";
 import QuizEndMenu from "./sections/QuizEndMenu.vue";
 import { LicenseConfigView } from "@/components/admin";
 import { useRoute } from "vue-router";
@@ -32,7 +30,6 @@ import { useStore } from "vuex";
 export default {
   components: {
     MenuSection,
-    QuizStateMenu,
     QuizEndMenu,
     LicenseConfigView,
   },

@@ -1,15 +1,11 @@
 <template>
   <template v-if="quizState">
-    <MenuSection title="진행상황"><QuizStateMenu /></MenuSection>
-    <MenuSection title="종료"><QuizEndMenu /></MenuSection>
+    <MenuSection title=""><QuizEndMenu /></MenuSection>
   </template>
   <template v-else>
     <MenuSection>
       <LicenseMenu @clicked="showLicenseConfig" />
     </MenuSection>
-    <!-- <MenuSection title="학생">
-      <StudentMenu />
-    </MenuSection> -->
   </template>
   <teleport to="body" v-if="modal.visible">
     <Modal @hidden="hideModal">
@@ -30,7 +26,7 @@ import { ref } from "@vue/reactivity";
 import MenuSection from "./MenuSection.vue";
 import LicenseMenu from "./sections/LicenseMenu.vue";
 // import StudentMenu from "./sections/StudentMenu.vue";
-import QuizStateMenu from "./sections/QuizStateMenu.vue";
+// import QuizStateMenu from "./sections/QuizStateMenu.vue";
 import QuizEndMenu from "./sections/QuizEndMenu.vue";
 import { LicenseConfigView } from "@/components/admin";
 import { useRoute } from "vue-router";
@@ -41,7 +37,7 @@ export default {
     MenuSection,
     LicenseMenu,
     // StudentMenu,
-    QuizStateMenu,
+    // QuizStateMenu,
     QuizEndMenu,
     LicenseConfigView,
   },
@@ -72,4 +68,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.pad {
+  flex: 1 1 auto;
+}
+</style>

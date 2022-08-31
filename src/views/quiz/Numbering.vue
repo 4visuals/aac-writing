@@ -4,16 +4,17 @@
     <div class="bar todo"></div>
     <div
       class="dot"
-      v-for="q in questions"
+      v-for="q in ctx.questions"
       :key="q.index"
       :style="{
-        left: `${(q.index / (len - 1)) * 100}%`,
+        left: `${(q.index / (ctx.questions.length - 1)) * 100}%`,
       }"
     ></div>
     <div
+      v-if="currentQuestion"
       class="current num"
       :style="{
-        left: `${(currentQuestion.index / (len - 1)) * 100}%`,
+        left: `${(currentQuestion.index / (ctx.questions.length - 1)) * 100}%`,
       }"
     >
       {{ currentQuestion.index + 1 }}
@@ -30,20 +31,21 @@
 </template>
 
 <script>
-import { computed } from "@vue/runtime-core";
+import { computed } from "vue";
 import { useStore } from "vuex";
-import quizStore from "./quizStore";
+// import quizStore from "./quizStore";
+
 export default {
   setup() {
-    const quizContext = quizStore.getQuizContext();
-    console.log("[cur quiz]", quizContext.currentQuestion);
-    const { questions } = quizContext;
     const store = useStore();
+    const ctx = computed(() => store.state.quiz.quizContext);
+
     const currentQuestion = computed(() => store.getters["quiz/currentPara"]);
+    // const questions = shallowRef(ctx.value.questions);
     return {
+      ctx,
       currentQuestion,
-      questions,
-      len: questions.length,
+      // len: questions.length,
     };
   },
 };

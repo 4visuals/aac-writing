@@ -11,7 +11,7 @@
         />
       </div>
     </div>
-    <div class="body">
+    <div class="body" @click="hideQuestionList">
       <Slide
         class="preview"
         :resources="cate.notes.map((n) => n.text)"
@@ -19,7 +19,7 @@
         height="100%"
         :resolveUrl="(rss) => path.aacweb.scene(rss)"
       />
-      <transition name="slideup">
+      <transition name="slideup" @click.stop>
         <div class="overlay" v-if="sentencesRef.length > 0">
           <ParaText class="quiz-nav"
             ><ActionIcon icon="expand_more" @click="hideQuestionList" /><span>{{

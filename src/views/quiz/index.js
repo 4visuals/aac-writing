@@ -12,6 +12,46 @@ import storage from "@/service/storage";
 const answerComponents = new Map();
 answerComponents.set("EJ", shallowRef(EojelInput));
 answerComponents.set("SEN", shallowRef(SentenceInput));
+
+const colors = [
+  ["#f3a600", "#ffd57c"],
+  ["#00acc2", "#95d7e0"],
+  ["#c2ac88", "#e2d2b7"],
+  ["#5e97f6", "#b9d3fe"],
+  ["#db4537", "#ffbcb6"],
+  ["#0e9d59", "#a1e0c2"],
+  ["#444444", "#c6c6c6"],
+];
+/**
+ * 20 ~ 60개 크기의 section을 10개씩 나눠서 segment로 나타냄.
+ * 5단계 낱말의 경우 문제가 60개. 총 6개의 segment + 전체1 => 7 segments
+ */
+class Segment {
+  constructor(index, offset, size, label, colors, sentences) {
+    this.index = index;
+    this.offset = offset;
+    this.size = size;
+    this.label = label;
+    this.colors = [...colors];
+    this.sentences = sentences;
+  }
+  get mainColor() {
+    return this.colors[0];
+  }
+  get subColor() {
+    return this.colors[1];
+  }
+  get start() {
+    return this.offset;
+  }
+  get end() {
+    return this.offset + this.size;
+  }
+  getSentences() {
+    const { start, end } = this;
+    return this.sentences.slice(start, end);
+  }
+}
 /**
  * 퀴즈 질문과 학생이 입력한 답안을 기록
  */
@@ -229,6 +269,46 @@ class QuizContext {
     quizDao.sync(this).then((res) => {
       console.log(res);
     });
+  }
+  getSegments(resourceType) {
+    let type = resourceType || this.resourceType;
+    type = type === "A" ? "S" : type;
+    const section = this.section;
+    const sentences = section.sentences.filter((sen) => sen.type === type);
+    const segments = [...Array(sentences.length / 10).keys()].map((index) => {
+      const label = `${index * 10 + 1}-${index * 10 + 10}`;
+      return new Segment(
+        index,
+        10 * index,
+        10,
+        label,
+        colors[index],
+        sentences
+      );
+    });
+    if (sentences.length > 10) {
+      const index = segments.length;
+      segments.push(
+        new Segment(
+          index,
+          0,
+          sentences.length,
+          "전체",
+          colors[index],
+          sentences
+        )
+      );
+    }
+
+    return segments;
+  }
+  /**
+   * 단게별 문제와 달리 교과서 문제인 경우 각각의 문항은 문장('S')으로 구성됨.
+   * @returns 'W' | 'S'
+   */
+  getQuestionType() {
+    const type = this.resourceType;
+    return type === "A" ? "S" : type;
   }
 }
 /**

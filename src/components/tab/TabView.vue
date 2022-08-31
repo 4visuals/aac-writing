@@ -1,7 +1,8 @@
 <template>
   <div class="tab-ui">
     <TabNav :model="model" />
-    <TabBody :model="model" />
+    <TabBody :model="model" v-if="model.hasBody()" />
+    <slot v-else />
   </div>
 </template>
 
