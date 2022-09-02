@@ -85,15 +85,21 @@ export default {
     };
     const flush = (e) => {
       const elapsedTime = new Date().getTime() - startTime[0];
+      const value = e.target.value.trim();
+      if (value.length === 0) {
+        e.target.value = "";
+        return;
+      }
       console.log("[flush] elapsed", elapsedTime);
 
       flushed = true;
       if (props.enableFlash) {
         doFlash();
       }
+
       emit("commit", {
         e,
-        value: e.target.value.trim(),
+        value,
         elapsedTime,
         done: resetTime,
         failed: retry,
