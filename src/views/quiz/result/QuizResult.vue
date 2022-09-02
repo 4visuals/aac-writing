@@ -93,12 +93,14 @@ export default {
         chart.value = "CUR";
         return;
       }
+      const mode = ctx.mode;
       const exam = {
         license: ctx.license.uuid,
         sectionRef: ctx.sectionSeq,
         startTime: ctx.startTime / 1000,
         endTime: new Date().getTime() / 1000,
         type: ctx.isWord() ? "W" : "S",
+        mode: mode.substring(0, 1),
         questionOffset: ctx.ranges[0],
         numOfQuestions: ctx.quizLength,
         submissions: null,
@@ -115,12 +117,14 @@ export default {
       });
     };
     const uploadLearning = () => {
+      const mode = ctx.mode;
       const exam = {
         license: ctx.license.uuid,
         sectionRef: ctx.sectionSeq,
         startTime: ctx.startTime / 1000,
         endTime: new Date().getTime() / 1000,
         type: ctx.isWord() ? "W" : "S",
+        mode: mode.substring(0, 1),
         questionOffset: ctx.ranges[0],
         numOfQuestions: ctx.quizLength,
         submissions: null,
@@ -163,9 +167,10 @@ export default {
       });
     };
     onMounted(() => {
-      if (ctx.isQuizMode()) {
+      console.log("!");
+      if (ctx.isQuizMode() || ctx.isWord()) {
         uploadExam();
-      } else if (ctx.isLearningMode()) {
+      } else {
         uploadLearning();
       }
     });

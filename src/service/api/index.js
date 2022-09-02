@@ -47,6 +47,12 @@ const exam = {
       sentenceType,
       license: licenseUuid,
     }),
+  /**
+   * 주어진 라이선스로 시도한 전체 학습 이력
+   * @param {string} licenseUuid
+   * @returns
+   */
+  queryExams: (licenseUuid) => GET("/exams", { license: licenseUuid }),
 };
 /**
  * 통계 관련 요청

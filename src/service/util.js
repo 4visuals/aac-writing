@@ -28,6 +28,23 @@ const path = {
   },
 };
 const time = {
+  readableText: (millis) => {
+    const divs = [
+      { amount: 1000, text: "초" },
+      { amount: 60, text: "분" },
+      { amount: 60, text: "시간" },
+      { amount: 24, text: "일" },
+    ];
+    let i = 0;
+    let diff = millis;
+    let suffix = "";
+    while (i < divs.length && diff >= divs[i].amount) {
+      diff /= divs[i].amount;
+      suffix = divs[i].text;
+      i++;
+    }
+    return `${parseInt(diff)} ${suffix}`;
+  },
   diff: (before, after) => {
     // as millis
     const btime = before instanceof Date ? before.getTime() : before;

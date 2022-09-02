@@ -85,6 +85,8 @@ export default {
   &.fill {
     left: 50%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
   }
   &.rect {
     border-radius: 0;

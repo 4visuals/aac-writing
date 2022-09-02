@@ -1,7 +1,7 @@
 /**
  * 퀴즈(시험) 정보 관리
  */
-// import api from "@/service/api";
+import api from "@/service/api";
 import storage from "@/service/storage";
 
 class ExamSession {
@@ -12,7 +12,7 @@ class ExamSession {
 
 export default {
   namespaced: true,
-  state: () => ({ session: null, activeLicense: null }),
+  state: () => ({ session: null, activeLicense: null, histories: null }),
   getters: {
     activeLicense: (state) => state.activeLicense,
     student: (state, getters, allState, allGetters) => {
@@ -42,6 +42,44 @@ export default {
     clear(state) {
       state.activeLicense = null;
       storage.local.remove("active_license");
+    },
+    setExamHistories(state, { sections, papers }) {
+      const byMonth = new Map();
+      const sectionMap = new Map();
+      sections.forEach((sec) => {
+        sectionMap.set(sec.seq, sec);
+      });
+      papers.forEach((paper) => {
+        const ym = paper.ymd.substring(0, "yyyy-mm".length);
+        const { sectionRef } = paper;
+        const section = sectionMap.get(sectionRef);
+        paper.origin = section.origin;
+        let exams = byMonth.get(ym);
+        if (!exams) {
+          exams = [];
+          byMonth.set(ym, exams);
+        }
+        exams.push(paper);
+      });
+      state.histories = byMonth;
+    },
+  },
+  actions: {
+    queryExams(ctx) {
+      const license = ctx.getters["activeLicense"];
+      api.exam.queryExams(license.uuid).then((res) => {
+        const { papers, learnings } = res;
+        // papers.forEach((paper) => {
+        //   paper.mode = "QUIZ";
+        // });
+        // learnings.forEach((learning) => {
+        //   learning.mode = "LEARNING";
+        // });
+        // 같이 합침
+        papers.push(...learnings);
+        const sections = ctx.rootGetters["course/sections"];
+        ctx.commit("setExamHistories", { papers, sections });
+      });
     },
   },
 };

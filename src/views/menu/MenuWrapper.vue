@@ -8,9 +8,6 @@
         <MenuSection>
           <UserProfile />
         </MenuSection>
-        <MenuSection :title="ctx.section.chapter.desc"
-          ><QuizSegmentMenu></QuizSegmentMenu
-        ></MenuSection>
         <TeacherSectionMenu v-if="isTeacher" />
         <StudentSectionMenu v-else />
       </div>
@@ -27,7 +24,6 @@
 import { useStore } from "vuex";
 import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
-import QuizSegmentMenu from "./sections/QuizSegmentMenu.vue";
 import TeacherSectionMenu from "./TeacherSectionMenu.vue";
 import StudentSectionMenu from "./StudentSectionMenu.vue";
 import Flag from "@/components/Flag.vue";
@@ -38,7 +34,6 @@ export default {
     Flag,
     MenuSection,
     UserProfile,
-    QuizSegmentMenu,
     TeacherSectionMenu,
     StudentSectionMenu,
   },

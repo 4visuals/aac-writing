@@ -63,7 +63,7 @@
 
 <script>
 import { computed, onMounted, onUnmounted, ref } from "@vue/runtime-core";
-import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { onBeforeRouteLeave } from "vue-router";
 import quizStore from "./quizStore";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
@@ -92,7 +92,7 @@ export default {
     const focusing = ref(null);
     const keyConsumer = ref(null);
     const quizFinished = computed(() => store.state.quiz.finished);
-    const router = useRouter();
+    // const router = useRouter();
     store.commit("ui/hideMenu");
     store.commit("quiz/hideHint");
     quiz.loadQuiz();
@@ -114,15 +114,15 @@ export default {
       // holdSoftKeyboard();
     };
     const alertForResult = () => {
-      if (ctx.value.isReadingMode()) {
-        router.replace({
-          name: ctx.value.prevPage,
-        });
-      } else {
-        const yes = window.confirm("결과 화면으로 이동합니까?");
-        if (yes) {
-          moveQuiz(1);
-        }
+      // if (ctx.value.isReadingMode()) {
+      //   router.replace({
+      //     name: ctx.value.prevPage,
+      //   });
+      // } else {
+      // }
+      const yes = window.confirm("결과 화면으로 이동합니까?");
+      if (yes) {
+        moveQuiz(1);
       }
     };
     const speak = () => {

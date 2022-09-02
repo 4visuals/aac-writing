@@ -1,5 +1,8 @@
 <template>
   <template v-if="quizState">
+    <MenuSection :title="ctx.section.chapter.desc"
+      ><QuizSegmentMenu></QuizSegmentMenu
+    ></MenuSection>
     <MenuSection title=""><QuizEndMenu /></MenuSection>
   </template>
   <template v-else>
@@ -26,7 +29,7 @@ import { ref } from "@vue/reactivity";
 import MenuSection from "./MenuSection.vue";
 import LicenseMenu from "./sections/LicenseMenu.vue";
 // import StudentMenu from "./sections/StudentMenu.vue";
-// import QuizStateMenu from "./sections/QuizStateMenu.vue";
+import QuizSegmentMenu from "./sections/QuizSegmentMenu.vue";
 import QuizEndMenu from "./sections/QuizEndMenu.vue";
 import { LicenseConfigView } from "@/components/admin";
 import { useRoute } from "vue-router";
@@ -37,11 +40,12 @@ export default {
     MenuSection,
     LicenseMenu,
     // StudentMenu,
-    // QuizStateMenu,
+    QuizSegmentMenu,
     QuizEndMenu,
     LicenseConfigView,
   },
   setup() {
+    const ctx = computed(() => store.state.quiz.quizContext);
     const modal = ref({ visible: false, args: null });
     const store = useStore();
     const students = computed(() => store.getters["user/students"]);
@@ -57,6 +61,7 @@ export default {
       modal.value.args = null;
     };
     return {
+      ctx,
       modal,
       quizState,
       students,

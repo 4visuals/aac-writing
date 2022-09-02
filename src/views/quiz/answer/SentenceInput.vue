@@ -7,6 +7,7 @@
       :hiddenText="question.text"
       :inputVisible="!correct"
       :spaceCommit="quizContext.isWord()"
+      :enableFlash="!quizContext.isQuizMode()"
       @commit="checkAnswer"
       @rest="() => (inputText = '')"
     />
@@ -26,7 +27,8 @@ class SentenceQuestion {
     // this.trials = storage.session.read(`para-${para.seq}`, []);
   }
   get text() {
-    return this.para.text;
+    // 퀴즈를 종료할때 this.para가 null인 상태가 잠깐 존재함
+    return this.para ? this.para.text : "";
   }
   get isSolved() {
     return this.para.solved;
@@ -119,6 +121,7 @@ export default {
       }, delay);
     };
     const checkAnswer = (e) => {
+      console.log("[ANSWER]", e.value.trim());
       const { elapsedTime } = e;
       const learngingMode = props.quizContext.isLearningMode();
       const dictationMode = props.quizContext.isReadingMode();

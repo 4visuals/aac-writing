@@ -5,7 +5,7 @@
     </div>
     <input
       type="search"
-      v-if="inputVisible"
+      v-if="inputVisible && flashing"
       tabindex="-1"
       spellcheck="false"
       enterkeyhint="done"
@@ -23,6 +23,7 @@
 
 <script>
 import { ref } from "@vue/reactivity";
+import { nextTick } from "vue";
 export default {
   props: [
     "inputVisible",
@@ -30,11 +31,14 @@ export default {
     "inputText",
     "textClick",
     "spaceCommit",
+    "enableFlash",
   ],
   emits: ["commit", "update:inputText", "reset", "clicked"],
   setup(props, { emit }) {
     let startTime = [];
     const inputEl = ref(null);
+    const flashing = ref(true);
+    let cachedInput = "";
     let flushed = false;
     let failed = ref(false);
     const focus = () => {
@@ -64,11 +68,29 @@ export default {
       }, 0);
       // setTimeout(() => (failed.value = false), 1000);
     };
+    const doFlash = () => {
+      flashing.value = false;
+      cachedInput = inputEl.value.value;
+      nextTick()
+        .then(() => {
+          flashing.value = true;
+        })
+        .then(() => {
+          console.log("[flash on]", cachedInput);
+          if (inputEl.value) {
+            // 오답인 경우에만 다시 복원
+            inputEl.value.value = cachedInput;
+          }
+        });
+    };
     const flush = (e) => {
       const elapsedTime = new Date().getTime() - startTime[0];
       console.log("[flush] elapsed", elapsedTime);
 
       flushed = true;
+      if (props.enableFlash) {
+        doFlash();
+      }
       emit("commit", {
         e,
         value: e.target.value.trim(),
@@ -152,6 +174,7 @@ export default {
       inputEl,
       handleEnter,
       focus,
+      flashing,
       resetTime,
       markTime,
       handleBlur,

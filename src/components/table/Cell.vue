@@ -44,6 +44,9 @@ export default {
     color: #27600c;
     background-color: #ccff98;
   }
+  &.w40 {
+    width: 40px;
+  }
   &.w60 {
     width: 60px;
   }
@@ -55,6 +58,9 @@ export default {
   }
   &.w120 {
     width: 120px;
+  }
+  &.w160 {
+    width: 160px;
   }
   &.nowrap {
     white-space: nowrap;
