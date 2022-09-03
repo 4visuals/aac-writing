@@ -8,12 +8,16 @@
         <MenuSection>
           <UserProfile />
         </MenuSection>
-        <TeacherSectionMenu v-if="isTeacher" />
-        <StudentSectionMenu v-else />
+        <TeacherSectionMenu v-if="isTeacher" @statview="openStatView" />
+        <StudentSectionMenu v-else @statview="openStatView" />
       </div>
     </Transition>
     <teleport to="body" v-if="modalComponent">
-      <Modal ref="modal" @hidden="hideModal">
+      <Modal ref="modal" @hidden="hideModal" :fill="true" :rect="true">
+        <ModalHeader
+          ><ActionIcon icon="arrow_back" @click="hideModal"></ActionIcon
+          ><SpanText>학습 결과</SpanText></ModalHeader
+        >
         <component :is="modalComponent" v-bind="{ ...modalArgs }" />
       </Modal>
     </teleport>
@@ -21,21 +25,27 @@
 </template>
 
 <script>
+import { ActionIcon } from "../../components/form";
+import { SpanText } from "@/components/text";
 import { useStore } from "vuex";
 import { computed, onMounted, ref, shallowRef } from "vue";
 import MenuSection from "./MenuSection.vue";
 import TeacherSectionMenu from "./TeacherSectionMenu.vue";
 import StudentSectionMenu from "./StudentSectionMenu.vue";
+import DailyStatView from "../../components/stats/DailyStatView.vue";
 import Flag from "@/components/Flag.vue";
 // import OAuthButton2 from "@/components/oauth/OAuthButton2.vue";
 import UserProfile from "./UserProfile.vue";
 export default {
   components: {
+    ActionIcon,
     Flag,
     MenuSection,
     UserProfile,
+    SpanText,
     TeacherSectionMenu,
     StudentSectionMenu,
+    DailyStatView,
   },
   setup() {
     const store = useStore();
@@ -53,6 +63,12 @@ export default {
     setTimeout(() => {
       slider.value = true;
     }, 0);
+
+    const openStatView = (e) => {
+      modalComponent.value = DailyStatView;
+      modalArgs.value = {};
+      console.log(e);
+    };
     const hideModal = () => {
       modalComponent.value = null;
       modalArgs.value = null;
@@ -72,6 +88,7 @@ export default {
       modalComponent,
       modalArgs,
       showLoginButton,
+      openStatView,
     };
   },
 };

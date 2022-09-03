@@ -17,7 +17,7 @@
         <div
           :class="`day row-${idx} col-${day.dayOfWeek} ${
             hasData(monthMap, day) ? 'has-data' : ''
-          }`"
+          } ${month.month !== day.month ? 'inactive' : ''}`"
           v-for="day in week.days"
           :key="day.toYMD()"
         >
@@ -135,29 +135,27 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+    row-gap: 1px;
     padding: 8px;
     .seven-days {
       display: flex;
+      column-gap: 1px;
       .day {
         flex: 1;
         display: inline-flex;
         justify-content: center;
+        background-color: #dceaff;
+        padding: 4px 0;
       }
     }
     .week {
       display: flex;
       flex: 1 1 auto;
+      column-gap: 1px;
       .day {
         flex: 1;
-        border-right: 1px solid #dcdcdc;
-        border-bottom: 1px solid #dcdcdc;
         position: relative;
-        &.row-0 {
-          border-top: 1px solid #dcdcdc;
-        }
-        &.col-0 {
-          border-left: 1px solid #dcdcdc;
-        }
+        cursor: pointer;
         & > .date {
           position: relative;
           display: inline-flex;
@@ -168,6 +166,11 @@ export default {
           height: 24px;
           align-items: center;
           justify-content: center;
+          font-size: 1.2em;
+          margin: 4px;
+        }
+        &:hover {
+          background-color: aliceblue;
         }
         .inner {
           position: absolute;
@@ -186,6 +189,12 @@ export default {
           }
           .inner {
             background-color: #d9ed64;
+          }
+        }
+        &.inactive {
+          .date {
+            color: #999;
+            font-size: 1em;
           }
         }
       }

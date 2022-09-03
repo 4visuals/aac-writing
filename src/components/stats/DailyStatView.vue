@@ -1,17 +1,29 @@
 <template>
   <div class="daily-stat">
     <div class="summary">
+      <div class="today">
+        <div>
+          <SpanText
+            >{{ now.year }}년 {{ now.month }}월 {{ now.date }}일</SpanText
+          >
+        </div>
+        <div>
+          <SpanText>{{ now.dayText }}요일</SpanText>
+        </div>
+      </div>
       <div class="item">
         <h5>학습 문항</h5>
-        <div class="body" v-if="today">{{ today.questions }}문항</div>
+        <div class="body" v-if="todayStat">
+          {{ todayStat.questions === 0 ? "---" : `${todayStat.questions}문항` }}
+        </div>
       </div>
       <div class="item">
         <h5>학습 시간</h5>
-        <div class="body" v-if="today">{{ timeText(today.times) }}</div>
+        <div class="body" v-if="todayStat">{{ timeText(todayStat.times) }}</div>
       </div>
       <div class="item">
         <h5>평균 점수</h5>
-        <div class="body" v-if="today">{{ today.score }}</div>
+        <div class="body" v-if="todayStat">{{ todayStat.score }}</div>
       </div>
     </div>
     <div class="cal-view">
@@ -39,16 +51,19 @@
  */
 import { ref, shallowRef } from "vue";
 import { time } from "@/service/util";
-import CalendarView from "../calendar/CalendarView.vue";
+import { CalendarView, Day } from "../calendar";
 import ExamPaperTableView from "./ExamPaperTableView.vue";
+import { SpanText } from "@/components/text";
 export default {
   components: {
     CalendarView,
     ExamPaperTableView,
+    SpanText,
   },
   setup() {
+    const now = Day.fromDate(new Date());
     const detail = shallowRef(null);
-    const today = ref(null);
+    const todayStat = ref(null);
     const showExamDetail = (e) => {
       detail.value = { ...e }; // papers, day
     };
@@ -68,12 +83,15 @@ export default {
         { questions: 0, times: 0, quiz: { total: 0, correct: 0 } }
       );
       const { total, correct } = stats.quiz;
-      stats.score = ((100 * correct) / total).toFixed(1);
-      today.value = stats;
+      stats.score = total === 0 ? "---" : ((100 * correct) / total).toFixed(1);
+      todayStat.value = stats;
     };
-    const timeText = (millis) => time.readableText(millis);
+    const timeText = (millis) => {
+      return millis === 0 ? "---" : time.readableText(millis);
+    };
     return {
-      today,
+      now,
+      todayStat,
       detail,
       timeText,
       showExamDetail,
@@ -90,8 +108,12 @@ export default {
   flex: 1 1 auto;
   .summary {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     column-gap: 16px;
+    padding: 0 16px;
+    .today {
+      flex: 1 1 auto;
+    }
     .item {
       position: relative;
       width: 80px;

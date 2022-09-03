@@ -1,3 +1,5 @@
+import CalendarView from "./CalendarView.vue";
+
 const ONE_DAY = 1 * 24 * 60 * 60 * 1000; // millis
 const UNIT = {
   DAY: ONE_DAY,
@@ -128,4 +130,4 @@ const fromDate = (date) => {
   const d = date || new Date();
   return monthOf(d.getFullYear(), d.getMonth() + 1);
 };
-export { sliceYear, monthOf, fromDate, Day };
+export { sliceYear, monthOf, fromDate, Day, CalendarView };
