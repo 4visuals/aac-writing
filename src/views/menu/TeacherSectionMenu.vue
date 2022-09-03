@@ -7,16 +7,19 @@
   </template>
   <template v-else>
     <MenuSection>
-      <LicenseMenu @clicked="showLicenseConfig" />
+      <LicenseMenu @clicked="showDailyStatView" />
     </MenuSection>
   </template>
   <teleport to="body" v-if="modal.visible">
-    <Modal @hidden="hideModal">
-      <LicenseConfigView
-        :license="modal.args"
-        :licenses="licenses"
-        :students="students"
-      />
+    <Modal @hidden="hideModal" :fill="true" :rect="true">
+      <ModalHeader
+        ><ActionIcon
+          icon="arrow_back"
+          @click="modal.visible = false"
+        ></ActionIcon
+        ><SpanText>학습 결과</SpanText></ModalHeader
+      >
+      <DailyStatView />
     </Modal>
   </teleport>
 </template>
@@ -25,24 +28,30 @@
 /**
  * 선생님용 메뉴
  */
+import { ActionIcon } from "../../components/form";
+import { SpanText } from "@/components/text";
 import { ref } from "@vue/reactivity";
 import MenuSection from "./MenuSection.vue";
 import LicenseMenu from "./sections/LicenseMenu.vue";
 // import StudentMenu from "./sections/StudentMenu.vue";
 import QuizSegmentMenu from "./sections/QuizSegmentMenu.vue";
 import QuizEndMenu from "./sections/QuizEndMenu.vue";
-import { LicenseConfigView } from "@/components/admin";
+// import { LicenseConfigView } from "@/components/admin";
 import { useRoute } from "vue-router";
 import { computed } from "@vue/runtime-core";
 import { useStore } from "vuex";
+import DailyStatView from "../../components/stats/DailyStatView.vue";
 export default {
   components: {
+    ActionIcon,
     MenuSection,
     LicenseMenu,
     // StudentMenu,
+    DailyStatView,
     QuizSegmentMenu,
     QuizEndMenu,
-    LicenseConfigView,
+    // LicenseConfigView,
+    SpanText,
   },
   setup() {
     const ctx = computed(() => store.state.quiz.quizContext);
@@ -52,7 +61,7 @@ export default {
     const licenses = computed(() => store.state.user.membership.licenses);
     const route = useRoute();
     const quizState = computed(() => route.path.startsWith("/quiz"));
-    const showLicenseConfig = (license) => {
+    const showDailyStatView = (license) => {
       modal.value.visible = true;
       modal.value.args = license;
     };
@@ -66,7 +75,7 @@ export default {
       quizState,
       students,
       licenses,
-      showLicenseConfig,
+      showDailyStatView,
       hideModal,
     };
   },

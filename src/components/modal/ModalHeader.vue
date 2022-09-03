@@ -11,6 +11,7 @@ export default {};
 .header {
   padding: 12px 16px;
   display: flex;
+  font-size: 2rem;
   &.pink {
     @include pink2($shadow: false);
   }

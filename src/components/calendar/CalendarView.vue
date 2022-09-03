@@ -1,11 +1,9 @@
 <template>
   <div class="calendar">
     <div class="cal-head">
-      <div class="ctrls">
-        <ActionIcon icon="chevron_left" @click="shiftMonth(-1)" />
-        <ActionIcon icon="chevron_right" @click="shiftMonth(1)" />
-      </div>
-      <h3>{{ month.year }}년 {{ month.month }}월</h3>
+      <ActionIcon class="move" icon="chevron_left" @click="shiftMonth(-1)" />
+      <h3>{{ month.year }}년 {{ month.monthText }}월</h3>
+      <ActionIcon class="move" icon="chevron_right" @click="shiftMonth(1)" />
     </div>
     <div class="weeks">
       <div class="seven-days">
@@ -126,12 +124,11 @@ export default {
   flex-direction: column;
   .cal-head {
     display: flex;
-    & > h3 {
-      flex: 1 1 auto;
-    }
-    .ctrls {
+    padding: 8px;
+    column-gap: 16px;
+    justify-content: center;
+    .move {
       font-size: 2.2rem;
-      display: flex;
     }
   }
   .weeks {

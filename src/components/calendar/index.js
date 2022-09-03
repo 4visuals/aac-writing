@@ -68,6 +68,9 @@ class Month {
   get ym() {
     return `${this.year}-${("0" + this.month).slice(-2)}`;
   }
+  get monthText() {
+    return ("0" + this.month).slice(-2);
+  }
   prevMonth() {
     if (this.month === 1) {
       // 이전해로 넘어간다!
