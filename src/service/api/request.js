@@ -7,6 +7,9 @@ axios.defaults.baseURL = `${host}/api`;
 
 axios.interceptors.request.use((config) => {
   const token = store.state.user.jwt;
+  config.headers["Cache-Control"] = "no-cache";
+  config.headers["Pragma"] = "no-cache";
+  config.headers["Expires"] = "0";
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

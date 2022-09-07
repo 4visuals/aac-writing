@@ -52,6 +52,17 @@ class Segment {
     return this.sentences.slice(start, end);
   }
 }
+
+Segment.createSegments = (section, resourceType) => {
+  let type = resourceType === "A" ? "S" : resourceType;
+  // const section = this.section;
+  const sentences = section.sentences.filter((sen) => sen.type === type);
+  const segments = [...Array(sentences.length / 10).keys()].map((index) => {
+    const label = `${index * 10 + 1}-${index * 10 + 10}`;
+    return new Segment(index, 10 * index, 10, label, colors[index], sentences);
+  });
+  return segments;
+};
 /**
  * 퀴즈 질문과 학생이 입력한 답안을 기록
  */
@@ -427,7 +438,7 @@ const prepareQuiz = ({
     resolve();
   });
 };
-export { Question, QuizContext, QuizView };
+export { Segment, Question, QuizContext, QuizView };
 export default {
   loadSentenceQuiz,
   prepareQuiz,

@@ -66,10 +66,7 @@ export default {
     onMounted(() => {
       const el = wrapperEl.value;
       el.addEventListener("scroll", scrolling, option);
-      // const { visualViewport } = window;
-      // if (visualViewport) {
-      //   visualViewport.addEventListener("resize", captureHeight);
-      // }
+      google.charts.load("50", { packages: ["corechart"] });
     });
     onUnmounted(() => {
       const el = wrapperEl.value;

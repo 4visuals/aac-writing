@@ -41,7 +41,7 @@ import { fromDate, Day } from ".";
 import { ActionIcon } from "../../components/form";
 export default {
   components: { ActionIcon },
-  emits: ["exams"],
+  emits: ["exams", "today"],
   props: { current: Date },
   setup(props, { emit }) {
     const days = "일월화수목금토".split("");

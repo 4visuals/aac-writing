@@ -14,17 +14,17 @@
       <template v-slot:data>
         <Col class="exam" v-for="(exam, idx) in exams" :key="idx">
           <Cell
-            v-for="(sbm, idx) in exam.submissions"
+            v-for="(sbm, idx) in sortSubmissions(exam, sentences)"
             :key="idx"
             :class="{
               even: idx % 2 === 0,
               odd: idx % 2 === 1,
-              correct: sbm.correct,
-              empty: !sbm.value,
+              correct: sbm?.correct,
+              empty: !sbm?.value,
             }"
             nowrap
             w="inline"
-            ><SpanText size="sm">{{ sbm.value || "미입력" }}</SpanText></Cell
+            ><SpanText size="sm">{{ sbm?.value || "미입력" }}</SpanText></Cell
           ></Col
         >
       </template>
@@ -45,7 +45,19 @@ export default {
   },
   props: ["sentences", "exams"],
   setup() {
-    return {};
+    const getValue = (exam, sentence) => {
+      const sbm = exam.submissions.find(
+        (submit) => submit.sentenceRef === sentence.seq
+      );
+      return sbm ? sbm.value : "미입력";
+    };
+    const sortSubmissions = (exam, sentences) => {
+      const submits = sentences.map((sen) =>
+        exam.submissions.find((sbm) => sbm.sentenceRef === sen.seq)
+      );
+      return submits;
+    };
+    return { getValue, sortSubmissions };
   },
 };
 </script>
