@@ -10,13 +10,13 @@
       </h4>
       <div
         class="item"
-        :class="{ active: level === activeLevel }"
-        v-for="level in levels"
-        :key="level.seq"
-        @click="showSectionChart(level)"
+        v-for="chapter in chapters"
+        :key="chapter.seq"
+        :class="{ active: chapter === activeChapter }"
+        @click="showSectionChart(chapter)"
       >
         <div class="wbar"></div>
-        <SpanText class="desc">{{ level.desc }}</SpanText>
+        <SpanText class="desc">{{ chapter.desc }}</SpanText>
       </div>
     </div>
     <ActionIcon
@@ -35,9 +35,15 @@
       <GoogleBarChart :chartFormat="sentenceChart" @select="showDetail" />
       <div class="detail" v-if="detailRef" @click.stop="">
         <div class="info">
-          <div><SpanText>2022.07.21</SpanText></div>
-          <div><SpanText>51~60</SpanText></div>
-          <div><SpanText>80점</SpanText></div>
+          <div>
+            <SpanText>{{ detailRef.date }}</SpanText>
+          </div>
+          <div>
+            <SpanText>{{ detailRef.segText }}</SpanText>
+          </div>
+          <div>
+            <SpanText>{{ detailRef.score }}</SpanText>
+          </div>
         </div>
         <SubmissionView
           class="submits"
@@ -50,13 +56,13 @@
 </template>
 
 <script>
+import { time } from "@/service/util";
 import { ActionIcon } from "@/components/form";
 import { SpanText } from "@/components/text";
 import { useStore } from "vuex";
 import { Segment } from "../../views/quiz";
 import GoogleBarChart from "./GoogleBarChart.vue";
 import { SubmissionView } from "@/views/quiz/chart";
-import api from "@/service/api";
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
 const courses = {
   L: { name: "course/levels", colors: ["#4472c4"] },
@@ -69,20 +75,18 @@ export default {
     GoogleBarChart,
     SubmissionView,
   },
-  props: ["origin"],
+  props: ["origin", "exams", "courseStat"],
   setup(props) {
     const store = useStore();
-    const levels = computed(() => store.getters[courses[props.origin].name]);
-    const license = store.getters["exam/activeLicense"];
+    const chapters = computed(() => store.getters[courses[props.origin].name]);
     const wordChart = ref(null);
     const sentenceChart = ref(null);
     const chartEl = shallowRef(null);
     const detailRef = shallowRef(null);
-    const activeLevel = shallowRef(null);
+    const activeChapter = shallowRef(null);
     const menuVisible = shallowRef(true);
     let timer;
     let resizer;
-    let exams = null;
 
     const createWordSegments = (chapter) => {
       const longestSection = chapter.sections.reduce((longest, section) => {
@@ -95,7 +99,7 @@ export default {
     const createChartData = (sections, segments, type) => {
       const rows = sections.map((section) => {
         // 주어진 section에 대한 chunks들
-        const chunks = exams.filter(
+        const chunks = props.exams.filter(
           (exam) => exam.type === type && exam.sectionRef === section.seq
         );
         // chart.rows[i].c 에 바인딩되는 배열
@@ -153,7 +157,12 @@ export default {
      */
     const showSectionChart = (chapter) => {
       closeDetail();
-      activeLevel.value = chapter;
+      if (activeChapter.value === chapter) {
+        activeChapter.value = null;
+        createCourseSummaryChart();
+        return;
+      }
+      activeChapter.value = chapter;
       const area = getChartArea();
       const wordSegments = createWordSegments(chapter);
       const wordCols = wordSegments.map((seg) => ({
@@ -196,16 +205,64 @@ export default {
         data: { cols: sentenceCols, rows: sentenceRowData },
       };
     };
+
+    const createCourseSummaryChart = () => {
+      const area = getChartArea();
+      const cols = [
+        { id: "xAxis", label: "단계", type: "string" },
+        { id: "chunk1", label: "", type: "number" },
+      ];
+      const wrows = props.courseStat.map((stat) => {
+        const { correct, total } = stat.wordStat;
+        const score = (100 * correct) / total;
+        return {
+          c: [
+            { v: stat.desc.substring(0, 1) },
+            {
+              v: score,
+              f: `정답 ${correct}개 / 전체 ${total}개 (${score.toFixed(1)}%)`,
+            },
+          ],
+        };
+      });
+      const srows = props.courseStat.map((stat) => {
+        const { correct, total } = stat.senStat;
+        const score = (100 * correct) / total;
+        return {
+          c: [
+            { v: stat.desc },
+            {
+              v: score,
+              f: `정답 ${correct}개 / 전체 ${total}개 (${score.toFixed(1)}%)`,
+            },
+          ],
+        };
+      });
+      wordChart.value = {
+        options: {
+          title: "낱말 퀴즈 완료율",
+          colors: courses[props.origin].colors,
+        },
+        area,
+        type: "W",
+        data: { cols: cols, rows: wrows },
+      };
+      sentenceChart.value = {
+        options: {
+          title: "문장 퀴즈 완료율",
+          colors: courses[props.origin].colors,
+        },
+        area,
+        type: "S",
+        data: { cols: cols, rows: srows },
+      };
+    };
+
     const resetChart = () => {
       closeDetail();
       menuVisible.value = true;
       wordChart.value = sentenceChart.value = null;
-    };
-    const loadData = () => {
-      api.exam.queryBySectionChunk(license.uuid).then((res) => {
-        console.log(res);
-        exams = res.quiz;
-      });
+      createCourseSummaryChart();
     };
     const updateArea = () => {
       const area = getChartArea();
@@ -222,14 +279,21 @@ export default {
       detailRef.value = null;
     };
     const showDetail = (e) => {
-      const exam = exams.find((exam) => exam.seq === e.examRef);
-
+      if (!activeChapter.value) {
+        return;
+      }
+      const exam = props.exams.find((exam) => exam.seq === e.examRef);
       const section = store.getters["course/section"](exam.sectionRef);
       const { questionOffset: offset, numOfQuestions: len } = exam;
       const sentences = section.sentences.filter(
         (sen) => sen.type === e.resourceType
       );
+      const score =
+        (100 * exam.submissions.filter((sbm) => sbm.correct).length) / len;
       detailRef.value = {
+        date: time.toYMD(exam.startTime),
+        segText: `${offset + 1}~${offset + len}`,
+        score: `${score.toFixed(1)}점`,
         sentences: sentences.slice(offset, offset + len),
         exams: [exam],
       };
@@ -238,10 +302,10 @@ export default {
       clearTimeout(timer);
       timer = setTimeout(updateArea, 300);
     };
-    loadData();
 
     watch(() => props.origin, resetChart);
     onMounted(() => {
+      createCourseSummaryChart();
       resizer = new ResizeObserver(debouncing);
       resizer.observe(chartEl.value);
     });
@@ -251,10 +315,10 @@ export default {
     return {
       detailRef,
       chartEl,
-      levels,
+      chapters,
       wordChart,
       sentenceChart,
-      activeLevel,
+      activeChapter,
       menuVisible,
       showSectionChart,
       closeDetail,

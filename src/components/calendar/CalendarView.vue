@@ -21,7 +21,15 @@
           v-for="day in week.days"
           :key="day.toYMD()"
         >
-          <span class="date">{{ day.date }}</span>
+          <span
+            class="date"
+            :class="{
+              today:
+                month.month === current.getMonth() + 1 &&
+                day.date === current.getDate(),
+            }"
+            >{{ day.date }}</span
+          >
           <div class="inner" v-if="hasData(monthMap, day)">
             <div class="cnt" @click="showDetail(day)">
               {{ countExams(monthMap, day) }}건
@@ -158,16 +166,22 @@ export default {
         cursor: pointer;
         & > .date {
           position: relative;
-          display: inline-flex;
+          display: flex;
           padding: 8px;
           z-index: 10;
           border-radius: 50px;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           align-items: center;
           justify-content: center;
-          font-size: 1.2em;
+          font-size: 1.1em;
           margin: 4px;
+          line-height: 1;
+          &.today {
+            border-radius: 30px;
+            background-color: #4c871f;
+            color: white !important;
+          }
         }
         &:hover {
           background-color: aliceblue;
@@ -181,6 +195,8 @@ export default {
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 1px 1px 2px #798438;
+          border-radius: 4px;
         }
         &.has-data {
           .date {

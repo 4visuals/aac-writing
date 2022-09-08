@@ -3,25 +3,23 @@
     <div class="summary">
       <div class="today">
         <div>
-          <SpanText
-            >{{ now.year }}년 {{ now.month }}월 {{ now.date }}일</SpanText
-          >
+          <SpanText>{{ now.month }}월 {{ now.date }}일</SpanText>
         </div>
         <div>
           <SpanText>{{ now.dayText }}요일</SpanText>
         </div>
       </div>
-      <div class="item">
+      <div class="item orange">
         <h5>학습 문항</h5>
         <div class="body" v-if="todayStat">
           {{ todayStat.questions === 0 ? "---" : `${todayStat.questions}문항` }}
         </div>
       </div>
-      <div class="item">
+      <div class="item blue">
         <h5>학습 시간</h5>
         <div class="body" v-if="todayStat">{{ timeText(todayStat.times) }}</div>
       </div>
-      <div class="item">
+      <div class="item green">
         <h5>평균 점수</h5>
         <div class="body" v-if="todayStat">{{ todayStat.score }}</div>
       </div>
@@ -111,29 +109,53 @@ export default {
     justify-content: flex-start;
     column-gap: 16px;
     padding: 0 16px;
+    margin: 16px 0;
     .today {
       flex: 1 1 auto;
     }
     .item {
       position: relative;
       width: 80px;
-      height: 50px;
+      height: 75px;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 8px;
+      flex-direction: column;
+      // padding: 8px;
       background-color: antiquewhite;
       border-radius: 8px;
+      box-shadow: 1px 1px 2px;
+      &.orange {
+        background-color: #ffe8a1;
+        color: #69520c;
+        h5 {
+          background-color: #ffc001;
+        }
+      }
+      &.blue {
+        background-color: #93e2ff;
+        color: #084359;
+        h5 {
+          background-color: #01b0f0;
+        }
+      }
+      &.green {
+        background-color: #bbff8e;
+        color: #335f0b;
+        h5 {
+          background-color: #85ec29;
+        }
+      }
       h5 {
-        position: absolute;
-        font-weight: 400;
-        top: -8px;
-        left: -10%;
-        font-size: 1rem;
+        padding: 8px;
+        font-size: 12px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
       }
       .body {
+        flex: 1 1 auto;
         font-size: 1.5rem;
-        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

@@ -54,12 +54,12 @@ const exam = {
    */
   queryExams: (licenseUuid) => GET("/exams", { license: licenseUuid }),
   /**
-   * 각 section chunk마다 가장 최근 시험 정보를 반환
+   * 각 section segment마다 최근 시험 정보를 반환
    * @param {string} licenseUuid 시험에 사용한 라이선스
    * @returns
    */
-  queryBySectionChunk: (licenseUuid) =>
-    GET("/exams/chunks", { license: licenseUuid }),
+  queryBySegments: (licenseUuid) =>
+    GET("/exams/segments", { license: licenseUuid }),
 };
 /**
  * 통계 관련 요청

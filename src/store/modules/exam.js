@@ -1,6 +1,7 @@
 /**
  * 퀴즈(시험) 정보 관리
  */
+import { time } from "@/service/util";
 import api from "@/service/api";
 import storage from "@/service/storage";
 
@@ -69,14 +70,11 @@ export default {
       const license = ctx.getters["activeLicense"];
       api.exam.queryExams(license.uuid).then((res) => {
         const { papers, learnings } = res;
-        // papers.forEach((paper) => {
-        //   paper.mode = "QUIZ";
-        // });
-        // learnings.forEach((learning) => {
-        //   learning.mode = "LEARNING";
-        // });
-        // 같이 합침
         papers.push(...learnings);
+        papers.forEach((paper) => {
+          // FIXME 서버의 timezone이 한국 시간이 아니면 9시간을 더하지 않은 날짜로 지정됨
+          paper.ymd = time.toYMD(paper.startTime);
+        });
         const sections = ctx.rootGetters["course/sections"];
         ctx.commit("setExamHistories", { papers, sections });
       });
