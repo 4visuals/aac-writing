@@ -93,11 +93,11 @@ class Month {
   }
 }
 const sliceYear = (year) => {
-  const firstDay = new Date(`${year}-01-01 00:00:00`);
+  const firstDay = new Date(`${year}-01-01T00:00:00`);
   const dayOfWeek = firstDay.getDay();
   const start = before(firstDay, dayOfWeek, "DAY");
 
-  const endDay = new Date(`${year + 1}-01-01 00:00:00`);
+  const endDay = new Date(`${year + 1}-01-01T00:00:00`);
   const end = fitToWeekend(endDay);
   const dates = [];
   const weeks = [];
