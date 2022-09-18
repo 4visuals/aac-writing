@@ -1,3 +1,4 @@
+import env from "@/service/env";
 import api from "@/service/api";
 import storage from "@/service/storage";
 import { time } from "@/service/util";
@@ -60,11 +61,14 @@ export default {
     initUser(state) {
       let jwt = storage.local.read("aac_jwt_token", null);
       state.jwt = jwt;
-      // if (location.host.startsWith("192.168") && !state.jwt) {
-      //   // mobile test
-      //   state.jwt = jwt =
-      //     "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTY3OTc2NDIsImlhdCI6MTY1Njc1NDQ0MiwiaXNzIjoiaHR0cHM6Ly9hYWNkaWN0Lnh5eiIsInN1YiI6IjEwMDIwMTAwMTE2MDExNDkzNTM4NCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJyb2xlIjoiVEVBQ0hFUiIsImdpdmVuX25hbWUiOiJZTiIsImxvY2FsZSI6ImtvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBVFhBSnlmV1I2V0Z4bHBBMm5ZTFFYd0FkQ0xDWVpTcU1PME0tdnpoa3VSPXM5Ni1jIiwidmVuZG9yIjoiZ29vZ2xlIiwibmFtZSI6IllOIFNlbyIsInVzZXEiOjQyLCJhYWNfaWQiOjQyLCJmYW1pbHlfbmFtZSI6IlNlbyIsImVtYWlsIjoieWVvcmkuc2VvQGdtYWlsLmNvbSJ9.btLHOaW40He1zR_JxeBG1RWTRHXah-kfxkBfQ2rYHCA6sF0FnZuWoTnfgo8jYW08jVwd5k8pZFKWg6ekiycXK6YsCPlYKu5fAeMsj3QLBTjBm_rqSJeCPOSt_6Dl9P-0tY88_W_456P46Z9brqGcEDHThGfHHaq9-ibKUBHtbaJn9KRvelMN1_4KIIkzr4aHEOy4GQbIOYtbnl8WwR4EK90m2A3fFBQNRM9mRhm6p_dknY41tdTl9KCM7UXe64qbONeyTqtIyv_7-YpkPRQx4pH_JQiTDdgnUCIv_jbz0UL5NGCmLNQEqBf2sOqK_Tb-s7EvQ-JFxnQDQtMB6XAFiQ";
-      // }
+      if (
+        env.MODE === "DEVELOPMENT" &&
+        location.host.startsWith("192.168.") &&
+        !state.jwt
+      ) {
+        // mobile test
+        state.jwt = jwt = env.JWT_TOKEN;
+      }
       return jwt;
     },
     logoutUser(state) {

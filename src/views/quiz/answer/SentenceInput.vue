@@ -7,7 +7,7 @@
       :hiddenText="question.text"
       :inputVisible="!correct"
       :spaceCommit="quizContext.isWord()"
-      :enableFlash="!quizContext.isQuizMode()"
+      :enableFlash="false"
       @commit="checkAnswer"
       @rest="() => (inputText = '')"
     />
@@ -91,18 +91,21 @@ export default {
           if (!question.value.para) {
             return;
           }
+          // FIXME 펭귄 나왔을때 엔터 누르는 경우 포커스 잡혀야 함
+          field.value.focus();
           if (passed) {
             if (question.value.para.hasNextQuiz()) {
               quizStore.moveNext();
             } else {
               emit("quizEnd");
             }
-          } else {
-            field.value.focus();
           }
+          // else {
+          //   field.value.focus();
+          // }
         },
       });
-      // dummy.value.focus();
+      dummy.value.focus();
       new Audio(require(`@/assets/reward/${name}.mp3`)).play();
     };
     let pendingSpeakId = null;
@@ -123,7 +126,9 @@ export default {
     const checkAnswer = (e) => {
       console.log("[ANSWER]", e.value.trim());
       const { elapsedTime } = e;
+      /* 낱말학습 or 문장학습인지 */
       const learngingMode = props.quizContext.isLearningMode();
+      /* 보고쓰기 모드인지 */
       const dictationMode = props.quizContext.isReadingMode();
       const passed = question.value.tryAnswer(e.value.trim(), elapsedTime);
       correct.value = learngingMode ? passed : false;

@@ -1,5 +1,5 @@
 <template>
-  <div class="symbol">
+  <div class="symbol" :class="{ locked: !ej.solved && !ej.active }">
     <div
       class="pic-holder"
       :style="{ 'background-image': `url('${pumsaImg()}')` }"
@@ -16,6 +16,7 @@
         :spaceCommit="true"
       />
     </div>
+    <div class="lock" v-if="!ej.solved && !ej.active"></div>
   </div>
 </template>
 
@@ -121,6 +122,12 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  &.locked {
+    filter: grayscale(1);
+    opacity: 0.6;
+    pointer-events: none;
+  }
   .pic-holder {
     width: 80px;
     height: 80px;
@@ -148,6 +155,14 @@ export default {
       position: absolute;
       padding: 3px;
     }
+  }
+  .lock {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
   }
 }
 </style>

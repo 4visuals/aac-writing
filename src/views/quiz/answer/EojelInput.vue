@@ -24,6 +24,7 @@
 <script>
 import { tts } from "@/components/tts";
 import Symbol from "./Symbol.vue";
+import quizStore from "@/views/quiz/quizStore";
 /**
  * 어절을 렌더링함 사용자는 어절에 정답을 입력함
  *
@@ -98,15 +99,42 @@ export default {
     };
 
     const eojeols = ref(question.value.data.eojeols.map(createEojeolWrapper));
+
+    const showReward = (name) => {
+      store.commit("ui/showReward", {
+        name,
+        field: dummy,
+        onClose: (passed) => {
+          if (passed) {
+            quizStore.moveNext();
+          }
+        },
+      });
+      // dummy.value.focus();
+      new Audio(require(`@/assets/reward/${name}.mp3`)).play();
+    };
+    const findUnsolvedEojeol = () => {
+      const ej = eojeols.value.find((ej) => !ej.solved);
+      return ej;
+    };
     const moveToNextEojeol = (ej, offset = 1) => {
       const nextEj = ej
         ? eojeols.value.find((elem) => elem.index === ej.index + offset)
-        : eojeols.value[0];
+        : findUnsolvedEojeol();
+      if (!ej && !nextEj) {
+        // 보고쓰기, 학습에서
+        // 1) 사용자가 버튼을 눌러서 이전, 다음 문제로 이동함
+        // 2) 모두 맞춘 경우
+        return;
+      }
       if (ej) {
         ej.active = false;
       }
       if (nextEj) {
         nextEj.active = true;
+      } else {
+        // 다음 문제로 이동
+        showReward("passed");
       }
       store.commit("quiz/hideHint");
     };
