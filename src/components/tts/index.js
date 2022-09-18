@@ -60,6 +60,9 @@ const browser = new TTS();
 
 class PollyTts {
   speak(text) {
+    if (text.length === 0) {
+      return Promise.resolve();
+    }
     const textHash = md5(text.trim()).toString();
     const url = `${env.TTS_POLLY_PATH}/voices3/${textHash}.mp3`;
 

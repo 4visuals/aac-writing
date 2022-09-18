@@ -46,7 +46,7 @@ module.exports = {
     manifestOptions: {
       background_color: "#ffffff",
       lang: "ko-KR",
-      categories: ["education", "kids"],
+      categories: ["education"],
     },
     workboxPluginMode: "InjectManifest",
     workboxOptions: {

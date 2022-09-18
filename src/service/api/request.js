@@ -2,6 +2,7 @@ import axios from "axios";
 import env from "@/service/env";
 import store from "@/store";
 
+let errorCallback = () => {};
 const host = env.BACKEND_HOST;
 axios.defaults.baseURL = `${host}/api`;
 
@@ -37,6 +38,7 @@ function onError(e) {
       status: 599,
     };
   }
+  errorCallback(res);
   throw res;
 }
 
@@ -103,4 +105,11 @@ function DELETE() {
     .catch((err) => onError(err));
 }
 
+const setErrorCallback = (callback) => {
+  errorCallback = callback;
+};
 export { GET, PUT, POST, DELETE, UPLOAD, onError, onSuccess };
+
+export default {
+  setErrorCallback,
+};

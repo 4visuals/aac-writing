@@ -1,12 +1,13 @@
 import api from "@/service/api";
 import storage from "@/service/storage";
 import { time } from "@/service/util";
-const installLoginData = (store, { membership, licenses, jwt }) => {
+const installLoginData = (store, { membership, licenses, jwt, segments }) => {
   membership.licenses = licenses;
   store.commit("setMembership", membership);
   store.commit("updateJwt", jwt);
   if (store.getters.isStudent) {
     store.commit("exam/setActiveLicense", licenses[0], { root: true });
+    store.commit("exam/setSegmentHistories", segments, { root: true });
   } else if (store.getters.isTeacher) {
     store.getters.students.forEach((student) => {
       student.userId = student.userId || null;
@@ -69,6 +70,7 @@ export default {
     logoutUser(state) {
       state.jwt = null;
       storage.local.remove("aac_jwt_token");
+      this.commit("user/clearMembership");
     },
     applyStudent(state, args) {
       const { student, license } = args;

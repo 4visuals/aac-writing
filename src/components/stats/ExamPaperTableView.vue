@@ -35,7 +35,12 @@
             }}</SpanText></Cell
           >
           <Cell w="w160"
-            ><SpanText size="sm">{{ pair.section.description }}</SpanText></Cell
+            ><SpanText size="sm"
+              >{{ pair.section.level === -1 ? "도전" : pair.section.level }}.
+              {{
+                pair.section.level === -1 ? "" : pair.section.description
+              }}</SpanText
+            ></Cell
           >
           <Cell w="w60"
             ><SpanText size="sm">{{ examType(pair.paper) }}</SpanText></Cell

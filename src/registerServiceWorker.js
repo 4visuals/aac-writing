@@ -13,6 +13,8 @@ const prepareAppData = () => {
     const { pathname } = location;
     if (pathname !== "/" && e.cause === "TOKEN_EXPIRED") {
       location.href = "/";
+    } else {
+      console.log(e);
     }
   });
 };

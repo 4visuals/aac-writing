@@ -124,11 +124,13 @@ const time = {
 const host = {
   isPwaMode: () => {
     const { hostname } = document.location;
-    return `pwa.${env.HOST}` === hostname;
+    const parts = hostname.split(".");
+    return "pwa" === parts[0];
   },
   isStudentMode: () => {
     const { hostname } = document.location;
-    return `student.${env.HOST}` === hostname;
+    const parts = hostname.split(".");
+    return "student" === parts[0];
   },
 };
 const logger = {

@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <button v-if="member" class="btn logout" @click="doLogout">
+      <span>로그</span><span>아웃</span>
+    </button>
     <div class="menu">
       <div class="logo main"></div>
       <div class="logo sub"></div>
@@ -99,6 +102,9 @@ export default {
       modal.value.lcs = lcs;
       console.log(licenses);
     };
+    const doLogout = () => {
+      store.commit("user/logoutUser");
+    };
 
     watch(
       () => member,
@@ -118,6 +124,7 @@ export default {
       moveTo,
       showLicenseConfig,
       host,
+      doLogout,
     };
   },
 };
@@ -141,7 +148,7 @@ export default {
     .logo {
       height: 120px;
       &.sub {
-        height: 90px;
+        height: 100px;
       }
     }
   }
@@ -152,7 +159,7 @@ export default {
     .logo {
       height: 120px;
       &.sub {
-        height: 90px;
+        height: 100px;
       }
     }
   }
@@ -160,12 +167,30 @@ export default {
 .home {
   height: 100%;
   padding: 0 24px;
+  position: relative;
+
+  .logout {
+    width: 48px;
+    height: 48px;
+    background-color: crimson;
+    color: white;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 24px;
+  }
 
   .logo {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     &.main {
       background-image: url("/img/white_back_02.png");
     }

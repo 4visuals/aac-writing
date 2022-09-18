@@ -10,7 +10,7 @@
           @active-segment="setSegment"
           :resourceType="resourceTypeRef"
         />
-        <div class="btns" v-if="segRef">
+        <div class="btns">
           <div class="group" :class="tabModel.activeTab.clazz">
             <div
               class="cmd"

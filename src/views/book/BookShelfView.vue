@@ -145,6 +145,8 @@ $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
     padding: 8px 4px;
     border-radius: 8px;
     border: 1px solid #8659004d;
+    margin-left: 0;
+    margin-right: 0;
     // box-shadow: rgb(0 0 0 / 4%) 0px 0px 0px 1px inset,
     //   rgb(0 0 0 / 8%) 0px 0px 0px 1px inset;
     &.active {

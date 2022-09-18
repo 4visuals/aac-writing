@@ -9,6 +9,8 @@ import "./assets/global.scss";
 import GooglgAuth from "vue3-google-oauth2";
 import env from "@/service/env";
 import quizHistoryStore from "./dao/quiz-history-store";
+import request from "./service/api/request";
+
 const app = createApp(App);
 app.use(store).use(router).use(GooglgAuth, {
   clientId: env.GOOGLE_CLIENT_ID,
@@ -32,7 +34,12 @@ app.provide("$gAuth", app.config.globalProperties.$gAuth);
 quizHistoryStore.register(store);
 
 app.mount("#app");
-app.config.errorHandler = (err, instance) => {
+
+const errorHandler = (err) => {
   console.error(err);
-  console.error(instance);
+  if (err.cause == "TOKEN_EXPIRED") {
+    location.href = "/";
+  }
 };
+app.config.errorHandler = errorHandler;
+request.setErrorCallback(errorHandler);

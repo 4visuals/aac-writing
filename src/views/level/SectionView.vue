@@ -108,7 +108,7 @@ export default {
     }
     const title = () => {
       const { level } = props.cate;
-      return level >= 0 ? level + "단계" : "종합";
+      return level >= 0 ? level + "단계" : "도전";
     };
 
     const startSentenceQuiz = (e) => {

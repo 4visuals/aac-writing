@@ -4,6 +4,7 @@
 import { time } from "@/service/util";
 import api from "@/service/api";
 import storage from "@/service/storage";
+import ChapterSummary from "@/components/stats/chapter-summary";
 
 class ExamSession {
   constructor(license) {
@@ -11,9 +12,49 @@ class ExamSession {
   }
 }
 
+const createSegmentMap = (exams) => {
+  const map = new Map();
+  exams.forEach((exam) => {
+    let elems = map.get(exam.sectionRef);
+    if (!elems) {
+      elems = { section: exam.sectionRef, W: 0, S: 0 };
+      map.set(exam.sectionRef, elems);
+    }
+    const correct = exam.submissions.filter((sbm) => sbm.correct);
+    elems[exam.type] += correct.length;
+  });
+  return map;
+};
+
+const createChapterStats = (examMap, chapters) => {
+  return chapters.map((chap) => {
+    const sentences = chap.sections.flatMap((sec) => sec.sentences);
+    const cntS = sentences.filter((sen) => sen.type === "S").length;
+    const cntW = sentences.length - cntS;
+    const stat = new ChapterSummary(
+      chap,
+      { total: cntW, correct: 0 },
+      { total: cntS, correct: 0 }
+    );
+    chap.sections.forEach((sec) => {
+      const submission = examMap.get(sec.seq);
+      if (submission) {
+        const { W, S } = submission;
+        stat.setCorrect(W, S);
+      }
+    });
+    return stat;
+  });
+};
+
 export default {
   namespaced: true,
-  state: () => ({ session: null, activeLicense: null, histories: null }),
+  state: () => ({
+    session: null,
+    activeLicense: null,
+    histories: null,
+    segmentHistory: null,
+  }),
   getters: {
     activeLicense: (state) => state.activeLicense,
     student: (state, getters, allState, allGetters) => {
@@ -21,6 +62,7 @@ export default {
       const students = allGetters["user/students"];
       return students.find((stud) => stud.seq === studentSeq);
     },
+    segmentHistory: (state) => state.segmentHistory,
   },
   mutations: {
     /**
@@ -63,6 +105,14 @@ export default {
         exams.push(paper);
       });
       state.histories = byMonth;
+    },
+    setSegmentHistories(state, segments) {
+      const levels = this.getters["course/levels"];
+      const books = this.getters["course/books"];
+      const segMap = createSegmentMap(segments);
+      const level = createChapterStats(segMap, levels);
+      const book = createChapterStats(segMap, books);
+      state.segmentHistory = { segMap, level, book, segments };
     },
   },
   actions: {

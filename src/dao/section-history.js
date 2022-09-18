@@ -80,7 +80,7 @@ const groupBySections = (rows) => {
 
 const createHistories = (origin, licenseUUID, sections) => {
   return quizDao.findByLicense(licenseUUID).then((rows) => {
-    const quizzes = rows.filter((row) => row.mode === "QUIZ");
+    const quizzes = rows; // rows.filter((row) => row.mode === "QUIZ");
     const groups = groupBySections(quizzes);
     groups.forEach((group) => {
       const section = sections.find(
