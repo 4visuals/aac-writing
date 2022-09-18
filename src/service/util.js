@@ -130,7 +130,11 @@ const host = {
   isStudentMode: () => {
     const { hostname } = document.location;
     const parts = hostname.split(".");
-    return "student" === parts[0];
+    return "kdict" === parts[0] || "aacdict" === parts[0];
+  },
+  isTeacherMode: () => {
+    const parts = document.location.hostname.split(".");
+    return "teacher" === parts[0];
   },
 };
 const logger = {

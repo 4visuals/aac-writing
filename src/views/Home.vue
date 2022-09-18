@@ -12,10 +12,7 @@
     <div class="menu" v-if="host.isPwaMode()">
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
     </div>
-    <div class="menu" v-else-if="host.isStudentMode()">
-      <StudentLoginForm />
-    </div>
-    <div class="menu" v-else>
+    <div class="menu" v-else-if="host.isTeacherMode()">
       <div class="students" v-if="member">
         <template v-if="students.length === 0">
           <ParaText
@@ -40,6 +37,9 @@
       <div class="login" v-else>
         <UserProfile class="google" />
       </div>
+    </div>
+    <div class="menu" v-else>
+      <StudentLoginForm />
     </div>
     <teleport to="body" v-if="modal.visible">
       <Modal @hidden="modal.visible = false" :fill="true" :rect="true">
@@ -203,8 +203,6 @@ export default {
     justify-content: center;
     margin: 4rem auto;
     max-width: 300px;
-    .google {
-    }
   }
   .title {
     font-family: "Roboto", sans-serif;
