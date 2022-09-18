@@ -1,6 +1,7 @@
 import { quizDao } from "../../dao";
 import store from "@/store";
 import api from "@/service/api";
+import { logger } from "@/service/util";
 
 store.registerModule("quiz", {
   namespaced: true,
@@ -103,7 +104,7 @@ const setQuestionAt = (index) => {
 const shiftBy = (offset) => {
   const ctx = store.state.quiz.quizContext;
   const nextQuizIndex = ctx.currentQuestion.index + offset;
-  console.log("[Q:NEXT IDX]", nextQuizIndex);
+  logger.log("[Q:NEXT IDX]", nextQuizIndex);
   if (nextQuizIndex === ctx.quizLength) {
     store.commit("quiz/showResultView");
   } else if (nextQuizIndex < 0) {

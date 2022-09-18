@@ -276,7 +276,6 @@ class QuizContext {
     this.currentQuestion = this.questions[this._currentIndex];
   }
   syncDb() {
-    console.log("[IDXDB]");
     quizDao.sync(this).then((res) => {
       console.log(res);
     });

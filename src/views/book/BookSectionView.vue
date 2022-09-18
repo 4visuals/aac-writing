@@ -78,7 +78,7 @@ export default {
     SpanText,
   },
   setup(props) {
-    console.log(props.theme);
+    util.logger.log(props.theme);
     const store = useStore();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     // eslint-disable-next-line vue/no-setup-props-destructure
@@ -111,7 +111,6 @@ export default {
       return level >= 0 ? level + "단원" : "종합";
     };
     const markHeight = (e) => {
-      console.log("[h]", e.offsetHeight);
       const height = [...e.children].reduce((h, p) => h + p.offsetHeight, 0);
       const style = window.getComputedStyle(e);
       const pad = parseInt(style.paddingTop) + parseInt(style.paddingBottom);

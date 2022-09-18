@@ -141,6 +141,7 @@ const logger = {
   log: (msg, title) => {
     if (env.devMode) {
       console.log(`[${title || ""}]`, msg);
+      console.trace(`[${title || ""}]`);
     }
   },
 };

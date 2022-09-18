@@ -24,6 +24,7 @@
 <script>
 import { ref } from "@vue/reactivity";
 import { nextTick } from "vue";
+import { logger } from "@/service/util";
 export default {
   props: [
     "inputVisible",
@@ -106,7 +107,7 @@ export default {
       });
     };
     const handleEnter = (e) => {
-      console.log("[enter]", e.isComposing, e);
+      logger.log("[enter]", e.isComposing, e);
       // CHROME: 한글 입력상태에서(composition)엔터를 누르면 이벤트가 두 번 발생함
       //       : 첫번째는 e.isComposing이 true이고
       //       : 뒤에 이어지는 이번트에서는 false

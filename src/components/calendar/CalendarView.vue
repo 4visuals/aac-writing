@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { logger } from "@/service/util";
 import { computed } from "@vue/reactivity";
 import { shallowRef, watch } from "vue";
 import { useStore } from "vuex";
@@ -85,7 +86,7 @@ export default {
     const notifyTodayData = () => {
       const cur = Day.fromDate(props.current);
       const papers = monthMap.value.get(cur.toYMD());
-      console.log(papers);
+      logger.log(papers);
       emit("today", papers);
     };
 
@@ -106,7 +107,7 @@ export default {
       emit("exams", { day, papers });
     };
     watch(historyMap, (histories) => {
-      console.log(histories);
+      logger.log(histories);
       updateMonthData();
       notifyTodayData();
     });

@@ -1,3 +1,5 @@
+import { logger } from "@/service/util";
+
 const tableName = "quizzes";
 const cols = "license,sectionSeq,type,mode,ranges".split(",");
 
@@ -78,10 +80,9 @@ class QuizDao {
       questions: [],
       startTime: quizContext.startTime,
     });
-    // console.log(res);
   }
   async saveQuiz(quizContext) {
-    console.log("[save]", quizContext);
+    logger.log("[save]", quizContext);
     if (!quizContext) {
       return;
     }
