@@ -27,13 +27,17 @@ const colors = [
  * 5단계 낱말의 경우 문제가 60개. 총 6개의 segment + 전체1 => 7 segments
  */
 class Segment {
-  constructor(index, offset, size, label, colors, sentences) {
+  constructor(index, offset, size, label, colors, sentences, ranges) {
     this.index = index;
     this.offset = offset;
     this.size = size;
     this.label = label;
     this.colors = [...colors];
     this.sentences = sentences;
+
+    const [start, end] = ranges;
+    // 현재 풀고 있는 segment인지 나타냄
+    this.current = offset === start && size === end - start;
   }
   get mainColor() {
     return this.colors[0];
@@ -59,7 +63,15 @@ Segment.createSegments = (section, resourceType) => {
   const sentences = section.sentences.filter((sen) => sen.type === type);
   const segments = [...Array(sentences.length / 10).keys()].map((index) => {
     const label = `${index * 10 + 1}-${index * 10 + 10}`;
-    return new Segment(index, 10 * index, 10, label, colors[index], sentences);
+    return new Segment(
+      index,
+      10 * index,
+      10,
+      label,
+      colors[index],
+      sentences,
+      [0, 0] // 현재 문제를 푸는 상태가 아니므로 의미없는 범위를 지정함
+    );
   });
   return segments;
 };
@@ -282,6 +294,7 @@ class QuizContext {
   }
   getSegments(resourceType) {
     let type = resourceType || this.resourceType;
+    // "A(교과서)" - 교과서는 낱말이 없고 모두 문장으로 구성된 상태
     type = type === "A" ? "S" : type;
     const section = this.section;
     const sentences = section.sentences.filter((sen) => sen.type === type);
@@ -293,9 +306,11 @@ class QuizContext {
         10,
         label,
         colors[index],
-        sentences
+        sentences,
+        this.ranges
       );
     });
+    // FIXME 전체 생략하기로 했음.(#67)
     if (sentences.length > 10) {
       const index = segments.length;
       segments.push(
@@ -305,7 +320,8 @@ class QuizContext {
           sentences.length,
           "전체",
           colors[index],
-          sentences
+          sentences,
+          this.ranges
         )
       );
     }

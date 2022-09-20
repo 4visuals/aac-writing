@@ -4,6 +4,7 @@
       <SegmentView
         @active-segment="setActiveSegment"
         :resourceType="ctx.resourceType"
+        :toggling="true"
       />
     </div>
     <div class="chart" ref="chartEl"></div>
@@ -199,6 +200,10 @@ export default {
     };
     const setActiveSegment = (segment) => {
       // const active = toRaw(activeSegment.value);
+      if (!chart.value.vmodel) {
+        // 아직 차트 준비 안됨
+        return;
+      }
       if (!segment) {
         activeSegment.value = null;
         hideColumns(chart.value, null);

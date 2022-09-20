@@ -3,8 +3,13 @@
     <TabView :model="tabModel">
       <div class="tab-body">
         <div class="info">
-          {{ section.level > 0 ? `${section.level}단계` : "도전" }}
-          {{ section.description }}
+          <div>
+            {{ chapter.desc }}
+          </div>
+          <div>
+            {{ section.level > 0 ? `${section.level}단계` : "도전" }}
+            {{ section.description }}
+          </div>
         </div>
         <SegmentView
           @active-segment="setSegment"
@@ -14,6 +19,12 @@
           <div class="group" :class="tabModel.activeTab.clazz">
             <div
               class="cmd"
+              :class="{
+                current:
+                  resourceTypeRef === currentRssType &&
+                  segRef?.current &&
+                  btn.mode === currentMode,
+              }"
               v-for="btn in buttons"
               :key="btn.cmd"
               @click="startQuiz(btn)"
@@ -43,33 +54,44 @@ export default {
   setup() {
     const store = useStore();
     const ctx = store.state.quiz.quizContext;
+    const { chapter } = ctx.section;
+    const currentRssType = ctx.resourceType === "A" ? "S" : ctx.resourceType;
+    const currentMode = ctx.mode;
     const segRef = ref(null);
     const resourceTypeRef = ref(ctx.resourceType);
+
     const buttons = ref([]);
 
     const isBookResource = ctx.section.origin === "B";
-    const tabModel = TabModel.create([
-      {
-        text: "낱말",
-        cmd: "W",
-        clazz: "word",
-        elems: [
-          { cmd: "READING:SEN:W", text: "보고쓰기" },
-          { cmd: "LEARNING:SEN:W", text: "학습" },
-          { cmd: "QUIZ:SEN:W", text: "퀴즈" },
-        ],
-      },
-      {
-        text: "문장",
-        cmd: "S",
-        clazz: "word",
-        elems: [
-          { cmd: "READING:EJ:S", text: "보고쓰기" },
-          { cmd: "LEARNING:EJ:S", text: "학습" },
-          { cmd: "QUIZ:SEN:S", text: "퀴즈" },
-        ],
-      },
-    ]);
+    const wordTab = {
+      text: "낱말",
+      cmd: "W",
+      clazz: "word",
+      active: "W" === currentRssType,
+      elems: [
+        { cmd: "READING:SEN:W", text: "보고쓰기", mode: "READING" },
+        { cmd: "LEARNING:SEN:W", text: "학습", mode: "LEARNING" },
+        { cmd: "QUIZ:SEN:W", text: "퀴즈", mode: "QUIZ" },
+      ],
+    };
+    const senTab = {
+      text: "문장",
+      cmd: "S",
+      clazz: "word",
+      active: "S" === currentRssType,
+      elems: [
+        { cmd: "READING:EJ:S", text: "보고쓰기", mode: "READING" },
+        { cmd: "LEARNING:EJ:S", text: "학습", mode: "LEARNING" },
+        { cmd: "QUIZ:SEN:S", text: "퀴즈", mode: "QUIZ" },
+      ],
+    };
+    const tabElems = [senTab];
+    if (ctx.resourceType !== "A") {
+      // 교과서인 경우('A') 모두 문장으로 구성되어 있음
+      // 단계별 학습인 경우에만 낱말탭을 추가함
+      tabElems.unshift(wordTab);
+    }
+    const tabModel = TabModel.create(tabElems);
     const setSegment = (seg) => {
       segRef.value = toRaw(seg);
     };
@@ -117,6 +139,9 @@ export default {
       segRef,
       buttons,
       resourceTypeRef,
+      chapter,
+      currentRssType,
+      currentMode,
       tabModel,
       setSegment,
       startQuiz,
@@ -158,6 +183,10 @@ export default {
         cursor: pointer;
         &:active {
           transform: translate(1px, 1px);
+        }
+        &.current {
+          background-color: #cac;
+          color: white;
         }
         // .type {
         //   position: absolute;

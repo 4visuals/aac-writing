@@ -18,6 +18,9 @@ class TabModel {
     tab.active = true;
     this.activeTab.value = tab;
   }
+  findTab(fnPredicate) {
+    return this.items.find(fnPredicate);
+  }
   hasBody() {
     return !!this.items[0]._body;
   }
