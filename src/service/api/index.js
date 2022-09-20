@@ -36,15 +36,15 @@ const exam = {
   submitExam: (exam) => POST(`/exam/quiz`, exam),
   submitLearning: (exam) => POST(`/exam/learning`, exam),
   /**
-   *
+   * 주어진 section에 대한 제출 답안 조회
    * @param {int} sectionSeq
+   * @param {enum} examMode [R|L|Q]
    * @param {enum} sentenceType [W|S|A]
    * @param {string} licenseUuid
    * @returns
    */
-  querySectionQuiz: (sectionSeq, sentenceType, licenseUuid) =>
-    GET(`/exam/quiz/section/${sectionSeq}`, {
-      sentenceType,
+  answers: (sectionSeq, examMode, sentenceType, licenseUuid) =>
+    GET(`/answer/section/${sectionSeq}/${examMode}/${sentenceType}`, {
       license: licenseUuid,
     }),
   /**

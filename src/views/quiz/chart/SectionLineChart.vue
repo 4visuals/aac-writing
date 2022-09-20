@@ -280,18 +280,21 @@ export default {
     const loadData = () => {
       // let type = ctx.resourceType;
       // type = type === "A" ? "S" : type;
+      const mode = ctx.mode.substring(0, 1);
       return api.exam
-        .querySectionQuiz(ctx.sectionSeq, type, ctx.license.uuid)
+        .answers(ctx.sectionSeq, mode, type, ctx.license.uuid)
         .then((res) => {
-          const stats = res.papers.map((paper) => {
-            const total = paper.numOfQuestions; // paper.submissions.length;
-            const correct = paper.submissions.filter(
-              (submit) => submit.correct
-            ).length;
-            const failed = total - correct;
-            const ymd = time.toYMD(paper.startTime);
-            return { ...paper, total, correct, failed, ymd };
-          });
+          const stats = res.papers
+            .filter((paper) => paper.mode === mode)
+            .map((paper) => {
+              const total = paper.numOfQuestions; // paper.submissions.length;
+              const correct = paper.submissions.filter(
+                (submit) => submit.correct
+              ).length;
+              const failed = total - correct;
+              const ymd = time.toYMD(paper.startTime);
+              return { ...paper, total, correct, failed, ymd };
+            });
           return stats;
         });
     };
