@@ -3,7 +3,7 @@
     <div class="sentence-list row">
       <div
         class="cell col-6 col-sm-6 col-md-3 col-lg-2"
-        v-for="(group, idx) in groups"
+        v-for="group in groups"
         :key="group.key"
       >
         <SpanText
@@ -11,7 +11,7 @@
           :class="{ visited: hasHistory(group) }"
           @click="$emit('choosen', group)"
         >
-          {{ idx === 0 ? "전체" : `${group.start + 1} ~ ${group.end}` }}
+          {{ `${group.start + 1} ~ ${group.end}` }}
         </SpanText>
       </div>
     </div>
@@ -32,12 +32,6 @@ export default {
     const size = 10;
     const updateGroups = () => {
       groups.value = [];
-      groups.value.push({
-        start: 0,
-        end: props.sentences.length,
-        sentences: props.sentences,
-        text: "전체",
-      });
       const groupSize =
         props.sentences.length / size +
         (props.sentences.length % size > 0 ? 1 : 0);

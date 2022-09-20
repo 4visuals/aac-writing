@@ -310,21 +310,6 @@ class QuizContext {
         this.ranges
       );
     });
-    // FIXME 전체 생략하기로 했음.(#67)
-    if (sentences.length > 10) {
-      const index = segments.length;
-      segments.push(
-        new Segment(
-          index,
-          0,
-          sentences.length,
-          "전체",
-          colors[index],
-          sentences,
-          this.ranges
-        )
-      );
-    }
 
     return segments;
   }
