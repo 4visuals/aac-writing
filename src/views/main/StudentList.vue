@@ -2,7 +2,11 @@
   <div class="stud-list">
     <div
       class="license"
-      :class="{ active: isActiveLicense(lcs), enabled: hasStudent(lcs) }"
+      :class="{
+        active: isActiveLicense(lcs),
+        enabled: hasStudent(lcs),
+        expired: isExpiredLicense(lcs),
+      }"
       v-for="lcs in licenses"
       :key="lcs.seq"
       @click="setActiveLicense(lcs)"
@@ -23,6 +27,12 @@
             size="xs"
             theme="gold"
             @click="$emit('selected', lcs, '/book')"
+          />
+          <div class="gutter"></div>
+          <ActionIcon
+            class="config"
+            icon="settings"
+            @click="$emit('register', lcs)"
           />
         </div>
         <AacButton
@@ -48,11 +58,11 @@
 import { computed, ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { SpanText } from "../../components/text";
-import AacButton from "../../components/form/AacButton.vue";
+import ActionIcon from "../../components/form/ActionIcon.vue";
 export default {
   components: {
     SpanText,
-    AacButton,
+    ActionIcon,
   },
   setup() {
     const store = useStore();
@@ -75,6 +85,10 @@ export default {
       const student = students.value.find((s) => s.seq === lcs.studentRef);
       return !!student;
     };
+
+    const isExpiredLicense = (lcs) => {
+      return lcs.expiredAt && lcs.expiredAt <= new Date().getTime();
+    };
     return {
       activeLcs,
       students,
@@ -83,6 +97,7 @@ export default {
       setActiveLicense,
       isActiveLicense,
       hasStudent,
+      isExpiredLicense,
     };
   },
 };
@@ -98,7 +113,7 @@ export default {
   .license {
     display: flex;
     align-items: center;
-    padding: 8px 16px;
+    padding: 8px 8px 8px 16px;
     column-gap: 16px;
     color: #aaa;
     cursor: pointer;
@@ -108,13 +123,24 @@ export default {
     }
     .cate {
       display: flex;
-      column-gap: 8px;
+      column-gap: 4px;
+      .gutter {
+        width: 1px;
+        margin: 6px 4px 10px 6px;
+        background-color: #83c0d6;
+      }
+      .config {
+        font-size: 18px;
+        padding: 4px;
+        color: #036192;
+      }
     }
     &.enabled {
       color: black;
     }
     &.active {
-      background-color: #e7f3ff;
+      background-color: #bcedff;
+      box-shadow: 0 0 8px #586d748a;
     }
   }
 }

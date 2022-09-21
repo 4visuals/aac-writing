@@ -108,6 +108,10 @@ export default {
     button {
       font-size: 1.1rem;
       padding: 6px 0.8rem;
+      &.xs {
+        font-size: 0.9rem;
+        padding: 0.35rem 0.7rem;
+      }
       &.sm {
         font-size: 0.85rem;
       }

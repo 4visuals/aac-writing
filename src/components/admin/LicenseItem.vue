@@ -24,6 +24,7 @@ import { ref, watch } from "@vue/runtime-core";
 export default {
   props: ["lcs", "students", "current", "active", "mode", "size"],
   setup(props) {
+    const UNLIMITED = 24 * 365 * 10;
     const assignee = ref(null);
     const vMode = ref(props.mode || "normal");
     const updateAssignee = () => {
@@ -33,7 +34,9 @@ export default {
     };
     const remaining = (lcs) => {
       const exp = lcs.expiredAt;
-
+      if (lcs.durationInHours === UNLIMITED) {
+        return "무제한";
+      }
       if (exp) {
         if (exp - props.current > 0) {
           return time.diff(props.current, exp);
@@ -46,7 +49,11 @@ export default {
     };
     const resolveWidth = (lcs) => {
       const totalMillis = lcs.durationInHours * 60 * 60 * 1000;
-      if (totalMillis === 0 || Number.isNaN(lcs.activatedAt)) {
+      if (
+        totalMillis === 0 ||
+        Number.isNaN(lcs.activatedAt) ||
+        lcs.durationInHours === UNLIMITED
+      ) {
         // 무제한 이용권(가입시 발급된 라이선스, totalMillis: 0)
         // 또는
         // 아직 사용 안했음(not activated)
