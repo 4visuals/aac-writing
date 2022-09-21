@@ -65,7 +65,7 @@ import { host } from "@/service/util";
 import StudentLoginForm from "./StudentLoginForm.vue";
 import UserProfile from "./menu/UserProfile.vue";
 import { useStore } from "vuex";
-import { watch, ref } from "vue";
+import { watch, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { computed } from "@vue/reactivity";
 import { LicenseConfigView } from "@/components/admin";
@@ -94,7 +94,7 @@ export default {
     const moveTo = (url, license) => {
       // console.log("move to ", url);
       store.commit("exam/setActiveLicense", license);
-      router.push(url);
+      router.replace(url);
       store.commit("ui/setNavSize", { expanded: false, topPadding: 120 });
     };
     const showLicenseConfig = (lcs) => {
@@ -116,6 +116,8 @@ export default {
       { immediate: true }
     );
     store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
+    store.commit("ui/hideMenu");
+    onMounted(() => {});
     return {
       modal,
       member,

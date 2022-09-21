@@ -1,10 +1,14 @@
 <template>
   <div class="stud-logo-wrapper">
-    <div class="chr logo" :class="size || ''">{{ char() }}</div>
+    <div class="chr logo" :class="size || ''" @click="openStatView">
+      {{ char() }}
+    </div>
   </div>
 </template>
 
 <script>
+import modal from "../components/modal";
+import AcademicProgressView from "@/components/stats/AcademicProgressView.vue";
 export default {
   props: ["student", "size"],
   setup(props) {
@@ -14,7 +18,10 @@ export default {
         props.student.name.split("").reverse().slice(0, 2).reverse().join("")
       );
     };
-    return { char };
+    const openStatView = () => {
+      modal.showModal(AcademicProgressView, { fill: true, rect: true });
+    };
+    return { char, openStatView };
   },
 };
 </script>

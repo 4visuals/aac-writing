@@ -19,6 +19,21 @@
   </div>
   <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
+  <teleport to="body" v-if="modalConfig">
+    <Modal
+      @hidden="hideModal"
+      :fill="modalConfig.fill"
+      :rect="modalConfig.rect"
+      :width="modalConfig.width"
+    >
+      <component
+        :is="modalConfig.comp"
+        v-bind="{ ...modalConfig.props }"
+        v-on="{ ...modalConfig.events }"
+        @close="hideModal"
+      ></component>
+    </Modal>
+  </teleport>
 </template>
 <script>
 import env from "@/service/env";
@@ -44,6 +59,7 @@ export default {
     const topPadding = computed(() => store.getters["ui/topPadding"]);
     const refreshRequired = computed(() => store.state.config.refreshing);
     const route = useRoute();
+    const modalConfig = computed(() => store.getters["modal/currentModal"]);
     // console.log(route.path, route.params, topPadding);
     const tr = {
       name: "route",
@@ -63,6 +79,8 @@ export default {
       store.commit("ui/setAppHeight", h);
       document.body.style.height = `${h}px`;
     };
+    const hideModal = () => store.commit("modal/clear");
+
     onMounted(() => {
       const el = wrapperEl.value;
       el.addEventListener("scroll", scrolling, option);
@@ -72,7 +90,16 @@ export default {
       const el = wrapperEl.value;
       el.removeEventListener("scroll", scrolling, option);
     });
-    return { refreshRequired, wrapperEl, route, tr, menuVisible, topPadding };
+    return {
+      refreshRequired,
+      wrapperEl,
+      route,
+      tr,
+      menuVisible,
+      topPadding,
+      modalConfig,
+      hideModal,
+    };
   },
 };
 </script>

@@ -44,12 +44,12 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   logger.log(`[${from.path}] -> [${to.path}]`);
-  if (from.name && to.fullPath === "/") {
-    const exit = confirm("앱을 종료합니까?");
-    return exit;
-  } else {
-    return true;
-  }
+  // if (from.name && to.fullPath === "/") {
+  //   const exit = confirm("앱을 종료합니까?");
+  //   return exit;
+  // } else {
+  //   return true;
+  // }
 });
 
 export default router;
