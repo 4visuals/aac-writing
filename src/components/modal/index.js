@@ -1,8 +1,8 @@
 import modalStore from "./modal-store";
-
+import { markRaw } from "vue";
 class ModalConfig {
   constructor(vueComponent, option) {
-    this.comp = vueComponent;
+    this.comp = markRaw(vueComponent);
     this.option = option || {};
   }
   get props() {

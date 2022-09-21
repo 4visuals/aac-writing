@@ -65,7 +65,7 @@ import { Modal } from "@/components";
 import modal from "../../components/modal";
 import { ActionIcon } from "@/components/form";
 import { useStore } from "vuex";
-import { computed, ref, markRaw } from "@vue/runtime-core";
+import { computed, ref } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
 export default {
   components: {
@@ -137,7 +137,7 @@ export default {
     };
     const doLogout = () => {
       store.commit("ui/hideMenu");
-      modal.showModal(markRaw(DialogView), {
+      modal.showModal(DialogView, {
         width: "sm",
         props: {
           title: "로그아웃",
