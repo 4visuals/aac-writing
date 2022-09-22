@@ -4,7 +4,7 @@
       <p>
         <SpanText>{{ q.text }}</SpanText>
       </p>
-      <TableView colsize="0px">
+      <TableView colsize="0px" fitBy="row">
         <template v-slot:fcol>&nbsp;</template>
         <template v-slot:data>
           <template v-if="ctx.isLearningMode()">
@@ -77,11 +77,13 @@ export default {
 <style lang="scss" scoped>
 .trials {
   .sen {
-    margin-bottom: 0.75rem;
+    margin: 0 16px 8px;
     .trials {
       .eojeols {
         display: flex;
         flex-direction: column;
+        padding: 0;
+        margin-right: 4px;
       }
       .trial {
         padding: 0.25rem 0.5rem;
@@ -91,7 +93,6 @@ export default {
         column-gap: 8px;
         border-left: 2px solid transparent;
         padding: 0.25rem 0.5rem;
-        margin-left: 4px;
         .icon {
           font-size: 1.4rem;
         }

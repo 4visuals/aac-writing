@@ -1,8 +1,9 @@
 <template>
   <div class="sheet" :style="`--sheet-col-width: ${colsize}`">
-    <div class="fixed-column"><slot name="fcol" /></div>
+    <div v-if="fitBy !== 'row'" class="fixed-column"><slot name="fcol" /></div>
     <div
       class="scrollable"
+      :class="{ 'fit-row': fitBy === 'row' }"
       :ref="bindScrollable"
       @wheel.prevent.stop="pageScroll"
     >
@@ -33,7 +34,7 @@ const bindScrollable = (el) => {};
 </script>
 <script>
 export default {
-  props: ["colsize", "columnBased"],
+  props: ["colsize", "columnBased", "fitBy"],
 };
 </script>
 
@@ -59,6 +60,9 @@ export default {
     z-index: 1;
     overflow-x: auto;
     display: flex;
+    &.fit-row {
+      position: relative;
+    }
     &::-webkit-scrollbar {
       width: 2px;
       height: 2px;
