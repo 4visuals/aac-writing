@@ -19,18 +19,15 @@
     </div>
     <template v-else-if="chart === 'CUR'">
       <WordExamResult
-        v-if="ctx.isWord()"
-        :ctx="ctx"
+        v-if="ctx.isQuizMode() || ctx.isWord()"
+        :questions="ctx.questions"
         :maxTrial="maxTrial"
         :getTrialAt="getTrialAt"
         :answerClass="answerClass"
       />
       <SentenceExamResult
         v-else-if="ctx.isSentence()"
-        :ctx="ctx"
-        :maxTrial="maxTrial"
-        :getTrialAt="getTrialAt"
-        :answerClass="answerClass"
+        :questions="ctx.questions"
       />
     </template>
     <SectionLineChart v-else-if="chart === 'SECTION'" />
@@ -68,7 +65,6 @@ export default {
       (max, q) => Math.max(q.trials.length, max),
       0
     );
-    console.log("d", ctx.config);
     const getTrialAt = (question, index) => {
       if (question.trials.length === 0) {
         return "-";
