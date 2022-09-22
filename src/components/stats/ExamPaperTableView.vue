@@ -20,8 +20,7 @@
           <Cell w="w160"><SpanText size="sm">단계</SpanText></Cell>
           <Cell w="w160"></Cell>
           <Cell w="w60"><SpanText size="sm">종류</SpanText></Cell>
-          <Cell w="w60"><SpanText size="sm">학습형태</SpanText></Cell>
-          <Cell w="w40"><SpanText size="sm">문항</SpanText></Cell>
+          <Cell w="w100"><SpanText size="sm">학습형태</SpanText></Cell>
           <Cell w="w40"><SpanText size="sm">점수</SpanText></Cell>
         </Row>
         <Row
@@ -45,13 +44,8 @@
           <Cell w="w60"
             ><SpanText size="sm">{{ examType(pair.paper) }}</SpanText></Cell
           >
-          <Cell w="w60"
+          <Cell w="w100"
             ><SpanText size="sm">{{ mode(pair.paper) }}</SpanText></Cell
-          >
-          <Cell w="w40"
-            ><SpanText size="sm">{{
-              pair.paper.numOfQuestions
-            }}</SpanText></Cell
           >
           <Cell w="w40"
             ><SpanText size="sm"
@@ -96,7 +90,11 @@ export default {
         return types.B;
       }
     };
-    const mode = (paper) => modes[paper.mode];
+    const mode = (paper) => {
+      const mode = modes[paper.mode];
+      const range = paper.questionOffset / 10 + 1;
+      return `${mode} ${range}`;
+    };
     const score = (paper) => {
       const { mode } = paper;
       if (mode !== "Q") {
