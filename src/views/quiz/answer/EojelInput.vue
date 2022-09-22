@@ -102,7 +102,7 @@ export default {
 
     const showReward = (name) => {
       store.commit("ui/showReward", {
-        name,
+        name: `sen_${name}`,
         field: dummy,
         onClose: (passed) => {
           if (passed) {

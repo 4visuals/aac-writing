@@ -15,8 +15,10 @@ class Menu {
   }
 }
 const rewards = {
-  passed: "passed",
-  failed: "failed",
+  sen_passed: "sen_passed",
+  sen_failed: "sen_failed",
+  word_passed: "word_passed",
+  word_failed: "word_failed",
 };
 class UI {
   constructor() {
@@ -51,7 +53,7 @@ class UI {
   hideReward() {
     const { name, onClose } = this.reward;
     if (onClose) {
-      onClose(name === "passed");
+      onClose(name.endsWith("passed"));
       this.reward.onClose = null;
     }
     this.reward.name = null;

@@ -36,6 +36,9 @@ class SentenceQuestion {
   get trials() {
     return this.para.trials;
   }
+  isWordType() {
+    return this.para.config.options.quizResource === "W";
+  }
   tryAnswer(trial, elapsedTime) {
     return this.para.addTrial(trial, elapsedTime);
   }
@@ -84,14 +87,14 @@ export default {
       store.commit("ui/hideReward");
     };
     const showReward = (name) => {
+      const type = question.value.isWordType() ? "word_" : "sen_";
       store.commit("ui/showReward", {
-        name,
+        name: type + name,
         field: dummy,
         onClose: (passed) => {
           if (!question.value.para) {
             return;
           }
-          // FIXME 펭귄 나왔을때 엔터 누르는 경우 포커스 잡혀야 함
           field.value.focus();
           if (passed) {
             if (question.value.para.hasNextQuiz()) {
@@ -100,9 +103,6 @@ export default {
               emit("quizEnd");
             }
           }
-          // else {
-          //   field.value.focus();
-          // }
         },
       });
       dummy.value.focus();
