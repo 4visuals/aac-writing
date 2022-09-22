@@ -128,8 +128,8 @@ export default {
     const changeStudent = () => {
       router.replace("/");
     };
-    const handleLogout = (commit) => {
-      if (commit) {
+    const handleLogout = (cmd) => {
+      if (cmd === "yes") {
         store.commit("user/logoutUser");
         router.replace("/");
       }
