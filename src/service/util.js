@@ -158,12 +158,35 @@ const pick = (arr, cnt) => {
   return picked.slice(0, cnt);
 };
 
-export { key, path, time, host, logger, pick };
+const bindElem = (obj, specs, idx, elem) => {
+  if (specs.length === idx) {
+    obj.push(elem);
+    return;
+  }
+  const prop = specs[idx];
+  if (!obj[prop]) {
+    obj[prop] = idx + 1 === specs.length ? [] : {};
+  }
+  bindElem(obj[prop], specs, idx + 1, elem);
+};
+const arr = {
+  unflat: (arr, target, keyResolver) => {
+    const t = target || {};
+    arr.forEach((elem) => {
+      const specs = keyResolver(elem);
+      bindElem(t, specs, 0, elem);
+    });
+    return t;
+  },
+};
+
+export { key, path, time, host, logger, arr, pick };
 export default {
   key,
   path,
   time,
   host,
   logger,
+  arr,
   pick,
 };

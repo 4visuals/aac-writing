@@ -49,7 +49,7 @@
           >
           <Cell w="w40"
             ><SpanText size="sm"
-              ><button :class="{ anchor: pair.paper.mode === 'Q' }">
+              ><button class="anchor" @click="$emit('view-submissions', pair)">
                 {{ score(pair.paper) }}
               </button></SpanText
             ></Cell
@@ -66,7 +66,7 @@ import { TableView, Row, Cell } from "@/components/table";
 import { shallowRef } from "vue";
 import { SpanText } from "@/components/text";
 import { useStore } from "vuex";
-
+import util from "@/service/util";
 export default {
   components: {
     ActionIcon,
@@ -74,6 +74,7 @@ export default {
     TableView,
     Row,
     Cell,
+    // SentenceExamResult,
   },
   props: ["date", "papers"],
   setup(props) {
@@ -95,14 +96,62 @@ export default {
       const range = paper.questionOffset / 10 + 1;
       return `${mode} ${range}`;
     };
+    const filterCorrectSentences = (paper) => {
+      const { submissions } = paper;
+      // 1. 제출된 어절을 문장, 어절로 분류함
+      /*
+       * {1: {
+       *   12: [...],
+       *   45: [...]
+       *   }
+       * }
+       */
+      const groups = util.arr.unflat(submissions, {}, (sbm) => [
+        sbm.sentenceRef,
+        sbm.eojeolRef,
+      ]);
+      const section = store.getters["course/section"](paper.sectionRef);
+      let sentences = [];
+      Object.keys(groups).forEach((senSeq) => {
+        const sentence = section.sentences.find((sen) => sen.seq === +senSeq);
+        const { eojeols } = sentence;
+        // 2. 각 어절마다 정답의 갯수를 센 후
+        const corrects = eojeols.reduce((acc, ej) => {
+          const trials = groups[senSeq]["" + ej.eojeolRef];
+          if (!trials) {
+            return acc;
+          }
+          const trial = trials.find((trial) => trial.correct);
+          return acc + (trial ? 1 : 0);
+        }, 0);
+        // 3. 문장의 어절 갯수와 정답의 갯수가 같으면 한 문제를 맞췄음.
+        if (eojeols.length === corrects) {
+          sentences.push(sentence);
+        }
+      });
+      return sentences;
+    };
     const score = (paper) => {
-      const { mode } = paper;
-      if (mode !== "Q") {
-        return "---";
+      const { type, mode } = paper;
+      let corrects = [];
+      if (type === "S" && mode !== "Q") {
+        // 어절입력: 문장 보고쓰기, 문장 학습
+        // 어절마다 1개 이상의 답안이 존재함
+        corrects = filterCorrectSentences(paper);
+      } else {
+        // 문장입력: 낱말(보고쓰기,학습,퀴즈) + 문장 퀴즈
+        // 하나의 문장에 최대 1개의 입력이 존재함
+        corrects = paper.submissions.filter((submit) => submit.correct);
       }
-      const corrects = paper.submissions.filter((submit) => submit.correct);
       const score = (100 * corrects.length) / paper.numOfQuestions;
       return score % 1 === 0 ? score : score.toFixed(1);
+    };
+    /**
+     * 제출 답안 상세 화면
+     * @param {object} paper
+     */
+    const showSubmissions = (paper) => {
+      console.log("[입력 상세 정보]", paper);
     };
     const initSheet = () => {
       const pairs = [];
@@ -118,6 +167,7 @@ export default {
       examType,
       mode,
       score,
+      showSubmissions,
     };
   },
 };

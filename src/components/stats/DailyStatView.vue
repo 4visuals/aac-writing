@@ -35,8 +35,26 @@
         <ExamPaperTableView
           :papers="detail.papers"
           :date="detail.day"
+          @view-submissions="showSubmissions"
           @close="detail = null"
         />
+      </div>
+      <div class="submissions" v-if="submissions">
+        <ActionIcon class="close" icon="close" @click="closeSubmitView" />
+        <div class="scrollable">
+          <WordExamResult
+            v-if="submissions.isWord"
+            :questions="submissions.questions"
+            :maxTrial="submissions.maxTrial"
+            :answerClass="answerClass"
+            :getTrialAt="getTrialAt"
+          />
+          <SentenceExamResult
+            v-else
+            mode="LEARNING"
+            :questions="submissions.questions"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -52,15 +70,25 @@ import { time } from "@/service/util";
 import { CalendarView, Day } from "../calendar";
 import ExamPaperTableView from "./ExamPaperTableView.vue";
 import { SpanText } from "@/components/text";
+import { Question } from "../../views/quiz";
+import WordExamResult from "../../views/quiz/result/WordExamResult.vue";
+import SentenceExamResult from "../../views/quiz/result/SentenceExamResult.vue";
+import util from "@/service/util";
+import { ActionIcon } from "../../components/form";
+
 export default {
   components: {
+    ActionIcon,
     CalendarView,
     ExamPaperTableView,
     SpanText,
+    SentenceExamResult,
+    WordExamResult,
   },
   setup() {
     const now = Day.fromDate(new Date());
     const detail = shallowRef(null);
+    const submissions = shallowRef(null);
     const todayStat = ref(null);
     const showExamDetail = (e) => {
       detail.value = { ...e }; // papers, day
@@ -87,13 +115,75 @@ export default {
     const timeText = (millis) => {
       return millis === 0 ? "---" : time.readableText(millis);
     };
+    const showSubmissions = (pair) => {
+      const { paper, section } = pair;
+      const { questionOffset: offset, numOfQuestions: size } = paper;
+      // 1. section내에서 낱말과 문장을 따로 분리
+      const sentences = section.sentences.filter(
+        (sen) => sen.type === paper.type
+      );
+      const questions = sentences
+        .slice(offset, offset + size)
+        .map((sen, idx) => new Question(null, idx, sen));
+      let maxTrial = 0;
+      const isWord = paper.type === "W" || paper.mode === "Q";
+      if (isWord) {
+        // 문장 형태
+        const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
+          sbm.sentenceRef,
+        ]);
+        questions.forEach((q) => {
+          const senSeq = "" + q.data.seq;
+          q.trials = groups[senSeq] || [];
+        });
+        maxTrial = questions.reduce(
+          (max, q) => Math.max(q.trials.length, max),
+          0
+        );
+      } else {
+        // 어절 형태
+        const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
+          sbm.sentenceRef,
+          sbm.eojeolRef,
+        ]);
+        questions.forEach((q) => {
+          const senSeq = "" + q.data.seq;
+          // 어절 입력
+          q.data.eojeols.forEach((ej) => {
+            const sen = groups[senSeq];
+            const trials = sen ? sen["" + ej.eojeolRef] : [];
+            ej.trials = trials || [];
+          });
+        });
+      }
+      submissions.value = { questions, maxTrial, isWord };
+    };
+    const answerClass = (question, index) => {
+      const trial = question.trials[index];
+      return trial ? "" + trial.correct : "";
+    };
+    const getTrialAt = (question, index) => {
+      if (question.trials.length === 0) {
+        return "-";
+      }
+      const trial = question.trials[index];
+      return (trial && (trial.value || "미입력")) || "미입력";
+    };
+    const closeSubmitView = () => {
+      submissions.value = null;
+    };
     return {
       now,
       todayStat,
       detail,
+      submissions,
       timeText,
       showExamDetail,
       showTodayExam,
+      showSubmissions,
+      closeSubmitView,
+      answerClass,
+      getTrialAt,
     };
   },
 };
@@ -177,6 +267,31 @@ export default {
       background-color: #0000004d;
       z-index: 10;
       padding: 16px;
+    }
+    .submissions {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 20;
+      padding: 32px;
+      background-color: #0000004d;
+      .scrollable {
+        position: relative;
+        background-color: white;
+        padding: 16px 0;
+        overflow: auto;
+      }
+      .close {
+        position: absolute;
+        top: 40px;
+        right: 40px;
+        font-size: 32px;
+        z-index: 30;
+      }
     }
   }
 }

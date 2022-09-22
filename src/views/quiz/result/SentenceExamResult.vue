@@ -1,13 +1,13 @@
 <template>
   <div class="trials">
-    <div class="sen" v-for="q in ctx.questions" :key="q.index">
+    <div class="sen" v-for="q in questions" :key="q.index">
       <p>
         <SpanText>{{ q.text }}</SpanText>
       </p>
       <TableView colsize="0px" fitBy="row">
         <template v-slot:fcol>&nbsp;</template>
         <template v-slot:data>
-          <template v-if="ctx.isLearningMode()">
+          <template v-if="mode !== 'QUIZ'">
             <!-- <Row>
               <Cell v-for="ej in q.eojeols" :key="ej.seq" w="w100"
                 ><SpanText>{{ ej.text }}</SpanText></Cell
@@ -32,7 +32,7 @@
               >
             </Row>
           </template>
-          <template v-else-if="ctx.isQuizMode()">
+          <template v-else>
             <Row class="trials" v-for="(jd, idx) in judge(q.trials)" :key="idx"
               ><SpanText
                 class="trial"
@@ -64,7 +64,7 @@ export default {
     Cell,
     SpanText,
   },
-  props: ["ctx", "getTrialAt", "answerClass", "maxTrial"],
+  props: ["questions", "mode", "getTrialAt", "answerClass", "maxTrial"],
   setup() {
     const judge = (trials) => trials;
     return {
@@ -76,6 +76,7 @@ export default {
 
 <style lang="scss" scoped>
 .trials {
+  background-color: white;
   .sen {
     margin: 0 16px 8px;
     .trials {

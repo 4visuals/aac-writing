@@ -3,7 +3,7 @@
     <TableView colsize="120px" :colummBased="false">
       <template v-slot:fcol>
         <Cell
-          v-for="(q, idx) in ctx.questions"
+          v-for="(q, idx) in questions"
           :key="q.index"
           :class="idx % 2 == 1 ? 'even' : 'odd'"
           w="w120"
@@ -13,7 +13,7 @@
       </template>
       <template v-slot:data>
         <Row
-          v-for="(q, idx) in ctx.questions"
+          v-for="(q, idx) in questions"
           :key="q.index"
           :class="idx % 2 == 1 ? 'even' : 'odd'"
         >
@@ -42,7 +42,7 @@ export default {
     Cell,
     SpanText,
   },
-  props: ["ctx", "getTrialAt", "answerClass", "maxTrial"],
+  props: ["questions", "getTrialAt", "answerClass", "maxTrial"],
 };
 </script>
 
