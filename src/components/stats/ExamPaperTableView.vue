@@ -96,13 +96,18 @@ export default {
       const range = paper.questionOffset / 10 + 1;
       return `${mode} ${range}`;
     };
-    const filterCorrectSentences = (paper) => {
+    /**
+     * 문장 S를 구성하는 각 어절들을 모두 맞혀야 정답 처리함
+     * (오답이 여러개 제출된 후 정답을 맞힌 경우는 최종 오답으로 처리함)
+     * @param {Object} paper
+     */
+    const countByEojeols = (paper) => {
       const { submissions } = paper;
       // 1. 제출된 어절을 문장, 어절로 분류함
       /*
-       * {1: {
-       *   12: [...],
-       *   45: [...]
+       * {4: {
+       *   12: [...], // 어절 12에 대한 답안들
+       *   45: [...]  // 어절 45에 대한 댭안들
        *   }
        * }
        */
@@ -118,11 +123,10 @@ export default {
         // 2. 각 어절마다 정답의 갯수를 센 후
         const corrects = eojeols.reduce((acc, ej) => {
           const trials = groups[senSeq]["" + ej.eojeolRef];
-          if (!trials) {
+          if (!trials || trials.length === 0) {
             return acc;
           }
-          const trial = trials.find((trial) => trial.correct);
-          return acc + (trial ? 1 : 0);
+          return acc + (trials[0].correct ? 1 : 0);
         }, 0);
         // 3. 문장의 어절 갯수와 정답의 갯수가 같으면 한 문제를 맞췄음.
         if (eojeols.length === corrects) {
@@ -131,17 +135,31 @@ export default {
       });
       return sentences;
     };
+    const countBySentence = (paper) => {
+      const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
+        sbm.sentenceRef,
+      ]);
+      const section = store.getters["course/section"](paper.sectionRef);
+      const corrects = [];
+      Object.keys(groups).forEach((senSeq) => {
+        const sentence = section.sentences.find((sen) => sen.seq === +senSeq);
+        if (groups[senSeq][0].correct) {
+          corrects.push(sentence);
+        }
+      });
+      return corrects;
+    };
     const score = (paper) => {
       const { type, mode } = paper;
       let corrects = [];
       if (type === "S" && mode !== "Q") {
         // 어절입력: 문장 보고쓰기, 문장 학습
         // 어절마다 1개 이상의 답안이 존재함
-        corrects = filterCorrectSentences(paper);
+        corrects = countByEojeols(paper);
       } else {
         // 문장입력: 낱말(보고쓰기,학습,퀴즈) + 문장 퀴즈
         // 하나의 문장에 최대 1개의 입력이 존재함
-        corrects = paper.submissions.filter((submit) => submit.correct);
+        corrects = countBySentence(paper);
       }
       const score = (100 * corrects.length) / paper.numOfQuestions;
       return score % 1 === 0 ? score : score.toFixed(1);
