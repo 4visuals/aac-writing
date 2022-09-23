@@ -42,18 +42,28 @@
       <div class="submissions" v-if="submissions">
         <ActionIcon class="close" icon="close" @click="closeSubmitView" />
         <div class="scrollable">
-          <WordExamResult
+          <!-- <WordExamResult
             v-if="submissions.isWord"
             :questions="submissions.questions"
             :maxTrial="submissions.maxTrial"
             :answerClass="answerClass"
             :getTrialAt="getTrialAt"
+          /> -->
+          <SentenceSubmissionView
+            v-if="submissions.isWord"
+            :paper="submissions.paper"
+            :section="submissions.section"
           />
-          <SentenceExamResult
+          <EojeolSubmissionView
+            v-else
+            :paper="submissions.paper"
+            :section="submissions.section"
+          />
+          <!-- <SentenceExamResult
             v-else
             mode="LEARNING"
             :questions="submissions.questions"
-          />
+          /> -->
         </div>
       </div>
     </div>
@@ -70,10 +80,8 @@ import { time } from "@/service/util";
 import { CalendarView, Day } from "../calendar";
 import ExamPaperTableView from "./ExamPaperTableView.vue";
 import { SpanText } from "@/components/text";
-import { Question } from "../../views/quiz";
-import WordExamResult from "../../views/quiz/result/WordExamResult.vue";
-import SentenceExamResult from "../../views/quiz/result/SentenceExamResult.vue";
-import util from "@/service/util";
+import EojeolSubmissionView from "../quiz/submission/EojeolSubmissionView.vue";
+import SentenceSubmissionView from "../quiz/submission/SentenceSubmissionView.vue";
 import { ActionIcon } from "../../components/form";
 
 export default {
@@ -82,8 +90,8 @@ export default {
     CalendarView,
     ExamPaperTableView,
     SpanText,
-    SentenceExamResult,
-    WordExamResult,
+    SentenceSubmissionView,
+    EojeolSubmissionView,
   },
   setup() {
     const now = Day.fromDate(new Date());
@@ -117,46 +125,9 @@ export default {
     };
     const showSubmissions = (pair) => {
       const { paper, section } = pair;
-      const { questionOffset: offset, numOfQuestions: size } = paper;
-      // 1. section내에서 낱말과 문장을 따로 분리
-      const sentences = section.sentences.filter(
-        (sen) => sen.type === paper.type
-      );
-      const questions = sentences
-        .slice(offset, offset + size)
-        .map((sen, idx) => new Question(null, idx, sen));
-      let maxTrial = 0;
+
       const isWord = paper.type === "W" || paper.mode === "Q";
-      if (isWord) {
-        // 문장 형태
-        const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
-          sbm.sentenceRef,
-        ]);
-        questions.forEach((q) => {
-          const senSeq = "" + q.data.seq;
-          q.trials = groups[senSeq] || [];
-        });
-        maxTrial = questions.reduce(
-          (max, q) => Math.max(q.trials.length, max),
-          0
-        );
-      } else {
-        // 어절 형태
-        const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
-          sbm.sentenceRef,
-          sbm.eojeolRef,
-        ]);
-        questions.forEach((q) => {
-          const senSeq = "" + q.data.seq;
-          // 어절 입력
-          q.data.eojeols.forEach((ej) => {
-            const sen = groups[senSeq];
-            const trials = sen ? sen["" + ej.eojeolRef] : [];
-            ej.trials = trials || [];
-          });
-        });
-      }
-      submissions.value = { questions, maxTrial, isWord };
+      submissions.value = { isWord, paper, section };
     };
     const answerClass = (question, index) => {
       const trial = question.trials[index];
@@ -190,6 +161,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .daily-stat {
   display: flex;
   flex-direction: column;
@@ -272,13 +244,14 @@ export default {
       display: flex;
       flex-direction: column;
       position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 0;
+      top: 50%;
+      left: 50%;
+      height: 400px;
       z-index: 20;
-      padding: 32px;
-      background-color: #0000004d;
+      transform: translate(-50%, -50%);
+      box-shadow: 2px 2px 16px #0000004d;
+      border-radius: 8px;
+      overflow: hidden;
       .scrollable {
         position: relative;
         background-color: white;
@@ -287,10 +260,26 @@ export default {
       }
       .close {
         position: absolute;
-        top: 40px;
-        right: 40px;
+        top: 8px;
+        right: 8px;
         font-size: 32px;
         z-index: 30;
+      }
+    }
+    @include mobile {
+      .submissions {
+        max-width: 400px;
+        width: 90%;
+      }
+    }
+    @include tablet {
+      .submissions {
+        width: 400px;
+      }
+    }
+    @include desktop {
+      .submissions {
+        width: 400px;
       }
     }
   }

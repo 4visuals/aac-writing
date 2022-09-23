@@ -20,11 +20,18 @@ const path = {
     scene: (path) =>
       `https://kr.object.ncloudstorage.com/aacweb/dictation/${path}`,
   },
+  dictation: {
+    scene: (path) =>
+      `https://kr.object.ncloudstorage.com/aacweb/scenes/${path}`,
+  },
   // https://kr.object.ncloudstorage.com/aacweb/scenes/a229b38f-3438-410c-afb3-5ad057323bf8.png
   resolveUrl: (picPath) => {
-    // 일단 이렇게만...
-    const uri = picPath.substring("aacweb:".length);
-    return path.aacweb.symbol(uri);
+    if (picPath.indexOf("aacweb:") === 0) {
+      const uri = picPath.substring("aacweb:".length);
+      return path.aacweb.symbol(uri);
+    } else {
+      return path.dictation.scene(picPath);
+    }
   },
 };
 const time = {

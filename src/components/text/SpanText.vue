@@ -14,7 +14,7 @@ export default {
   span {
     font-size: 1.15rem;
     &.sm {
-      font-size: 0.85rem;
+      font-size: 1rem;
     }
     &.lg {
       font-size: 1.35rem;
