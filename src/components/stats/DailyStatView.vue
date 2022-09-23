@@ -31,24 +31,17 @@
         @today="showTodayExam"
         @exams="showExamDetail"
       />
-      <div class="details" v-if="detail">
+      <div class="details" v-if="detail" ref="detailEl">
         <ExamPaperTableView
           :papers="detail.papers"
           :date="detail.day"
           @view-submissions="showSubmissions"
-          @close="detail = null"
+          @close="closeDetailView"
         />
       </div>
       <div class="submissions" v-if="submissions">
         <ActionIcon class="close" icon="close" @click="closeSubmitView" />
         <div class="scrollable">
-          <!-- <WordExamResult
-            v-if="submissions.isWord"
-            :questions="submissions.questions"
-            :maxTrial="submissions.maxTrial"
-            :answerClass="answerClass"
-            :getTrialAt="getTrialAt"
-          /> -->
           <SentenceSubmissionView
             v-if="submissions.isWord"
             :paper="submissions.paper"
@@ -59,11 +52,6 @@
             :paper="submissions.paper"
             :section="submissions.section"
           />
-          <!-- <SentenceExamResult
-            v-else
-            mode="LEARNING"
-            :questions="submissions.questions"
-          /> -->
         </div>
       </div>
     </div>
@@ -75,7 +63,7 @@
  * 학생 일일 통계 화면
  * - 달력 형태로 화면에 보여줌
  */
-import { ref, shallowRef } from "vue";
+import { nextTick, ref, shallowRef } from "vue";
 import { time } from "@/service/util";
 import { CalendarView, Day } from "../calendar";
 import ExamPaperTableView from "./ExamPaperTableView.vue";
@@ -95,6 +83,7 @@ export default {
   },
   setup() {
     const now = Day.fromDate(new Date());
+    const detailEl = shallowRef(null);
     const detail = shallowRef(null);
     const submissions = shallowRef(null);
     const todayStat = ref(null);
@@ -128,33 +117,31 @@ export default {
 
       const isWord = paper.type === "W" || paper.mode === "Q";
       submissions.value = { isWord, paper, section };
+      nextTick().then(() => {
+        detailEl.value.addEventListener("click", closeSubmitView, false);
+      });
     };
-    const answerClass = (question, index) => {
-      const trial = question.trials[index];
-      return trial ? "" + trial.correct : "";
-    };
-    const getTrialAt = (question, index) => {
-      if (question.trials.length === 0) {
-        return "-";
-      }
-      const trial = question.trials[index];
-      return (trial && (trial.value || "미입력")) || "미입력";
-    };
+
     const closeSubmitView = () => {
+      detailEl.value.removeEventListener("click", closeSubmitView, false);
       submissions.value = null;
+    };
+    const closeDetailView = () => {
+      closeSubmitView();
+      detail.value = null;
     };
     return {
       now,
       todayStat,
       detail,
+      detailEl,
       submissions,
       timeText,
       showExamDetail,
       showTodayExam,
       showSubmissions,
       closeSubmitView,
-      answerClass,
-      getTrialAt,
+      closeDetailView,
     };
   },
 };

@@ -49,7 +49,10 @@
           >
           <Cell w="w40"
             ><SpanText size="sm"
-              ><button class="anchor" @click="$emit('view-submissions', pair)">
+              ><button
+                class="anchor"
+                @click.stop="$emit('view-submissions', pair)"
+              >
                 {{ score(pair.paper) }}
               </button></SpanText
             ></Cell

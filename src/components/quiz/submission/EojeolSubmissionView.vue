@@ -85,14 +85,13 @@ export default {
   .sbm {
     padding: 0 8px 8px;
     .pic {
-      background-color: #efefef;
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
       grid-column: 1/2;
       grid-row: 1/3;
       border-radius: 4px;
-      box-shadow: 1px 1px 2px #0000004f;
+      box-shadow: 1px 1px 2px #0000008f;
       &.ej {
         width: 48px;
         height: 48px;
