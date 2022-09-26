@@ -52,7 +52,6 @@ export default {
     WordExamResult,
     AacButton,
     StaticButton,
-    // SectionHeatMapChart,
     SectionLineChart,
   },
   setup() {

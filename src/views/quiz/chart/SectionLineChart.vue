@@ -8,29 +8,39 @@
       />
     </div>
     <div class="chart" ref="chartEl"></div>
-    <div v-if="chartEvent.active" class="custom-tooltip">
+    <div
+      v-if="chartEvent.active"
+      class="custom-tooltip"
+      :class="{ h80: ctx.isSentence() && ctx.mode !== 'QUIZ' }"
+    >
       <h3 class="head">
         <ActionIcon icon="arrow_back_ios" @click="closeSubmissionView" />
         <span>{{ section.description }}</span>
       </h3>
-      <div class="body">
-        <div class="stats">
-          <ParaText
-            ><span>{{ chartEvent.stats.date }}</span
-            >(<span>{{ chartEvent.stats.range }}번</span>)</ParaText
-          >
-          <ParaText :small="true"
-            ><span class="score"
-              >최종 {{ chartEvent.stats.score.toFixed(1) }}점</span
-            ><span class="cnt"
-              >전체: {{ chartEvent.stats.total }}, 정답:
-              {{ chartEvent.stats.correct }}</span
-            ></ParaText
-          >
-        </div>
-        <SubmissionView
+      <div class="stats">
+        <ParaText
+          ><span>{{ chartEvent.stats.date }}</span
+          >(<span>{{ chartEvent.stats.range }}번</span>)</ParaText
+        >
+        <ParaText :small="true"
+          ><span class="score"
+            >최종 {{ chartEvent.stats.score.toFixed(1) }}점</span
+          ><span class="cnt"
+            >전체: {{ chartEvent.stats.total }}, 정답:
+            {{ chartEvent.stats.correct }}</span
+          ></ParaText
+        >
+      </div>
+      <div class="scrollable">
+        <EojeolSubmissionStackView
           :sentences="chartEvent.sentences"
-          :exams="chartEvent.exams"
+          :papers="chartEvent.exams"
+          v-if="ctx.isSentence() && ctx.mode !== 'QUIZ'"
+        />
+        <SentenceSubmissionStackView
+          :sentences="chartEvent.sentences"
+          :papers="chartEvent.exams"
+          v-else
         />
       </div>
     </div>
@@ -47,9 +57,11 @@ import api from "@/service/api";
 import { time } from "@/service/util";
 import { onMounted, onUnmounted, ref, shallowRef } from "vue";
 import { useStore } from "vuex";
-import SubmissionView from "./SubmissionView.vue";
+// import SubmissionView from "./SubmissionView.vue";
 import SegmentView from "@/components/quiz/SegmentView.vue";
-
+import EojeolSubmissionStackView from "../../../components/quiz/submission/EojeolSubmissionStackView.vue";
+import SentenceSubmissionStackView from "../../../components/quiz/submission/SentenceSubmissionStackView.vue";
+import countAnswer from "@/components/stats/count-answer";
 const colors = [
   "#f3a600",
   "#00acc2",
@@ -121,7 +133,9 @@ const options = {
 export default {
   components: {
     ActionIcon,
-    SubmissionView,
+    EojeolSubmissionStackView,
+    SentenceSubmissionStackView,
+    // SubmissionView,
     ParaText,
     SegmentView,
   },
@@ -226,7 +240,7 @@ export default {
           closeSubmissionView();
         } else if (targetID.startsWith("point")) {
           chartEvent.value.click = e;
-          chartEvent.value.active = true;
+          // chartEvent.value.active = true;
           chartEvent.value.type = "point";
         } else {
           // closeSubmissionView();
@@ -242,9 +256,9 @@ export default {
         }
 
         if (chartEvent.value.type === "point") {
-          if (!chartEvent.value.active) {
-            return;
-          }
+          // if (!chartEvent.value.active) {
+          //   return;
+          // }
           chartEvent.value.select = s[0];
           const { row, column } = s[0];
           const rowData = chart.rows[row]; // ['2022-09-01', 23, 45, 11]
@@ -258,8 +272,6 @@ export default {
               stat.questionOffset === offset &&
               stat.numOfQuestions === size
           );
-          chartEvent.value.exams = exams;
-          chartEvent.value.sentences = sentences.slice(offset, offset + size);
           const stats = exams.reduce(
             (acc, exam) => {
               acc.total += exam.total;
@@ -274,6 +286,9 @@ export default {
           stats.range = `${offset + 1} ~ ${offset + 10}`;
 
           chartEvent.value.stats = stats;
+          chartEvent.value.active = true;
+          chartEvent.value.exams = exams;
+          chartEvent.value.sentences = sentences.slice(offset, offset + size);
         }
       });
     };
@@ -288,12 +303,10 @@ export default {
             .filter((paper) => paper.mode === mode)
             .map((paper) => {
               const total = paper.numOfQuestions; // paper.submissions.length;
-              const correct = paper.submissions.filter(
-                (submit) => submit.correct
-              ).length;
-              const failed = total - correct;
+              const corrects = countAnswer(paper, section);
+              const failed = total - corrects.length;
               const ymd = time.toYMD(paper.startTime);
-              return { ...paper, total, correct, failed, ymd };
+              return { ...paper, total, correct: corrects.length, failed, ymd };
             });
           return stats;
         });
@@ -405,6 +418,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .chart-wrapper {
   flex: 1 1 auto;
   overflow: auto;
@@ -454,21 +468,20 @@ export default {
   }
   .custom-tooltip {
     // width: 80%;
-    width: 90%;
-    max-width: 300px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
-    border: solid 1px #bdbdbd;
-    border-radius: 2px;
-    background-color: white;
-    position: absolute;
-    box-shadow: 0px 2px 2px 0px rgb(204 204 204 / 60%);
-    font-size: 12px;
-    padding: 0px;
+    box-shadow: 2px 2px 16px #0000004d;
+    border-radius: 8px;
+    overflow: hidden;
     z-index: 10000;
-
+    &.h80 {
+      height: 80%;
+    }
     .head {
       display: flex;
       align-items: center;
@@ -476,16 +489,36 @@ export default {
       column-gap: 8px;
     }
 
-    .body {
-      .stats {
-        padding: 0 16px;
-        .score {
-          margin-right: 8px;
-          font-weight: bold;
-          font-size: 1.2em;
-          color: #bd0303;
-        }
+    .stats {
+      padding: 0 16px;
+      .score {
+        margin-right: 8px;
+        font-weight: bold;
+        font-size: 1.2em;
+        color: #bd0303;
       }
+    }
+    .scrollable {
+      position: relative;
+      background-color: white;
+      padding: 8px;
+      overflow: auto;
+    }
+  }
+  @include mobile {
+    .custom-tooltip {
+      max-width: 400px;
+      width: 90%;
+    }
+  }
+  @include tablet {
+    .custom-tooltip {
+      width: 400px;
+    }
+  }
+  @include desktop {
+    .custom-tooltip {
+      width: 400px;
     }
   }
 }

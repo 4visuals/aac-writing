@@ -45,10 +45,10 @@
             <SpanText>{{ detailRef.score }}</SpanText>
           </div>
         </div>
-        <SubmissionView
+        <SentenceSubmissionView
           class="submits"
-          :sentences="detailRef.sentences"
-          :exams="detailRef.exams"
+          :paper="detailRef.exams[0]"
+          :section="detailRef.section"
         />
       </div>
     </div>
@@ -62,7 +62,7 @@ import { SpanText } from "@/components/text";
 import { useStore } from "vuex";
 import { Segment } from "../../views/quiz";
 import GoogleBarChart from "./GoogleBarChart.vue";
-import { SubmissionView } from "@/views/quiz/chart";
+import SentenceSubmissionView from "../quiz/submission/SentenceSubmissionView.vue";
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
 const courses = {
   L: { name: "course/levels", colors: ["#4472c4"] },
@@ -73,7 +73,7 @@ export default {
     ActionIcon,
     SpanText,
     GoogleBarChart,
-    SubmissionView,
+    SentenceSubmissionView,
   },
   props: ["origin", "exams", "courseStat"],
   setup(props) {
@@ -296,6 +296,7 @@ export default {
         score: `${score.toFixed(1)}점`,
         sentences: sentences.slice(offset, offset + len),
         exams: [exam],
+        section,
       };
     };
     const debouncing = () => {
@@ -413,10 +414,13 @@ export default {
     overflow: hidden;
     position: relative;
     .detail {
+      display: flex;
+      flex-direction: column;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      height: 80%;
 
       background-color: white;
       padding: 0;
@@ -428,7 +432,26 @@ export default {
         padding: 8px 16px;
       }
       .submits {
-        width: 300px;
+        position: relative;
+        background-color: white;
+        padding: 8px;
+        overflow: auto;
+      }
+    }
+    @include mobile {
+      .detail {
+        max-width: 400px;
+        width: 90%;
+      }
+    }
+    @include tablet {
+      .detail {
+        width: 400px;
+      }
+    }
+    @include desktop {
+      .detail {
+        width: 400px;
       }
     }
   }
