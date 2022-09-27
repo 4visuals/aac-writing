@@ -186,8 +186,22 @@ const arr = {
     return t;
   },
 };
-
-export { key, path, time, host, logger, arr, pick };
+const valid = {
+  y4md: (value) => {
+    // check valid yyyy-mm-dd
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return false;
+    }
+    const cur = new Date();
+    const time = new Date(value);
+    const y = time.getFullYear();
+    const m = time.getMonth() + 1;
+    const d = time.getDate();
+    const [year, month, date] = value.split("-").map((s) => +s);
+    return cur.getFullYear() > y && year === y && month == m && date === d;
+  },
+};
+export { key, path, time, host, logger, arr, valid, pick };
 export default {
   key,
   path,
@@ -196,4 +210,5 @@ export default {
   logger,
   arr,
   pick,
+  valid,
 };

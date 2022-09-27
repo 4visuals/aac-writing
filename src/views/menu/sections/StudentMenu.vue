@@ -4,10 +4,6 @@
       <p class="mgt-8px mgb-8px">
         등록된 학생이 없습니다. 수강증을 클릭해서 학생을 등록해주세요.
       </p>
-      <!-- <button class="nude reg effect pressed" @click="showStudentRegForm">
-        <span class="icon material-icons-outlined"> person_add </span
-        ><span>학생 등록</span>
-      </button> -->
     </template>
     <template v-else>
       <p>{{ students.length }}명</p>
@@ -19,15 +15,6 @@
           @clicked="showStudentDetailView"
         />
       </div>
-      <!-- <div class="ctrl-stud">
-        <StaticButton
-          text="추가"
-          size="sm"
-          theme="blue"
-          inline
-          @click="showStudentRegForm"
-        ></StaticButton>
-      </div> -->
     </template>
 
     <teleport to="body" v-if="modal">
@@ -45,14 +32,13 @@
 <script>
 // import QuizStatsView from "@/components/stats/QuizStatsView.vue";
 import { StudentDetailView } from "@/components/user";
-import { StudentRegForm, StudentItem } from "@/components/admin";
+import { StudentItem } from "@/components/admin";
 import { StaticButton } from "@/components/form";
 import { shallowRef } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { computed } from "@vue/runtime-core";
 export default {
   components: {
-    StudentRegForm,
     StudentItem,
     StaticButton,
   },
@@ -60,13 +46,6 @@ export default {
     const store = useStore();
     const students = computed(() => store.getters["user/students"]);
     const modal = shallowRef(null);
-    const showStudentRegForm = () => {
-      modal.value = {
-        comp: StudentRegForm,
-        args: {},
-        events: { student: "createStudent" },
-      };
-    };
     const showStudentDetailView = (student) => {
       modal.value = {
         comp: StudentDetailView,
@@ -83,7 +62,6 @@ export default {
     return {
       modal,
       students,
-      showStudentRegForm,
       showStudentDetailView,
       createStudent,
       hideModal,

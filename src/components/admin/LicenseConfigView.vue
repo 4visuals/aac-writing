@@ -17,17 +17,28 @@
       <div class="stud-list" v-if="studentInUse">
         <StudentItem :student="studentInUse" @click="openStudenEditor" />
       </div>
-      <div v-else class="reg">
-        <p>새로운 학생을 추가할 수 있습니다.</p>
-        <!-- <StudentRegForm @student="registerStudent" /> -->
-      </div>
+
       <StudentRegForm
         class="stud-form"
         @editing="error = null"
         @commit="registerStudent"
         :student="studentInUse"
         :error="error"
+        v-if="studentInUse"
       />
+      <div v-else class="no-bound-stud">
+        <p class="mg8px">수강증에 새로운 학생을 추가할 수 있습니다.</p>
+        <div class="mg8px">
+          <div class="license">
+            <span class="icon material-icons-outlined"> sell </span
+            ><span class="code">{{ active.uuid }}</span>
+          </div>
+        </div>
+        <NewStudentForm v-if="newStudForm" @student="registerStudent" />
+        <button v-else class="nude blue round" @click="showNewStudForm">
+          학생 등록
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -35,15 +46,18 @@
 <script>
 import LicenseItem from "./LicenseItem.vue";
 import StudentRegForm from "./StudentRegForm.vue";
+import NewStudentForm from "./NewStudentForm.vue";
 import StudentItem from "./StudentItem.vue";
 // import api from "@/service/api";
 import { ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
+import toast from "../../components/toast";
 export default {
   props: ["license", "licenses", "students"],
   components: {
     LicenseItem,
     StudentItem,
+    NewStudentForm,
     // DatePicker,
     // TextField,
     StudentRegForm,
@@ -55,6 +69,7 @@ export default {
     const error = ref(null);
     const assignables = ref(null);
     const current = ref(new Date().getTime());
+    const newStudForm = ref(false);
 
     const studentReg = ref({
       name: "",
@@ -72,6 +87,7 @@ export default {
       const idx = props.students.findIndex(
         (s) => license && license.studentRef === s.seq
       );
+      newStudForm.value = false;
       studentReg.value.visible = false;
       studentInUse.value = props.students[idx];
       assignables.value = props.students.filter(
@@ -102,15 +118,22 @@ export default {
         : { name, userId, birth, pass, license: active.value };
       store
         .dispatch(method, args)
-        .then(() => updateUse())
+        .then(() => {
+          updateUse();
+          const msgCode = editing ? "@USER_EDIT_SUCCESS" : "@NEW_USER_SUCCESS";
+          toast.success(msgCode, null, 5);
+        })
         .catch((e) => {
           console.log("[error]", e);
           error.value = e.cause;
+          toast.error(`@${e.cause}`, `실패`, 15);
         });
     };
-
     const openStudenEditor = () => {
       console.log("done");
+    };
+    const showNewStudForm = () => {
+      newStudForm.value = true;
     };
     return {
       current,
@@ -119,9 +142,11 @@ export default {
       studentInUse,
       assignables,
       studentReg,
+      newStudForm,
       bindStudent,
       registerStudent,
       openStudenEditor,
+      showNewStudForm,
     };
   },
 };
@@ -132,6 +157,7 @@ export default {
 .lcs-config-view {
   display: flex;
   align-items: flex-start;
+  flex: 1 1 auto;
   .lcs-view {
     flex: 0 0 160px;
     border-right: 1px solid #ccc;
@@ -160,6 +186,20 @@ export default {
       row-gap: 8px;
       flex-direction: column;
       align-items: flex-start;
+    }
+    .license {
+      display: inline-flex;
+      align-items: center;
+      column-gap: 6px;
+      background-color: #ececec;
+      padding: 8px;
+      color: #444;
+      border-radius: 4px;
+      border: 1px solid #777;
+      user-select: none;
+      .icon {
+        font-size: 14px;
+      }
     }
   }
 }

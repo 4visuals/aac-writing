@@ -8,18 +8,21 @@
         @cur-date="setBirthday"
         @toggle="(visible) => (form.visible = !visible)"
       />
+      <h5>학생 이름</h5>
       <TextField
         icon="face"
         v-model:value="form.student.name"
         size="sm"
         placeholder="이름 입력"
       />
+      <h5>학생 아이디</h5>
       <TextField
         icon="face"
         v-model:value="form.student.userId"
         size="sm"
         placeholder="아이디 입력"
       />
+      <h5>비밀 번호</h5>
       <TextField
         icon="password"
         v-model:value="form.student.pass"
@@ -27,46 +30,25 @@
         type="text"
         placeholder="비밀번호"
       />
-      <AacButton
-        size="xs"
-        inline
-        theme="pink"
-        text="정보 수정"
-        @click="registerStudent"
-        v-if="form.editMode"
-      ></AacButton>
-      <AacButton
-        size="xs"
-        inline
-        theme="blue"
-        text="학생 등록"
-        @click="registerStudent"
-        v-else
-      ></AacButton>
+      <div class="ctrl mgt-8px">
+        <FormButton text="정보 수정" @click="registerStudent"></FormButton>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { TextField, AacButton } from "@/components/form";
+import { TextField } from "@/components/form";
 import DatePicker from "@/components/DatePicker.vue";
 import { ref } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
-// import api from "@/service/api";
-
-const DEFAULT_STUDENT = {
-  name: "",
-  userId: "",
-  password: "",
-  birth: undefined,
-};
 
 const codes = {
-  DUP_RESOURCE: "사용중인 아이디입니다.",
+  DUP_USER_ID: "사용중인 아이디입니다.",
 };
 
 export default {
-  components: { TextField, AacButton, DatePicker },
+  components: { TextField, DatePicker },
   props: ["student", "error"],
   setup(props, { emit }) {
     const form = ref({
@@ -74,12 +56,6 @@ export default {
       visible: false,
       editMode: true,
     });
-    if (!props.student) {
-      form.value.student = Object.assign({}, DEFAULT_STUDENT, {
-        birth: new Date(),
-      });
-      form.value.editMode = false;
-    }
     const registerStudent = () => {
       emit("commit", { ...form.value.student, editing: form.value.editMode });
     };
@@ -95,12 +71,8 @@ export default {
     watch(
       () => props.student,
       (student) => {
-        form.value.student =
-          student ||
-          Object.assign({}, DEFAULT_STUDENT, {
-            birth: new Date(),
-          });
-        form.value.editMode = !!student;
+        form.value.student = { ...student };
+        form.value.editMode = true;
       }
     );
     watch(
@@ -129,6 +101,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    h5 {
+      margin: 12px 0 4px;
+    }
     .error {
       background-color: chocolate;
       color: white;
