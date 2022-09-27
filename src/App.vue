@@ -34,6 +34,7 @@
       ></component>
     </Modal>
   </teleport>
+  <ToastUI />
 </template>
 <script>
 import env from "@/service/env";
@@ -45,12 +46,15 @@ import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
 import RefreshView from "./views/RefreshView.vue";
+import ToastUI from "./components/toast/ToastUI.vue";
+
 export default {
   components: {
     Nav,
     Background,
     MenuWrapper,
     RefreshView,
+    ToastUI,
   },
   setup() {
     logger.log(env);
