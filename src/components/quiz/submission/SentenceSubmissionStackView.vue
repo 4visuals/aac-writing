@@ -41,7 +41,7 @@
 
 <script>
 import util from "@/service/util";
-import { shallowRef } from "vue";
+import { shallowRef, watch } from "vue";
 export default {
   props: ["papers", "sentences"],
   setup(props) {
@@ -71,6 +71,8 @@ export default {
       submit.value = { sentences, answers };
     };
     buildData();
+    watch(() => props.papers, buildData);
+
     return { submit, answersByEojeol, imagePathOfEojeol };
   },
 };
