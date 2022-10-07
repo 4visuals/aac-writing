@@ -41,7 +41,7 @@
       </div>
       <div class="submissions" v-if="submissions">
         <ActionIcon class="close" icon="close" @click="closeSubmitView" />
-        <div class="scrollable">
+        <div class="scrollable" ref="scrollEl">
           <SentenceSubmissionView
             v-if="submissions.isWord"
             :paper="submissions.paper"
@@ -87,6 +87,7 @@ export default {
     const detail = shallowRef(null);
     const submissions = shallowRef(null);
     const todayStat = ref(null);
+    const scrollEl = ref(null);
     const showExamDetail = (e) => {
       detail.value = { ...e }; // papers, day
     };
@@ -118,6 +119,7 @@ export default {
       const isWord = paper.type === "W" || paper.mode === "Q";
       submissions.value = { isWord, paper, section };
       nextTick().then(() => {
+        scrollEl.value.scrollTop = 0;
         detailEl.value.addEventListener("click", closeSubmitView, false);
       });
     };
@@ -135,6 +137,7 @@ export default {
       todayStat,
       detail,
       detailEl,
+      scrollEl,
       submissions,
       timeText,
       showExamDetail,

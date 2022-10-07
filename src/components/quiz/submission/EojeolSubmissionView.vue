@@ -14,9 +14,9 @@
             }"
           ></div>
           <div
+            v-for="answer in answerOf(eojeol)"
             class="val"
             :class="{ correct: answer.correct }"
-            v-for="answer in answerOf(eojeol)"
             :key="answer.index"
           >
             {{ answer.value }}
@@ -31,13 +31,17 @@
 <script>
 import util from "@/service/util";
 import { SpanText } from "@/components/text";
-import { shallowRef } from "vue";
+import { shallowRef, watch } from "vue";
 export default {
   components: {
     SpanText,
   },
   props: ["paper", "section"],
   setup(props) {
+    const image = {
+      passed: require("@/assets/reward/passed.png"),
+      failed: require("@/assets/reward/failed.png"),
+    };
     const submit = shallowRef(null);
 
     const answerOf = (ej) => {
@@ -50,7 +54,13 @@ export default {
     };
 
     const imagePathOfEojeol = (ej) => {
-      return util.path.resolveUrl(ej.picturePath);
+      const answers = answerOf(ej);
+      if (answers.length === 1 && answers[0].correct) {
+        return image.passed;
+      } else {
+        return image.failed;
+      }
+      // return util.path.resolveUrl(ej.picturePath);
     };
     const isEmptyEojeol = (ej) => {
       const { groups } = submit.value;
@@ -75,6 +85,7 @@ export default {
       submit.value = { sentences, groups };
     };
     buildData();
+    watch(() => props.paper, buildData);
     return { submit, answerOf, imagePathOfEojeol, isEmptyEojeol };
   },
 };
@@ -85,7 +96,7 @@ export default {
   .sbm {
     padding: 0 8px 8px;
     .pic {
-      background-size: contain;
+      background-size: 80%;
       background-position: center;
       background-repeat: no-repeat;
       grid-column: 1/2;

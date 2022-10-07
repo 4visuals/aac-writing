@@ -11,11 +11,11 @@
       </div>
       <div class="answers">
         <ul v-if="hasSubmissions(sen)">
-          <li class="mark a">A</li>
           <li
             v-for="(sbm, idx) in filterSubmissions(sen)"
             :key="idx"
-            :class="{ corret: sbm.correct }"
+            class="answer"
+            :class="{ correct: sbm.correct }"
           >
             <SpanText size="sm">{{ sbm.value }}</SpanText>
           </li>
@@ -27,14 +27,17 @@
 </template>
 
 <script>
-import { path } from "@/service/util";
 import { SpanText } from "@/components/text";
 import util from "@/service/util";
-import { shallowRef } from "vue";
+import { shallowRef, watch } from "vue";
 export default {
   components: { SpanText },
   props: ["paper", "section"],
   setup(props) {
+    const image = {
+      passed: require("@/assets/reward/passed.png"),
+      failed: require("@/assets/reward/failed.png"),
+    };
     const submit = shallowRef(null);
     const buildData = () => {
       const { section, paper } = props;
@@ -57,10 +60,16 @@ export default {
       return submissions && submissions.length > 0;
     };
     const imagePath = (sentence) => {
-      const imgPath = sentence.scenePicture || sentence.eojeols[0].picturePath;
-      return path.resolveUrl(imgPath);
+      // const imgPath = sentence.scenePicture || sentence.eojeols[0].picturePath;
+      const submissions = filterSubmissions(sentence);
+      if (submissions.length === 1 && submissions[0].correct) {
+        return image.passed;
+      } else {
+        return image.failed;
+      }
     };
     buildData();
+    watch(() => props.paper, buildData);
     return { submit, filterSubmissions, hasSubmissions, imagePath };
   },
 };
@@ -89,7 +98,7 @@ export default {
       width: 60px;
       height: 60px;
       background-color: #efefef;
-      background-size: contain;
+      background-size: 80%;
       background-position: center;
       background-repeat: no-repeat;
       grid-column: 1/2;
@@ -112,6 +121,16 @@ export default {
         display: flex;
         flex-wrap: wrap;
         column-gap: 8px;
+        .answer {
+          background-color: #efefef;
+          color: #777;
+          padding: 4px 6px;
+          border-radius: 4px;
+          &.correct {
+            background-color: #b3ff70;
+            color: #335f0b;
+          }
+        }
       }
       .empty {
         color: #999;
