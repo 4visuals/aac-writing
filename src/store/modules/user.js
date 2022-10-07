@@ -2,8 +2,11 @@ import env from "@/service/env";
 import api from "@/service/api";
 import storage from "@/service/storage";
 import { time } from "@/service/util";
+import License from "@/entity/license";
+
 const installLoginData = (store, { membership, licenses, jwt, segments }) => {
-  membership.licenses = licenses;
+  licenses.forEach((lcs) => (lcs.isNew = false));
+  membership.licenses = licenses.map((lcs) => new License(lcs));
   store.commit("setMembership", membership);
   store.commit("updateJwt", jwt);
   if (store.getters.isStudent) {
@@ -48,6 +51,12 @@ export default {
       membership.image = membership.profile.picture;
       state.membership = membership;
     },
+    addLicenses(state, licenses) {
+      licenses.forEach((lcs) => (lcs.isNew = true));
+      state.membership.licenses.push(
+        ...licenses.map((lcs) => new License(lcs))
+      );
+    },
     clearMembership(state) {
       state.membership = null;
     },
@@ -87,8 +96,14 @@ export default {
       student.birth = time.birthToDate(student.birth);
       const { students } = state.membership.user;
       const pos = students.findIndex((stud) => stud.seq === student.seq);
-      students[pos] = student;
+      students.splice(pos, 1, student);
+      // students[pos] = student;
       state.membership.user.students = [...students];
+    },
+    updateStudentProp(state, { student, prop, value }) {
+      const { students } = state.membership.user;
+      const pos = students.findIndex((stud) => stud.seq === student.seq);
+      students[pos][prop] = value;
     },
   },
 
@@ -147,6 +162,13 @@ export default {
       return api.student.update(student.seq, props).then((res) => {
         args.user = args.student;
         ctx.commit("updateStudent", res.student);
+      });
+    },
+    updateStudentProp(ctx, { student, prop, value }) {
+      return api.student.updateProp(student.seq, prop, value).then((res) => {
+        const { student } = res;
+        ctx.commit("updateStudent", student);
+        return student;
       });
     },
     bindStudent(ctx, args) {

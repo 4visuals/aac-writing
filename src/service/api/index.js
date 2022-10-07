@@ -14,7 +14,9 @@ const student = {
     POST(`/student/login`, { id, password, role: "STUDENT" }),
   register: (name, birth, userId, pass, license) =>
     POST(`/student`, { name, birth, userId, pass, license }),
-  update: (studentSeq, props) => PUT(`/student/${studentSeq}`, props),
+  // update: (studentSeq, props) => PUT(`/student/${studentSeq}`, props),
+  updateProp: (studentSeq, prop, value) =>
+    PUT(`/student/${studentSeq}`, { studentSeq, prop, value }),
 };
 const chapter = {
   list: (origin) => GET(`/chapters/origin/${origin}`),
@@ -78,9 +80,29 @@ const stats = {
   bySection: (sectionSeq, licenseUuid) =>
     GET(`/stats/section/${sectionSeq}`, { license: licenseUuid }),
 };
-
+/**
+ * 상품
+ */
+const product = {
+  list: () => GET("/products"),
+};
+const order = {
+  createBeta: (productCode, quantity) =>
+    POST("/order/beta", { productCode, quantity }),
+};
 const tts = {};
 
 export { section };
 
-export default { user, student, chapter, license, section, exam, stats, tts };
+export default {
+  user,
+  student,
+  chapter,
+  license,
+  section,
+  exam,
+  stats,
+  tts,
+  product,
+  order,
+};

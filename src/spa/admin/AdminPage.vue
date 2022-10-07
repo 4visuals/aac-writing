@@ -14,10 +14,12 @@ import { useStore } from "vuex";
 import AdminMenu from "./views/AdminMenu.vue";
 import LevelAnalysis from "./views/LevelAnalysis.vue";
 import LicenseManage from "./views/LicenseManage.vue";
+import OrderListView from "./views/order/OrderListView.vue";
 
 export default {
   components: {
     AdminMenu,
+    OrderListView,
   },
   setup() {
     const store = useStore();
@@ -27,6 +29,12 @@ export default {
         icon: "account_balance",
         title: "문제은행",
         comp: LevelAnalysis,
+      },
+      {
+        id: "order",
+        icon: "monetization_on",
+        title: "주문내역",
+        comp: OrderListView,
       },
       { id: "license", icon: "badge", title: "수강증", comp: LicenseManage },
       { id: "stats", icon: "insights", title: "통계", comp: null },

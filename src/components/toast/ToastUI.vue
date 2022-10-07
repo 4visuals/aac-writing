@@ -115,7 +115,7 @@ export default {
     transform: translateX(-100%);
   }
   .slide-enter-active {
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
   }
   .slide-enter-to {
     transform: translateX(0%);
@@ -125,7 +125,7 @@ export default {
     transform: translateX(0%);
   }
   .slide-leave-active {
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
   }
   .slide-leave-to {
     opacity: 0;

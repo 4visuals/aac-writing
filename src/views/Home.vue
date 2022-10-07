@@ -43,7 +43,7 @@
     </div>
     <teleport to="body" v-if="modal.visible">
       <Modal @hidden="modal.visible = false" :fill="true" :rect="true">
-        <ModalHeader
+        <ModalHeader :shadow="true"
           ><ActionIcon
             icon="arrow_back"
             @click="modal.visible = false"

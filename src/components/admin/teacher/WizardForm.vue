@@ -1,22 +1,29 @@
 <template>
-  <div :class="`wizard ${wizard.status || ''}`">
-    <h3 v-if="wizard.title && wizard.status !== 'confirmed'">
-      {{ wizard.title }}
+  <div :class="`inputForm ${inputForm.status || ''}`">
+    <h3 v-if="inputForm.title && inputForm.status !== 'confirmed'">
+      {{ inputForm.title }}
     </h3>
-    <div class="desc mg8" v-if="wizard.status === 'active' && wizard.desc">
-      {{ wizard.desc }}
+    <div
+      class="desc mg8"
+      v-if="inputForm.status === 'active' && inputForm.desc"
+    >
+      {{ inputForm.desc }}
     </div>
-    <div class="body mg8" v-if="wizard.status === 'active'">
-      <input :type="wizard.type || 'text'" ref="inputEl" @input="valueTyped" />
+    <div class="body mg8" v-if="inputForm.status === 'active'">
+      <input
+        :type="inputForm.type || 'text'"
+        ref="inputEl"
+        @input="valueTyped"
+      />
     </div>
-    <div class="body mg8" v-else-if="wizard.status === 'confirmed'">
-      <div class="value">{{ wizard.value }}</div>
-      <a href="#" class="no-style" @click.prevent="$emit('active', wizard)"
+    <div class="body mg8" v-else-if="inputForm.status === 'confirmed'">
+      <div class="value">{{ inputForm.value }}</div>
+      <a href="#" class="no-style" @click.prevent="$emit('active', inputForm)"
         >편집</a
       >
     </div>
-    <div class="error mg8" v-if="wizard.error">{{ wizard.error }}</div>
-    <div class="ctrl" v-if="wizard.status === 'active'">
+    <div class="error mg8" v-if="inputForm.error">{{ inputForm.error }}</div>
+    <div class="ctrl" v-if="inputForm.status === 'active'">
       <button class="nude round blue" @click="commit">
         <span class="left icon material-icons-outlined">
           keyboard_arrow_down </span
@@ -30,39 +37,43 @@
 import { nextTick, onMounted, ref, watch } from "vue";
 
 export default {
-  props: ["wizard"],
+  props: ["inputForm"],
   setup(props, { emit }) {
     const inputEl = ref(null);
     const commit = () => {
-      const { wizard } = props;
-      emit("commit", { wizard });
+      const { inputForm } = props;
+      emit("commit", { inputForm });
     };
     const valueTyped = (e) => {
-      const { wizard } = props;
+      const { inputForm } = props;
       let { value } = e.target;
-      if (wizard.filter) {
-        value = wizard.filter(value);
+      if (inputForm.filter) {
+        value = inputForm.filter(value, inputForm);
       }
       inputEl.value.value = value;
-      emit("value", { wizard, value, setValue: (v) => setValue(wizard, v) });
+      emit("value", {
+        inputForm,
+        value,
+        setValue: (v) => setValue(inputForm, v),
+      });
     };
     const setFocus = () => {
       nextTick().then(() => {
         inputEl.value.focus();
       });
     };
-    const setValue = (wizard, value) => {
+    const setValue = (inputForm, value) => {
       inputEl.value.value = value;
-      wizard.value = value;
+      inputForm.value = value;
     };
     watch(
-      () => props.wizard.value,
+      () => props.inputForm.value,
       (value) => {
         inputEl.value.value = value;
       }
     );
     watch(
-      () => props.wizard.status,
+      () => props.inputForm.status,
       (cur) => {
         if (cur === "active") {
           setFocus();
@@ -71,7 +82,7 @@ export default {
     );
     onMounted(() => {
       if (inputEl.value) {
-        inputEl.value.value = props.wizard.value;
+        inputEl.value.value = props.inputForm.value;
         setFocus();
       }
     });
@@ -81,7 +92,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.wizard {
+.inputForm {
   .mg8 {
     margin-bottom: 8px;
   }

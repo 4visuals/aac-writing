@@ -15,6 +15,7 @@
       ><span class="student" v-else>없음</span>
       <span class="remaining" v-if="size !== 'sm'">{{ remaining(lcs) }}</span>
     </div>
+    <div class="newlcs" v-if="lcs.isNew">NEW</div>
   </div>
 </template>
 
@@ -141,6 +142,17 @@ export default {
         color: #999;
       }
     }
+  }
+  .newlcs {
+    color: #fff9ac;
+    background-color: crimson;
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    font-size: 9px;
+    border-radius: 4px;
+    padding: 1px 3px;
   }
   &.active {
     border-color: #4d3d06; // #096c86;

@@ -7,7 +7,7 @@
         :inline="true"
         theme="blue"
         text="닫기"
-        @click="$emit('close')"
+        @click="$emit(eventName || 'close')"
       />
     </div>
   </div>
@@ -21,7 +21,7 @@ export default {
     ParaText,
     AacButton,
   },
-  props: ["pending"],
+  props: ["pending", "eventName"],
 };
 </script>
 

@@ -4,11 +4,17 @@
       <DropDown
         :items="users"
         :fomat="(user) => `${user.name}(${user.email})`"
+        placeholder="선생님 이메일 또는 이름"
         @typing="search"
+        @clear="clearSearch"
+        @navigate="startNavigation"
+        @move="moveBy"
+        @commit="showUserDetail"
         v-slot:default="{ item: user, setText }"
       >
         <div
           class="user"
+          :class="{ focused: user === focusedUserRef }"
           @click="
             () => {
               userSelected(user);
@@ -34,8 +40,15 @@
           @click="popupModal"
         ></AacButton>
       </div>
-      <div class="licenses">
-        <LicenseConfigView :licenses="licenses" :students="students" />
+      <div class="licenses" v-if="licenses && licenses.length > 0">
+        <LicenseConfigView
+          :readOnly="true"
+          :licenses="licenses"
+          :students="students"
+        />
+      </div>
+      <div class="empty-lcs">
+        <p>사용자에게 발급된 라이선스가 없습니다.</p>
       </div>
     </div>
     <teleport to="body" v-if="modal">
@@ -57,6 +70,7 @@ import { DropDown } from "@/components/form";
 import { ref, shallowRef } from "@vue/reactivity";
 import adminApi from "../../service/admin-api";
 import { time } from "@/service/util";
+import License from "@/entity/license";
 /**
  * 라이선스 발급 화면
  */
@@ -68,7 +82,7 @@ export default {
   },
   setup() {
     const users = ref([]);
-
+    const focusedUserRef = shallowRef(null);
     const activeUser = ref(null);
     const licenses = ref([]);
     const students = ref([]);
@@ -78,7 +92,7 @@ export default {
         res.students.forEach((student) => {
           student.birth = time.birthToDate(student.birth);
         });
-        licenses.value = res.licenses;
+        licenses.value = res.licenses.map((lcs) => new License(lcs));
         students.value = res.students;
         activeUser.value = user;
       });
@@ -91,6 +105,9 @@ export default {
         users.value = res.members;
       });
     };
+    const clearSearch = () => {
+      users.value = null;
+    };
     const licenseCreated = (newLicenses) => {
       licenses.value.push(...newLicenses);
     };
@@ -101,15 +118,41 @@ export default {
         events: { created: licenseCreated },
       };
     };
+    const startNavigation = () => {
+      focusedUserRef.value = users.value[0];
+    };
+    const moveBy = (delta) => {
+      if (!focusedUserRef.value) {
+        return;
+      }
+      const userList = users.value;
+      const focused = focusedUserRef.value;
+      const idx = userList.findIndex((user) => user === focused);
+      const nextIdx = (idx + delta + userList.length) % userList.length;
+      focusedUserRef.value = userList[nextIdx];
+    };
+    const showUserDetail = (e) => {
+      if (!focusedUserRef.value) {
+        return;
+      }
+      userSelected(focusedUserRef.value);
+      clearSearch();
+      e.setText(focusedUserRef.value.email, true);
+    };
     return {
       users,
+      focusedUserRef,
       activeUser,
       licenses,
       students,
       modal,
       userSelected,
       search,
+      clearSearch,
       popupModal,
+      startNavigation,
+      moveBy,
+      showUserDetail,
     };
   },
 };
@@ -120,6 +163,9 @@ export default {
   .search-box {
     .user {
       padding: 4px 8px;
+      &.focused {
+        background-color: #ececec;
+      }
     }
   }
   .license-view {

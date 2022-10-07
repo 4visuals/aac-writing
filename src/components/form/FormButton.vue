@@ -1,5 +1,8 @@
 <template>
-  <button class="nude" :class="{ round, blue: theme === 'blue' }">
+  <button
+    class="nude"
+    :class="{ round, blue: theme === 'blue', sm: size === 'sm' }"
+  >
     <span v-if="icon" class="left icon material-icons-outlined">
       {{ icon }} </span
     ><span class="text">{{ text }}</span>
@@ -23,6 +26,7 @@ export default {
     text: {
       type: String,
     },
+    size: { type: String, default: "md" },
   },
   setup() {
     return {};
@@ -34,17 +38,18 @@ export default {
 button {
   display: inline-flex;
   align-items: center;
+  font-size: 1rem;
   .icon {
-    font-size: 18px;
+    font-size: 1.25rem;
   }
   &:hover {
     background-color: #105bbc;
     color: white;
   }
   &.sm {
-    font-size: 12px;
+    font-size: 0.9rem;
     .icon {
-      font-size: 18px;
+      font-size: 1.15rem;
     }
   }
   .text {

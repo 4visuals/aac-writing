@@ -9,4 +9,8 @@ const license = {
   create: (userSeq, numOfLicense) =>
     POST(`/admin/license`, { userSeq, qtt: numOfLicense }),
 };
-export default { member, license };
+
+const order = {
+  list: () => GET("/admin/orders"),
+};
+export default { member, license, order };

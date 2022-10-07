@@ -12,7 +12,7 @@
         </div>
       </div>
       <WizardForm
-        :wizard="wizard"
+        :inputForm="wizard"
         class="wizard"
         @value="normalize"
         @active="changeActiveWizard"
@@ -39,61 +39,21 @@ import api from "@/service/api";
 import message from "@/service/message";
 import { ref } from "vue";
 import WizardForm from "./teacher/WizardForm.vue";
+import { InputForm } from "./../../components/form";
 
 export default {
   components: {
     WizardForm,
   },
   setup(_, { emit }) {
-    const wizards = [
-      {
-        wid: "userId",
-        title: "아이디",
-        desc: "영문자와 숫자로 아이디를 입력헤주세요.",
-        status: "active",
-        value: "",
-        error: null,
-        filter: (val) => val.replace(/[^a-z0-9]/g, ""),
-      },
-      {
-        wid: "birth",
-        title: "생일",
-        desc: "생일을 입력해주세요(예: 2010-03-15)",
-        status: "pending",
-        value: "",
-        error: null,
-        filter: (val) => val.replace(/[^0-9-]/g, "").replace(/-{2,}/g, "-"),
-      },
-      {
-        wid: "name",
-        title: "이름",
-        desc: "학생 이름을 입력해주세요",
-        status: "pending",
-        value: "",
-        error: null,
-      },
-      {
-        wid: "pass",
-        title: "비밀 번호",
-        desc: "학생이 사용할 비밀번호입니다. 영문자와 숫자를 반드시 포함해야 합니다(특수문자 포함 추천).",
-        status: "pending",
-        type: "password",
-        value: "",
-        error: null,
-      },
-      {
-        wid: "pass2",
-        title: "비밀 번호 확인",
-        desc: "비밀번호를 한 번 더 입럭해주세요.",
-        status: "pending",
-        type: "password",
-        skip: true,
-        value: "",
-        error: null,
-      },
-    ];
-
     const normalizers = {
+      userId: (value, inputForm) => {
+        const result = value.replace(/[^a-z0-9]/g, "");
+        if (result !== value) {
+          inputForm.error = message.parse("USER_ID_NO_KOR");
+        }
+        return value;
+      },
       birth: (value) => {
         value = value.replace(/[^0-9-]/g, "").replace(/-{2,}/g, "-");
         if (/^\d{4,4}$/.test(value)) {
@@ -121,8 +81,8 @@ export default {
       userId: (wizard) =>
         new Promise((yes, no) => {
           const { value } = wizard;
-          if (value.length < 6 || value.length > 16) {
-            no("아이디는 6글자 이상, 16글자 이하여야 합니다.");
+          if (value.length < 4 || value.length > 20) {
+            no("아이디는 4글자 이상, 20글자 이하여야 합니다.");
           } else {
             api.user.check
               .id(value)
@@ -146,6 +106,7 @@ export default {
           return Promise.resolve();
         }
       },
+
       pass2: (wizard) => {
         const passForm = wizards.find((wzd) => wzd.wid === "pass");
         if (passForm.value !== wizard.value) {
@@ -155,6 +116,69 @@ export default {
         }
       },
     };
+    /*
+    const filters = {
+      userId: (value, inputForm) => {
+        const result = value.replace(/[^a-z0-9]/g, "");
+        if (result !== value) {
+          inputForm.error = message.parse("USER_ID_NO_KOR");
+        }
+        return value;
+      },
+    };
+    const doFilter = (value, wizard) => {
+      const filterFn = filters[wizard.wid];
+      return filterFn ? filterFn(value, wizard) : value;
+    };
+    */
+    const wizards = [
+      new InputForm({
+        wid: "userId",
+        title: "아이디",
+        desc: "영문자와 숫자로 아이디를 입력헤주세요(최소 4글자 이상).",
+        status: "active",
+        value: "",
+        error: null,
+        // filter: (val) => val.replace(/[^a-z0-9]/g, ""),
+        // filter: doFilter,
+      }),
+      new InputForm({
+        wid: "birth",
+        title: "생일",
+        desc: "생일을 입력해주세요(예: 2010-03-15)",
+        status: "pending",
+        value: "",
+        error: null,
+        filter: (val) => val.replace(/[^0-9-]/g, "").replace(/-{2,}/g, "-"),
+      }),
+      new InputForm({
+        wid: "name",
+        title: "이름",
+        desc: "학생 이름을 입력해주세요",
+        status: "pending",
+        value: "",
+        error: null,
+      }),
+      new InputForm({
+        wid: "pass",
+        title: "비밀 번호",
+        desc: "학생이 사용할 비밀번호입니다. 영문자와 숫자를 반드시 포함해야 합니다(특수문자 포함 추천).",
+        status: "pending",
+        type: "password",
+        value: "",
+        error: null,
+      }),
+      new InputForm({
+        wid: "pass2",
+        title: "비밀 번호 확인",
+        desc: "비밀번호를 한 번 더 입럭해주세요.",
+        status: "pending",
+        type: "password",
+        skip: true,
+        value: "",
+        error: null,
+      }),
+    ];
     const wizardRef = ref(wizards);
     const userFormRef = ref(null);
     const moveNext = (wzd) => {
@@ -181,26 +205,26 @@ export default {
       wizard.status = "active";
     };
     const commitValue = (e) => {
-      const { wizard } = e;
-      const fn = validators[wizard.wid];
+      const { inputForm } = e;
+      const fn = validators[inputForm.wid];
       if (fn) {
-        fn(wizard)
-          .then(() => moveNext(wizard))
+        fn(inputForm)
+          .then(() => moveNext(inputForm))
           .catch((error) => {
             if (error.startsWith("@")) {
               error = message.parse(error.substring(1));
             }
-            wizard.error = error;
+            inputForm.error = error;
           });
       } else {
-        moveNext(wizard);
+        moveNext(inputForm);
       }
     };
     const normalize = (e) => {
-      let { wizard, value } = e;
-      wizard.error = null;
-      const fn = normalizers[wizard.wid];
-      wizard.value = fn ? fn(value) : value;
+      let { inputForm, value } = e;
+      inputForm.error = null;
+      const fn = normalizers[inputForm.wid];
+      inputForm.value = fn ? fn(value, inputForm) : value;
     };
     const emitStudent = () => {
       const userForm = { editing: false };

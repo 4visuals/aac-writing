@@ -1,95 +1,80 @@
 <template>
   <div class="stud-reg">
+    <p>학생 정보를 수정할 수 있습니다.</p>
     <div class="form">
-      <div class="error" v-if="error">{{ errorText() }}</div>
-      <DatePicker
-        :visible="form.visible"
-        :time="form.student.birth"
-        @cur-date="setBirthday"
-        @toggle="(visible) => (form.visible = !visible)"
+      <TextFieldView
+        v-for="form in formRef"
+        :readOnly="!editable"
+        :key="form.wid"
+        :formModel="form"
+        @value="handleForm"
       />
-      <h5>학생 이름</h5>
-      <TextField
-        icon="face"
-        v-model:value="form.student.name"
-        size="sm"
-        placeholder="이름 입력"
-      />
-      <h5>학생 아이디</h5>
-      <TextField
-        icon="face"
-        v-model:value="form.student.userId"
-        size="sm"
-        placeholder="아이디 입력"
-      />
-      <h5>비밀 번호</h5>
-      <TextField
-        icon="password"
-        v-model:value="form.student.pass"
-        size="sm"
-        type="text"
-        placeholder="비밀번호"
-      />
-      <div class="ctrl mgt-8px">
-        <FormButton text="정보 수정" @click="registerStudent"></FormButton>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { TextField } from "@/components/form";
-import DatePicker from "@/components/DatePicker.vue";
+import { TextFieldView, InputForm, validators } from "@/components/form";
+// import DatePicker from "@/components/DatePicker.vue";
 import { ref } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
-
-const codes = {
-  DUP_USER_ID: "사용중인 아이디입니다.",
-};
+import { useStore } from "vuex";
+import toast from "../toast";
 
 export default {
-  components: { TextField, DatePicker },
-  props: ["student", "error"],
-  setup(props, { emit }) {
-    const form = ref({
-      student: { ...props.student },
-      visible: false,
-      editMode: true,
-    });
-    const registerStudent = () => {
-      emit("commit", { ...form.value.student, editing: form.value.editMode });
-    };
+  components: { TextFieldView },
+  props: {
+    student: { type: Object },
+    error: { type: Object },
+    editable: { type: Boolean, default: true },
+  },
+  setup(props) {
+    const store = useStore();
+    const forms = InputForm.fromUser(props.student);
+    const formRef = ref(forms);
     const setBirthday = (e) => {
-      form.value.student.birth = new Date(e.time);
+      formRef.value.student.birth = new Date(e.time);
       if (e.changed === "month") {
-        form.value.visible = false;
+        formRef.value.visible = false;
       }
     };
-    const errorText = () => {
-      return codes[props.error] || `요청 처리 실패(${props.error})`;
+    const updateForm = (student) => {
+      const forms = InputForm.fromUser(student);
+      formRef.value = forms;
+    };
+    const handleForm = ({ inputForm, value, commit }) => {
+      console.log(inputForm, value);
+      const { student } = props;
+      const validator = validators.user[inputForm.wid];
+      if (validator) {
+        validator(value)
+          .then(() =>
+            store.dispatch("user/updateStudentProp", {
+              student,
+              prop: inputForm.wid,
+              value,
+            })
+          )
+          .then(() => {
+            commit(value);
+            toast.success("수정 완료", null, 2);
+          })
+          .catch((err) => {
+            inputForm.error = err.cause ? "@" + err.cause : err;
+            commit(null);
+          });
+      }
     };
     watch(
       () => props.student,
       (student) => {
-        form.value.student = { ...student };
-        form.value.editMode = true;
-      }
-    );
-    watch(
-      () => [
-        form.value.student.name,
-        form.value.student.userId,
-        form.value.student.password,
-      ],
-      () => {
-        emit("editing");
+        updateForm(student);
       }
     );
     return {
-      form,
-      registerStudent,
+      formRef,
+      handleForm,
       setBirthday,
-      errorText,
     };
   },
 };
