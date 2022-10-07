@@ -76,6 +76,7 @@ store.registerModule("quiz", {
     },
     hideHint(state) {
       state.hint.visible = false;
+      state.hint.cnt = 0;
       state.hint.level = state.hint.text = null;
     },
     sceneClicked(state) {
