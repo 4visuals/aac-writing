@@ -162,7 +162,7 @@ export default {
       });
     };
     onMounted(() => {
-      console.log("!");
+      store.commit("quiz/hideHint");
       if (ctx.isQuizMode() || ctx.isWord()) {
         uploadExam();
       } else {
