@@ -20,6 +20,7 @@
             <div
               class="cmd"
               :class="{
+                disabled: btn.disabled,
                 current:
                   resourceTypeRef === currentRssType &&
                   segRef?.current &&
@@ -69,9 +70,19 @@ export default {
       clazz: "word",
       active: "W" === currentRssType,
       elems: [
-        { cmd: "READING:SEN:W", text: "보고쓰기", mode: "READING" },
-        { cmd: "LEARNING:SEN:W", text: "학습", mode: "LEARNING" },
-        { cmd: "QUIZ:SEN:W", text: "퀴즈", mode: "QUIZ" },
+        {
+          cmd: "READING:SEN:W",
+          text: "보고쓰기",
+          mode: "READING",
+          disabled: false,
+        },
+        {
+          cmd: "LEARNING:SEN:W",
+          text: "학습",
+          mode: "LEARNING",
+          disabled: false,
+        },
+        { cmd: "QUIZ:SEN:W", text: "퀴즈", mode: "QUIZ", disabled: false },
       ],
     };
     const senTab = {
@@ -80,16 +91,32 @@ export default {
       clazz: "word",
       active: "S" === currentRssType,
       elems: [
-        { cmd: "READING:EJ:S", text: "보고쓰기", mode: "READING" },
-        { cmd: "LEARNING:EJ:S", text: "학습", mode: "LEARNING" },
-        { cmd: "QUIZ:SEN:S", text: "퀴즈", mode: "QUIZ" },
+        {
+          cmd: "READING:EJ:S",
+          text: "보고쓰기",
+          mode: "READING",
+          disabled: false,
+        },
+        {
+          cmd: "LEARNING:EJ:S",
+          text: "학습",
+          mode: "LEARNING",
+          disabled: false,
+        },
+        { cmd: "QUIZ:SEN:S", text: "퀴즈", mode: "QUIZ", disabled: false },
       ],
     };
     const tabElems = [senTab];
-    if (ctx.resourceType !== "A") {
-      // 교과서인 경우('A') 모두 문장으로 구성되어 있음
-      // 단계별 학습인 경우에만 낱말탭을 추가함
+    if (ctx.resourceType !== "A" && ctx.section.level > 0) {
+      // 1. 교과서인 경우('A') 모두 문장으로 구성되어 있음
+      // 2. 단계별/도전의 경우 낱말이 없음(level이 -1)
+      // 도전이 아닌 단계별 학습인 경우에만 낱말탭을 추가함
       tabElems.unshift(wordTab);
+    }
+    if (ctx.section.level === -1) {
+      // 단계별/도전의 경우 [퀴즈]만 있으므로 보고쓰기와 학습을 비활성화시킴
+      senTab.elems[0].disabled = true;
+      senTab.elems[1].disabled = true;
     }
     const tabModel = TabModel.create(tabElems);
     const setSegment = (seg) => {
@@ -99,6 +126,9 @@ export default {
       /*
       answerType: 'EJ' | {comp: 'EJ', pumsa: 'what'}
       */
+      if (btn.disabled) {
+        return;
+      }
       let [quizMode, answerType, quizResource] = btn.cmd.split(":");
       if (isBookResource) {
         answerType = { comp: answerType, pumsa: "what" };
@@ -156,7 +186,10 @@ export default {
   width: 100%;
 
   .tab-body {
-    margin: 8px 0;
+    margin-top: 0px;
+    padding: 8px;
+    border: 1px solid #cbe8ff;
+    position: relative;
     .info {
       padding: 4px 0px 8px;
     }
@@ -181,12 +214,19 @@ export default {
         padding: 8px;
         border-radius: 8px;
         cursor: pointer;
+        font-size: 10px;
         &:active {
           transform: translate(1px, 1px);
         }
         &.current {
           background-color: #cac;
           color: white;
+        }
+        &.disabled {
+          background-color: #eee;
+          border-color: #ccc;
+          color: #777;
+          cursor: not-allowed;
         }
         // .type {
         //   position: absolute;
