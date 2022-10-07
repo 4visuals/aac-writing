@@ -2,46 +2,40 @@
   <div
     class="brand-name"
     :style="`--bname-bgc: ${theme.bgc}; --bname-fgc: ${theme.color}`"
-    @click="showCourseMenu"
   >
-    <h5 @click="showCourseMenu">
+    <h5 @click="toggleCourseMenu">
       <span>{{ text }}</span
       ><ActionIcon icon="expand_more" />
     </h5>
+    <div class="course-view" v-if="modalVisible">
+      <h5
+        :class="`course ${course.name}`"
+        v-for="course in courses.filter((c) => c.name !== path)"
+        :key="course.name"
+        @click="changeCourse(course)"
+      >
+        <span>{{ course.text }}</span
+        ><ActionIcon icon="navigate_next" />
+      </h5>
+    </div>
   </div>
-  <teleport to="body" v-if="modalVisible">
-    <Modal :width="'sm'" @hidden="hideModal">
-      <div class="course-view">
-        <h3>코스 선택</h3>
-        <div class="courses">
-          <div class="course" v-for="course in courses" :key="course.name">
-            <h3 @click="changeCourse(course)">
-              <span class="name">{{ course.text }}</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </Modal>
-  </teleport>
 </template>
 
 <script>
 import { ActionIcon } from "@/components/form";
-import { Modal } from "@/components";
 import router from "@/router";
 // import { ParaText } from "@/components/text";
 import { ref } from "vue";
 export default {
   components: {
     ActionIcon,
-    Modal,
+    // Modal,
   },
   props: ["text", "theme", "path"],
   setup() {
-    ref;
     const modalVisible = ref(false);
-    const showCourseMenu = () => {
-      modalVisible.value = true;
+    const toggleCourseMenu = () => {
+      modalVisible.value = !modalVisible.value;
     };
     const hideModal = () => {
       modalVisible.value = false;
@@ -51,11 +45,13 @@ export default {
         name: "level",
         path: "/level",
         text: "단계별 받아쓰기",
+        theme: { color: "#d23d70", bgc: "#ffe1ea" },
       },
       {
         name: "book",
         path: "/book",
         text: "교과서 받아쓰기",
+        theme: { color: "#865900", bgc: "#ffec88" },
       },
     ];
 
@@ -64,7 +60,7 @@ export default {
     };
     return {
       modalVisible,
-      showCourseMenu,
+      toggleCourseMenu,
       hideModal,
       courses,
       changeCourse,
@@ -75,6 +71,7 @@ export default {
 
 <style lang="scss" scoped>
 .brand-name {
+  position: relative;
   h5 {
     display: inline-flex;
     align-items: center;
@@ -84,12 +81,32 @@ export default {
     box-shadow: 0 0 0 1px var(--bname-fgc);
     color: var(--bname-fgc);
     pointer-events: all;
+    cursor: pointer;
     span {
       padding-right: 1rem;
     }
   }
-}
-.course-view {
-  padding: 16px;
+  .course-view {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, 8px);
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    pointer-events: all;
+    .course {
+      &.level {
+        color: #d23d70;
+        background-color: #ffe1ea;
+        box-shadow: 0 0 0 1px #d23d70;
+      }
+      &.book {
+        color: #865900;
+        background-color: #ffec88;
+        box-shadow: 0 0 0 1px #865900;
+      }
+    }
+  }
 }
 </style>
