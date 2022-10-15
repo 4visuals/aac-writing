@@ -39,22 +39,37 @@ export default {
       failed: require("@/assets/reward/failed.png"),
     };
     const submit = shallowRef(null);
-    const buildData = () => {
-      const { section, paper } = props;
-      const { questionOffset: offset, numOfQuestions: size } = paper;
-      // 1. section내에서 낱말과 문장을 따로 분리
-      const sentences = section.sentences
-        .filter((sen) => sen.type === paper.type)
-        .slice(offset, offset + size);
-      const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
-        sbm.sentenceRef,
-      ]);
-      submit.value = { sentences, groups };
-    };
+
     const filterSubmissions = (sentence) => {
       const submissions = submit.value.groups[sentence.seq];
       return submissions || [];
     };
+    const buildData = () => {
+      const { section, paper } = props;
+      const { questionOffset: offset, numOfQuestions: size } = paper;
+
+      const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
+        sbm.sentenceRef,
+      ]);
+      submit.value = { groups };
+      // 1. section내에서 낱말과 문장을 따로 분리
+      const sentences = section.sentences
+        .filter((sen) => sen.type === paper.type)
+        .slice(offset, offset + size)
+        .filter((sen) => {
+          const submissions = filterSubmissions(sen);
+          if (submissions.length === 0) {
+            return true;
+          }
+          if (!submissions[0].correct) {
+            return true;
+          }
+          return false;
+        });
+
+      submit.value.sentences = sentences;
+    };
+
     const hasSubmissions = (sentence) => {
       const submissions = submit.value.groups[sentence.seq];
       return submissions && submissions.length > 0;
@@ -122,14 +137,10 @@ export default {
         flex-wrap: wrap;
         column-gap: 8px;
         .answer {
-          background-color: #efefef;
-          color: #777;
+          background-color: #ffe370;
+          color: #a54e00;
           padding: 4px 6px;
           border-radius: 4px;
-          &.correct {
-            background-color: #b3ff70;
-            color: #335f0b;
-          }
         }
       }
       .empty {

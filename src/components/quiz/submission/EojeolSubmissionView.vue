@@ -74,15 +74,24 @@ export default {
     const buildData = () => {
       const { section, paper } = props;
       const { questionOffset: offset, numOfQuestions: size } = paper;
-      // 1. section내에서 낱말과 문장을 따로 분리
-      const sentences = section.sentences
-        .filter((sen) => sen.type === paper.type)
-        .slice(offset, offset + size);
       const groups = util.arr.unflat(paper.submissions, {}, (sbm) => [
         sbm.sentenceRef,
         sbm.eojeolRef,
       ]);
-      submit.value = { sentences, groups };
+      submit.value = { groups };
+      // 1. section내에서 낱말과 문장을 따로 분리
+      const sentences = section.sentences
+        .filter((sen) => sen.type === paper.type)
+        .slice(offset, offset + size)
+        .filter((sen) => {
+          const ejSize = sen.eojeols.length;
+          const corrects = sen.eojeols.filter((ej) => {
+            const answers = answerOf(ej);
+            return answers.length > 0 && answers[0].correct;
+          }).length;
+          return ejSize !== corrects;
+        });
+      submit.value.sentences = sentences;
     };
     buildData();
     watch(() => props.paper, buildData);
@@ -129,15 +138,10 @@ export default {
         align-items: flex-start;
         .val {
           padding: 1px 2px 1px 4px;
-          border-left: 1px solid #777;
-          background-color: #efefef;
-          color: #777;
+          border-left: 1px solid #a54e00;
+          background-color: #ffe370;
+          color: #a54e00;
           width: 100%;
-          &.correct {
-            border-left-color: #335f0b;
-            background-color: #b3ff70;
-            color: #335f0b;
-          }
         }
         .empty {
           padding-left: 5px;

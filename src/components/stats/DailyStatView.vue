@@ -232,7 +232,7 @@ export default {
     }
     .submissions {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -247,6 +247,7 @@ export default {
         background-color: white;
         padding: 16px 0;
         overflow: auto;
+        flex: 1 1 auto;
       }
       .close {
         position: absolute;
