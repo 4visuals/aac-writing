@@ -213,7 +213,7 @@ export default {
     transform: translate(-50%, -16px);
     text-align: center;
     padding: 8px 16px;
-    margin: 8px;
+    margin: 8px 0;
     color: #007bff;
     cursor: pointer;
     background-color: white;

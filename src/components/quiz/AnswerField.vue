@@ -1,6 +1,10 @@
 <template>
   <div class="desc" :class="{ shaking: failed }">
-    <div class="text" @click="$emit('textClick', hiddenText)">
+    <div
+      class="text"
+      :class="{ hidden: inputVisible }"
+      @click="$emit('textClick', hiddenText)"
+    >
       {{ hiddenText }}
     </div>
     <input
@@ -149,13 +153,11 @@ export default {
       // iOS: input에 포커스 놓이면 가운데로 스크롤함.
       //    : 강제로 스크롤 땡겨줌
       setTimeout(() => {
-        console.log("[SCROLL TOP]");
         window.scrollTo(0, 0);
       }, 500);
     };
     const clicked = (e) => {
       // tts.speak(props.hiddenText);
-      console.log("[ANSWERFILED] CLICKED");
       e.stopImmediatePropagation();
       // resetTime();
       emit("clicked");
@@ -210,6 +212,9 @@ export default {
     flex: 1 1 auto;
     align-items: center;
     border-radius: 1rem;
+    &.hidden {
+      padding: 1rem 3.5rem;
+    }
   }
   input {
     top: 0;
@@ -224,6 +229,7 @@ export default {
     background-color: #a2ec9c;
     outline-color: #78ba73;
     border-radius: 1rem;
+    text-align: center;
   }
   .shaking {
     animation: shaking 0.3s cubic-bezier(0, 0, 0.2, 1) 1;
