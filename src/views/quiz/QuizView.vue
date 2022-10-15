@@ -25,16 +25,9 @@
         />
         <template v-if="!ctx.isQuizMode()">
           <ActionIcon
-            v-if="ctx.currentQuestion.hasNextQuiz()"
             class="icon right"
             icon="chevron_right"
             @click.stop.prevent="moveQuiz(1)"
-          />
-          <ActionIcon
-            v-else
-            class="icon right"
-            icon="last_page"
-            @click.stop.prevent="alertForResult"
           />
         </template>
         <div class="sentence-view" v-if="ctx.isReadingMode()" @click="speak">
@@ -114,16 +107,7 @@ export default {
       // holdSoftKeyboard();
     };
     const alertForResult = () => {
-      // if (ctx.value.isReadingMode()) {
-      //   router.replace({
-      //     name: ctx.value.prevPage,
-      //   });
-      // } else {
-      // }
-      const yes = window.confirm("결과 화면으로 이동합니까?");
-      if (yes) {
-        moveQuiz(1);
-      }
+      moveQuiz(1);
     };
     const speak = () => {
       return tts.speak(ctx.value.currentQuestion.text);
