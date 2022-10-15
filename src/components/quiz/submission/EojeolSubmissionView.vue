@@ -1,5 +1,6 @@
 <template>
   <div class="sbm-view">
+    <div class="perfect" v-if="submit.sentences.length === 0">100점</div>
     <div class="sbm" v-for="sen in submit.sentences" :key="sen.seq">
       <div class="sen">
         <SpanText size="sm" class="mark q">Q</SpanText
@@ -31,13 +32,13 @@
 <script>
 import util from "@/service/util";
 import { SpanText } from "@/components/text";
-import { shallowRef, watch } from "vue";
+import { onMounted, shallowRef, watch } from "vue";
 export default {
   components: {
     SpanText,
   },
   props: ["paper", "section"],
-  setup(props) {
+  setup(props, { emit }) {
     const image = {
       passed: require("@/assets/reward/passed.png"),
       failed: require("@/assets/reward/failed.png"),
@@ -95,6 +96,12 @@ export default {
     };
     buildData();
     watch(() => props.paper, buildData);
+    onMounted(() => {
+      const { sentences } = submit.value;
+      if (sentences.length === 0) {
+        emit("perfect");
+      }
+    });
     return { submit, answerOf, imagePathOfEojeol, isEmptyEojeol };
   },
 };
@@ -102,6 +109,17 @@ export default {
 
 <style lang="scss" scoped>
 .sbm-view {
+  .perfect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: 600;
+    text-shadow: 4px 4px #453b80;
+    color: #298efb;
+    transition: font-size 0.2s linear 0.3;
+  }
   .sbm {
     padding: 0 8px 8px;
     .pic {
@@ -142,6 +160,11 @@ export default {
           background-color: #ffe370;
           color: #a54e00;
           width: 100%;
+          &.correct {
+            border-left-color: #335f0b;
+            background-color: #b3ff70;
+            color: #335f0b;
+          }
         }
         .empty {
           padding-left: 5px;

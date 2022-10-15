@@ -46,13 +46,16 @@
             v-if="submissions.isWord"
             :paper="submissions.paper"
             :section="submissions.section"
+            @perfect="showConfetti"
           />
           <EojeolSubmissionView
             v-else
             :paper="submissions.paper"
             :section="submissions.section"
+            @perfect="showConfetti"
           />
         </div>
+        <canvas v-if="confettiVisible" class="confetti" ref="canvas"></canvas>
       </div>
     </div>
   </div>
@@ -71,6 +74,7 @@ import { SpanText } from "@/components/text";
 import EojeolSubmissionView from "../quiz/submission/EojeolSubmissionView.vue";
 import SentenceSubmissionView from "../quiz/submission/SentenceSubmissionView.vue";
 import { ActionIcon } from "../../components/form";
+import confetti from "canvas-confetti";
 
 export default {
   components: {
@@ -88,6 +92,8 @@ export default {
     const submissions = shallowRef(null);
     const todayStat = ref(null);
     const scrollEl = ref(null);
+    const canvas = ref(null);
+    const confettiVisible = ref(false);
     const showExamDetail = (e) => {
       detail.value = { ...e }; // papers, day
     };
@@ -125,12 +131,47 @@ export default {
     };
 
     const closeSubmitView = () => {
+      confettiVisible.value = false;
       detailEl.value.removeEventListener("click", closeSubmitView, false);
       submissions.value = null;
     };
     const closeDetailView = () => {
       closeSubmitView();
       detail.value = null;
+    };
+    const showConfetti = () => {
+      confettiVisible.value = true;
+      nextTick().then(() => {
+        canvas.value.width = 400;
+        canvas.value.height = 400;
+        if (!canvas.value.confetti) {
+          canvas.value.confetti = confetti.create(canvas.value, {
+            resizie: true,
+          });
+        }
+        canvas.value.confetti.reset();
+        let cnt = 0;
+        const stop = () => {
+          cnt++;
+          if (cnt === 2) {
+            confettiVisible.value = false;
+          }
+        };
+        canvas.value
+          .confetti({
+            particleCount: 50,
+            spread: 80,
+            origin: { x: 0, y: 1 },
+          })
+          .then(stop);
+        canvas.value
+          .confetti({
+            particleCount: 50,
+            spread: 80,
+            origin: { x: 1, y: 1 },
+          })
+          .then(stop);
+      });
     };
     return {
       now,
@@ -139,12 +180,15 @@ export default {
       detailEl,
       scrollEl,
       submissions,
+      canvas,
+      confettiVisible,
       timeText,
       showExamDetail,
       showTodayExam,
       showSubmissions,
       closeSubmitView,
       closeDetailView,
+      showConfetti,
     };
   },
 };
@@ -255,6 +299,15 @@ export default {
         right: 8px;
         font-size: 32px;
         z-index: 30;
+      }
+      .confetti {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
       }
     }
     @include mobile {
