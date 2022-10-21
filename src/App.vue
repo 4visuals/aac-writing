@@ -16,6 +16,7 @@
         <component :is="Component" />
       </transition>
     </router-view>
+    <CompanyInfo />
   </div>
   <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
@@ -47,6 +48,7 @@ import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
 import RefreshView from "./views/RefreshView.vue";
 import ToastUI from "./components/toast/ToastUI.vue";
+import CompanyInfo from "./components/company/CompanyInfo.vue";
 
 export default {
   components: {
@@ -55,6 +57,7 @@ export default {
     MenuWrapper,
     RefreshView,
     ToastUI,
+    CompanyInfo,
   },
   setup() {
     logger.log(env);
@@ -121,6 +124,8 @@ export default {
 .app-wrapper {
   overflow-y: auto;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   &.no-padding {
     padding-top: 0;
