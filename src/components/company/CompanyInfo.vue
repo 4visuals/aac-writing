@@ -1,7 +1,7 @@
 <template>
   <div class="c-info">
     <div class="container" :class="{ max480: maxWidth }">
-      <div class="left">
+      <div class="left" v-if="!hideLogo">
         <div class="logo">
           <img src="/img/icons/android-chrome-192x192.png" alt="그림한글" />
         </div>
@@ -23,6 +23,11 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 export default {
+  props: {
+    hideLogo: {
+      default: false,
+    },
+  },
   setup() {
     const route = useRoute();
     const maxWidth = ref(false);

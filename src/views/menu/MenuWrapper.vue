@@ -10,6 +10,7 @@
         </MenuSection>
         <TeacherSectionMenu v-if="isTeacher" @statview="openStatView" />
         <StudentSectionMenu v-else @statview="openStatView" />
+        <CompanyInfo :hideLogo="true" />
       </div>
     </Transition>
     <teleport to="body" v-if="modal">
@@ -28,6 +29,8 @@ import TeacherSectionMenu from "./TeacherSectionMenu.vue";
 import StudentSectionMenu from "./StudentSectionMenu.vue";
 import AcademicProgressView from "@/components/stats/AcademicProgressView.vue";
 import UserProfile from "./UserProfile.vue";
+import CompanyInfo from "../../components/company/CompanyInfo.vue";
+
 export default {
   components: {
     AcademicProgressView,
@@ -35,6 +38,7 @@ export default {
     UserProfile,
     TeacherSectionMenu,
     StudentSectionMenu,
+    CompanyInfo,
   },
   setup() {
     const store = useStore();

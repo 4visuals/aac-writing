@@ -16,7 +16,7 @@
         <component :is="Component" />
       </transition>
     </router-view>
-    <CompanyInfo />
+    <CompanyInfo v-if="$route.path === '/'" />
   </div>
   <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
@@ -42,7 +42,7 @@ import env from "@/service/env";
 import { logger } from "@/service/util";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import { computed, onMounted, onUnmounted, shallowRef } from "vue";
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
@@ -66,6 +66,7 @@ export default {
     const topPadding = computed(() => store.getters["ui/topPadding"]);
     const refreshRequired = computed(() => store.state.config.refreshing);
     const route = useRoute();
+    const companyVisible = ref(false);
     const modalConfig = computed(() => store.getters["modal/currentModal"]);
     // console.log(route.path, route.params, topPadding);
     const tr = {
@@ -88,6 +89,13 @@ export default {
     };
     const hideModal = () => store.commit("modal/clear");
 
+    watch(
+      () => route.path,
+      () => {
+        companyVisible.value = route.path === "/";
+      },
+      { immediate: true }
+    );
     onMounted(() => {
       const el = wrapperEl.value;
       el.addEventListener("scroll", scrolling, option);
@@ -105,6 +113,7 @@ export default {
       menuVisible,
       topPadding,
       modalConfig,
+      companyVisible,
       hideModal,
     };
   },
