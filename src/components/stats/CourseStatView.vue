@@ -49,7 +49,9 @@
           class="submits"
           :paper="detailRef.exams[0]"
           :section="detailRef.section"
+          @perfect="showConfetti"
         />
+        <canvas v-if="confettiVisible" class="confetti" ref="canvas"></canvas>
       </div>
     </div>
   </div>
@@ -63,7 +65,17 @@ import { useStore } from "vuex";
 import { Segment } from "../../views/quiz";
 import GoogleBarChart from "./GoogleBarChart.vue";
 import SentenceSubmissionView from "../quiz/submission/SentenceSubmissionView.vue";
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
+import confetti from "canvas-confetti";
+
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  shallowRef,
+  watch,
+} from "vue";
 const courses = {
   L: { name: "course/levels", colors: ["#4472c4"] },
   B: { name: "course/books", colors: ["#4472c4", "#ed7d31", "#a5a5a5"] },
@@ -85,6 +97,8 @@ export default {
     const detailRef = shallowRef(null);
     const activeChapter = shallowRef(null);
     const menuVisible = shallowRef(true);
+    const canvas = ref(null);
+    const confettiVisible = ref(false);
     let timer;
     let resizer;
 
@@ -303,6 +317,43 @@ export default {
       clearTimeout(timer);
       timer = setTimeout(updateArea, 300);
     };
+    const showConfetti = () => {
+      confettiVisible.value = true;
+
+      nextTick().then(() => {
+        const parent = canvas.value.parentElement;
+        console.log(parent);
+        canvas.value.width = parent.offsetWidth;
+        canvas.value.height = parent.offsetHeight;
+        if (!canvas.value.confetti) {
+          canvas.value.confetti = confetti.create(canvas.value, {
+            resizie: true,
+          });
+        }
+        canvas.value.confetti.reset();
+        let cnt = 0;
+        const stop = () => {
+          cnt++;
+          if (cnt === 2) {
+            confettiVisible.value = false;
+          }
+        };
+        canvas.value
+          .confetti({
+            particleCount: 50,
+            spread: 80,
+            origin: { x: 0, y: 1 },
+          })
+          .then(stop);
+        canvas.value
+          .confetti({
+            particleCount: 50,
+            spread: 80,
+            origin: { x: 1, y: 1 },
+          })
+          .then(stop);
+      });
+    };
 
     watch(() => props.origin, resetChart);
     onMounted(() => {
@@ -321,9 +372,12 @@ export default {
       sentenceChart,
       activeChapter,
       menuVisible,
+      canvas,
+      confettiVisible,
       showSectionChart,
       closeDetail,
       showDetail,
+      showConfetti,
     };
   },
 };
@@ -436,6 +490,16 @@ export default {
         background-color: white;
         padding: 8px;
         overflow: auto;
+        flex: 1 1 auto;
+      }
+      .confetti {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
       }
     }
     @include mobile {
