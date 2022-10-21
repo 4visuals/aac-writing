@@ -204,7 +204,7 @@ export default {
   display: flex;
   flex-direction: column;
   .text {
-    padding: 1rem 1.5rem;
+    padding: 1rem 3.5rem;
     border: 2px solid transparent;
     background-color: #d2d2d2;
     white-space: nowrap;
