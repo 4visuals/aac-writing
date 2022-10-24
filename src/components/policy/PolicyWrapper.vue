@@ -52,7 +52,7 @@ export default {
       {
         path: "/policy/privacy",
         type: "PV",
-        text: "개인정보 보호 정책",
+        text: "개인정보 처리 방침",
       },
     ];
     const activeBtn = ref(null);

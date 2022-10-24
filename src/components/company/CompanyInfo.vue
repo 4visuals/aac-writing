@@ -8,8 +8,19 @@
       </div>
       <div class="mid">
         <div class="policy">
-          <router-link to="/policy/tou">이용 약관</router-link> |
-          <router-link to="/policy/privacy">개인정보처리방침</router-link>
+          <router-link
+            active-class="pol"
+            exact-active-class="active"
+            to="/policy/tou"
+            >이용 약관</router-link
+          >
+          |
+          <router-link
+            active-class="pol"
+            exact-active-class="active"
+            to="/policy/privacy"
+            >개인정보처리방침</router-link
+          >
         </div>
         <div>
           (주)성주코퍼레이션 | 정인균 | 사업자번호 402-88-01673 | TEL:
@@ -88,6 +99,16 @@ export default {
     .mid {
       flex: 1 1 auto;
       font-size: 10px;
+      .policy {
+        a {
+          padding: 2px 4px;
+          text-decoration: none;
+          font-size: 12px;
+          &.active {
+            background-color: #d0edff;
+          }
+        }
+      }
     }
   }
 }
