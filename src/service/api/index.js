@@ -94,6 +94,8 @@ const tts = {};
 
 const policy = {
   load: () => GET("/policies"),
+  listBy: (policyType) => GET(`/policy/${policyType}/histories`),
+  update: (seq, policy) => POST(`/policy`, policy),
 };
 
 export { section };

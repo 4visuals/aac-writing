@@ -15,6 +15,7 @@ import AdminMenu from "./views/AdminMenu.vue";
 import LevelAnalysis from "./views/LevelAnalysis.vue";
 import LicenseManage from "./views/LicenseManage.vue";
 import OrderListView from "./views/order/OrderListView.vue";
+import PolicyEditor from "./views/PolicyManage.vue";
 
 export default {
   components: {
@@ -38,6 +39,7 @@ export default {
       },
       { id: "license", icon: "badge", title: "수강증", comp: LicenseManage },
       { id: "stats", icon: "insights", title: "통계", comp: null },
+      { id: "policy", icon: "security", title: "이용약관", comp: PolicyEditor },
     ];
     const activeBody = shallowRef(null);
     const openAdminBody = (menu) => {

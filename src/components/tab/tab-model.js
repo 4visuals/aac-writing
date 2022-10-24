@@ -18,6 +18,12 @@ class TabModel {
     tab.active = true;
     this.activeTab.value = tab;
   }
+  setActiveAt(index) {
+    const tab = this.items[index];
+    if (tab) {
+      this.setActiveTab(tab);
+    }
+  }
   findTab(fnPredicate) {
     return this.items.find(fnPredicate);
   }

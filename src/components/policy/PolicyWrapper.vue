@@ -20,7 +20,7 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <router-view v-if="policy" :policy="policy" />
+        <router-view v-if="policy" :policy="policy" :mdText="policy.detail" />
         <div v-else class="loading">...</div>
       </div>
     </div>

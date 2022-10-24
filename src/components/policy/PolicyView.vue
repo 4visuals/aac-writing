@@ -4,17 +4,12 @@
 
 <script>
 import { marked } from "marked";
-import { onMounted } from "vue";
 export default {
-  props: ["policy"],
+  props: ["mdText"],
   setup(props) {
     const getDetail = () => {
-      return marked.parse(props.policy.detail);
+      return marked.parse(props.mdText);
     };
-
-    onMounted(() => {
-      console.log("[policy view]");
-    });
     return { getDetail };
   },
 };

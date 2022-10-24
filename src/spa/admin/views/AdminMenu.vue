@@ -41,6 +41,9 @@ export default {
 .menu-wrapper {
   flex: 0 0 140px;
   .menu-body {
+    position: fixed;
+    top: 0;
+    width: 140px;
     .section {
       padding: 0.75rem 1rem;
       user-select: none;

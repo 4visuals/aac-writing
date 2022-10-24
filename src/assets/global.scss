@@ -66,6 +66,20 @@ button {
       outline: 3px solid #1369ff5e;
     }
   }
+  &.red {
+    background-color: crimson;
+    color: white;
+    padding: 6px 8px;
+    &:hover {
+      box-shadow: 0 0 3px #19366988;
+    }
+    &:active {
+      background-color: crimson;
+    }
+    &:focus {
+      outline: 3px solid #ff99ad96;
+    }
+  }
   &.round {
     border-radius: 4px;
   }
@@ -84,6 +98,28 @@ button {
 .mgb-8px {
   margin-bottom: 8px;
 }
+.mgb-16px {
+  margin-bottom: 16px;
+}
 .mg8px {
   margin: 8px 0;
+}
+.max800 {
+  max-width: 800px;
+}
+
+.anim {
+  &.rotate {
+    animation: anim-rotate 2s linear 0s infinite;
+  }
+}
+
+@keyframes anim-rotate {
+  0% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(-270deg);
+  }
 }
