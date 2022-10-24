@@ -94,7 +94,7 @@ export default {
       (path) => {
         const matched = visiblePathes.filter((regex) => regex.test(path));
         companyVisible.value = matched.length > 0;
-        if (companyVisible.value) {
+        if (companyVisible.value && wrapperEl.value) {
           wrapperEl.value.scrollTop = 0;
         }
       },
