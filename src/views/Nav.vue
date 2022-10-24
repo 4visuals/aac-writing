@@ -118,11 +118,14 @@
         compact
       />
     </div>
-    <StudentLogo :student="student" class="btn-menu right s32" />
-    <div class="lcs-combobox" v-if="boxVisible" @click="hideLincenseBox">
-      <div class="lcs">감자군</div>
-      <div class="lcs">양파군</div>
+    <div class="btn-menu center policy" v-else-if="policyPage">
+      <h3>그림한글 이용 약관</h3>
     </div>
+    <StudentLogo
+      v-if="!policyPage"
+      :student="student"
+      class="btn-menu right s32"
+    />
   </div>
 </template>
 
@@ -132,6 +135,7 @@ import { useStore } from "vuex";
 // import { ActionIcon } from "@/components/form";
 import { computed, ref, watch } from "@vue/runtime-core";
 import SectionButton from "@/components/SectionButton.vue";
+import { useRoute } from "vue-router";
 const modeText = {
   READING: "읽기",
   LEARNING: "학습",
@@ -150,13 +154,15 @@ export default {
   },
   setup() {
     const store = useStore();
+    const route = useRoute();
     const loginUser = computed(() => store.getters["user/currentUser"]);
     const membership = computed(() => store.state.user.membership);
     const isStudent = computed(() => store.getters["user/isStudent"]);
     const ctx = computed(() => store.state.quiz.quizContext);
-    const boxVisible = ref(false);
+    // const boxVisible = ref(false);
     const topPadding = computed(() => store.getters["ui/topPadding"]);
     const quizPage = computed(() => store.getters["quiz/quizPage"]);
+    const policyPage = computed(() => route.path.startsWith("/policy"));
     const student = computed(() => store.getters["exam/student"]);
     const sectionSpec = ref({ theme: "", idx: 0, type: null, mode: null });
     const section = ref(null);
@@ -194,26 +200,19 @@ export default {
       // router.back();
       store.commit("ui/showMenu");
     };
-    const showLicenseBox = () => {
-      boxVisible.value = true;
-    };
-    const hideLincenseBox = () => {
-      boxVisible.value = false;
-    };
+
     return {
       ctx,
       loginUser, // 로그인 사용자(학생, 선생님)
       student, // 현재 시험을 보는 학생을 나타냄
-      isStudent, // 로그인한 사람이 학생인지를 나타냄
-      boxVisible,
+      isStudent, // 로그인한 사람이 학생인지를 나타냄,
+      policyPage, // 이용 약관 등 정보 페이지인지 나타냄
       topPadding,
       sectionSpec,
       section,
       quizPage,
       openMenu,
       membership,
-      showLicenseBox,
-      hideLincenseBox,
     };
   },
 };
@@ -284,6 +283,14 @@ export default {
       top: 0;
       left: 56px;
       right: 56px;
+    }
+    &.policy {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      h3 {
+        flex: 1 1 auto;
+      }
     }
   }
   .quiz-status {

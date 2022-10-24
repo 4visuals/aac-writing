@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import LevelView from "../views/level/LevelView.vue";
 import BookShelfView from "../views/book/BookShelfView.vue";
+import { PolicyWrapper, PolicyView } from "../components/policy";
 import { QuizView } from "../views/quiz";
 import { logger } from "@/service/util";
 
@@ -34,6 +35,23 @@ const routes = [
       import(
         /* webpackChunkName: "admin-module" */ "../spa/admin/AdminPage.vue"
       ),
+  },
+  {
+    path: "/policy",
+    name: "PolicyWrapper",
+    component: PolicyWrapper,
+    children: [
+      {
+        path: "tou",
+        name: "TermsOfUse",
+        component: PolicyView,
+      },
+      {
+        path: "privacy",
+        name: "PrivacyView",
+        component: PolicyView,
+      },
+    ],
   },
 ];
 

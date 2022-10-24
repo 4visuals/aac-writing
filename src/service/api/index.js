@@ -92,6 +92,10 @@ const order = {
 };
 const tts = {};
 
+const policy = {
+  load: () => GET("/policies"),
+};
+
 export { section };
 
 export default {
@@ -105,4 +109,5 @@ export default {
   tts,
   product,
   order,
+  policy,
 };

@@ -7,6 +7,10 @@
         </div>
       </div>
       <div class="mid">
+        <div class="policy">
+          <router-link to="/policy/tou">이용 약관</router-link> |
+          <router-link to="/policy/privacy">개인정보처리방침</router-link>
+        </div>
         <div>
           (주)성주코퍼레이션 | 정인균 | 사업자번호 402-88-01673 | TEL:
           070-7808-8807

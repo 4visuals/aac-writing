@@ -68,7 +68,7 @@ export default {
     const route = useRoute();
     const companyVisible = ref(false);
     const modalConfig = computed(() => store.getters["modal/currentModal"]);
-    // console.log(route.path, route.params, topPadding);
+    const visiblePathes = [/^\/$/, /^\/policy.*/];
     const tr = {
       name: "route",
     };
@@ -91,8 +91,12 @@ export default {
 
     watch(
       () => route.path,
-      () => {
-        companyVisible.value = route.path === "/";
+      (path) => {
+        const matched = visiblePathes.filter((regex) => regex.test(path));
+        companyVisible.value = matched.length > 0;
+        if (companyVisible.value) {
+          wrapperEl.value.scrollTop = 0;
+        }
       },
       { immediate: true }
     );
