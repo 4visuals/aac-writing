@@ -20,6 +20,12 @@ class ModalConfig {
   get rect() {
     return this.option.rect || false;
   }
+  get noBgc() {
+    return this.option.noBgc || false;
+  }
+  get noShadow() {
+    return this.option.noShadow || false;
+  }
 }
 const showModal = (vueComponent, option) => {
   const config = new ModalConfig(vueComponent, option || {});

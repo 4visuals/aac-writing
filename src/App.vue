@@ -5,7 +5,16 @@
     ref="wrapperEl"
     :style="`padding-top: ${topPadding}px`"
   >
-    <Nav v-if="route.path !== '/' && route.path !== '/console'" ref="nav" />
+    <Nav
+      v-if="
+        route.path !== '/' &&
+        route.path !== '/console' &&
+        route.path !== '/purchase' &&
+        route.path !== '/support' &&
+        !route.path.startsWith('/policy')
+      "
+      ref="nav"
+    />
 
     <router-view v-slot="{ Component }">
       <transition
@@ -16,7 +25,6 @@
         <component :is="Component" />
       </transition>
     </router-view>
-    <CompanyInfo v-if="$route.path === '/'" />
   </div>
   <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
@@ -26,6 +34,8 @@
       :fill="modalConfig.fill"
       :rect="modalConfig.rect"
       :width="modalConfig.width"
+      :noBgc="modalConfig.noBgc"
+      :noShadow="modalConfig.noShadow"
     >
       <component
         :is="modalConfig.comp"

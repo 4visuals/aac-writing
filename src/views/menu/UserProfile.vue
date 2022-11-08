@@ -1,6 +1,10 @@
 <template>
-  <div class="user-profile" @click="resolveClick">
-    <div class="blocked chip rounded border">
+  <div class="user-profile">
+    <div
+      v-if="membership"
+      class="blocked chip rounded border"
+      @click="resolveClick"
+    >
       <StudentLogo
         :student="membership.user"
         size="sm"
@@ -21,7 +25,7 @@
         <div class="name">{{ membership.profile.name }}님</div>
         <div class="email">{{ membership.profile.email }}</div>
       </div>
-      <div class="text" v-else>Google 계정으로 로그인</div>
+      <div class="text" v-else>{{ loginText || "Google 계정으로 로그인" }}</div>
       <ActionIcon class="setting" v-if="membership" icon="settings" />
     </div>
     <div class="option" v-if="membership">
@@ -55,7 +59,7 @@
 </template>
 
 <script>
-import env from "@/service/env";
+// import env from "@/service/env";
 import Logo from "@/components/oauth/Logo.vue";
 import StudentLogo from "@/components/StudentLogo.vue";
 import JoinView from "@/views/user/JoinView.vue";
@@ -67,7 +71,9 @@ import { ActionIcon } from "@/components/form";
 import { useStore } from "vuex";
 import { computed, ref } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
+// import { onMounted } from "vue";
 export default {
+  props: ["loginText"],
   components: {
     Logo,
     StudentLogo,
@@ -84,37 +90,16 @@ export default {
     const modalVisible = ref(false);
     const showWelcome = computed(() => store.state.user.welcome);
     const router = useRouter();
-    const handleCredentialResponse = (res) => {
-      store
-        .dispatch("user/checkMembership", {
-          vendor: "google",
-          token: res.access_token,
-          type: "access_token",
-        })
-        .then((membership) => {
-          modalVisible.value = !membership.user;
-        });
-    };
-
-    const { google } = window;
-    const client = google.accounts.oauth2.initTokenClient({
-      client_id: env.GOOGLE_CLIENT_ID,
-      scope:
-        "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
-      ux_mode: "popup",
-      callback: handleCredentialResponse,
-    });
-
-    const login = () => {
-      // client.requestCode();
-      client.requestAccessToken();
-    };
+    const googleRef = ref(null);
+    // const login = () => {
+    //   google.accounts.id.prompt();
+    // };
 
     const resolveClick = () => {
       if (membership.value) {
         console.log("사용자 정보");
       } else {
-        login();
+        // login();
       }
     };
     /**
@@ -155,12 +140,14 @@ export default {
         console.log("교사");
       }
     };
+
     return {
       isStudent,
       isTeacher,
       membership,
       modalVisible,
       showWelcome,
+      googleRef,
       resolveClick,
       joinRequired,
       closeJoinModal,

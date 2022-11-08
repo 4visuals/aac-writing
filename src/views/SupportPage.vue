@@ -1,41 +1,7 @@
 <template>
   <div class="home" @scroll="detectScroll">
-    <TeacherNav
-      v-if="host.isTeacherMode()"
-      :fixed="fixedMenu"
-      @logout="doLogout"
-    />
+    <TeacherNav :fixed="fixedMenu" @logout="doLogout" />
     <BannerView />
-    <ProductBanner v-if="products" :products="products" />
-    <section class="menu" v-if="host.isPwaMode()">
-      <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
-    </section>
-    <section class="menu" v-else-if="host.isTeacherMode()">
-      <div class="students" v-if="member">
-        <template v-if="students.length === 0">
-          <ParaText
-            >학생을 등록해주세요. 최대 2명까지 등록 가능합니다.</ParaText
-          >
-          <div class="stud-reg">
-            <AacButton
-              text="학생 등록"
-              theme="pink"
-              :inline="true"
-              @click="showLicenseConfig"
-            />
-          </div>
-        </template>
-        <template v-else>
-          <StudentList
-            @selected="(license, path) => moveTo(path, license)"
-            @register="(license) => showLicenseConfig(license)"
-          />
-        </template>
-      </div>
-    </section>
-    <div class="menu" v-else>
-      <StudentLoginForm />
-    </div>
     <section class="info pc">
       <ArticlePart
         v-for="(each, idx) in articles"
@@ -74,7 +40,7 @@
           (주)성주코퍼레이션 | 정인균 | 사업자번호 402-88-01673 | TEL:
           070-7808-8807
         </p>
-        <p>admin@kdict.kr</p>
+        <p>contact@kdict.kr</p>
         <p>서울특별시 성동구 왕십리로 24나길 20, 2층 243호 (창성빌딩)</p>
         <p>© 2022 그림한글. All rights reserved.</p>
       </div>
@@ -100,36 +66,28 @@
 
 <script>
 import { host } from "@/service/util";
-import StudentLoginForm from "./StudentLoginForm.vue";
 import { useStore } from "vuex";
 import { watch, ref } from "vue";
 import { useRouter } from "vue-router";
 import { computed } from "@vue/reactivity";
 import { LicenseConfigView } from "@/components/admin";
-import { SpanText, ParaText } from "@/components/text";
+import { SpanText } from "@/components/text";
 import { ActionIcon } from "../components/form";
-import StudentList from "./main/StudentList.vue";
 import TeacherNav from "./nav/TeacherNav.vue";
 import BannerView from "./main/Banner.vue";
 import ArticlePart from "./main/ArticlePart.vue";
 import modalHandler from "../components/modal";
 import IntroWord from "./main/IntroWord.vue";
-import ProductBanner from "../components/product/ProductBanner.vue";
-import api from "../service/api";
 
 export default {
   name: "Home",
   components: {
-    StudentLoginForm,
     LicenseConfigView,
     SpanText,
-    ParaText,
     ActionIcon,
-    StudentList,
     TeacherNav,
     BannerView,
     ArticlePart,
-    ProductBanner,
   },
   setup() {
     const store = useStore();
@@ -139,7 +97,6 @@ export default {
     const member = computed(() => store.getters["user/isMember"]);
     const modal = ref({ visible: false, lcs: null });
     const fixedMenu = ref(false);
-    const products = ref(null);
     const intro = {
       word: {
         type: "video",
@@ -266,10 +223,6 @@ export default {
       console.log(res);
     };
 
-    api.product.list().then((res) => {
-      products.value = res.products;
-    });
-
     watch(
       () => member,
       (isMember) => {
@@ -290,7 +243,6 @@ export default {
       licenses,
       fixedMenu,
       articles,
-      products,
       moveTo,
       showLicenseConfig,
       host,

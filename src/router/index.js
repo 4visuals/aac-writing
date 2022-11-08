@@ -3,7 +3,10 @@ import Home from "../views/Home.vue";
 import LevelView from "../views/level/LevelView.vue";
 import BookShelfView from "../views/book/BookShelfView.vue";
 import { PolicyWrapper, PolicyView } from "../components/policy";
+import LoginPage from "../views/LoginPage.vue";
 import { QuizView } from "../views/quiz";
+import SupportPage from "../views/SupportPage.vue";
+import PurchasePage from "../views/PurchagePage.vue";
 import { logger } from "@/service/util";
 
 const routes = [
@@ -37,6 +40,16 @@ const routes = [
       ),
   },
   {
+    path: "/support",
+    name: "SupportPage",
+    component: SupportPage,
+  },
+  {
+    path: "/purchase",
+    name: "PurchagePage",
+    component: PurchasePage,
+  },
+  {
     path: "/policy",
     name: "PolicyWrapper",
     component: PolicyWrapper,
@@ -52,6 +65,11 @@ const routes = [
         component: PolicyView,
       },
     ],
+  },
+  {
+    path: "/login",
+    name: "LoginPage",
+    component: LoginPage,
   },
 ];
 

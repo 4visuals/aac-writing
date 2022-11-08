@@ -1,39 +1,41 @@
 <template>
-  <div class="container-fluid pwrapper max800">
-    <div class="background"></div>
-    <div class="row">
-      <div class="col-12">
-        <div class="pol-head">
-          <div class="policies">
-            <div
-              v-for="btn in buttons"
-              :key="btn.path"
-              class="pol"
-              :class="{ active: activeBtn.path === btn.path }"
-              @click="moveTo(btn)"
-            >
-              {{ btn.text }}
-            </div>
-          </div>
+  <div class="pwrapper" @scroll="detectScroll">
+    <TeacherNav :fixed="fixedMenu" />
+    <div class="pol-head max800">
+      <div class="policies">
+        <div
+          v-for="btn in buttons"
+          :key="btn.path"
+          class="pol"
+          :class="{ active: activeBtn.path === btn.path }"
+          @click="moveTo(btn)"
+        >
+          {{ btn.text }}
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-12">
-        <router-view v-if="policy" :policy="policy" :mdText="policy.detail" />
-        <div v-else class="loading">...</div>
+    <div class="container-fluid max800">
+      <div class="row">
+        <div class="col-12">
+          <router-view v-if="policy" :policy="policy" :mdText="policy.detail" />
+          <div v-else class="loading">...</div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import TeacherNav from "../../views/nav/TeacherNav.vue";
 import { ref, watch } from "vue";
 import { useStore } from "vuex";
 import api from "@/service/api";
 import { useRoute, useRouter } from "vue-router";
 
 export default {
+  components: {
+    TeacherNav,
+  },
   setup() {
     const store = useStore();
     const route = useRoute();
@@ -57,12 +59,13 @@ export default {
     ];
     const activeBtn = ref(null);
     const policy = ref(null);
+    const fixedMenu = ref(false);
     let policies = null;
     const pathMap = {
       tou: "TM",
       privacy: "PV",
     };
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
+    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
     api.policy.load().then((res) => {
       policies = res;
       const subpath = route.path.split("/")[2];
@@ -71,6 +74,10 @@ export default {
     const moveTo = ({ path, type }) => {
       policy.value = policies[type];
       router.replace(path);
+    };
+    const detectScroll = (e) => {
+      const scroll = e.target.scrollTop;
+      fixedMenu.value = scroll > 180;
     };
     watch(
       () => route.path,
@@ -88,7 +95,9 @@ export default {
       buttons,
       activeBtn,
       policy,
+      fixedMenu,
       moveTo,
+      detectScroll,
     };
   },
 };
@@ -96,18 +105,13 @@ export default {
 
 <style lang="scss" scoped>
 .pwrapper {
-  position: sticky;
-  top: 0px;
-  .background {
-    height: 56px;
-    background: #fffdf4;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
   .pol-head {
-    margin-top: 16px;
+    position: sticky;
+    top: 56px;
+    margin: 0 auto;
     .policies {
       display: flex;
       align-items: center;
@@ -126,6 +130,9 @@ export default {
         }
       }
     }
+  }
+  .container-fluid {
+    margin-top: 56px;
   }
 }
 </style>

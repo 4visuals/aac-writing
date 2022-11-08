@@ -19,6 +19,7 @@ class InputForm {
     value,
     error,
     type = "text",
+    placeholder,
     filter,
   }) {
     this.wid = wid;
@@ -28,6 +29,7 @@ class InputForm {
     this.value = value;
     this.error = error;
     this.type = type;
+    this.placeholder = placeholder;
     this.filter = filter || DEFAULT_FILTER;
   }
   getErrorMessage() {

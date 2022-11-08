@@ -7,8 +7,11 @@
         :class="{
           container: !fill,
           sm: width === 'sm',
+          md: width === 'md',
           fill: fill,
           rect: rect,
+          'no-bgc': noBgc === true,
+          'no-shadow': noShadow === true,
         }"
         :style="{ height: fill ? '100%' : height ? height : 'auto' }"
         v-if="visible"
@@ -23,7 +26,7 @@
 import { ref, onMounted } from "vue";
 export default {
   emits: ["hidden"],
-  props: ["width", "height", "fill", "rect"],
+  props: ["width", "height", "fill", "rect", "noBgc", "noShadow"],
   setup(props, { emit }) {
     const fadeOut = () => {
       visible.value = false;
@@ -82,6 +85,9 @@ export default {
   &.sm {
     max-width: 560px;
   }
+  &.md {
+    max-width: 720px;
+  }
   &.fill {
     left: 50%;
     width: 100%;
@@ -90,6 +96,12 @@ export default {
   }
   &.rect {
     border-radius: 0;
+  }
+  &.no-shadow {
+    box-shadow: none;
+  }
+  &.no-bgc {
+    background-color: transparent;
   }
 }
 </style>

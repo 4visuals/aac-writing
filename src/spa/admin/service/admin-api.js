@@ -1,4 +1,5 @@
 import { GET, POST } from "@/service/api/request";
+import Product from "../../../entity/product";
 
 const member = {
   search: (keyword) => GET(`/admin/member`, { keyword }),
@@ -13,4 +14,13 @@ const license = {
 const order = {
   list: () => GET("/admin/orders"),
 };
-export default { member, license, order };
+
+const product = {
+  list: () =>
+    GET("/admin/products").then((res) => {
+      res.products = res.products.map((prod) => new Product(prod));
+      return res;
+    }),
+  create: (product) => POST("/admin/product", product),
+};
+export default { member, license, order, product };

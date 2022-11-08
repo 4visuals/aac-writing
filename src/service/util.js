@@ -1,9 +1,10 @@
 import env from "./env";
 
 const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
-
+//
 const key = {
   /**
+   *
    * macOS 크롬에서 한글 입력상태에서 enter를 누르면 key event가 두 번 발생한다.
    * (한글 입력 상태 ON, 한글 입력 상태 OFF)
    * @param {KeyEvent} e
@@ -137,11 +138,18 @@ const host = {
   isStudentMode: () => {
     const { hostname } = document.location;
     const parts = hostname.split(".");
-    return "kdict" === parts[0] || "aacdict" === parts[0];
+    if (parts.length === 1 && parts[0] === "localhost") {
+      const mode = new URL(document.location).searchParams.get("mode");
+      parts[0] = mode || "student";
+    }
+    return "student" === parts[0];
   },
   isTeacherMode: () => {
     const parts = document.location.hostname.split(".");
-    return "teacher" === parts[0];
+    if (parts.length === 1 && parts[0] === "localhost") {
+      parts[0] = "kdict";
+    }
+    return "kdict" === parts[0] || "aacdict" === parts[0];
   },
 };
 const logger = {

@@ -2,6 +2,7 @@
   <div v-if="visible" class="bg" ref="bgRef">
     <div
       class="char"
+      :class="{ ani: bgAnimationEnabled }"
       v-for="path in pathesRef"
       :key="path.index"
       :style="{
@@ -18,8 +19,11 @@ import { trigger } from "@vue/reactivity";
 import { computed, onMounted, onUnmounted } from "vue";
 import { ref } from "vue";
 import { useStore } from "vuex";
+import storage from "../service/storage";
+
 export default {
   setup() {
+    const bgAnimationEnabled = !storage.local.read("bg.anim.disable");
     const IMG_SIZE = 48;
     const bgRef = ref(null);
     const pathes = "00,01,02,03".split(",").map((fnum, index) => {
@@ -63,7 +67,9 @@ export default {
         path.vy = 30 * Math.cos(deg);
       });
       pathesRef.value = pathes;
-      updatePosition();
+      if (bgAnimationEnabled) {
+        updatePosition();
+      }
     };
     onMounted(() => {
       assignPosition();
@@ -75,6 +81,7 @@ export default {
     return {
       bgRef,
       visible,
+      bgAnimationEnabled,
       path: require("@/assets/bg00.jpg"),
       pathesRef,
     };
@@ -104,7 +111,9 @@ export default {
     background-repeat: no-repeat;
     opacity: 0.8;
     transition: all 2s linear;
-    // animation: bingle 8s linear 0s infinite;
+    &.ani {
+      animation: bingle 8s linear 0s infinite;
+    }
   }
 }
 

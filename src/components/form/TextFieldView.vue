@@ -10,6 +10,7 @@
       <input
         :class="{ pending: editing || valueVisible, error: formModel.error }"
         :type="valueVisible ? 'text' : formModel.type || 'text'"
+        :placeholder="formModel.placeholder || ''"
         ref="inputEl"
         :disabled="readOnly"
         @input="valueTyped"

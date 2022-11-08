@@ -15,10 +15,20 @@
               <div class="info" @click="order.product = prod">
                 <h5>{{ prod.name }}</h5>
                 <p>{{ prod.description }}</p>
-                <div class="price">
-                  <span class="cur">{{ prod.priceKrWon }}</span
-                  ><span>원</span>
-                </div>
+                <table class="price">
+                  <tr class="cost">
+                    <td>정가</td>
+                    <td class="acc">{{ prod.priceKrWon }}</td>
+                  </tr>
+                  <tr class="disc">
+                    <td>할인</td>
+                    <td class="acc">{{ prod.discountKrWon }}</td>
+                  </tr>
+                  <tr class="price">
+                    <td>가격</td>
+                    <td class="acc">{{ prod.price }}</td>
+                  </tr>
+                </table>
               </div>
             </li>
           </ul>
@@ -36,11 +46,11 @@
         <div v-if="validOrder(order)" class="section overview">
           <div class="prod">{{ order.product.name }}</div>
           <div class="price">
-            <span class="qtt">{{ order.product.priceKrWon }}원</span
+            <span class="qtt">{{ order.product.price }}원</span
             ><span class="mul">X</span
             ><span class="qtt">{{ order.qtt }}개</span>
           </div>
-          <div class="total">{{ order.product.priceKrWon * order.qtt }} 원</div>
+          <div class="total">{{ order.product.price * order.qtt }} 원</div>
         </div>
         <div v-if="validOrder(order)" class="section">
           <FormButton text="구매하기" size="sm" @click="createOrder" />
@@ -93,6 +103,37 @@ export default {
           console.log(err);
         });
     };
+    const createOrderByImport = (order) => {
+      const imp = window.IMP;
+      imp.init("imp20450844");
+      console.log(order);
+      // imp20450844
+      const merchant_uid =
+        Math.random().toString(36).substring(2) +
+        Math.random().toString(36).substring(2);
+      imp.request_pay(
+        {
+          // param
+          pg: "danal_tpay.9810030929",
+          pay_method: "card",
+          merchant_uid,
+          name: order.product.name,
+          amount: 100,
+          buyer_email: "yeori.seo@gmail.com",
+          buyer_name: "서채민",
+        },
+        (res) => {
+          // callback
+          if (res.success) {
+            console.log("[SUCCESS]", res);
+            // 결제 성공 시 로직,
+          } else {
+            console.log("[FAILURE]", res);
+            // 결제 실패 시 로직,
+          }
+        }
+      );
+    };
     const loadProducts = () => {
       pending.value.state = "LOADING";
       api.product
@@ -115,6 +156,7 @@ export default {
       isTeacher,
       validOrder,
       createOrder,
+      createOrderByImport,
     };
   },
 };
@@ -145,6 +187,15 @@ export default {
         cursor: pointer;
         background-color: #efefef;
         border: 1px solid #dcdcdc;
+        .price {
+          margin-left: auto;
+          td {
+            padding: 1px 2px;
+            &.acc {
+              text-align: right;
+            }
+          }
+        }
       }
     }
     .overview {
@@ -156,8 +207,6 @@ export default {
         align-items: center;
         justify-content: flex-end;
         column-gap: 8px;
-        span {
-        }
       }
       .total {
         text-align: right;

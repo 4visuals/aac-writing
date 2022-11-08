@@ -1,5 +1,9 @@
 <template>
   <div class="home">
+    <div class="home-nav" v-if="host.isTeacherMode()">
+      <router-link to="/support">소개</router-link>
+      <router-link to="/purchase">이용권구매</router-link>
+    </div>
     <button v-if="member" class="btn logout" @click="doLogout">
       <span>로그</span><span>아웃</span>
     </button>
@@ -35,12 +39,13 @@
         </template>
       </div>
       <div class="login" v-else>
-        <UserProfile class="google" />
+        <GoogleButton />
       </div>
     </div>
     <div class="menu" v-else>
       <StudentLoginForm />
     </div>
+    <CompanyInfo />
     <teleport to="body" v-if="modal.visible">
       <Modal @hidden="modal.visible = false" :fill="true" :rect="true">
         <ModalHeader :shadow="true"
@@ -63,7 +68,7 @@
 <script>
 import { host } from "@/service/util";
 import StudentLoginForm from "./StudentLoginForm.vue";
-import UserProfile from "./menu/UserProfile.vue";
+// import UserProfile from "./menu/UserProfile.vue";
 import { useStore } from "vuex";
 import { watch, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -72,17 +77,21 @@ import { LicenseConfigView } from "@/components/admin";
 import { SpanText, ParaText } from "@/components/text";
 import { ActionIcon } from "../components/form";
 import StudentList from "./main/StudentList.vue";
+import GoogleButton from "../components/oauth/GoogleButton.vue";
+import CompanyInfo from "../components/company/CompanyInfo.vue";
 
 export default {
   name: "Home",
   components: {
     StudentLoginForm,
-    UserProfile,
+    // UserProfile,
     LicenseConfigView,
     SpanText,
     ParaText,
     ActionIcon,
     StudentList,
+    GoogleButton,
+    CompanyInfo,
   },
   setup() {
     const store = useStore();
@@ -170,7 +179,17 @@ export default {
   height: 100%;
   padding: 0 24px;
   position: relative;
-
+  .home-nav {
+    display: flex;
+    font-size: 1.5rem;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    column-gap: 16px;
+    a {
+      text-decoration: none;
+    }
+  }
   .logout {
     width: 48px;
     height: 48px;

@@ -16,11 +16,13 @@ import LevelAnalysis from "./views/LevelAnalysis.vue";
 import LicenseManage from "./views/LicenseManage.vue";
 import OrderListView from "./views/order/OrderListView.vue";
 import PolicyEditor from "./views/PolicyManage.vue";
+import ProductManage from "./views/ProductManage.vue";
 
 export default {
   components: {
     AdminMenu,
     OrderListView,
+    ProductManage,
   },
   setup() {
     const store = useStore();
@@ -40,6 +42,12 @@ export default {
       { id: "license", icon: "badge", title: "수강증", comp: LicenseManage },
       { id: "stats", icon: "insights", title: "통계", comp: null },
       { id: "policy", icon: "security", title: "이용약관", comp: PolicyEditor },
+      {
+        id: "product",
+        icon: "storefront",
+        title: "판매 상품",
+        comp: ProductManage,
+      },
     ];
     const activeBody = shallowRef(null);
     const openAdminBody = (menu) => {

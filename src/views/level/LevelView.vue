@@ -15,7 +15,7 @@
           active: activeChapter === chapter,
         }"
       >
-        <div class="col-12">
+        <div class="col-12 chap-title">
           <ParaText :lg="true" class="title">
             <span
               class="chapter-name"
@@ -26,6 +26,14 @@
               @click="toggleActiveChapter(chapter)"
             />
           </ParaText>
+          <!-- <div class="reward">
+            <div class="crown">
+              <img src="@/assets/reward/crown_chapter_word.png" />
+            </div>
+            <div class="crown">
+              <img src="@/assets/reward/crown_chapter_sen.png" />
+            </div>
+          </div> -->
         </div>
         <transition name="section">
           <div v-if="activeChapter === chapter" class="col-12 row">
@@ -82,6 +90,8 @@ import QuizHistoryView from "../QuizHistoryView.vue";
 import { ParaText } from "../../components/text";
 import { ActionIcon } from "../../components/form";
 import { useRoute } from "vue-router";
+import { logger } from "@/service/util";
+
 export default {
   props: ["cate"],
   components: {
@@ -99,6 +109,8 @@ export default {
     const store = useStore();
     const route = useRoute();
     const license = computed(() => store.getters["exam/activeLicense"]);
+    const segmentHistory = computed(() => store.getters["exam/segmentHistory"]);
+    logger.log(segmentHistory, "SEG HISTORY");
     const modal = ref(null);
     const activeChapter = ref(null);
     // let chapterEl = null;
@@ -203,6 +215,8 @@ $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
   /* box-shadow: #ffb24114 0px 0px 0px 1px inset, #e3a03d7d 0px 0px 0px 1px inset; */
   border: 1px solid #d23d7044;
   transition: height 0.2s $timing-fn 0.1s;
+  margin-left: 0;
+  margin-right: 0;
   &.active {
     margin-top: 16px;
     margin-bottom: 16px;
@@ -211,6 +225,36 @@ $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
     padding-bottom: 24px;
     // background-image: linear-gradient(15deg, #ffeeff 45%, #cdfaff 100%);
     background-image: linear-gradient(15deg, #faffde 75%, #cdfaff 100%);
+    .chap-title {
+      .reward {
+        transform: translateY(-50%);
+        .crown {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    }
+  }
+  .chap-title {
+    position: relative;
+    .reward {
+      position: absolute;
+      display: flex;
+      column-gap: 16px;
+      transform: translateY(-50%);
+      top: 50%;
+      right: 40px;
+      z-index: 5;
+      .crown {
+        width: 28px;
+        height: 28px;
+        img {
+          width: 100%;
+          height: auto;
+          filter: drop-shadow(1px 1px 3px #0000009d);
+        }
+      }
+    }
   }
 }
 

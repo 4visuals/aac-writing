@@ -8,7 +8,7 @@ $br-desktop: 4096px;
   }
 }
 @mixin tablet {
-  @media (min-width: #{$br-mobile}) {
+  @media (min-width: #{$br-mobile}) and (max-width: #{$br-tablet - 1px}) {
     @content;
   }
 }

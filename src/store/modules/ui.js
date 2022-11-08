@@ -99,6 +99,7 @@ export default {
   namespaced: true,
   state: () => ({ ui, leftMenu, themes }),
   getters: {
+    appHeight: (state) => state.ui.appHeight,
     leftVisible(state) {
       return state.leftMenu.isVisible;
     },
@@ -120,8 +121,8 @@ export default {
     setBackgroundVisible(state, visible) {
       state.ui.setBackgroundVisible(visible);
     },
-    setAppHeight(state) {
-      state.ui.setAppHeight(visualViewport.height);
+    setAppHeight(state, h) {
+      state.ui.setAppHeight(h);
     },
     setNavSize(state, { expanded, topPadding }) {
       state.ui.nav.expanded = expanded;

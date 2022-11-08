@@ -8,6 +8,14 @@
       <span>{{ idx }}</span
       ><span v-if="compact !== '' && visited">+</span>
     </h1>
+    <!-- <div class="reward">
+      <div class="crown">
+        <img src="@/assets/reward/crown_section_word.png" />
+      </div>
+      <div class="crown">
+        <img src="@/assets/reward/crown_section_sen.png" />
+      </div>
+    </div> -->
     <div class="desc" :class="theme">
       <!-- <h4>{{ item.title }}</h4> -->
       <ParaText :small="true">{{ item.description }}</ParaText>
@@ -101,6 +109,23 @@ export default {
     &.blue {
       // text-shadow: 2px 2px #6c97dc;
       color: #0b0a45;
+    }
+  }
+  .reward {
+    position: absolute;
+    right: 16px;
+    z-index: 5;
+    display: flex;
+    column-gap: 8px;
+    transform: translateY(-60%);
+    .crown {
+      width: 24px;
+      height: 24px;
+      img {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(1px 1px 1px #0000004a);
+      }
     }
   }
   .desc {

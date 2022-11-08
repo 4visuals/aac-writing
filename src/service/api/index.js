@@ -1,4 +1,5 @@
 import { GET, POST, PUT } from "./request";
+import Product from "../../entity/product";
 
 const user = {
   membership: (vendor, type, token) =>
@@ -84,7 +85,13 @@ const stats = {
  * 상품
  */
 const product = {
-  list: () => GET("/products"),
+  list: () =>
+    GET("/products").then((res) => {
+      {
+        res.products = res.products.map((prod) => new Product(prod));
+        return res;
+      }
+    }),
 };
 const order = {
   createBeta: (productCode, quantity) =>
