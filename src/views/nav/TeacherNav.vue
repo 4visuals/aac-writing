@@ -1,12 +1,12 @@
 <template>
   <header :class="{ fixed: fixed }">
-    <a class="brand" href="/">
+    <router-link class="brand" to="/">
       <div class="logo">
         <span class="b">ㄱ</span><span class="y">ㄹ</span
         ><span class="d">ㅎ</span><span class="b">ㄱ</span>
       </div>
       <strong>그림한글</strong>
-    </a>
+    </router-link>
     <nav>
       <div class="inline">
         <router-link class="btn" to="/support">소개</router-link>
@@ -80,7 +80,7 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
 $navheight: 3.5rem;
-$bgcolor: #fffdf46d;
+$bgcolor: #fffdf4;
 header {
   display: flex;
   align-items: center;

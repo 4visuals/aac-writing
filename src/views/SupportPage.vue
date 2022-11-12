@@ -35,15 +35,7 @@
           >개인정보처리방침</router-link
         >
       </div>
-      <div class="cmp-detail">
-        <p>
-          (주)성주코퍼레이션 | 정인균 | 사업자번호 402-88-01673 | TEL:
-          070-7808-8807
-        </p>
-        <p>contact@kdict.kr</p>
-        <p>서울특별시 성동구 왕십리로 24나길 20, 2층 243호 (창성빌딩)</p>
-        <p>© 2022 그림한글. All rights reserved.</p>
-      </div>
+      <CompanyDetail class="cmp-detail" />
     </section>
     <teleport to="body" v-if="modal.visible">
       <Modal @hidden="modal.visible = false" :fill="true" :rect="true">
@@ -78,6 +70,7 @@ import BannerView from "./main/Banner.vue";
 import ArticlePart from "./main/ArticlePart.vue";
 import modalHandler from "../components/modal";
 import IntroWord from "./main/IntroWord.vue";
+import CompanyDetail from "../components/CompanyDetail.vue";
 
 export default {
   name: "Home",
@@ -88,6 +81,7 @@ export default {
     TeacherNav,
     BannerView,
     ArticlePart,
+    CompanyDetail,
   },
   setup() {
     const store = useStore();

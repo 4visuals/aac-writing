@@ -104,6 +104,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$bgcolor: #fffdf4;
 .pwrapper {
   height: 100%;
   overflow-y: auto;
@@ -116,6 +117,7 @@ export default {
       display: flex;
       align-items: center;
       margin: 1px;
+      background-color: $bgcolor;
       .pol {
         flex: 1 1 auto;
         font-size: 1.25rem;
