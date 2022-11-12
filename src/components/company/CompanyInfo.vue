@@ -22,13 +22,7 @@
             >개인정보처리방침</router-link
           >
         </div>
-        <div>
-          (주)성주코퍼레이션 | 정인균 | 사업자번호 402-88-01673 | TEL:
-          070-7808-8807
-        </div>
-        <div>contact@kdict.kr</div>
-        <div>서울특별시 성동구 왕십리로 24나길 20, 2층 243호 (창성빌딩)</div>
-        <div>© 2022 그림한글. All rights reserved.</div>
+        <CompanyDetail />
       </div>
     </div>
   </div>
@@ -37,6 +31,7 @@
 <script>
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import CompanyDetail from "../CompanyDetail.vue";
 
 export default {
   props: {
@@ -57,6 +52,7 @@ export default {
     );
     return { maxWidth };
   },
+  components: { CompanyDetail },
 };
 </script>
 
