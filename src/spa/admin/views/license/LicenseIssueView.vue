@@ -90,7 +90,8 @@ export default {
     const userSelected = (user) => {
       adminApi.member.licenses(user.seq).then((res) => {
         res.students.forEach((student) => {
-          student.birth = time.birthToDate(student.birth);
+          const ymd = student.birth.split("-");
+          student.birth = time.birthToDate(ymd);
         });
         licenses.value = res.licenses.map((lcs) => new License(lcs));
         students.value = res.students;

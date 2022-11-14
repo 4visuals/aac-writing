@@ -15,7 +15,8 @@ const installLoginData = (store, { membership, licenses, jwt, segments }) => {
   } else if (store.getters.isTeacher) {
     store.getters.students.forEach((student) => {
       student.userId = student.userId || null;
-      student.birth = time.birthToDate(student.birth);
+      const ymd = student.birth.split("-");
+      student.birth = time.birthToDate(ymd);
     });
   }
   return membership;
@@ -87,13 +88,15 @@ export default {
     },
     applyStudent(state, args) {
       const { student, license } = args;
-      student.birth = time.birthToDate(student.birth);
+      const ymd = student.birth.split("-");
+      student.birth = time.birthToDate(ymd);
       const mm = state.membership;
       mm.user.students.push(student);
       license.studentRef = student.seq;
     },
     updateStudent(state, student) {
-      student.birth = time.birthToDate(student.birth);
+      const ymd = student.birth.split("-");
+      student.birth = time.birthToDate(ymd);
       const { students } = state.membership.user;
       const pos = students.findIndex((stud) => stud.seq === student.seq);
       students.splice(pos, 1, student);
@@ -139,6 +142,11 @@ export default {
       return api.student.login(args.id, args.password).then((res) => {
         return installLoginData(ctx, res);
       });
+    },
+    loginManual(ctx, args) {
+      return api.user
+        .loginManually(args.id, args.password)
+        .then((res) => installLoginData(ctx, res));
     },
     join(ctx) {
       return api.user.join().then((res) => {
