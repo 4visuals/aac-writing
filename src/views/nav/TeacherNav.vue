@@ -20,7 +20,8 @@
       </div>
       <div class="inline" v-else>
         <a class="btn" href="#">가입</a>
-        <GoogleButton size="small" text="signin" class="g btn" />
+        <router-link class="btn" to="/">로그인</router-link>
+        <!-- <GoogleButton size="small" text="signin" class="g btn" /> -->
       </div>
       <a class="btn menu" href="#"><AppIcon icon="menu" fsize="20px" /></a>
     </nav>
@@ -33,14 +34,14 @@ import { useStore } from "vuex";
 import modal from "../../components/modal";
 import DialogView from "../../components/dialog/DialogView.vue";
 import AppIcon from "../../components/AppIcon.vue";
-import GoogleButton from "../../components/oauth/GoogleButton.vue";
+// import GoogleButton from "../../components/oauth/GoogleButton.vue";
 import BadgeIcon from "../../components/BadgeIcon.vue";
 export default {
   props: ["fixed"],
   components: {
     AppIcon,
     BadgeIcon,
-    GoogleButton,
+    // GoogleButton,
   },
   setup() {
     const store = useStore();

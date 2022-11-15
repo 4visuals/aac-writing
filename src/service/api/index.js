@@ -6,6 +6,7 @@ const user = {
     POST(`/user/membership`, { vendor, type, token }),
   join: () => POST(`/user/join`),
   login: () => POST(`/user/login`),
+  loginManually: (id, password) => POST("/user/login/manual", { id, password }),
   check: {
     id: (userId) => POST(`/user/prop`, { prop: "userId", value: userId }),
   },

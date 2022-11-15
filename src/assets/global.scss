@@ -59,6 +59,10 @@ button {
         margin-right: 4px;
       }
     }
+    &.disabled {
+      color: #9a9a9a;
+      background-color: #ececec;
+    }
   }
   &.blue {
     background-color: #2b70ea;
@@ -119,6 +123,20 @@ button {
 .anim {
   &.rotate {
     animation: anim-rotate 2s linear 0s infinite;
+  }
+}
+
+.tr-fade {
+  &-enter-from,
+  &-enter {
+    opacity: 0;
+  }
+  &-enter-active,
+  &-leave-active {
+    transition: opacity 0.2s ease-in;
+  }
+  &-leave-to {
+    opacity: 0;
   }
 }
 
