@@ -1,7 +1,23 @@
 <template>
   <div class="product">
-    <!-- <a href="#"></a> -->
-    <div class="inner">
+    <div class="inner" @touchstart="hover(true)" @mouseenter="hover(true)">
+      <Transition name="tr-fade">
+        <div v-if="hovering" class="panel" @mouseleave="hover(false)">
+          <div class="logo" :style="`--logo-bg: ${themes[theme].colorB}`">
+            <span class="dur">{{ product.durationInDays }}</span>
+            <span class="sub">days</span>
+          </div>
+          <div v-if="user" class="option">
+            <button class="nude disabled">
+              <AppIcon icon="phone_android"></AppIcon><span>휴대폰 결제</span>
+            </button>
+            <button class="nude" @click="dispatchOrder('card')">
+              <AppIcon icon="credit_card"></AppIcon><span>신용카드</span>
+            </button>
+          </div>
+          <div v-else class="option">로그인 후 구매 가능합니다.</div>
+        </div>
+      </Transition>
       <div class="bg red">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -115,28 +131,32 @@
         </svg>
       </div>
       <div class="logo" :style="`--logo-bg: ${themes[theme].colorB}`">
-        <span>{{ product.durationInDays }}</span>
+        <span class="dur">{{ product.durationInDays }}</span>
+        <span class="sub">days</span>
       </div>
+      <h3 class="base-price" v-if="product.discountKrWon > 0">
+        ₩{{ format(product.priceKrWon) }}
+      </h3>
+      <h3 class="price">₩{{ format(product.price) }}</h3>
       <h3>{{ product.name }}</h3>
       <div class="desc">{{ product.description }}</div>
-      <div class="price">
-        <div class="cost">
-          <span class="cur">₩</span>{{ product.priceKrWon }}
+      <div class="discount">
+        <div v-if="product.discountKrWon > 0">
+          약
+          <span class="cur">{{ product.discountRate.toFixed(1) }}%</span> 할인
         </div>
-        <div class="discout cost">
-          <span class="cur">₩</span>{{ product.discountKrWon }}
-        </div>
-        <div class="cost real">
-          <span class="cur">₩</span>{{ product.price }}
-        </div>
+        <div v-else>할인 없음</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { computed, defineProps, ref, defineEmits } from "vue";
+import util from "../../service/util";
 import Product from "../../entity/product";
+import { useStore } from "vuex";
+import AppIcon from "../AppIcon.vue";
 
 const themes = {
   red: {
@@ -152,7 +172,19 @@ const themes = {
     colorB: "hsl(70, 69%, 40%)",
   },
 };
-defineProps({ product: Product, theme: String });
+const props = defineProps({ product: Product, theme: String });
+const emit = defineEmits(["order"]);
+const store = useStore();
+const user = computed(() => store.getters["user/currentUser"]);
+const hovering = ref(false);
+const format = (money) => util.currency.format(money);
+const hover = (on) => {
+  hovering.value = on;
+};
+
+const dispatchOrder = (method) => {
+  emit("order", { method, product: props.product });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -161,6 +193,8 @@ $bsize: 4px;
 .product {
   position: relative;
   overflow: hidden;
+  padding-top: 16px;
+  padding-bottom: 16px;
   .bg {
     position: absolute;
     top: 0;
@@ -177,15 +211,7 @@ $bsize: 4px;
       transform: translate(-50%, -50%);
     }
   }
-  a {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: transparent;
-    z-index: 10;
-  }
+
   .inner {
     position: relative;
     z-index: 5;
@@ -195,10 +221,49 @@ $bsize: 4px;
     flex-direction: column;
     align-items: center;
     border-radius: 16px;
-    box-shadow: 0 0px 16px 0 rgb(60 64 67 / 30%),
-      0 0px 8px 1px rgb(60 64 67 / 15%);
+    box-shadow: 0 0px 8px 0 #3c40434d, 0 0px 4px 1px #3c404326;
     background-color: white;
     overflow: hidden;
+    height: 100%;
+    .panel {
+      position: absolute;
+      top: $r * 2;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #0000004d;
+      cursor: pointer;
+      z-index: 10;
+      .logo {
+        box-shadow: 0 0 16px #0000004d;
+        top: 0;
+      }
+      .option {
+        position: absolute;
+        top: $r * 4;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        column-gap: 8px;
+        > button {
+          flex: 1 1 auto;
+          background-color: white;
+          border: 1px solid #000;
+          border-radius: 8px;
+          display: inline-flex;
+          align-items: center;
+          column-gap: 8px;
+          &.disabled {
+            background-color: #ececec;
+            border-color: #9a9a9a;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
     .logo {
       position: absolute;
       top: $r * 2;
@@ -206,6 +271,7 @@ $bsize: 4px;
       width: 2 * $r + 2 * $bsize;
       height: 2 * $r + 2 * $bsize;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       // background-color: rgb(220, 255, 131);
@@ -216,6 +282,48 @@ $bsize: 4px;
       font-size: 28px;
       font-weight: 900;
       border: $bsize solid white;
+      .dur {
+        line-height: 1;
+      }
+      .sub {
+        font-size: 1.2rem;
+      }
+    }
+    h3 {
+      margin-top: 12px;
+      &.base-price {
+        font-size: 1.5rem;
+        color: rgb(152, 152, 152);
+        position: relative;
+        &::after,
+        &::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: #9b9b9b;
+        }
+        &::after {
+          transform: rotate(6deg);
+        }
+        &::before {
+          transform: rotate(-6deg);
+        }
+      }
+      &.price {
+        font-size: 2rem;
+        font-weight: 900;
+        // font-family: Rowdies, monospace, cursive, sans-serif;
+      }
+    }
+    .desc {
+      margin-top: 12px;
+    }
+    .discount {
+      margin-top: 16px;
+      font-size: 1.2rem;
     }
   }
 }

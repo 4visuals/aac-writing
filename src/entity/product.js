@@ -12,6 +12,10 @@ class Product {
   get durationInDays() {
     return this.durationInHours / 24;
   }
+  get discountRate() {
+    const { discountKrWon, priceKrWon } = this;
+    return (discountKrWon / priceKrWon) * 100;
+  }
 }
 
 export default Product;

@@ -1,5 +1,5 @@
 <template>
-  <div class="home" @scroll="detectScroll">
+  <div class="support" @scroll="detectScroll">
     <TeacherNav :fixed="fixedMenu" @logout="doLogout" />
     <BannerView />
     <section class="info pc">
@@ -20,23 +20,7 @@
         @detail="popupDetail"
       />
     </section>
-    <section class="company">
-      <div class="policy">
-        <router-link
-          active-class="pol"
-          exact-active-class="active"
-          to="/policy/tou"
-          >이용 약관</router-link
-        >
-        <router-link
-          active-class="pol"
-          exact-active-class="active"
-          to="/policy/privacy"
-          >개인정보처리방침</router-link
-        >
-      </div>
-      <CompanyDetail class="cmp-detail" />
-    </section>
+    <CompanyInfoDark />
     <teleport to="body" v-if="modal.visible">
       <Modal @hidden="modal.visible = false" :fill="true" :rect="true">
         <ModalHeader :shadow="true"
@@ -70,7 +54,7 @@ import BannerView from "./main/Banner.vue";
 import ArticlePart from "./main/ArticlePart.vue";
 import modalHandler from "../components/modal";
 import IntroWord from "./main/IntroWord.vue";
-import CompanyDetail from "../components/CompanyDetail.vue";
+import CompanyInfoDark from "../components/company/CompanyInfoDark.vue";
 
 export default {
   name: "Home",
@@ -81,7 +65,7 @@ export default {
     TeacherNav,
     BannerView,
     ArticlePart,
-    CompanyDetail,
+    CompanyInfoDark,
   },
   setup() {
     const store = useStore();
@@ -255,7 +239,7 @@ $fontcolor: #2a2a2a;
 $navheight: 3.5rem;
 
 $trasition: all 1s ease;
-.home {
+.support {
   color: $fontcolor;
   background-color: $bgcolor;
   position: relative;
@@ -291,47 +275,12 @@ $trasition: all 1s ease;
         display: none;
       }
     }
-    &.company {
-      background-color: #242424;
-      color: #ccc;
-      padding: 16px;
-      scroll-snap-align: end;
-      .policy {
-        display: inline-flex;
-        flex-direction: column;
-        margin-bottom: 20px;
-        row-gap: 8px;
-        position: relative;
-        &:after {
-          content: "";
-          position: absolute;
-          height: 1px;
-          bottom: -10px;
-          left: 0;
-          width: 100%;
-          background-color: #ccc;
-        }
-        a {
-          color: white;
-          &:hover {
-            color: rgb(125, 168, 255);
-          }
-        }
-      }
-      .cmp-detail {
-        p {
-          font-size: 0.8em;
-          margin: 0;
-          line-height: 1.5;
-        }
-      }
-    }
   }
 }
 @include mobile {
-  .home {
+  .support {
     scroll-snap-type: y mandatory;
-    font-size: 16px;
+    font-size: 12px;
     .logo {
       height: 75px;
       &.sub {
@@ -352,8 +301,8 @@ $trasition: all 1s ease;
   }
 }
 @include tablet {
-  .home {
-    font-size: 16px;
+  .support {
+    font-size: 12px;
     .logo {
       height: 120px;
       &.sub {
@@ -373,8 +322,8 @@ $trasition: all 1s ease;
   }
 }
 @include desktop {
-  .home {
-    font-size: 16px;
+  .support {
+    font-size: 12px;
     .logo {
       height: 120px;
       &.sub {
@@ -383,7 +332,7 @@ $trasition: all 1s ease;
     }
   }
 }
-.home {
+.support {
   .logout {
     width: 48px;
     height: 48px;

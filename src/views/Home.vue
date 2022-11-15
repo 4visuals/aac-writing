@@ -19,10 +19,8 @@
     <div class="menu" v-else-if="host.isTeacherMode()">
       <div class="students" v-if="member">
         <template v-if="students.length === 0">
-          <ParaText
-            >학생을 등록해주세요. 최대 2명까지 등록 가능합니다.</ParaText
-          >
           <div class="stud-reg">
+            <ParaText class="mgb-16px">학생을 등록할 수 있습니다.</ParaText>
             <AacButton
               text="학생 등록"
               theme="pink"
@@ -31,15 +29,15 @@
             />
           </div>
         </template>
-        <template v-else>
-          <StudentList
-            @selected="(license, path) => moveTo(path, license)"
-            @register="(license) => showLicenseConfig(license)"
-          />
-        </template>
+        <StudentList
+          @selected="(license, path) => moveTo(path, license)"
+          @register="(license) => showLicenseConfig(license)"
+        />
       </div>
       <div class="login" v-else>
         <GoogleButton />
+        <div class="hr"><span>OR</span></div>
+        <ManualLoginForm />
       </div>
     </div>
     <div class="menu" v-else>
@@ -68,6 +66,7 @@
 <script>
 import { host } from "@/service/util";
 import StudentLoginForm from "./StudentLoginForm.vue";
+import ManualLoginForm from "./ManualLoginForm.vue";
 // import UserProfile from "./menu/UserProfile.vue";
 import { useStore } from "vuex";
 import { watch, ref, onMounted } from "vue";
@@ -84,6 +83,7 @@ export default {
   name: "Home",
   components: {
     StudentLoginForm,
+    ManualLoginForm,
     // UserProfile,
     LicenseConfigView,
     SpanText,
@@ -144,7 +144,7 @@ export default {
 @import "~@/assets/resizer";
 @include mobile {
   .home {
-    font-size: 2rem;
+    // font-size: 2rem;
     .logo {
       height: 75px;
       &.sub {
@@ -155,7 +155,7 @@ export default {
 }
 @include tablet {
   .home {
-    font-size: 2.5rem;
+    // font-size: 2.5rem;
     .logo {
       height: 120px;
       &.sub {
@@ -166,7 +166,7 @@ export default {
 }
 @include desktop {
   .home {
-    font-size: 2.5rem;
+    // font-size: 2.5rem;
     .logo {
       height: 120px;
       &.sub {
@@ -221,6 +221,8 @@ export default {
   }
   .login {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     margin: 4rem auto;
     max-width: 300px;
@@ -247,6 +249,38 @@ export default {
         align-items: center;
         flex-direction: column;
       }
+    }
+  }
+  .hr {
+    margin: 16px 0;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: linear-gradient(
+        90deg,
+        #ccc 0px,
+        #ccc 2px,
+        #fff 2px,
+        #fff 6px
+      );
+      background-size: 6px;
+      background-repeat: repeat-x;
+      z-index: 0;
+    }
+    & > span {
+      background-color: white;
+      z-index: 5;
+      position: relative;
+      padding: 0 8px;
     }
   }
 }

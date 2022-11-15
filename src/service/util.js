@@ -209,7 +209,20 @@ const valid = {
     return cur.getFullYear() > y && year === y && month == m && date === d;
   },
 };
-export { key, path, time, host, logger, arr, valid, pick };
+const currency = {
+  format: (amount) => {
+    const chr = "" + amount;
+    let txt = "";
+    let end = chr.length;
+    while (end > 0) {
+      let start = Math.max(end - 3, 0);
+      txt = `,${chr.substring(start, end)}` + txt;
+      end = start;
+    }
+    return txt.substring(1);
+  },
+};
+export { key, path, time, host, logger, arr, valid, currency, pick };
 export default {
   key,
   path,
@@ -217,6 +230,7 @@ export default {
   host,
   logger,
   arr,
-  pick,
   valid,
+  currency,
+  pick,
 };

@@ -31,10 +31,12 @@ const create = (type, title, msg, durationInSeconds) => {
 };
 const info = (msg, title, dur = 3) => create("info", title, msg, dur);
 const success = (msg, title, dur = 3) => create("success", title, msg, dur);
+const warn = (msg, title, dur = 3) => create("warn", title, msg, dur);
 const error = (msg, title, dur = 3) => create("error", title, msg, dur);
 export { Toast };
 export default {
   info,
   success,
+  warn,
   error,
 };

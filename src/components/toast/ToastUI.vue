@@ -101,6 +101,13 @@ export default {
           background-color: #629563;
         }
       }
+      &.warn {
+        background-color: #fffca3;
+        color: #974900;
+        .left {
+          background-color: #b56400;
+        }
+      }
       &.error {
         background-color: #f8dfdf;
         color: #c16c69;
