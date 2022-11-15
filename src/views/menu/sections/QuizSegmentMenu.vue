@@ -148,6 +148,7 @@ export default {
         .then(() => {
           // location.reload();
           store.commit("ui/hideMenu");
+          store.commit("quiz/hideHint");
           quiz.loadQuiz();
         })
         .catch((e) => {
