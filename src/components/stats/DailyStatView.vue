@@ -101,7 +101,7 @@ export default {
       const stats = papers.reduce(
         (acc, paper) => {
           acc.questions += +paper.numOfQuestions;
-          acc.times += paper.endTime - paper.startTime;
+          acc.times += Date.parse(paper.endTime) - Date.parse(paper.startTime);
           if (paper.mode === "Q") {
             acc.quiz.total += paper.numOfQuestions;
             acc.quiz.correct += paper.submissions.filter(
