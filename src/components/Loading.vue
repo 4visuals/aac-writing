@@ -1,6 +1,8 @@
 <template>
   <div class="loading-view" :class="{ error: pending.error }">
-    <div class="loading" v-if="pending.state == 'LOADING'">LOADING</div>
+    <div class="loading" v-if="pending.state == 'LOADING'">
+      <span class="icon material-icons-outlined">loop</span>
+    </div>
     <div class="error" v-if="pending.error">
       <ParaText>오류 발생({{ pending.msg }})</ParaText>
       <AacButton
@@ -34,6 +36,17 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    .icon {
+      font-size: 36px;
+      color: #999;
+      animation: anim-rotate 3s linear 0s infinite;
+    }
+  }
   .error {
     display: flex;
     row-gap: 16px;

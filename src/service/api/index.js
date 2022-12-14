@@ -1,15 +1,19 @@
-import { GET, POST, PUT } from "./request";
+import { DELETE, GET, POST, PUT } from "./request";
 import Product from "../../entity/product";
 
 const user = {
   membership: (vendor, type, token) =>
     POST(`/user/membership`, { vendor, type, token }),
   join: () => POST(`/user/join`),
+  joinManually: (form) => POST("/user/join/manual", form),
   login: () => POST(`/user/login`),
   loginManually: (id, password) => POST("/user/login/manual", { id, password }),
   check: {
     id: (userId) => POST(`/user/prop`, { prop: "userId", value: userId }),
+    password: (password) =>
+      POST(`/user/prop`, { prop: "pass", value: password }),
   },
+  checkPropForJoin: (prop, value) => POST("/user/join/prop", { prop, value }),
 };
 const student = {
   login: (id, password) =>
@@ -93,10 +97,18 @@ const product = {
         return res;
       }
     }),
+  detail: (search) =>
+    GET("/product", search).then((res) => {
+      res.product = new Product(res.product);
+      return res;
+    }),
 };
 const order = {
   createBeta: (productCode, quantity) =>
     POST("/order/beta", { productCode, quantity }),
+  create: (productCode) => POST("/order", { productCode }),
+  cancel: (orderUuid) => PUT("/order", { orderUuid }),
+  get: (orderUuid) => GET(`/order/${orderUuid}`),
 };
 const tts = {};
 
@@ -106,6 +118,14 @@ const policy = {
   update: (seq, policy) => POST(`/policy`, policy),
 };
 
+const setting = {
+  password: {
+    unlock: (password) => POST("/setting/password/unlock", { password }),
+    change: (newPass, curPass) =>
+      PUT("/setting/password", { newPass, curPass }),
+  },
+  unsubscribe: () => DELETE("/setting/unsubscribe"),
+};
 export { section };
 
 export default {
@@ -120,4 +140,5 @@ export default {
   product,
   order,
   policy,
+  setting,
 };

@@ -1,8 +1,12 @@
 <template>
-  <div class="product">
+  <div class="product" :class="{ minified: minified }">
     <div class="inner" @touchstart="hover(true)" @mouseenter="hover(true)">
       <Transition name="tr-fade">
-        <div v-if="hovering" class="panel" @mouseleave="hover(false)">
+        <div
+          v-if="paymentVisible && hovering"
+          class="panel"
+          @mouseleave="hover(false)"
+        >
           <div class="logo" :style="`--logo-bg: ${themes[theme].colorB}`">
             <span class="dur">{{ product.durationInDays }}</span>
             <span class="sub">days</span>
@@ -15,7 +19,12 @@
               <AppIcon icon="credit_card"></AppIcon><span>신용카드</span>
             </button>
           </div>
-          <div v-else class="option">로그인 후 구매 가능합니다.</div>
+          <div v-else class="option">
+            <div class="login">
+              <p>로그인 후 구매 가능합니다.</p>
+              <FormButton text="로그인" @click="$router.push('/')" />
+            </div>
+          </div>
         </div>
       </Transition>
       <div class="bg red">
@@ -134,18 +143,23 @@
         <span class="dur">{{ product.durationInDays }}</span>
         <span class="sub">days</span>
       </div>
-      <h3 class="base-price" v-if="product.discountKrWon > 0">
-        ₩{{ format(product.priceKrWon) }}
-      </h3>
-      <h3 class="price">₩{{ format(product.price) }}</h3>
-      <h3>{{ product.name }}</h3>
-      <div class="desc">{{ product.description }}</div>
-      <div class="discount">
-        <div v-if="product.discountKrWon > 0">
-          약
-          <span class="cur">{{ product.discountRate.toFixed(1) }}%</span> 할인
+      <div class="detail">
+        <h3 class="base-price" v-if="product.discountKrWon > 0">
+          ₩{{ format(product.priceKrWon) }}
+        </h3>
+        <h3 class="price">₩{{ format(product.price) }}</h3>
+        <h3>{{ product.name }}</h3>
+        <div class="desc">{{ product.description }}</div>
+        <div class="discount">
+          <div v-if="product.discountKrWon > 0">
+            약
+            <span class="cur">{{ product.discountRate.toFixed(1) }}%</span> 할인
+          </div>
+          <div v-else>할인 없음</div>
         </div>
-        <div v-else>할인 없음</div>
+      </div>
+      <div v-if="minified" class="name-only">
+        <h3>{{ product.name }}</h3>
       </div>
     </div>
   </div>
@@ -157,6 +171,7 @@ import util from "../../service/util";
 import Product from "../../entity/product";
 import { useStore } from "vuex";
 import AppIcon from "../AppIcon.vue";
+import FormButton from "../form/FormButton.vue";
 
 const themes = {
   red: {
@@ -172,7 +187,12 @@ const themes = {
     colorB: "hsl(70, 69%, 40%)",
   },
 };
-const props = defineProps({ product: Product, theme: String });
+const props = defineProps({
+  product: Product,
+  theme: String,
+  paymentVisible: { type: Boolean, required: false, default: true },
+  minified: { type: Boolean, required: false, default: false },
+});
 const emit = defineEmits(["order"]);
 const store = useStore();
 const user = computed(() => store.getters["user/currentUser"]);
@@ -188,13 +208,15 @@ const dispatchOrder = (method) => {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 $r: 40px;
 $bsize: 4px;
 .product {
   position: relative;
   overflow: hidden;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 0;
+  box-shadow: 0 0px 8px 0 #3c40434d, 0 0px 4px 1px #3c404326;
+  border-radius: 16px;
   .bg {
     position: absolute;
     top: 0;
@@ -220,8 +242,7 @@ $bsize: 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 16px;
-    box-shadow: 0 0px 8px 0 #3c40434d, 0 0px 4px 1px #3c404326;
+
     background-color: white;
     overflow: hidden;
     height: 100%;
@@ -246,8 +267,10 @@ $bsize: 4px;
         bottom: 0;
         display: flex;
         align-items: center;
+        justify-content: center;
         padding: 0 16px;
         column-gap: 8px;
+
         > button {
           flex: 1 1 auto;
           background-color: white;
@@ -260,6 +283,18 @@ $bsize: 4px;
             background-color: #ececec;
             border-color: #9a9a9a;
             cursor: not-allowed;
+          }
+        }
+        .login {
+          background-color: white;
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          padding: 16px;
+          p {
+            margin-bottom: 16px;
+            font-size: 1.15rem;
           }
         }
       }
@@ -324,6 +359,38 @@ $bsize: 4px;
     .discount {
       margin-top: 16px;
       font-size: 1.2rem;
+    }
+    .detail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+}
+@include mobile {
+  .product.minified {
+    .inner {
+      .detail {
+        display: none;
+      }
+    }
+  }
+}
+@include tablet {
+  .product.minified {
+    .inner {
+      .name-only {
+        display: none;
+      }
+    }
+  }
+}
+@include desktop {
+  .product.minified {
+    .inner {
+      .name-only {
+        display: none;
+      }
     }
   }
 }

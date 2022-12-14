@@ -4,9 +4,21 @@ import LevelView from "../views/level/LevelView.vue";
 import BookShelfView from "../views/book/BookShelfView.vue";
 import { PolicyWrapper, PolicyView } from "../components/policy";
 import LoginPage from "../views/LoginPage.vue";
+import JoinPage from "../views/JoinPage.vue";
 import { QuizView } from "../views/quiz";
 import SupportPage from "../views/SupportPage.vue";
-import PurchasePage from "../views/PurchagePage.vue";
+import {
+  PurchaseWrapper,
+  ProductListView,
+  OrderFormView,
+  OrderValidationView,
+} from "../views/purchase";
+import SettingPage from "../views/user/setting/SettingPage.vue";
+import {
+  SettingOverview,
+  SettingAccount,
+  SettingLicense,
+} from "../views/user/setting/viewport";
 import { logger } from "@/service/util";
 
 const routes = [
@@ -14,6 +26,11 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home,
+  },
+  {
+    path: "/join",
+    name: "JoinView",
+    component: JoinPage,
   },
   {
     path: "/level",
@@ -46,8 +63,47 @@ const routes = [
   },
   {
     path: "/purchase",
-    name: "PurchagePage",
-    component: PurchasePage,
+    name: "PurchaseWrapper",
+    component: PurchaseWrapper,
+    children: [
+      {
+        path: "",
+        name: "ProductListView",
+        component: ProductListView,
+      },
+      {
+        path: "order/:code",
+        name: "OrderFormView",
+        component: OrderFormView,
+      },
+      {
+        path: "order/checking",
+        name: "OrderValidationView",
+        component: OrderValidationView,
+      },
+    ],
+  },
+  {
+    path: "/setting",
+    name: "SettingPage",
+    component: SettingPage,
+    children: [
+      {
+        path: "",
+        name: "SettingOverview",
+        component: SettingOverview,
+      },
+      {
+        path: "account",
+        name: "SettingAccount",
+        component: SettingAccount,
+      },
+      {
+        path: "license",
+        name: "SettingLicense",
+        component: SettingLicense,
+      },
+    ],
   },
   {
     path: "/policy",

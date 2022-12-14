@@ -8,10 +8,13 @@
     <Nav
       v-if="
         route.path !== '/' &&
+        route.path !== '/join' &&
+        route.path !== '/login' &&
         route.path !== '/console' &&
-        route.path !== '/purchase' &&
+        !route.path.startsWith('/purchase') &&
         route.path !== '/support' &&
-        !route.path.startsWith('/policy')
+        !route.path.startsWith('/policy') &&
+        !route.path.startsWith('/setting')
       "
       ref="nav"
     />

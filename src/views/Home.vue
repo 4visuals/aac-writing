@@ -2,6 +2,7 @@
   <div class="home">
     <div class="home-nav" v-if="host.isTeacherMode()">
       <router-link to="/support">소개</router-link>
+      <router-link to="/join" v-if="!member">가입</router-link>
       <router-link to="/purchase">이용권구매</router-link>
     </div>
     <button v-if="member" class="btn logout" @click="doLogout">

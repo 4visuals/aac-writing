@@ -1,49 +1,32 @@
 <template>
   <div class="purchase" @scroll="detectScroll">
-    <TeacherNav :fixed="fixedMenu" @logout="doLogout" />
+    <TeacherNav :fixed="fixedMenu" />
+    <!-- <ProductBanner v-if="products" :products="products" /> -->
     <Jumbotron title="이용권 구매" />
-
-    <div class="banner container">
-      <div class="row">
-        <ProductView
-          v-for="(prod, index) in products"
-          :key="prod.code"
-          :product="prod"
-          :theme="themes[index]"
-          @order="createOrderByIMPORT"
-          class="col-xs-12 col-sm-6 col-md-6 col-lg-6"
-        />
-      </div>
-    </div>
+    <router-view />
     <CompanyInfoDark />
   </div>
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import TeacherNav from "./nav/TeacherNav.vue";
-import ProductView from "../components/product/ProductView.vue";
-import Jumbotron from "../components/Jumbotron.vue";
-import api from "../service/api";
-import toast from "../components/toast";
+import Jumbotron from "../../components/Jumbotron.vue";
+import { computed, onUnmounted, ref } from "vue";
+import TeacherNav from "../nav/TeacherNav.vue";
+import toast from "../../components/toast";
 
 import { useStore } from "vuex";
-import CompanyInfoDark from "../components/company/CompanyInfoDark.vue";
+import CompanyInfoDark from "../../components/company/CompanyInfoDark.vue";
 
 export default {
   components: {
     Jumbotron,
     TeacherNav,
-    ProductView,
     CompanyInfoDark,
   },
   setup() {
     const store = useStore();
-    const products = ref(null);
-    const themes = ["red", "blue", "green", "red", "blue", "green"];
     const loginUser = computed(() => store.getters["user/currentUser"]);
     const fixedMenu = ref(false);
-    const bannerEl = ref(null);
     const detectScroll = (e) => {
       const scroll = e.target.scrollTop;
       fixedMenu.value = scroll > 80;
@@ -87,16 +70,15 @@ export default {
       );
     };
 
-    api.product.list().then((res) => {
-      products.value = res.products;
-    });
-
     store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
+    store.commit("ui/setBackgroundVisible", false);
 
+    onUnmounted(() => {
+      store.commit("ui/setBackgroundVisible", true);
+    });
     return {
-      bannerEl,
-      products,
-      themes,
+      // products,
+      // themes,
       fixedMenu,
       loginUser,
       detectScroll,

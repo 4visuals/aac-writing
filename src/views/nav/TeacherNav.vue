@@ -15,11 +15,15 @@
         <router-link class="btn" to="/purchase">이용권 구매</router-link>
       </div>
       <div class="inline" v-if="member">
-        <BadgeIcon :icon="member.image" :text="member.user.name" />
+        <BadgeIcon
+          :icon="member.image"
+          :text="member.user.name"
+          @click="gotoSetting"
+        />
         <a class="btn" href="#" @click.prevent="tryLogOut">로그아웃</a>
       </div>
       <div class="inline" v-else>
-        <a class="btn" href="#">가입</a>
+        <router-link class="btn" to="/join">가입</router-link>
         <router-link class="btn" to="/">로그인</router-link>
         <!-- <GoogleButton size="small" text="signin" class="g btn" /> -->
       </div>
@@ -36,6 +40,7 @@ import DialogView from "../../components/dialog/DialogView.vue";
 import AppIcon from "../../components/AppIcon.vue";
 // import GoogleButton from "../../components/oauth/GoogleButton.vue";
 import BadgeIcon from "../../components/BadgeIcon.vue";
+import { useRouter } from "vue-router";
 export default {
   props: ["fixed"],
   components: {
@@ -45,6 +50,7 @@ export default {
   },
   setup() {
     const store = useStore();
+    const router = useRouter();
     const member = computed(() => store.state.user.membership);
 
     const doLogout = (cmd) => {
@@ -73,7 +79,10 @@ export default {
         events: { commit: doLogout },
       });
     };
-    return { member, tryLogOut };
+    const gotoSetting = () => {
+      router.push("/setting");
+    };
+    return { member, tryLogOut, gotoSetting };
   },
 };
 </script>

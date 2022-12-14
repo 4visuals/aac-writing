@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="bottom">
     <div class="policy">
       <router-link
         active-class="pol"
@@ -34,6 +34,10 @@ section {
   color: #ccc;
   padding: 16px;
   scroll-snap-align: end;
+  &.bottom {
+    position: sticky;
+    top: 100%;
+  }
   .policy {
     display: inline-flex;
     align-items: center;

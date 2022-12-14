@@ -54,6 +54,8 @@ button {
     background-color: transparent;
     outline: none;
     padding: 6px 8px;
+    font-size: 1rem;
+    font-weight: 600;
     .icon {
       &.left {
         margin-right: 4px;
@@ -83,7 +85,7 @@ button {
     color: white;
     padding: 6px 8px;
     &:hover {
-      box-shadow: 0 0 3px #19366988;
+      box-shadow: 0 0 3px #692e1988;
     }
     &:active {
       background-color: crimson;
@@ -106,6 +108,12 @@ button {
 }
 .mgt-8px {
   margin-top: 8px;
+}
+.mgt-16px {
+  margin-top: 16px;
+}
+.mgt-32px {
+  margin-top: 32px;
 }
 .mgb-8px {
   margin-bottom: 8px;
@@ -137,6 +145,59 @@ button {
   }
   &-leave-to {
     opacity: 0;
+  }
+}
+
+.trs-scale {
+  &-grow {
+    &-enter-from,
+    &-enter {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    &-enter-active,
+    &-leave-active {
+      transition: opacity 0.2s ease-in, transform 0.2s ease-in;
+    }
+    &-leave-to {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  }
+}
+
+.hr {
+  &-dash {
+    margin: 16px 0;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: linear-gradient(
+        90deg,
+        #ccc 0px,
+        #ccc 2px,
+        #fff 2px,
+        #fff 6px
+      );
+      background-size: 6px;
+      background-repeat: repeat-x;
+      z-index: 0;
+    }
+    & > span {
+      background-color: white;
+      z-index: 5;
+      position: relative;
+      padding: 0 8px;
+    }
   }
 }
 
