@@ -6,7 +6,11 @@
         <button class="nude blue" @click="showNewProductForm">상품 추가</button>
       </div>
     </div>
-    <ProductListView v-if="products" :products="products" />
+    <ProductListView
+      v-if="products"
+      :products="products"
+      @selected="showEditForm"
+    />
   </div>
 </template>
 
@@ -26,11 +30,28 @@ const createProduct = (product) => {
     console.log(product);
   });
 };
+const updateProduct = (product) => {
+  api.product.update(product).then((res) => {
+    const { product } = res;
+    const idx = products.value.findIndex((prod) => prod.seq === product.seq);
+    products.value.splice(idx, 1, product);
+  });
+};
 const showNewProductForm = () => {
   modal.showModal(NewProductForm, {
     width: "sm",
     fill: false,
     events: { product: createProduct },
+  });
+};
+const showEditForm = (product) => {
+  modal.showModal(NewProductForm, {
+    width: "sm",
+    fill: false,
+    props: {
+      product,
+    },
+    events: { product: updateProduct },
   });
 };
 </script>

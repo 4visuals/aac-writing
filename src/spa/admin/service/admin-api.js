@@ -1,6 +1,8 @@
-import { GET, POST } from "@/service/api/request";
+import { GET, POST, PUT } from "@/service/api/request";
 import Product from "../../../entity/product";
-
+const admin = {
+  authenticate: () => POST("/admin/auth"),
+};
 const member = {
   search: (keyword) => GET(`/admin/member`, { keyword }),
   licenses: (teacherSeq) => GET(`/admin/member/${teacherSeq}/licenses`),
@@ -21,6 +23,15 @@ const product = {
       res.products = res.products.map((prod) => new Product(prod));
       return res;
     }),
-  create: (product) => POST("/admin/product", product),
+  create: (product) =>
+    POST("/admin/product", product).then((res) => {
+      res.product = new Product(res.product);
+      return res;
+    }),
+  update: (product) =>
+    PUT("/admin/product", product).then((res) => {
+      res.product = new Product(res.product);
+      return res;
+    }),
 };
-export default { member, license, order, product };
+export default { admin, member, license, order, product };

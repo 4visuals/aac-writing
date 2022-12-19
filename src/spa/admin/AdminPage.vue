@@ -1,15 +1,18 @@
 <template>
   <div class="admin-wrapper">
-    <admin-menu :menus="menus" @menuClicked="openAdminBody" />
-    <div class="admin-body">
-      <!-- <level-analysis /> -->
-      <component :is="activeBody" />
-    </div>
+    <div v-if="authCheck === 'LOADING'" class="loading"></div>
+    <template v-else-if="authCheck === 'SUCCESS'">
+      <admin-menu :menus="menus" @menuClicked="openAdminBody" />
+      <div class="admin-body">
+        <router-view />
+      </div>
+    </template>
+    <div class="error" v-else>권한 없음</div>
   </div>
 </template>
 
 <script>
-import { onMounted, shallowRef } from "@vue/runtime-core";
+import { computed, ref, onMounted, shallowRef } from "vue";
 import { useStore } from "vuex";
 import AdminMenu from "./views/AdminMenu.vue";
 import LevelAnalysis from "./views/LevelAnalysis.vue";
@@ -17,46 +20,91 @@ import LicenseManage from "./views/LicenseManage.vue";
 import OrderListView from "./views/order/OrderListView.vue";
 import PolicyEditor from "./views/PolicyManage.vue";
 import ProductManage from "./views/ProductManage.vue";
+import adminApi from "./service/admin-api";
+import toast from "@/components/toast";
+import { useRouter } from "vue-router";
 
 export default {
   components: {
     AdminMenu,
-    OrderListView,
-    ProductManage,
   },
   setup() {
     const store = useStore();
+    const user = computed(() => store.getters("user/currentUser"));
+    const authCheck = ref("LOADING");
+    const router = useRouter();
     const menus = [
       {
         id: "quiz",
         icon: "account_balance",
         title: "문제은행",
+        path: "/console/qbank",
         comp: LevelAnalysis,
       },
       {
         id: "order",
         icon: "monetization_on",
         title: "주문내역",
+        path: "/console/order",
         comp: OrderListView,
       },
-      { id: "license", icon: "badge", title: "수강증", comp: LicenseManage },
-      { id: "stats", icon: "insights", title: "통계", comp: null },
-      { id: "policy", icon: "security", title: "이용약관", comp: PolicyEditor },
+      {
+        id: "license",
+        icon: "badge",
+        title: "수강증",
+        path: "/console/licenses",
+        comp: LicenseManage,
+      },
+      {
+        id: "stats",
+        icon: "insights",
+        title: "통계",
+        path: "/console/stats",
+        comp: null,
+      },
+      {
+        id: "policy",
+        icon: "security",
+        title: "이용약관",
+        path: "/console/tos",
+        comp: PolicyEditor,
+      },
       {
         id: "product",
         icon: "storefront",
         title: "판매 상품",
+        path: "/console/product",
         comp: ProductManage,
       },
     ];
+    menus.forEach((menu) => {
+      router.addRoute("AdminConsole", {
+        path: menu.path,
+        component: menu.comp,
+        name: menu.id,
+      });
+    });
     const activeBody = shallowRef(null);
     const openAdminBody = (menu) => {
       activeBody.value = menu.comp;
+      router.push(menu.path);
     };
     onMounted(() => {
+      adminApi.admin
+        .authenticate()
+        .then(() => {
+          authCheck.value = "SUCCESS";
+        })
+        .catch((err) => {
+          toast.error("@" + err.cause, "권한 없음", 5000);
+          router.replace("/");
+        });
       store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
+      store.commit("ui/setBackgroundVisible", false);
     });
     return {
+      user,
+      authCheck,
       menus,
       activeBody,
       openAdminBody,

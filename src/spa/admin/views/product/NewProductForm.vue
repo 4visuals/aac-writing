@@ -1,53 +1,60 @@
 <template>
   <div class="prod-form">
-    <h3>상품 등록</h3>
+    <h3>상품 {{ editMode ? "편집" : "등록" }}</h3>
     <TextFieldView
       v-for="form in forms"
       :key="form.wid"
       :formModel="form"
+      :readOnly="editMode && form.wid !== 'name' && form.wid !== 'description'"
       @value="commit"
     />
     <div class="fotter">
-      <button class="nude bue" @click="buildProduct">추가</button>
+      <button class="nude blue" @click="buildProduct">
+        {{ editMode ? "상품 편집" : "상품 추가" }}
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { defineEmits, defineProps } from "vue";
 import { TextFieldView, InputForm } from "../../../../components/form";
 import Product from "../../../../entity/product";
 
-// eslint-disable-next-line no-undef
+const props = defineProps(["product"]);
 const emit = defineEmits(["product"]);
+
+const editMode = !!props.product;
+
 const forms = [
   new InputForm({
     wid: "name",
     title: "상품명",
     placeholder: "상품명 입력",
     desc: "상품명 입력",
-    value: "",
+    value: props.product ? props.product.name : "",
   }),
   new InputForm({
     wid: "description",
     title: "상세 설명",
     desc: "상세 정보 입력",
     placeholder: "상세 정보",
-    value: "",
+    value: props.product ? props.product.description : "",
   }),
   new InputForm({
     wid: "days",
     title: "사용 기간",
     desc: "가급적 30일 단위로 맞춰주세요.(30일, 180일)",
     placeholder: "사용 기간(단위: 일)",
-    value: "0",
+    value: props.product?.durationInHours / 24 || "0",
   }),
   new InputForm({
     wid: "priceKrWon",
-    title: "가격",
+    title: "정가",
     type: "number",
-    desc: "가격(Korean Won)",
+    desc: "정가(Korean Won)",
     placeholder: "금액 입력",
-    value: "",
+    value: props.product?.priceKrWon || "0",
   }),
   new InputForm({
     wid: "discountKrWon",
@@ -55,7 +62,7 @@ const forms = [
     type: "number",
     desc: "구매 시 적용되는 할인 금액. 입력한 가격에서 할인 금액을 뺀 액수가 실제 상품 가격입니다.",
     placeholder: "할인 금액(없으면 0으로 입력)",
-    value: "0",
+    value: props.product?.discountKrWon || "0",
   }),
 ];
 
@@ -75,6 +82,10 @@ const buildProduct = () => {
   });
   const product = new Product(prod);
   console.log("[prod]", product);
+  if (props.product) {
+    product.seq = props.product.seq;
+    product.code = props.product.code;
+  }
   emit("product", product);
 };
 </script>

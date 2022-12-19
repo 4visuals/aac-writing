@@ -3,7 +3,7 @@
     <div class="menu-body">
       <h3>관리자 메뉴</h3>
       <div class="secion">
-        <button class="exit">나가기</button>
+        <button class="exit" @click="exitPage">나가기</button>
       </div>
       <div
         class="section"
@@ -20,20 +20,13 @@
   </div>
 </template>
 
-<script>
-import { shallowRef } from "@vue/reactivity";
-
-export default {
-  props: ["menus"],
-  setup() {
-    const bodyComponent = shallowRef(null);
-    const showAdminBody = (menu) => {
-      bodyComponent.value = menu.comp;
-    };
-    return {
-      showAdminBody,
-    };
-  },
+<script setup>
+import { defineProps } from "vue";
+import { useRouter } from "vue-router";
+defineProps(["menus"]);
+const router = useRouter();
+const exitPage = () => {
+  router.replace("/");
 };
 </script>
 

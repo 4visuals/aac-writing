@@ -10,7 +10,7 @@
         route.path !== '/' &&
         route.path !== '/join' &&
         route.path !== '/login' &&
-        route.path !== '/console' &&
+        !route.path.startsWith('/console') &&
         !route.path.startsWith('/purchase') &&
         route.path !== '/support' &&
         !route.path.startsWith('/policy') &&

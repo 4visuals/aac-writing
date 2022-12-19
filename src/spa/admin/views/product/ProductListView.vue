@@ -17,7 +17,9 @@
       >
         <td><span v-if="prod.beta">평가용</span><span v-else>판매용</span></td>
         <td>
-          <span>{{ prod.name }}</span>
+          <span class="name" @click="$emit('selected', prod)">{{
+            prod.name
+          }}</span>
         </td>
         <td>
           <span>{{ prod.priceKrWon }}</span>
@@ -54,6 +56,11 @@ export default {
       padding: 4px;
       &.dur {
         text-align: right;
+      }
+      span.name {
+        text-decoration: underline;
+        color: blue;
+        cursor: pointer;
       }
     }
   }

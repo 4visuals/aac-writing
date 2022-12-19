@@ -151,6 +151,11 @@ export default {
         border-color: #d5330d;
       }
     }
+    &:disabled {
+      color: #999;
+      background-color: #e4e8ea;
+      cursor: not-allowed;
+    }
   }
   .body {
     display: flex;

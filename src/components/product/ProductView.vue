@@ -12,11 +12,9 @@
             <span class="sub">days</span>
           </div>
           <div v-if="user" class="option">
-            <button class="nude disabled">
-              <AppIcon icon="phone_android"></AppIcon><span>휴대폰 결제</span>
-            </button>
             <button class="nude" @click="dispatchOrder('card')">
-              <AppIcon icon="credit_card"></AppIcon><span>신용카드</span>
+              <AppIcon icon="credit_card" fsize="24px"></AppIcon
+              ><span>주문 페이지로 이동</span>
             </button>
           </div>
           <div v-else class="option">
@@ -268,8 +266,8 @@ $bsize: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0 16px;
-        column-gap: 8px;
+        padding: 0 16px 16px;
+        column-gap: 12px;
 
         > button {
           flex: 1 1 auto;
@@ -279,6 +277,8 @@ $bsize: 4px;
           display: inline-flex;
           align-items: center;
           column-gap: 8px;
+          font-size: 1.5rem;
+          padding: 8px 12px;
           &.disabled {
             background-color: #ececec;
             border-color: #9a9a9a;

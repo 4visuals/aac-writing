@@ -19,6 +19,7 @@ const messages = {
   OUT_OF_LENGTH: "올바른 길이가 아닙니다.",
   SETTING_UNLOCK_FAILED: "비밀번호를 확인해주세요",
   NO_PENDING_ORDER: "대기중인 결제 정보가 없습니다.",
+  NOT_A_ADMIN: "관리자가 아닙니다",
 };
 
 const parse = (code) => {
