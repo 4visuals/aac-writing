@@ -40,7 +40,10 @@ export default {
       console.log(router.push);
       console.log(method, product);
       // new OrderForm(method, product.code).save();
-      router.push(`/purchase/order/${product.code}`);
+      router.push({
+        path: `/purchase/order/${product.code}`,
+        params: { method },
+      });
     };
     api.product.list().then((res) => {
       products.value = res.products;

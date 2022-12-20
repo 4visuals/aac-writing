@@ -15,13 +15,14 @@
           :paymentVisible="false"
           :minified="true"
         />
-        <FormButton
-          class="btn-purchase"
-          theme="red"
-          text="구매하기"
-          @click="startOrder('card')"
-        >
-        </FormButton>
+        <div class="inline buy">
+          <button class="btn-purchase nude blue" @click="startOrder('card')">
+            <AppIcon icon="credit_card" /><span>신용카드</span>
+          </button>
+          <button class="btn-purchase nude green" @click="startOrder('phone')">
+            <AppIcon icon="phone_android" /><span>휴대폰</span>
+          </button>
+        </div>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
         <div class="product">
@@ -79,7 +80,12 @@
           </ul>
         </section>
         <section class="buy">
-          <button class="nude red" @click="startOrder('card')">구매하기</button>
+          <button class="btn-purchase nude blue" @click="startOrder('card')">
+            <AppIcon icon="credit_card" /><span>신용카드</span>
+          </button>
+          <button class="btn-purchase nude green" @click="startOrder('phone')">
+            <AppIcon icon="phone_android" /><span>휴대폰 결제</span>
+          </button>
         </section>
       </div>
     </div>
@@ -96,13 +102,13 @@ import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import toast from "../../components/toast";
 import env from "../../service/env";
-import FormButton from "../../components/form/FormButton.vue";
+import AppIcon from "../../components/AppIcon.vue";
 
 export default {
   components: {
+    AppIcon,
     ActionIcon,
     ProductView,
-    FormButton,
   },
   setup() {
     const store = useStore();
@@ -137,7 +143,7 @@ export default {
       imp.request_pay(
         {
           // param
-          pg: "uplus.tlgdacomxpay",
+          pg: env.IMPORT_PGNAME,
           pay_method: method,
           merchant_uid,
           name: prod.name,
@@ -159,7 +165,6 @@ export default {
       );
     };
     const startOrder = (method) => {
-      // console.log(prod);
       order.value.prepare(method).then(startPgOrder);
       // imp20450844
     };
@@ -269,14 +274,24 @@ export default {
       margin-bottom: 16px;
     }
   }
-  .btn-purchase {
-    margin-top: 16px;
-    width: 100%;
-    font-size: 1.3rem;
-    border-radius: 2rem;
-    padding: 8px 16px;
+  .buy {
     display: flex;
-    justify-content: center;
+    column-gap: 8px;
+    .btn-purchase {
+      margin-top: 16px;
+      font-size: 1.3rem;
+      border-radius: 2rem;
+      padding: 8px 16px;
+      display: inline-flex;
+      align-items: center;
+      column-gap: 8px;
+    }
+    &.inline {
+      .btn-purchase {
+        font-size: 1rem;
+        flex: 1 1 auto;
+      }
+    }
   }
 }
 </style>
