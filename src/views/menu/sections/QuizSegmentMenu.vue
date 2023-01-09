@@ -78,11 +78,11 @@ export default {
         },
         {
           cmd: "LEARNING:SEN:W",
-          text: "학습",
+          text: "연습하기",
           mode: "LEARNING",
           disabled: false,
         },
-        { cmd: "QUIZ:SEN:W", text: "퀴즈", mode: "QUIZ", disabled: false },
+        { cmd: "QUIZ:SEN:W", text: "받아쓰기", mode: "QUIZ", disabled: false },
       ],
     };
     const senTab = {
@@ -99,11 +99,11 @@ export default {
         },
         {
           cmd: "LEARNING:EJ:S",
-          text: "학습",
+          text: "연습하기",
           mode: "LEARNING",
           disabled: false,
         },
-        { cmd: "QUIZ:SEN:S", text: "퀴즈", mode: "QUIZ", disabled: false },
+        { cmd: "QUIZ:SEN:S", text: "받아쓰기", mode: "QUIZ", disabled: false },
       ],
     };
     const tabElems = [senTab];

@@ -43,13 +43,13 @@
           @click="listQuestions('READING', 'EJ')"
         />
         <AacButton
-          :text="`${sourceText()} 학습`"
+          text="연습하기"
           theme="blue"
           :disabled="quizOnly === '' || quizOnly === true"
           @click="listQuestions('LEARNING', 'EJ')"
         />
         <AacButton
-          :text="`${sourceText()} 퀴즈`"
+          text="받아쓰기"
           theme="red"
           @click="listQuestions('QUIZ', 'SEN')"
         />
@@ -100,8 +100,8 @@ export default {
 
     const descritions = {
       READING: "보고 쓰기",
-      LEARNING: "학습",
-      QUIZ: "퀴즈",
+      LEARNING: "연습하기",
+      QUIZ: "받아쓰기",
     };
     if (props.quizOnly) {
       wordMode.value = false;
@@ -175,7 +175,7 @@ export default {
       const sentences = props.cate.sentences.filter(
         (sen) => sen.type === quizResource
       );
-      examDesc.value = sourceText() + " " + descritions[quizMode];
+      examDesc.value = descritions[quizMode];
       findQuizHistories().then((histories) => {
         replace(sectionHistories, histories);
         replace(sentencesRef, sentences);

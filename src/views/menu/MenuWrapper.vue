@@ -94,7 +94,7 @@ export default {
   }
   .menu-body {
     height: 100%;
-    width: 240px;
+    width: 300px;
     background-color: white;
     position: relative;
     box-shadow: 2px 0 6px #0000004d;

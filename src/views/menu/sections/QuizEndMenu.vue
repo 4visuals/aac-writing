@@ -26,9 +26,9 @@ export default {
       if (ctx.isReadingMode()) {
         return "보고 쓰기";
       } else if (ctx.isLearningMode()) {
-        return "학습";
+        return "연습하기";
       } else {
-        return "퀴즈";
+        return "받아쓰기";
       }
     };
     const closeQuiz = () => {
