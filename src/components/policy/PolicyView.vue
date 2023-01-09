@@ -1,11 +1,15 @@
 <template>
-  <div class="detail" v-html="getDetail()"></div>
+  <div
+    class="detail"
+    :style="{ padding: padding || '0' }"
+    v-html="getDetail()"
+  ></div>
 </template>
 
 <script>
 import { marked } from "marked";
 export default {
-  props: ["mdText"],
+  props: ["mdText", "padding"],
   setup(props) {
     const getDetail = () => {
       return marked.parse(props.mdText);

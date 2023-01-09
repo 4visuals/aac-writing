@@ -13,7 +13,10 @@
           'no-bgc': noBgc === true,
           'no-shadow': noShadow === true,
         }"
-        :style="{ height: fill ? '100%' : height ? height : 'auto' }"
+        :style="{
+          height: fill ? '100%' : height ? height : 'auto',
+          'overflow-y': height ? 'auto' : 'auto',
+        }"
         v-if="visible"
       >
         <slot></slot>

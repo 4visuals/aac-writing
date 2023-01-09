@@ -17,7 +17,7 @@
     <div class="container-fluid max800">
       <div class="row">
         <div class="col-12">
-          <router-view v-if="policy" :policy="policy" :mdText="policy.detail" />
+          <router-view v-if="policy" :mdText="policy.detail" />
           <div v-else class="loading">...</div>
         </div>
       </div>
