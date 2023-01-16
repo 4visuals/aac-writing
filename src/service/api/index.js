@@ -18,11 +18,12 @@ const user = {
 const student = {
   login: (id, password) =>
     POST(`/student/login`, { id, password, role: "STUDENT" }),
-  register: (name, birth, userId, pass, license) =>
-    POST(`/student`, { name, birth, userId, pass, license }),
+  register: (name, birth, userId, pass, license, randomProps = false) =>
+    POST(`/student`, { name, birth, userId, pass, license, randomProps }),
   // update: (studentSeq, props) => PUT(`/student/${studentSeq}`, props),
   updateProp: (studentSeq, prop, value) =>
     PUT(`/student/${studentSeq}`, { studentSeq, prop, value }),
+  delete: (studentSeq) => DELETE(`/student/${studentSeq}`),
 };
 const chapter = {
   list: (origin) => GET(`/chapters/origin/${origin}`),
@@ -109,6 +110,7 @@ const order = {
   create: (productCode) => POST("/order", { productCode }),
   cancel: (orderUuid) => PUT("/order", { orderUuid }),
   get: (orderUuid) => GET(`/order/${orderUuid}`),
+  list: () => GET("/orders"),
 };
 const tts = {};
 

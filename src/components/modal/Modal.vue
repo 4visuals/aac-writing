@@ -14,6 +14,7 @@
           'no-shadow': noShadow === true,
         }"
         :style="{
+          padding: padding || 0,
           height: fill ? '100%' : height ? height : 'auto',
           'overflow-y': height ? 'auto' : 'auto',
         }"
@@ -29,7 +30,7 @@
 import { ref, onMounted } from "vue";
 export default {
   emits: ["hidden"],
-  props: ["width", "height", "fill", "rect", "noBgc", "noShadow"],
+  props: ["width", "height", "fill", "rect", "noBgc", "noShadow", "padding"],
   setup(props, { emit }) {
     const fadeOut = () => {
       visible.value = false;

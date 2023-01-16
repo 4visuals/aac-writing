@@ -45,7 +45,13 @@ export default {
   components: {
     WizardForm,
   },
-  setup(_, { emit }) {
+  props: {
+    exclude: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  setup(props, { emit }) {
     const normalizers = {
       userId: (value, inputForm) => {
         const result = value.replace(/[^a-z0-9]/g, "");
@@ -136,11 +142,19 @@ export default {
         wid: "userId",
         title: "아이디",
         desc: "영문자와 숫자로 아이디를 입력헤주세요(최소 4글자 이상).",
-        status: "active",
+        status: "pending",
         value: "",
         error: null,
         // filter: (val) => val.replace(/[^a-z0-9]/g, ""),
         // filter: doFilter,
+      }),
+      new InputForm({
+        wid: "name",
+        title: "이름",
+        desc: "학생 이름을 입력해주세요",
+        status: "pending",
+        value: "",
+        error: null,
       }),
       new InputForm({
         wid: "birth",
@@ -150,14 +164,6 @@ export default {
         value: "",
         error: null,
         filter: (val) => val.replace(/[^0-9-]/g, "").replace(/-{2,}/g, "-"),
-      }),
-      new InputForm({
-        wid: "name",
-        title: "이름",
-        desc: "학생 이름을 입력해주세요",
-        status: "pending",
-        value: "",
-        error: null,
       }),
       new InputForm({
         wid: "pass",
@@ -179,6 +185,14 @@ export default {
         error: null,
       }),
     ];
+    if (props.exclude.includes("pass")) {
+      wizards.splice(3, 2);
+    }
+    if (props.exclude.includes("userId")) {
+      wizards.splice(0, 1);
+    }
+    wizards[0].status = "active";
+
     const wizardRef = ref(wizards);
     const userFormRef = ref(null);
     const moveNext = (wzd) => {

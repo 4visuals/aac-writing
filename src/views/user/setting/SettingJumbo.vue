@@ -1,6 +1,18 @@
 <template>
   <div class="jumbo">
     <h3>{{ menu && menu.label }}</h3>
+    <div class="actions" v-if="menu">
+      <button
+        v-for="action in menu.actions"
+        :key="action.id"
+        @click="$emit('action', action)"
+        class="action nude"
+      >
+        <AppIcon :icon="action.icon" fsize="1.5rem" /><span>{{
+          action.text
+        }}</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -12,7 +24,10 @@ export default {
   setup() {
     const store = useStore();
     const menu = computed(() => store.state.setting.active);
-    return { menu };
+    const clicked = (action) => {
+      console.log(action);
+    };
+    return { menu, clicked };
   },
 };
 </script>
@@ -30,6 +45,12 @@ export default {
   z-index: 10;
   h3 {
     font-weight: 900;
+    flex: 1 1 auto;
+  }
+  button.action {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
   }
 }
 </style>

@@ -4,6 +4,7 @@ import { Modal, ModalHeader } from "./components";
 import AacButton from "./components/form/AacButton.vue";
 import FormButton from "./components/form/FormButton.vue";
 import AppIcon from "./components/AppIcon.vue";
+import ActionIcon from "./components/form/ActionIcon.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
@@ -24,6 +25,7 @@ app.use(store).use(router).use(GooglgAuth, {
  */
 app
   .component("AppIcon", AppIcon)
+  .component("ActionIcon", ActionIcon)
   .component("AacButton", AacButton)
   .component("FormButton", FormButton)
   .component("Modal", Modal)

@@ -31,7 +31,11 @@ class License {
   }
   isExpired() {
     const { expiredAt } = this;
-    return expiredAt && expiredAt < new Date().getTime();
+    if (!expiredAt) {
+      return false;
+    }
+    return Date.parse(expiredAt) < new Date().getTime();
+    // return expiredAt && expiredAt < new Date().getTime();
   }
 }
 export default License;

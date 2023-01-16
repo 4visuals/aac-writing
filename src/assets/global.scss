@@ -94,6 +94,20 @@ button {
       outline: 3px solid #ff99ad96;
     }
   }
+  &.green {
+    background-color: #43cd63;
+    color: white;
+    padding: 6px 8px;
+    &:hover {
+      box-shadow: 0 0 3px #279340;
+    }
+    &:active {
+      background-color: #2e9c48;
+    }
+    &:focus {
+      outline: 3px solid #86ffa2;
+    }
+  }
   &.round {
     border-radius: 4px;
   }

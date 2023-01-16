@@ -46,6 +46,17 @@ export default {
         return [];
       }
     },
+    enrolledStudents: (state, getters) => {
+      const { students } = getters;
+      const { licenses } = state.membership;
+      return licenses
+        .filter((lcs) => !lcs.isExpired())
+        .map((lcs) => students.find((stud) => lcs.studentRef === stud.seq));
+    },
+    unregisterdStudents: (state, getters) => {
+      const { students, enrolledStudents } = getters;
+      return students.filter((stud) => !enrolledStudents.includes(stud));
+    },
   },
   mutations: {
     setMembership(state, membership) {
@@ -92,7 +103,9 @@ export default {
       student.birth = time.birthToDate(ymd);
       const mm = state.membership;
       mm.user.students.push(student);
-      license.studentRef = student.seq;
+      if (license) {
+        license.studentRef = student.seq;
+      }
     },
     updateStudent(state, student) {
       const ymd = student.birth.split("-");
@@ -107,6 +120,14 @@ export default {
       const { students } = state.membership.user;
       const pos = students.findIndex((stud) => stud.seq === student.seq);
       students[pos][prop] = value;
+    },
+    deleteStudent(state, student) {
+      const { students } = state.membership.user;
+      const pos = students.findIndex((stud) => stud.seq === student.seq);
+      students.splice(pos, 1);
+    },
+    bindStudent(state, { student, license }) {
+      license.studentRef = student.seq;
     },
   },
 
@@ -155,11 +176,10 @@ export default {
       });
     },
     createStudent(ctx, args) {
-      const { name, birth, userId, pass, license } = args;
+      const { name, birth, userId, pass, license, randomProps } = args;
       return api.student
-        .register(name, birth, userId, pass, license?.uuid)
+        .register(name, birth, userId, pass, license?.uuid, randomProps)
         .then((res) => {
-          console.log(res);
           ctx.commit("applyStudent", { student: res.student, license });
           return res;
         });
@@ -181,7 +201,14 @@ export default {
     },
     bindStudent(ctx, args) {
       const { license, student } = args;
-      return api.license.bind(license.seq, student.seq);
+      return api.license.bind(license.seq, student.seq).then(() => {
+        ctx.commit("bindStudent", args);
+      });
+    },
+    deleteStudent(ctx, student) {
+      return api.student.delete(student.seq).then(() => {
+        ctx.commit("deleteStudent", student);
+      });
     },
   },
 };

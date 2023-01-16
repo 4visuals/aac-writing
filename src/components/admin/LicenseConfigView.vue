@@ -210,7 +210,9 @@ export default {
       slideMenuRef.value.visible = false;
     };
     const timeText = (millis) => {
-      return millis ? time.toYMD(millis) : "사용 전입니다. 햑생을 등록해주세요";
+      return millis
+        ? time.toYMD(Date.parse(millis))
+        : "사용 전입니다. 햑생을 등록해주세요";
     };
 
     watch(() => active.value, updateUse, { immediate: true });

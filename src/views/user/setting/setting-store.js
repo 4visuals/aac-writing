@@ -13,6 +13,9 @@ export default {
       if (old) {
         old.setActive(false);
       }
+      if (typeof menu === "string") {
+        menu = state.menus.find((m) => m.path === menu);
+      }
       if (menu) {
         menu.setActive(true);
       }

@@ -113,7 +113,7 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
-    const user = computed(() => store.getters["user/isMember"]);
+    const user = computed(() => store.getters["user/currentUser"]);
     const setting = reactive({
       user: {
         name: user.value.name,

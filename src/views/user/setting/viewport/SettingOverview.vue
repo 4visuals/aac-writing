@@ -9,8 +9,20 @@
     </WidthLayout>
     <WidthLayout>
       <section @click="routeTo('license')">
-        <h4>수강증</h4>
-        <p>사용중인 수강증을 확인합니다.</p>
+        <h4>이용권</h4>
+        <p>사용중인 이용권을 확인합니다.</p>
+      </section>
+    </WidthLayout>
+    <WidthLayout>
+      <section @click="routeTo('student')">
+        <h4>학생 관리</h4>
+        <p>학생 추가, 삭제합니다.</p>
+      </section>
+    </WidthLayout>
+    <WidthLayout>
+      <section @click="routeTo('student')">
+        <h4>구매 내역</h4>
+        <p>상품 구매 이력을 확인합니다.</p>
       </section>
     </WidthLayout>
   </div>

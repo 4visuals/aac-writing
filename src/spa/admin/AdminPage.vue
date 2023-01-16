@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { computed, ref, onMounted, shallowRef } from "vue";
+import { computed, ref, onMounted, shallowRef, watch } from "vue";
 import { useStore } from "vuex";
 import AdminMenu from "./views/AdminMenu.vue";
 import LevelAnalysis from "./views/LevelAnalysis.vue";
@@ -30,7 +30,7 @@ export default {
   },
   setup() {
     const store = useStore();
-    const user = computed(() => store.getters("user/currentUser"));
+    const user = computed(() => store.getters["user/currentUser"]);
     const authCheck = ref("LOADING");
     const router = useRouter();
     const menus = [
@@ -89,16 +89,24 @@ export default {
       activeBody.value = menu.comp;
       router.push(menu.path);
     };
-    onMounted(() => {
+
+    const checkAdmin = () => {
+      if (!user.value) {
+        return;
+      }
       adminApi.admin
         .authenticate()
         .then(() => {
           authCheck.value = "SUCCESS";
         })
         .catch((err) => {
-          toast.error("@" + err.cause, "권한 없음", 5000);
+          toast.error("@" + err.cause, "권한 없음", 6);
           router.replace("/");
         });
+    };
+
+    watch(() => user.value, checkAdmin);
+    onMounted(() => {
       store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
       store.commit("ui/setBackgroundVisible", false);
     });

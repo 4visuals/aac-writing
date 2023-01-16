@@ -26,6 +26,9 @@ class ModalConfig {
   get noShadow() {
     return this.option.noShadow || false;
   }
+  get padding() {
+    return this.option.padding || "0";
+  }
 }
 const showModal = (vueComponent, option) => {
   const config = new ModalConfig(vueComponent, option || {});

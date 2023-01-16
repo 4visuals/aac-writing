@@ -18,6 +18,8 @@ import {
   SettingOverview,
   SettingAccount,
   SettingLicense,
+  SettingStudent,
+  SettingOrder,
 } from "../views/user/setting/viewport";
 import { logger } from "@/service/util";
 
@@ -102,6 +104,16 @@ const routes = [
         path: "license",
         name: "SettingLicense",
         component: SettingLicense,
+      },
+      {
+        path: "student",
+        name: "SettingStudent",
+        component: SettingStudent,
+      },
+      {
+        path: "order",
+        name: "SettingOrder",
+        component: SettingOrder,
       },
     ],
   },

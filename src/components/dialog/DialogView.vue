@@ -11,7 +11,7 @@
         :inline="true"
         :text="action.text"
         :theme="themes[idx]"
-        @click="$emit('commit', action.cmd)"
+        @click="doAction(action)"
       />
     </div>
   </div>
@@ -23,9 +23,18 @@ import { AacButton } from "@/components/form";
 export default {
   components: { AacButton, ParaText },
   props: ["title", "message", "actions"],
-  setup() {
+  setup(props, { emit }) {
     const themes = ["blue", "red"];
-    return { themes };
+    const doAction = (action) => {
+      const { cmd, trigger } = action;
+      if (cmd) {
+        emit("commit", cmd);
+      }
+      if (trigger && typeof trigger === "function") {
+        action.trigger();
+      }
+    };
+    return { themes, doAction };
   },
 };
 </script>

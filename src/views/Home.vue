@@ -26,13 +26,13 @@
               text="학생 등록"
               theme="pink"
               :inline="true"
-              @click="showLicenseConfig"
+              @click="goTo('/setting/student')"
             />
           </div>
         </template>
         <StudentList
           @selected="(license, path) => moveTo(path, license)"
-          @register="(license) => showLicenseConfig(license)"
+          @register="goTo('/setting/student')"
         />
       </div>
       <div class="login" v-else>
@@ -107,10 +107,8 @@ export default {
       router.replace(url);
       store.commit("ui/setNavSize", { expanded: false, topPadding: 120 });
     };
-    const showLicenseConfig = (lcs) => {
-      modal.value.visible = true;
-      modal.value.lcs = lcs;
-      console.log(licenses);
+    const goTo = (uri) => {
+      router.push(uri);
     };
     const doLogout = () => {
       store.commit("user/logoutUser");
@@ -134,7 +132,7 @@ export default {
       students,
       licenses,
       moveTo,
-      showLicenseConfig,
+      goTo,
       host,
       doLogout,
     };

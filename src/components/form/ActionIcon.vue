@@ -1,12 +1,18 @@
 <template>
-  <button type="button">
+  <button type="button" :disabled="disabled">
     <span class="material-icons-outlined">{{ icon }}</span>
   </button>
 </template>
 
 <script>
 export default {
-  props: ["icon"],
+  props: {
+    icon: { type: String, default: "add" },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   setup() {},
 };
 </script>
@@ -30,6 +36,12 @@ button {
   }
   &.md-4 {
     font-size: 4rem;
+  }
+  &:disabled {
+    color: #999 !important;
+    &:hover {
+      background-color: #efefef !important;
+    }
   }
   .material-icons-outlined {
     font-size: inherit;

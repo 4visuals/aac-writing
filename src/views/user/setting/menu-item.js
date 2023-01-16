@@ -1,9 +1,10 @@
 export default class MenuItem {
-  constructor(path, icon, label, active) {
+  constructor(path, icon, label, actions = []) {
     this.path = path;
     this.icon = icon;
     this.label = label;
-    this.active = !!active;
+    this.active = false;
+    this.actions = actions;
   }
   setActive(active) {
     this.active = active;

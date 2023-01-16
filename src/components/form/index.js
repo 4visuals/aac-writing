@@ -62,6 +62,14 @@ InputForm.fromUser = (user) => {
       filter: (val) => val.replace(/[^a-z0-9]/g, ""),
     }),
     new InputForm({
+      wid: "name",
+      title: "이름",
+      desc: "학생 이름을 입력해주세요",
+      status: "active",
+      value: user.name,
+      error: null,
+    }),
+    new InputForm({
       wid: "birth",
       title: "생일",
       desc: "생일을 입력해주세요(예: 2010-03-15)",
@@ -70,14 +78,7 @@ InputForm.fromUser = (user) => {
       error: null,
       filter: (val) => val.replace(/[^0-9-]/g, "").replace(/-{2,}/g, "-"),
     }),
-    new InputForm({
-      wid: "name",
-      title: "이름",
-      desc: "학생 이름을 입력해주세요",
-      status: "active",
-      value: user.name,
-      error: null,
-    }),
+
     new InputForm({
       wid: "pass",
       title: "비밀 번호",

@@ -27,10 +27,13 @@ export default {
     student: { type: Object },
     error: { type: Object },
     editable: { type: Boolean, default: true },
+    exclude: { type: Array, default: () => [] },
   },
   setup(props) {
     const store = useStore();
-    const forms = InputForm.fromUser(props.student);
+    const forms = InputForm.fromUser(props.student).filter(
+      (form) => !props.exclude.includes(form.wid)
+    );
     const formRef = ref(forms);
     const setBirthday = (e) => {
       formRef.value.student.birth = new Date(e.time);
@@ -43,7 +46,7 @@ export default {
       formRef.value = forms;
     };
     const handleForm = ({ inputForm, value, commit }) => {
-      console.log(inputForm, value);
+      // console.log(inputForm, value);
       const { student } = props;
       const validator = validators.user[inputForm.wid];
       if (validator) {

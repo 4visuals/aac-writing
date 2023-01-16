@@ -39,6 +39,7 @@
       :width="modalConfig.width"
       :noBgc="modalConfig.noBgc"
       :noShadow="modalConfig.noShadow"
+      :padding="modalConfig.padding"
     >
       <component
         :is="modalConfig.comp"
