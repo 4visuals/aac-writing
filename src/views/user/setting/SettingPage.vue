@@ -27,7 +27,7 @@ import modal from "@/components/modal";
 import DialogView from "@/components/dialog/DialogView.vue";
 import NewStudentForm from "@/components/admin/NewStudentForm.vue";
 import toast from "@/components/toast";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 export default {
   components: {
     SettingNav,
@@ -37,6 +37,7 @@ export default {
   setup() {
     const store = useStore();
     const user = computed(() => store.getters["user/isMember"]);
+    const router = useRouter();
     const activeMenu = computed(() => store.state.setting.active);
 
     const registerStudent = (student) => {
@@ -76,13 +77,19 @@ export default {
         },
       });
     };
+    const goToOrder = () => {
+      router.push("/purchase");
+    };
     const actionMap = {
       "new-student": showNewStudentForm,
+      "new-order": goToOrder,
     };
     const menus = [
       new MenuItem("", "home", "마이페이지"),
       new MenuItem("account", "account_circle", "내 정보"),
-      new MenuItem("license", "badge", "이용권"),
+      new MenuItem("license", "badge", "이용권", [
+        new NavAction("new-order", "이용권 구매", "add"),
+      ]),
       new MenuItem("student", "face", "학생 관리", [
         new NavAction("new-student", "학생 추가", "add"),
       ]),
