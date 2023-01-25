@@ -77,14 +77,14 @@ const time = {
   },
   toYMD: (epochMillis) => {
     const D =
-      typeof epochMillis === "number" ? new Date(epochMillis) : epochMillis;
+      epochMillis.constructor === Date ? epochMillis : new Date(epochMillis);
     const mm = ("0" + (D.getMonth() + 1)).slice(-2);
     const dd = ("0" + D.getDate()).slice(-2);
     return `${D.getFullYear()}-${mm}-${dd}`;
   },
   toHMS: (epochMillis) => {
     const D =
-      typeof epochMillis === "number" ? new Date(epochMillis) : epochMillis;
+      epochMillis.constructor === Date ? epochMillis : new Date(epochMillis);
     const hh = ("0" + D.getHours()).slice(-2);
     const mm = ("0" + D.getMinutes()).slice(-2);
     const ss = ("0" + D.getSeconds()).slice(-2);
