@@ -20,6 +20,7 @@ import LicenseManage from "./views/LicenseManage.vue";
 import OrderListView from "./views/order/OrderListView.vue";
 import PolicyEditor from "./views/PolicyManage.vue";
 import ProductManage from "./views/ProductManage.vue";
+import GroupOrderView from "./views/GroupOrderView.vue";
 import adminApi from "./service/admin-api";
 import toast from "@/components/toast";
 import { useRouter } from "vue-router";
@@ -76,6 +77,13 @@ export default {
         path: "/console/product",
         comp: ProductManage,
       },
+      {
+        id: "grouporder",
+        icon: "forum",
+        title: "단체 구매",
+        path: "/console/grouporder",
+        comp: GroupOrderView,
+      },
     ];
     menus.forEach((menu) => {
       router.addRoute("AdminConsole", {
@@ -109,6 +117,12 @@ export default {
     onMounted(() => {
       store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
       store.commit("ui/setBackgroundVisible", false);
+      store.dispatch("user/autoLogin").then((res) => {
+        if (res === false) {
+          toast.info("로그인 정보 없음", "로그인 필요", 5);
+          router.replace("/");
+        }
+      });
     });
     return {
       user,

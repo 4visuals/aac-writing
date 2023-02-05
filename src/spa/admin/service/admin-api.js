@@ -15,6 +15,9 @@ const license = {
 
 const order = {
   list: () => GET("/admin/orders"),
+  group: {
+    list: () => GET("/admin/group-orders"),
+  },
 };
 
 const product = {

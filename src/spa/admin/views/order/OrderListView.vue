@@ -25,7 +25,7 @@ export default {
   setup() {
     const ordersRef = ref(null);
 
-    const toTimeText = (millis) => time.toYMD(millis);
+    const toTimeText = (millis) => time.toYMD(Date.parse(millis));
     const loadOrders = () => {
       api.order.list().then((res) => {
         ordersRef.value = res.orders;

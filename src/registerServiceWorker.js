@@ -71,5 +71,5 @@ if (process.env.NODE_ENV !== "development") {
   };
   // registerRoute(aacDictRequest, new StaleWhileRevalidate());
 } else {
-  prepareAppData();
+  setTimeout(prepareAppData, 1000);
 }

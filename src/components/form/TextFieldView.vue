@@ -1,8 +1,11 @@
 <template>
   <div :class="`text-form ${formModel.status || ''}`">
-    <h3 v-if="formModel.title">
-      {{ formModel.title }}
-    </h3>
+    <slot v-if="formModel.title" name="title"
+      ><h3>
+        {{ formModel.title }}
+      </h3></slot
+    >
+
     <div class="desc mg8" v-if="formModel.desc">
       {{ formModel.desc }}
     </div>

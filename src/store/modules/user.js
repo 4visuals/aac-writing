@@ -144,6 +144,8 @@ export default {
             ctx.commit("logoutUser");
             throw e;
           });
+      } else {
+        return Promise.resolve(false);
       }
     },
     /**

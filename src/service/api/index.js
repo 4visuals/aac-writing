@@ -111,6 +111,9 @@ const order = {
   cancel: (orderUuid) => PUT("/order", { orderUuid }),
   get: (orderUuid) => GET(`/order/${orderUuid}`),
   list: () => GET("/orders"),
+  group: {
+    sendForm: (orderForm) => POST("/group-order/contact", orderForm),
+  },
 };
 const tts = {};
 

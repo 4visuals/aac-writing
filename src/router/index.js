@@ -12,6 +12,7 @@ import {
   ProductListView,
   OrderFormView,
   OrderValidationView,
+  GroupOrderFormView,
 } from "../views/purchase";
 import SettingPage from "../views/user/setting/SettingPage.vue";
 import {
@@ -57,6 +58,15 @@ const routes = [
       import(
         /* webpackChunkName: "admin-module" */ "../spa/admin/AdminPage.vue"
       ),
+    children: [
+      {
+        path: "grouporder",
+        component: () =>
+          import(
+            /* webpackChunkName: "admin-module" */ "../spa/admin/views/GroupOrderView.vue"
+          ),
+      },
+    ],
   },
   {
     path: "/support",
@@ -82,6 +92,11 @@ const routes = [
         path: "order/checking",
         name: "OrderValidationView",
         component: OrderValidationView,
+      },
+      {
+        path: "contact",
+        name: "GroupOrderFormView",
+        component: GroupOrderFormView,
       },
     ],
   },
