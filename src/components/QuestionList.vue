@@ -79,7 +79,7 @@ export default {
         groups.value.push({
           key: groupSize,
           start: 0,
-          end: 10,
+          end: 0,
           rand: true,
           sentences: util.pick(sentences, 10),
         });
