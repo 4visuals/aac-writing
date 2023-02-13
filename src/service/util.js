@@ -231,7 +231,27 @@ const currency = {
     return txt.substring(1);
   },
 };
-export { key, path, time, host, logger, arr, valid, currency, pick };
+const vue = {
+  parsePath: (route) => route.path.split("/").filter((p) => p.length > 0),
+};
+/**
+ * level, book chapter관련 utility 함수들
+ */
+const chapter = {
+  /**
+   * chapter에 속하는 section들의 범위를 나타내는 값(ex: 1 ~ 4 단계)
+   * @param {Object} chapter
+   * @param {String} suffix
+   * @returns
+   */
+  rangeText: (chapter, suffix = "") => {
+    const { sections } = chapter;
+    const min = sections[0].level;
+    const max = sections[sections.length - 2].level;
+    return `${min} - ${max}${suffix}`;
+  },
+};
+export { key, path, time, host, logger, arr, vue, valid, currency, pick };
 export default {
   key,
   path,
@@ -239,7 +259,9 @@ export default {
   host,
   logger,
   arr,
+  vue,
   valid,
   currency,
   pick,
+  chapter,
 };

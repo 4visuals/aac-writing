@@ -26,7 +26,7 @@ class SectionHistory {
     return this.section.level < 0 ? "도전" : this.section.level;
   }
   get theme() {
-    return this.section.level < 0 ? "green" : "pink";
+    return this.section.level < 0 ? "purple" : "blue";
   }
   get typeText() {
     return this.type === "W" ? "낱말" : "문장";
@@ -37,6 +37,9 @@ class SectionHistory {
   get total() {
     return this.section.sentences.filter((sen) => sen.type === this.type)
       .length;
+  }
+  isChallengeSection() {
+    return this.section.level < 0;
   }
   lacText(cur) {
     return time.diff(cur, this.lastAccessTime);

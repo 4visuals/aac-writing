@@ -1,5 +1,6 @@
 import ActionIcon from "./ActionIcon.vue";
 import AacButton from "./AacButton.vue";
+import AppButton from "./AppButton.vue";
 import StaticButton from "./StaticButton.vue";
 import TextField from "./TextField.vue";
 import SwitchButton from "./SwitchButton.vue";
@@ -94,6 +95,7 @@ export {
   InputForm,
   ActionIcon,
   AacButton,
+  AppButton,
   StaticButton,
   TextField,
   TextFieldView,

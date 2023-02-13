@@ -1,60 +1,54 @@
 <template>
   <div class="section-detail" :class="theme">
-    <div class="jumbo">
-      <div class="title">
-        <h3>{{ title() }}</h3>
-        <SwitchButton
-          v-model:selected="wordMode"
-          :disabled="quizOnly === '' || quizOnly === true"
-          onText="낱말"
-          offText="문장"
-        />
-      </div>
-    </div>
-    <div class="body" @click="hideQuestionList">
-      <Slide
-        class="preview"
-        :resources="cate.notes.map((n) => n.text)"
-        :width="600"
-        height="100%"
-        :resolveUrl="(rss) => path.aacweb.scene(rss)"
+    <template v-if="cate">
+      <LevelNavBar
+        :section="cate"
+        @quizMode="(mode) => (wordMode = mode)"
+        @back="moveBack"
+        @overview="showOverview"
       />
-      <transition name="slideup" @click.stop>
-        <div class="overlay" v-if="sentencesRef.length > 0">
-          <ParaText class="quiz-nav"
-            ><ActionIcon icon="expand_more" @click="hideQuestionList" /><span>{{
-              examDesc
-            }}</span></ParaText
-          >
-          <QuestionList
-            :histories="sectionHistories"
-            :sentences="sentencesRef"
-            @choosen="startSentenceQuiz"
-          />
-        </div>
-      </transition>
-    </div>
-    <div class="footer">
-      <div class="choose">
-        <AacButton
-          :text="`보고 쓰기`"
-          theme="orange"
-          :disabled="quizOnly === '' || quizOnly === true"
-          @click="listQuestions('READING', 'EJ')"
-        />
-        <AacButton
-          text="연습하기"
-          theme="blue"
-          :disabled="quizOnly === '' || quizOnly === true"
-          @click="listQuestions('LEARNING', 'EJ')"
-        />
-        <AacButton
-          text="받아쓰기"
-          theme="red"
-          @click="listQuestions('QUIZ', 'SEN')"
+      <div class="body" v-if="overviewVisible">
+        <Slide
+          class="preview"
+          :resources="cate.notes.map((n) => n.text)"
+          :width="600"
+          height="100%"
+          :resolveUrl="(rss) => path.aacweb.scene(rss)"
         />
       </div>
-    </div>
+      <div class="body" v-else>
+        <QuestionList
+          quizMode="READING"
+          answerType="EJ"
+          theme="blue"
+          :wordMode="wordMode"
+          :section="cate"
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          @choosen="startSentenceQuiz"
+        />
+        <QuestionList
+          quizMode="LEARNING"
+          answerType="EJ"
+          theme="blue"
+          :wordMode="wordMode"
+          :section="cate"
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          @choosen="startSentenceQuiz"
+        />
+        <QuestionList
+          quizMode="QUIZ"
+          answerType="SEN"
+          theme="blue"
+          :wordMode="wordMode"
+          :section="cate"
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          @choosen="startSentenceQuiz"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -62,32 +56,40 @@
 import { path } from "@/service/util";
 import { computed, ref, watch } from "vue";
 import router from "@/router";
+import { useRoute } from "vue-router";
 import { quizDao } from "@/dao";
-import { SwitchButton } from "@/components/form";
+// import { SwitchButton } from "@/components/form";
 import QuestionList from "@/components/QuestionList.vue";
-import { AacButton } from "@/components/form";
-import { Slide } from "@/components/slide";
 import quiz from "@/views/quiz";
 import { useStore } from "vuex";
-import { ParaText } from "../../components/text";
-import { ActionIcon } from "../../components/form";
+// import { ActionIcon } from "../../components/form";
+// import SpanText from "../../components/text/SpanText.vue";
+import Slide from "@/components/slide/Slide.vue";
+import LevelNavBar from "./LevelNavBar.vue";
+
 export default {
-  props: ["cate", "theme", "quizOnly"],
   components: {
-    AacButton,
-    SwitchButton,
+    // SwitchButton,
     Slide,
     QuestionList,
-    ParaText,
-    ActionIcon,
+    // ParaText,
+    // ActionIcon,
+    // SpanText,
+    LevelNavBar,
   },
-  setup(props) {
+  setup(props, { emit }) {
     const store = useStore();
+    const route = useRoute();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const wordMode = ref(true);
     const sentencesRef = ref([]);
     const examDesc = ref(null);
     const sectionHistories = ref([]);
+    const chapters = computed(() => store.state.course.chapters.levels);
+    const cate = ref(null);
+    const theme = "blue";
+
+    const overviewVisible = ref(false);
 
     /**
      * 받아쓰기("READING"), 학습모드('LEARNING') 또는 시험모드('QUIZ')
@@ -99,40 +101,52 @@ export default {
     const answerTypeRef = ref(null);
 
     const descritions = {
-      READING: "보고 쓰기",
+      READING: "보고쓰기",
       LEARNING: "연습하기",
       QUIZ: "받아쓰기",
     };
-    if (props.quizOnly) {
-      wordMode.value = false;
-    }
+    // if (quizOnly) {
+    //   wordMode.value = false;
+    // }
+    const setActiveSection = () => {
+      const seq = Number.parseInt(route.params.sectionSeq);
+      cate.value = store.getters["course/section"](seq);
+      if (cate.value.level === -1) {
+        wordMode.value = false;
+      }
+    };
     const title = () => {
-      const { level } = props.cate;
+      const { level } = cate.value;
       return level >= 0 ? level + "단계" : "도전";
     };
+    const desc = () => cate.value.description;
 
     const startSentenceQuiz = (e) => {
+      const { group, quizMode, answerType } = e;
       if (!activeLicense.value) {
         alert("학생을 선택해주세요");
         return;
       }
-      const quizMode = quizModeRef.value;
-      const sectionSeq = props.cate.seq;
+      // const quizMode = quizModeRef.value;
+      const sectionSeq = cate.value.seq;
       const quizResource = wordMode.value ? "W" : "S";
       /*
        * 단어 학습인 경우 무조건 받아쓰기 모드
        */
-      const answerType = quizResource === "W" ? "SEN" : answerTypeRef.value;
+      const ansType = quizResource === "W" ? "SEN" : answerType;
       quiz
         .prepareQuiz({
           quizMode,
-          answerType,
+          answerType: ansType,
           section: sectionSeq,
           quizResource,
           license: activeLicense.value.seq,
-          prevPage: "LevelView",
-          sentenceFilter: () => e.sentences,
-          ranges: [e.start, e.end],
+          prevPage: {
+            back: "LevelListingView",
+            close: `/level/section/${sectionSeq}`,
+          },
+          sentenceFilter: () => group.sentences,
+          ranges: [group.start, group.end],
         })
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
@@ -147,7 +161,7 @@ export default {
       const mode = quizModeRef.value;
       return quizDao.findByQuiz(
         activeLicense.value.uuid,
-        props.cate.seq,
+        cate.value.seq,
         quizResource,
         mode
       );
@@ -169,10 +183,13 @@ export default {
         alert("학생을 선택해주세요");
         return;
       }
+      if (cate.value.level === -1) {
+        wordMode.value = false;
+      }
       quizModeRef.value = quizMode;
       answerTypeRef.value = answerType;
       const quizResource = wordMode.value ? "W" : "S";
-      const sentences = props.cate.sentences.filter(
+      const sentences = cate.value.sentences.filter(
         (sen) => sen.type === quizResource
       );
       examDesc.value = descritions[quizMode];
@@ -187,15 +204,32 @@ export default {
     };
     const sourceText = () => (wordMode.value ? "낱말" : "문장");
 
+    const showOverview = () => {
+      overviewVisible.value = !overviewVisible.value;
+    };
+    const moveBack = () => {
+      if (overviewVisible.value) {
+        overviewVisible.value = false;
+      } else {
+        emit("back");
+      }
+    };
+
     watch(
       () => wordMode.value,
       () => {
         sentencesRef.value.splice(0, sentencesRef.value.length);
       }
     );
+    watch(() => chapters.value, setActiveSection, { immediate: true });
     return {
+      overviewVisible,
+      cate,
+      theme,
+      // quizOnly,
       path,
       title,
+      desc,
       wordMode,
       examDesc,
       quizModeRef,
@@ -205,6 +239,8 @@ export default {
       listQuestions,
       hideQuestionList,
       sourceText,
+      showOverview,
+      moveBack,
     };
   },
 };
@@ -213,27 +249,15 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
 $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
-$padding: 16px;
+
 .section-detail {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  border-top-left-radius: 2vmin;
-  border-top-right-radius: 2vmin;
+  border-radius: 2vmin;
   overflow: hidden;
-  .body {
-    flex: 1 1 auto;
-  }
-  .jumbo {
-    .title {
-      display: flex;
-      column-gap: 8px;
-      align-items: center;
-      h3 {
-        flex: 1 1 auto;
-      }
-    }
-  }
+  background-color: white;
+  height: 100%;
+
   @include mobile {
     h3 {
       font-size: 1.5rem;
@@ -249,26 +273,40 @@ $padding: 16px;
       font-size: 2.5rem;
     }
   }
+  /*
+  &.blue {
+    .header {
+      background-color: #4b7bec;
+      color: white;
+    }
+  }
+  &.brown {
+    .header {
+      background-color: #ffd110;
+      color: #865900;
+    }
+  }
   &.pink {
-    .jumbo {
+    .header {
       background-color: var(--aac-color-pink-400);
       color: var(--aac-color-pink-900);
-      padding: 16px $padding;
     }
   }
   &.green {
-    .jumbo {
+    .header {
       background-color: var(--aac-color-green-400);
       color: var(--aac-color-green-900);
-      padding: 16px $padding;
     }
   }
+  */
   .body {
     display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
     position: relative;
     // align-items: flex-start;
-    padding: 0;
-    flex-direction: column;
+    padding: 48px 0;
+
     overflow-y: hidden;
     .desc {
       padding-bottom: 16px;
@@ -312,17 +350,7 @@ $padding: 16px;
       }
     }
   }
-  .footer {
-    .choose {
-      display: flex;
-      justify-content: space-evenly;
-      padding: $padding;
-      column-gap: 1rem;
-      h4 {
-        flex: 1 1 auto;
-      }
-    }
-  }
+
   .slideup-enter-from,
   .slideup-leave-to {
     transform: translateY(100%);

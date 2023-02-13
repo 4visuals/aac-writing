@@ -1,113 +1,36 @@
 <template>
-  <div class="container">
-    <BrandPanel :theme="theme" text="단계별 받아쓰기" path="level" />
+  <div class="container layout-h-child w-1190px">
     <QuizHistoryView
-      v-if="license && chapters.length > 0"
+      v-if="$route.path === '/level' && license && chapters.length > 0"
       origin="L"
-      @itemClicked="(section) => showDetail(section, 'pink')"
+      @itemClicked="(section) => gotoSectionView({ section })"
     />
-    <transition-group name="chapter">
-      <div
-        class="row ltr group"
-        v-for="chapter in chapters"
-        :key="chapter.seq"
-        :class="{
-          active: activeChapter === chapter,
-        }"
-      >
-        <div class="col-12 chap-title">
-          <ParaText :lg="true" class="title">
-            <span
-              class="chapter-name"
-              @click="toggleActiveChapter(chapter, $event.target)"
-              >{{ chapter.desc }}</span
-            ><ActionIcon
-              :icon="activeChapter === chapter ? 'expand_less' : 'expand_more'"
-              @click="toggleActiveChapter(chapter)"
-            />
-          </ParaText>
-          <!-- <div class="reward">
-            <div class="crown">
-              <img src="@/assets/reward/crown_chapter_word.png" />
-            </div>
-            <div class="crown">
-              <img src="@/assets/reward/crown_chapter_sen.png" />
-            </div>
-          </div> -->
-        </div>
-        <transition name="section">
-          <div v-if="activeChapter === chapter" class="col-12 row">
-            <div
-              class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer"
-              v-for="section in chapter.sections.filter(
-                (sec) => sec.level >= 0
-              )"
-              :key="section.seq"
-            >
-              <SectionButton
-                :item="section"
-                :idx="section.level"
-                @itemClicked="(section) => showDetail(section, 'pink')"
-                theme="pink"
-                :history="true"
-              />
-            </div>
-
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 section-outer">
-              <SectionButton
-                :item="chapter.sections.filter((sec) => sec.level == -1)[0]"
-                :idx="'도전'"
-                @itemClicked="(section) => showDetail(section, 'green')"
-                theme="green"
-              />
-            </div>
-          </div>
-        </transition>
-      </div>
-    </transition-group>
-    <teleport to="body" v-if="activeCate">
-      <Modal ref="modal" height="90%" @hidden="hideModal">
-        <SectionView
-          :cate="activeCate"
-          :theme="themeRef"
-          :quizOnly="activeCate.level === -1"
-        />
-      </Modal>
-    </teleport>
+    <router-view
+      cate="levels"
+      theme="blue"
+      @active-section="gotoSectionView"
+      @back="$router.push('/level')"
+    />
   </div>
 </template>
 
 <script>
-// import sound from "@/service/sound";
-import SectionButton from "@/components/SectionButton.vue";
-import { BrandPanel } from "@/components/brand";
-import { Modal } from "@/components";
-import SectionView from "./SectionView.vue";
 import { useStore } from "vuex";
 import { computed, ref, watch } from "vue";
 import router from "@/router";
 import QuizHistoryView from "../QuizHistoryView.vue";
-import { ParaText } from "../../components/text";
-import { ActionIcon } from "../../components/form";
-import { useRoute } from "vue-router";
 import { logger } from "@/service/util";
 
 export default {
   props: ["cate"],
   components: {
-    SectionButton,
-    SectionView,
-    Modal,
-    BrandPanel,
     QuizHistoryView,
-    ParaText,
-    ActionIcon,
   },
   setup() {
     const theme = ref("none");
     const challenge = ref(true);
     const store = useStore();
-    const route = useRoute();
+    // const route = useRoute();
     const license = computed(() => store.getters["exam/activeLicense"]);
     const segmentHistory = computed(() => store.getters["exam/segmentHistory"]);
     logger.log(segmentHistory, "SEG HISTORY");
@@ -127,9 +50,7 @@ export default {
       console.log(quiz);
       router.push("/quiz/" + quiz.seq);
     };
-    const hideModal = () => {
-      activeCate.value = null;
-    };
+
     const sectionDir = (idx) => {
       return idx % 2 === 0 ? "ltr" : "rtl";
     };
@@ -145,28 +66,16 @@ export default {
       collapse(groupEl);
     };
 
-    const toggleActiveChapter = (chapter) => {
-      let seq = null;
-      if (activeChapter.value === chapter) {
-        activeChapter.value = null;
-        // store.commit('ui/setActiveChapter', {group: 'level', seq: null})
-      } else {
-        activeChapter.value = chapter;
-        seq = chapter.seq;
-      }
-      store.commit("ui/setActiveChapter", { group: "level", seq });
+    const chapterText = (chapter) => {
+      const { sections } = chapter;
+      const min = sections[0].level;
+      const max = sections[sections.length - 2].level;
+      return `${min} - ${max}단계`;
     };
-
-    watch(
-      () => route.name,
-      () => {
-        const path = route.path.substring(1);
-        const themeValue = path === "level" ? "pink" : "gold";
-        theme.value = themeValue;
-        challenge.value = path === "level";
-      },
-      { immediate: true }
-    );
+    const gotoSectionView = (e) => {
+      console.log(e);
+      router.push("/level/section/" + e.section.seq);
+    };
     watch(
       () => chapters.value,
       (levels) => {
@@ -192,12 +101,11 @@ export default {
       showDetail,
       activeCate,
       themeRef,
-      hideModal,
       sectionDir,
-      toggleActiveChapter,
       markHeight,
       collapse,
-      // expand,
+      chapterText,
+      gotoSectionView,
     };
   },
 };
@@ -206,103 +114,7 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
 $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
-.group {
-  color: #d23d70;
-  background-image: linear-gradient(0deg, #ffe4f469 50%, #ffffffcc 80%);
-  margin-bottom: 8px;
-  padding: 8px 4px;
-  border-radius: 8px;
-  /* box-shadow: #ffb24114 0px 0px 0px 1px inset, #e3a03d7d 0px 0px 0px 1px inset; */
-  border: 1px solid #d23d7044;
-  transition: height 0.2s $timing-fn 0.1s;
-  margin-left: 0;
-  margin-right: 0;
-  &.active {
-    margin-top: 16px;
-    margin-bottom: 16px;
-    box-shadow: 8px 8px 16px #cf99be57, 0px 0px 4px #cf99be57;
-    border-color: transparent;
-    padding-bottom: 24px;
-    // background-image: linear-gradient(15deg, #ffeeff 45%, #cdfaff 100%);
-    background-image: linear-gradient(15deg, #faffde 75%, #cdfaff 100%);
-    .chap-title {
-      .reward {
-        transform: translateY(-50%);
-        .crown {
-          width: 32px;
-          height: 32px;
-        }
-      }
-    }
-  }
-  .chap-title {
-    position: relative;
-    .reward {
-      position: absolute;
-      display: flex;
-      column-gap: 16px;
-      transform: translateY(-50%);
-      top: 50%;
-      right: 40px;
-      z-index: 5;
-      .crown {
-        width: 28px;
-        height: 28px;
-        img {
-          width: 100%;
-          height: auto;
-          filter: drop-shadow(1px 1px 3px #0000009d);
-        }
-      }
-    }
-  }
-}
-
-.title {
-  display: flex;
-  cursor: pointer;
-  .chapter-name {
-    flex: 1 1 auto;
-  }
-}
-@include mobile {
-  .title {
-    font-size: 1.25rem;
-  }
-}
-@include tablet {
-  .title {
-    font-size: 3vmin;
-  }
-}
-@include desktop {
-  .title {
-    font-size: 3vmin;
-  }
-}
-.section-outer {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-.ltr {
-  .section-enter-from {
-    transform: translateX(-1%);
-    opacity: 0;
-    // transform: scale(0.95);
-  }
-  .section-leave-to {
-    opacity: 0;
-    // opacity: 0.5;
-    // transform: scale(0.9);
-  }
-}
-.ltr {
-  .section-enter-active {
-    transition: all 0.5s $timing-fn;
-  }
-  .section-leave-active {
-    transition: all 0s $timing-fn;
-  }
+.container {
+  padding-bottom: 16px;
 }
 </style>

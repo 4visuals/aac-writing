@@ -1,10 +1,6 @@
 <template>
   <Background />
-  <div
-    class="app-wrapper"
-    ref="wrapperEl"
-    :style="`padding-top: ${topPadding}px`"
-  >
+  <div class="app-wrapper" ref="wrapperEl">
     <Nav
       v-if="
         route.path !== '/' &&
@@ -18,16 +14,17 @@
       "
       ref="nav"
     />
-
-    <router-view v-slot="{ Component }">
-      <transition
-        :name="tr.name"
-        mode="out-in"
-        :duration="{ enter: 300, leave: 0 }"
-      >
-        <component :is="Component" />
-      </transition>
-    </router-view>
+    <LayoutWrapper>
+      <router-view v-slot="{ Component }">
+        <transition
+          :name="tr.name"
+          mode="out-in"
+          :duration="{ enter: 300, leave: 0 }"
+        >
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </LayoutWrapper>
   </div>
   <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
@@ -63,6 +60,8 @@ import MenuWrapper from "./views/menu/MenuWrapper.vue";
 import RefreshView from "./views/RefreshView.vue";
 import ToastUI from "./components/toast/ToastUI.vue";
 import CompanyInfo from "./components/company/CompanyInfo.vue";
+import LayoutWrapper from "./components/layout/LayoutWrapper.vue";
+import util from "./service/util";
 
 export default {
   components: {
@@ -72,6 +71,7 @@ export default {
     RefreshView,
     ToastUI,
     CompanyInfo,
+    LayoutWrapper,
   },
   setup() {
     logger.log(env);
@@ -111,6 +111,8 @@ export default {
         if (companyVisible.value && wrapperEl.value) {
           wrapperEl.value.scrollTop = 0;
         }
+        const pathes = util.vue.parsePath(route);
+        store.commit("ui/setTheme", pathes);
       },
       { immediate: true }
     );
@@ -186,22 +188,6 @@ export default {
   }
   .nav.leave-active {
     transition: tranform $dur ease-in;
-  }
-}
-
-@include mobile {
-  .app-wrapper {
-    padding-top: 120px;
-  }
-}
-@include tablet {
-  .app-wrapper {
-    padding-top: 120px;
-  }
-}
-@include desktop {
-  .app-wrapper {
-    padding-top: 120px;
   }
 }
 </style>

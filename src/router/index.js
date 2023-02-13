@@ -1,7 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import LevelView from "../views/level/LevelView.vue";
+import LevelListingView from "../views/level/LevelListingView.vue";
+import SectionView from "../views/level/SectionView.vue";
 import BookShelfView from "../views/book/BookShelfView.vue";
+import BookListingView from "../views/book/BookListingView.vue";
+import BookSectionView from "../views/book/BookSectionView.vue";
 import { PolicyWrapper, PolicyView } from "../components/policy";
 import LoginPage from "../views/LoginPage.vue";
 import JoinPage from "../views/JoinPage.vue";
@@ -39,11 +43,27 @@ const routes = [
     path: "/level",
     name: "LevelView",
     component: LevelView,
+    children: [
+      { path: "", name: "LevelListingView", component: LevelListingView },
+      {
+        path: "section/:sectionSeq",
+        name: "LevelSectionView",
+        component: SectionView,
+      },
+    ],
   },
   {
     path: "/book",
     name: "BookShelfView",
     component: BookShelfView,
+    children: [
+      { path: "", name: "BookListingView", component: BookListingView },
+      {
+        path: "section/:sectionSeq",
+        name: "BookSectionView",
+        component: BookSectionView,
+      },
+    ],
   },
   {
     path: "/quiz/:seq",

@@ -147,7 +147,7 @@ export default {
         }
       } else {
         // 퀴즈모드에서는 정답 상관없이 바로 다음 문제로 넘어감
-        e.done();
+        e.done({ clearInput: true });
         quizStore.moveNext();
       }
     };
@@ -161,7 +161,7 @@ export default {
     watch(
       () => source.value,
       () => {
-        trial.value = "";
+        trial.value = "" + Math.random();
         correct.value = source.value && source.value.solved;
         question.value = new SentenceQuestion(source.value);
         // dummy.value.focus();

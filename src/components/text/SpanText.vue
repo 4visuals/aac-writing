@@ -12,34 +12,34 @@ export default {
 @import "~@/assets/resizer";
 @include mobile {
   span {
-    font-size: 1.15rem;
+    font-size: 14px;
     &.sm {
-      font-size: 1rem;
+      font-size: 12px;
     }
     &.lg {
-      font-size: 1.35rem;
+      font-size: 16px;
     }
   }
 }
 @include tablet {
   span {
-    font-size: 1.35rem;
+    font-size: 16px;
     &.sm {
-      font-size: 1.2rem;
+      font-size: 14px;
     }
     &.lg {
-      font-size: 1.65rem;
+      font-size: 18px;
     }
   }
 }
 @include desktop {
   span {
-    font-size: 1.35rem;
+    font-size: 16px;
     &.sm {
-      font-size: 1.2rem;
+      font-size: 14px;
     }
     &.lg {
-      font-size: 1.65rem;
+      font-size: 18px;
     }
   }
 }

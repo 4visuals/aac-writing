@@ -8,8 +8,14 @@
       @keydown="moveNext"
     />
     <transition name="pop" appear>
-      <ImageView :imgPath="imgPath" @click="hideReward" />
+      <ImageView class="img" :imgPath="imgPath" @click="hideReward" />
     </transition>
+    <AppButton
+      text="다음"
+      borderColor="#4B7BEC"
+      :fill="true"
+      @click="hideReward"
+    />
   </div>
 </template>
 
@@ -26,7 +32,7 @@ export default {
     const reward = store.getters["ui/reward"];
     const disposer = ref(null);
     const imgPath = computed(() => {
-      return require(`@/assets/reward/${reward}.png`);
+      return require(`@/assets/reward/${reward}.gif`);
     });
     const hideReward = () => {
       store.commit("ui/hideReward");
@@ -46,16 +52,22 @@ export default {
 
 <style lang="scss" scoped>
 .reward-wrapper {
-  background-color: #0000004d;
+  background-color: #ffffffcc;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  padding: 8%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   overflow: hidden;
   z-index: 5;
+  .img {
+    width: 100%;
+  }
   .pop-enter-from,
   .pop-leave-to {
     transform: scale(0.1);

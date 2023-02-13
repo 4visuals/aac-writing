@@ -140,6 +140,12 @@ class Question {
     this.solved = correct;
     return correct;
   }
+  /**
+   * section내에서의 index. 첫번째 문제는 0
+   */
+  get offsetInSection() {
+    return this.config.options.ranges[0] + this.index;
+  }
   get text() {
     return this.data.sentence.trim();
   }
@@ -168,6 +174,9 @@ class QuizConfig {
   }
   get ranges() {
     return this.options.ranges;
+  }
+  get section() {
+    return this.options.section;
   }
 }
 /**
@@ -238,6 +247,12 @@ class QuizContext {
   }
   get mode() {
     return this.options.mode;
+  }
+  isLevelQuiz() {
+    return this.section.origin === "L";
+  }
+  isBookQuiz() {
+    return this.section.origin === "B";
   }
   /**
    * @return 'W', 'S', or 'A'

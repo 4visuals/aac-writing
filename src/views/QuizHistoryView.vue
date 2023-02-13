@@ -1,61 +1,53 @@
 <template>
-  <div class="histories row" v-if="histories.length > 0">
-    <div class="col-12">
-      <h3>학습중</h3>
-    </div>
+  <div class="histories" v-if="histories.length > 0">
     <div
-      class="col-6 col-sm-6 col-md-4 col-lg-3 section-outer"
       v-for="history in histories"
       :key="history.uuid"
+      class="quiz-elem"
+      :class="history.theme"
+      @click="$emit('itemClicked', history.section)"
     >
-      <div
-        class="quiz-elem"
-        :class="history.theme"
-        @click="$emit('itemClicked', history.section)"
-      >
-        <ActionIcon
-          class="btn-close"
-          icon="close"
-          @click.stop="deleteHistory(history)"
-        />
-        <ParaText class="desc">
-          <SpanText>{{ history.levelText }}</SpanText
-          ><SpanText size="sm">{{ history.desc }}</SpanText>
-        </ParaText>
-        <ParaText class="lat">{{ history.lacText(cur) }}전</ParaText>
-        <div class="stats">
-          <div>
-            <SpanText size="sm">낱말</SpanText>
-            <div class="progress">
-              <div class="bar" :style="{ width: history.ratio('word') }"></div>
-              <SpanText class="text" size="sm"
-                >{{ history.stats.word.solved }} /
-                {{ history.stats.word.total }}</SpanText
-              >
-            </div>
-          </div>
-          <div>
-            <SpanText size="sm">문장</SpanText>
-            <div class="progress">
-              <div
-                class="bar"
-                :style="{ width: history.ratio('sentence') }"
-              ></div>
-              <SpanText class="text" size="sm"
-                >{{ history.stats.sentence.solved }} /
-                {{ history.stats.sentence.total }}</SpanText
-              >
-            </div>
-          </div>
+      <SpanText>학습중</SpanText>
+      <AppButton
+        size="chapter"
+        :invert="!history.isChallengeSection()"
+        :transparent="true"
+        :borderColor="history.isChallengeSection() ? '#FFD110' : ''"
+        :theme="history.isChallengeSection() ? 'yellow' : history.theme"
+        :text="getChapterText(history.section)"
+      ></AppButton>
+      <ParaText class="desc">
+        <SpanText>{{ history.desc }}</SpanText>
+      </ParaText>
+      <div class="stats">
+        <div v-if="!history.isChallengeSection()" class="each">
+          <SpanText class="text" size="sm">낱말</SpanText>
+          <SpanText class="text" size="sm"
+            >{{ history.stats.word.solved }} /
+            {{ history.stats.word.total }}</SpanText
+          >
+        </div>
+        <div class="each">
+          <SpanText class="text" size="sm">문장</SpanText>
+          <SpanText class="text" size="sm"
+            >{{ history.stats.sentence.solved }} /
+            {{ history.stats.sentence.total }}</SpanText
+          >
         </div>
       </div>
-      <!-- <SectionButton
+      <ParaText class="lat">{{ history.lacText(cur) }}전</ParaText>
+      <ActionIcon
+        class="btn-close"
+        icon="cancel"
+        @click.stop="deleteHistory(history)"
+      />
+    </div>
+    <!-- <SectionButton
         :item="section"
         :idx="section.level"
         @itemClicked="$emit('itemClicked', section)"
         theme="pink"
       /> -->
-    </div>
   </div>
 </template>
 
@@ -69,13 +61,15 @@ import quizHistory from "@/dao/section-history";
 import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { computed } from "@vue/runtime-core";
+import util from "../service/util";
+import { AppButton } from "../components/form";
 
 export default {
   components: {
     ActionIcon,
     ParaText,
     SpanText,
-    // SectionButton,
+    AppButton,
   },
   props: ["origin"],
   setup(props) {
@@ -99,83 +93,93 @@ export default {
           histories.value.splice(idx, 1);
         });
     };
+
+    const getChapterText = (section) => {
+      if (section.level < 0) {
+        return "도전";
+      } else {
+        return util.chapter.rangeText(section.chapter, " 단계");
+      }
+    };
     quizHistory
       .createHistories(props.origin, license.value.uuid, sections)
       .then((res) => {
         histories.value.push(...res.histories);
       });
 
-    return { cur, license, histories, deleteHistory };
+    return { cur, license, histories, deleteHistory, getChapterText };
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .histories {
+  margin-bottom: 17px;
   .quiz-elem {
-    padding: 6px 6px 6px 12px;
-    margin-bottom: 20px;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    padding: 5px 10px 5px 24px;
+    margin-bottom: 12px;
+    border-radius: 40px;
     font-family: Rowdies, monospace, cursive, sans-serif;
     position: relative;
     cursor: pointer;
     .btn-close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      transform: translate(45%, -50%);
-      font-size: 24px;
-      display: flex;
-      border-radius: 12px;
+      font-size: 32px;
+      border-radius: 16px;
+    }
+    &.blue {
+      color: white;
+      background-color: #4b7bec;
+      &:active {
+        top: 2px;
+        left: 2px;
+      }
+      .btn-close {
+        color: white;
+      }
+    }
+    &.purple {
+      color: white;
+      background-color: #8971bd;
+      &:active {
+        top: 2px;
+        left: 2px;
+      }
+      .btn-close {
+        color: white;
+      }
     }
     &.pink {
       color: var(--aac-color-pink-900);
       background-color: #ffe1ea;
-      box-shadow: 4px 4px var(--aac-color-pink-500);
       &:active {
         top: 2px;
         left: 2px;
-        box-shadow: 2px 2px var(--aac-color-pink-500);
       }
       .btn-close {
         background-color: var(--aac-color-pink-900);
         color: var(--aac-color-pink-200);
       }
-      .stats {
-        .progress {
-          background-color: #fbd0de;
-          .bar {
-            background-color: #f4abc4;
-          }
-        }
-      }
     }
     &.green {
       color: var(--aac-color-green-900);
       background-color: var(--aac-color-green-400);
-      box-shadow: 4px 4px var(--aac-color-green-700);
       &:active {
         top: 2px;
         left: 2px;
-        box-shadow: 2px 2px var(--aac-color-green-700);
       }
       .btn-close {
         background-color: var(--aac-color-green-900);
         color: var(--aac-color-green-400);
-      }
-      .stats {
-        .progress {
-          background-color: #e7efa0;
-          .bar {
-            background-color: var(--aac-color-green-700);
-          }
-        }
       }
     }
     .desc {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+      flex: 1 1 auto;
       span + span {
         margin-left: 8px;
       }
@@ -188,16 +192,15 @@ export default {
     }
     .stats {
       display: flex;
-      flex-direction: row;
       column-gap: 8px;
-      & > div {
+      & > .each {
         flex: 1;
         display: flex;
         column-gap: 2px;
         align-items: center;
-        .progress {
+        .text {
           flex: 1 1 auto;
-
+          white-space: nowrap;
           display: flex;
           align-items: center;
           justify-content: center;

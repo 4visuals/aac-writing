@@ -1,5 +1,5 @@
 <template>
-  <div class="desc" :class="{ shaking: failed }">
+  <div class="desc" :class="[theme.name, failed && 'shaking']">
     <div
       class="text"
       :class="{ hidden: inputVisible }"
@@ -20,15 +20,15 @@
       @keydown.tab.stop.prevent="handleTab"
       @click="clicked"
       ref="inputEl"
-      :value="inputText"
     />
   </div>
 </template>
 
 <script>
 import { ref } from "@vue/reactivity";
-import { nextTick } from "vue";
+import { watch, nextTick } from "vue";
 import { logger } from "@/service/util";
+import { useStore } from "vuex";
 export default {
   props: [
     "inputVisible",
@@ -40,6 +40,8 @@ export default {
   ],
   emits: ["commit", "update:inputText", "reset", "clicked"],
   setup(props, { emit }) {
+    const store = useStore();
+    const theme = store.state.ui.theme;
     let startTime = [];
     const inputEl = ref(null);
     const flashing = ref(true);
@@ -57,7 +59,7 @@ export default {
      * 틀렸을때 호출됨
      */
     const retry = () => {
-      const falseInput = inputEl.value.value.trim();
+      // const falseInput = inputEl.value.value.trim();
 
       setTimeout(() => {
         /*
@@ -65,7 +67,7 @@ export default {
          */
         failed.value = true;
         setTimeout(() => {
-          inputEl.value.value = falseInput;
+          // inputEl.value.value = falseInput;
           focus();
           resetTime();
         }, 200);
@@ -92,7 +94,7 @@ export default {
       const elapsedTime = new Date().getTime() - startTime[0];
       const value = e.target.value.trim();
       if (value.length === 0) {
-        e.target.value = "";
+        // e.target.value = "";
         return;
       }
       console.log("[flush] elapsed", elapsedTime);
@@ -145,11 +147,14 @@ export default {
         flush(e);
       }
     };
-    const resetTime = () => {
+    const resetTime = (option = { clearInput: false }) => {
       startTime = [];
       console.log("[RESET]");
       flushed = false;
-      emit("update:inputText", "");
+      if (option.clearInput) {
+        inputEl.value.value = "";
+      }
+      // emit("update:inputText", "");
       // iOS: input에 포커스 놓이면 가운데로 스크롤함.
       //    : 강제로 스크롤 땡겨줌
       setTimeout(() => {
@@ -179,7 +184,17 @@ export default {
       }
       flush(e);
     };
+    watch(
+      () => props.inputText,
+      () => {
+        console.log("[REST INPUT]");
+        if (inputEl.value) {
+          inputEl.value.value = "";
+        }
+      }
+    );
     return {
+      theme,
       inputEl,
       handleEnter,
       focus,
@@ -198,15 +213,48 @@ export default {
 
 <style lang="scss" scoped>
 .desc {
-  font-size: 2.5rem;
+  font-size: 18px;
   position: relative;
   text-align: center;
   display: flex;
   flex-direction: column;
+  &.blue {
+    input {
+      border: 1px solid #4b7bec;
+      color: #4b7bec;
+      font-weight: 600;
+      &:focus {
+        background-color: #d2ecfd;
+      }
+    }
+    &.shaking {
+      input {
+        background-color: #fff5c7;
+        border-color: #fff5c7;
+      }
+    }
+  }
+  &.brown {
+    input {
+      border: 1px solid #865900;
+      color: #958f77;
+      font-weight: 600;
+      &:focus {
+        background-color: #fffbd5;
+      }
+    }
+    &.shaking {
+      input {
+        background-color: #fff5c7;
+        border-color: #fff5c7;
+      }
+    }
+  }
   .text {
     padding: 1rem 3.5rem;
     border: 2px solid transparent;
-    background-color: #d2d2d2;
+    background-color: #f7f7f7;
+    color: #4d4d4d;
     white-space: nowrap;
     display: flex;
     flex: 1 1 auto;
@@ -224,10 +272,11 @@ export default {
     width: 100%;
     color: black;
     position: absolute;
-    padding: 1rem 1.5rem;
+    padding: 8px 16px;
     border-color: transparent;
-    background-color: #a2ec9c;
-    outline-color: #78ba73;
+    background-color: #fff;
+    outline: none;
+    // outline-color: #78ba73;
     border-radius: 1rem;
     text-align: center;
   }

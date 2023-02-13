@@ -11,8 +11,8 @@
       ><input type="checkbox" :checked="selected" @change="changed" />
       <div class="slider"></div
     ></label>
-    <SpanText class="label on">{{ onText }}</SpanText>
-    <SpanText class="label off">{{ offText }}</SpanText>
+    <SpanText size="sm" class="label on">{{ onText }}</SpanText>
+    <SpanText size="sm" class="label off">{{ offText }}</SpanText>
   </div>
 </template>
 
@@ -41,7 +41,7 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/theme";
 .switch-button {
-  background: rgba(255, 255, 255, 0.56) !important;
+  background: rgba(255, 255, 255);
   border-radius: 30px;
   overflow: hidden;
   text-align: center;
@@ -68,7 +68,8 @@ export default {
     flex: 1 1 auto;
     position: relative;
     pointer-events: none;
-    padding: 0.5rem 1rem;
+    padding: 8px 24px;
+    line-height: 24px;
   }
   label {
     position: absolute;
@@ -86,7 +87,7 @@ export default {
       bottom: 0;
       left: 0;
       width: 50%;
-      background-color: white;
+      background-color: #45aaf2;
       border-radius: 30px;
       transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
     }
@@ -99,7 +100,7 @@ export default {
       font-weight: 500;
     }
     .label.off {
-      color: #898989;
+      color: #4b7bec;
     }
   }
   &.off {

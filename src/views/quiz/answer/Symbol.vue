@@ -1,6 +1,12 @@
 <template>
   <div class="symbol" :class="{ locked: !ej.solved && !ej.active }">
+    <HintView
+      v-if="ej.hint.visible"
+      :hint="ej.hint"
+      @hint-click="symbolClicked"
+    />
     <div
+      v-else
       class="pic-holder"
       :style="{ 'background-image': `url('${pumsaImg()}')` }"
       @click.stop="symbolClicked"
@@ -25,9 +31,11 @@ import AnswerField from "@/components/quiz/AnswerField.vue";
 import { tts } from "@/components/tts";
 import { key, path } from "@/service/util";
 import { ref, watch } from "@vue/runtime-core";
+import HintView from "../HintView.vue";
 export default {
   components: {
     AnswerField,
+    HintView,
   },
   props: ["ej", "pumsaType", "showAnswer"],
   setup(props, { emit }) {
@@ -41,17 +49,22 @@ export default {
       correct.value = true;
     }
     const pumsaImg = () => {
-      if (props.ej.isSolved || props.showAnswer) {
+      const { ej } = props;
+      if (ej.isSolved || props.showAnswer) {
         return path.resolveUrl(props.ej.picturePath);
       } else {
         const { pumsaType } = props;
         let pumsa = "";
-        if (pumsaType === "follow") {
-          pumsa = props.ej.pumsa.startsWith("hada") ? "hada" : props.ej.pumsa;
+        let ext = ".png";
+        if (ej.hint.cnt === 1) {
+          pumsa = "not-good";
+          ext = ".svg";
+        } else if (pumsaType === "follow") {
+          pumsa = ej.pumsa.startsWith("hada") ? "hada" : ej.pumsa;
         } else {
           pumsa = pumsaType;
         }
-        return require(`@/assets/s-${pumsa}.png`);
+        return require(`@/assets/s-${pumsa}${ext}`);
       }
     };
     const inputEl = ref(null);
@@ -62,7 +75,7 @@ export default {
         if (props.showAnswer) {
           correct.value = true;
         }
-        trial.value = "";
+        trial.value = "" + Math.random();
       },
       { immediate: true }
     );
@@ -118,6 +131,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .symbol {
   display: flex;
   flex-direction: column;
@@ -129,8 +143,8 @@ export default {
     pointer-events: none;
   }
   .pic-holder {
-    width: 80px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -163,6 +177,14 @@ export default {
     right: 0;
     bottom: 0;
     pointer-events: none;
+  }
+}
+@include mobile {
+  .symbol {
+    .pic-holder {
+      width: 56px;
+      height: 56px;
+    }
   }
 }
 </style>

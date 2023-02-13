@@ -1,32 +1,23 @@
 <template>
-  <div class="numbering">
-    <div class="bar done"></div>
-    <div class="bar todo"></div>
-    <div
-      class="dot"
-      v-for="q in ctx.questions"
-      :key="q.index"
-      :style="{
-        left: `${(q.index / (ctx.questions.length - 1)) * 100}%`,
-      }"
-    ></div>
-    <div
-      v-if="currentQuestion"
-      class="current num"
-      :style="{
-        left: `${(currentQuestion.index / (ctx.questions.length - 1)) * 100}%`,
-      }"
-    >
-      {{ currentQuestion.index + 1 }}
+  <div class="numbering" :class="[theme.name]">
+    <div class="desc">
+      <p>{{ rss }} {{ desc }}</p>
+      <button class="nude speaker" @click="$emit('speak')"></button>
     </div>
-    <!-- <div
-        class="num"
-        :class="{ current: currentQuestion === q }"
-        v-for="q in questions"
+    <div class="bars">
+      <div
+        v-for="q in ctx.questions"
         :key="q.index"
+        class="elem"
+        :class="{ current: q.index <= currentQuestion.index }"
       >
-        {{ q.index + 1 }}
-      </div> -->
+        <div v-if="q.index <= currentQuestion.index" class="num">
+          {{ q.offsetInSection + 1 }}
+        </div>
+        <div v-else class="num"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -36,16 +27,28 @@ import { useStore } from "vuex";
 // import quizStore from "./quizStore";
 
 export default {
+  props: ["theme"],
   setup() {
+    const descMap = {
+      READING: "보고쓰기",
+      LEARNING: "연습하기",
+      QUIZ: "받아쓰기",
+    };
+    const rssTypeMap = {
+      W: "낱말",
+      S: "문장",
+      A: "교과서",
+    };
     const store = useStore();
     const ctx = computed(() => store.state.quiz.quizContext);
-
     const currentQuestion = computed(() => store.getters["quiz/currentPara"]);
-    // const questions = shallowRef(ctx.value.questions);
+    const desc = descMap[ctx.value.mode];
+    const rss = rssTypeMap[ctx.value.resourceType];
     return {
       ctx,
+      desc,
+      rss,
       currentQuestion,
-      // len: questions.length,
     };
   },
 };
@@ -53,71 +56,104 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
-$bdrc: rgb(22, 95, 0);
 $bgc: transparent;
-$dot-color: rgb(95, 172, 8);
-$active-bgc: rgb(22, 95, 0);
-$active-fgc: white;
+$active-bgc: #4840ee;
+$inactive-bgc: #eee9fe;
 
 .numbering {
   display: flex;
-  margin: 0 32px 8px;
-  font-size: 1.2rem;
+  align-items: center;
+  margin: 0 10%;
+  font-size: 2rem;
+  font-weight: 600;
   position: relative;
-  .bar {
-    position: absolute;
-    height: 6px;
-    background-color: rgb(189, 247, 81);
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .dot {
-    position: absolute;
-    top: 50%;
-    width: 6px;
-    height: 6px;
-    transform: translate(-3px, -3px);
-    border-radius: 2px;
-    background-color: $dot-color;
-  }
-  .num {
-    border: 1px solid $bdrc;
-    border-radius: 3vmin;
+  padding: 16px 0;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    top: 0;
-    z-index: 5;
-    transform: translateX(-50%);
-    transition: left 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
-    &.current {
-      background-color: $active-bgc;
-      color: $active-fgc;
+  &.blue {
+    color: #3867d6;
+    .desc {
+      .speaker {
+        background-color: #45aaf2;
+      }
+    }
+    .bars {
+      .current.elem {
+        color: #4840ee;
+        .bar {
+          background-color: #4840ee;
+        }
+      }
     }
   }
+  &.brown {
+    color: #865900;
+    .desc {
+      .speaker {
+        background-color: #865900;
+      }
+    }
+    .bars {
+      .current.elem {
+        color: #865900;
+        .bar {
+          background-color: #865900;
+        }
+      }
+    }
+  }
+  .desc {
+    flex: 1 1 50%;
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    .speaker {
+      width: 32px;
+      height: 32px;
+      background-size: contain;
+      mask-image: url("/img/speaker.svg");
+    }
+  }
+  .bars {
+    flex: 1 1 50%;
+    display: flex;
+    justify-content: center;
+    column-gap: 3px;
+    .elem {
+      flex: 1 1 10%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      color: $inactive-bgc;
+      font-weight: 600;
+      user-select: none;
+      &.current {
+        color: $active-bgc;
+        .bar {
+          background-color: $active-bgc;
+        }
+      }
+      .bar {
+        height: 10px;
+        width: 100%;
+        background-color: $inactive-bgc;
+      }
+    }
+  }
+
   @include mobile {
     .num {
-      font-size: 3vmin;
-      width: 6vmin;
-      height: 6vmin;
+      font-size: 16px;
     }
   }
   @include tablet {
     .num {
-      font-size: 2.5vmin;
-      width: 5vmin;
-      height: 5vmin;
+      font-size: 16px;
     }
   }
   @include desktop {
     .num {
-      font-size: 2.5vmin;
-      width: 5vmin;
-      height: 5vmin;
+      font-size: 16px;
     }
   }
   .scrollable {

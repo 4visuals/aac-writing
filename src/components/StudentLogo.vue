@@ -49,6 +49,11 @@ export default {
       height: 24px;
       font-size: 10px;
     }
+    &.lg {
+      width: 48px;
+      height: 48px;
+      font-size: 10px;
+    }
   }
 }
 </style>

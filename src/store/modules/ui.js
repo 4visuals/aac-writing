@@ -20,6 +20,54 @@ const rewards = {
   word_passed: "word_passed",
   word_failed: "word_failed",
 };
+const themes = {
+  mapper: {
+    level: "blue",
+    book: "brown",
+  },
+  none: {
+    name: "none",
+    bgc: "transparent",
+  },
+  blue: {
+    name: "blue",
+    bgc: "#d2ecfd",
+    color: {
+      main: "#4B7BEC",
+      sub: "#4B7BEC",
+    },
+  },
+  yellow: {
+    name: "yellow",
+    bgc: "#FFFAD5",
+    color: {
+      main: "#FFD700",
+      sub: "#865900",
+    },
+  },
+  brown: {
+    name: "brown",
+    bgc: "#FFFAD5",
+    color: {
+      main: "#865900",
+      sub: "#ffd110",
+    },
+  },
+  gold: {
+    bgc: "gold",
+    button: {
+      color: "#865900",
+      bgc: "#ffec88",
+    },
+  },
+  pink: {
+    bgc: "#ff9bbd",
+    button: {
+      color: "#d23d70",
+      bgc: "#ffe1ea",
+    },
+  },
+};
 class UI {
   constructor() {
     this.nav = { height: 120, expanded: true };
@@ -35,6 +83,7 @@ class UI {
       level: null,
       book: null,
     };
+    this.theme = themes.none;
   }
   get backgroundVisible() {
     return this.bg.visible;
@@ -74,22 +123,6 @@ class UI {
   }
 }
 
-const themes = {
-  gold: {
-    bgc: "gold",
-    button: {
-      color: "#865900",
-      bgc: "#ffec88",
-    },
-  },
-  pink: {
-    bgc: "#ff9bbd",
-    button: {
-      color: "#d23d70",
-      bgc: "#ffe1ea",
-    },
-  },
-};
 const ui = new UI();
 const leftMenu = new Menu("left");
 
@@ -139,6 +172,14 @@ export default {
     },
     setActiveChapter(state, { group, seq }) {
       state.ui.markChapter(group, seq);
+    },
+    setTheme(state, pathes) {
+      const path = pathes[0];
+      if (path === "quiz") {
+        return;
+      }
+      const themeName = themes.mapper[path] || "none";
+      state.theme = themes[themeName];
     },
   },
 };

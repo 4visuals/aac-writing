@@ -1,13 +1,5 @@
 <template>
-  <div
-    class="section"
-    :class="{ compact: compact === '', visited }"
-    @click="$emit('itemClicked', item)"
-  >
-    <h1 :class="theme">
-      <span>{{ idx }}</span
-      ><span v-if="compact !== '' && visited">+</span>
-    </h1>
+  <div class="section" :class="{ compact: compact === '', visited }">
     <!-- <div class="reward">
       <div class="crown">
         <img src="@/assets/reward/crown_section_word.png" />
@@ -16,24 +8,25 @@
         <img src="@/assets/reward/crown_section_sen.png" />
       </div>
     </div> -->
-    <div class="desc" :class="theme">
-      <!-- <h4>{{ item.title }}</h4> -->
-      <ParaText :small="true">{{ item.description }}</ParaText>
-      <ParaText class="sub" :class="theme" :small="true" v-if="desc">{{
-        desc
-      }}</ParaText>
-    </div>
+    <AppButton
+      class="sec-btn"
+      size="sm"
+      :theme="theme"
+      :nowrap="false"
+      :text="title()"
+      @click="$emit('itemClicked', item)"
+    ></AppButton>
   </div>
 </template>
 
 <script>
-import { ParaText } from "@/components/text";
 import { useStore } from "vuex";
 import { computed } from "@vue/runtime-core";
+import { AppButton } from "./form";
 
 export default {
   components: {
-    ParaText,
+    AppButton,
   },
   props: ["idx", "item", "theme", "compact", "desc", "history"],
   setup(props) {
@@ -42,8 +35,17 @@ export default {
       store.getters["quizHistory/hasHistory"](props.item)
     );
 
+    const title = () => {
+      const { item } = props;
+      const num = item.level === -1 ? "도전" : item.level;
+      const desc =
+        item.level === -1 ? item.description.substring(2) : item.description;
+      return `${num}. ${desc}`;
+    };
+
     return {
       visited,
+      title,
     };
   },
 };
@@ -54,7 +56,6 @@ export default {
 
 @include mobile {
   .section {
-    margin-top: 2rem;
     h1 {
       font-size: 1.8rem;
     }
@@ -62,7 +63,6 @@ export default {
 }
 @include tablet {
   .section {
-    margin-top: 2.2rem;
     h1 {
       font-size: 2.2rem;
     }
@@ -70,7 +70,6 @@ export default {
 }
 @include desktop {
   .section {
-    margin-top: 2.2rem;
     h1 {
       font-size: 2.2rem;
     }
@@ -80,36 +79,9 @@ export default {
   user-select: none;
   position: relative;
   flex: 1;
-  h1 {
-    font-family: "Rowdies", monospace, cursive;
-    position: absolute;
-    left: 24px;
-    transform: translateY(-60%);
-    z-index: 10;
-    border-radius: 24px;
-    line-height: 1;
-    display: block;
-    color: #d23d70;
-    display: inline-flex;
-    align-items: center;
-    &.green {
-      // text-shadow: 2px 2px #d4e250;
-      color: #20450a;
-    }
-
-    &.pink {
-      // text-shadow: 2px 2px var(--aac-color-pink-500);
-      color: var(--aac-color-pink-900);
-    }
-    &.yellow {
-      // text-shadow: 2px 2px var(--aac-color-yellow-400);
-      color: var(--aac-color-yellow-900);
-    }
-
-    &.blue {
-      // text-shadow: 2px 2px #6c97dc;
-      color: #0b0a45;
-    }
+  display: flex;
+  .sec-btn {
+    flex: 1 1 auto;
   }
   .reward {
     position: absolute;

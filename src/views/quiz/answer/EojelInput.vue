@@ -31,7 +31,26 @@ import quizStore from "@/views/quiz/quizStore";
  */
 import { computed, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
-// import { useStore } from "vuex";
+
+class Hint {
+  constructor() {
+    this.cnt = 0;
+    this.visible = false;
+    this.text = "";
+  }
+  addFailure(text) {
+    this.cnt++;
+    this.text = text;
+    if (this.cnt > 1) {
+      this.visible = true;
+    }
+  }
+  reset() {
+    this.cnt = 0;
+    this.visible = false;
+    this.text = "";
+  }
+}
 
 class Ej {
   constructor(ej, index) {
@@ -39,6 +58,7 @@ class Ej {
     this.index = index;
     this.solved = ej.solved;
     this.active = false;
+    this.hint = new Hint();
   }
   get order() {
     return this.data.order;
@@ -57,6 +77,10 @@ class Ej {
   }
   get trials() {
     return this.data.trials;
+  }
+  setActive(active) {
+    this.active = active;
+    this.hint.reset();
   }
   addTrial(value, elapsedTimeMillis, correct) {
     this.data.trials.push({
@@ -110,7 +134,6 @@ export default {
           }
         },
       });
-      // dummy.value.focus();
       new Audio(require(`@/assets/reward/${name}.mp3`)).play();
     };
     const findUnsolvedEojeol = () => {
@@ -128,10 +151,10 @@ export default {
         return;
       }
       if (ej) {
-        ej.active = false;
+        ej.setActive(false);
       }
       if (nextEj) {
-        nextEj.active = true;
+        nextEj.setActive(true);
       } else {
         // 다음 문제로 이동
         showReward("passed");
@@ -153,13 +176,9 @@ export default {
       } else {
         e.failed();
         if (!dictationMode) {
-          store.commit("quiz/showHint", {
-            cnt: ej.trials.length,
-            text: ej.text,
-          });
+          ej.hint.addFailure(ej.text);
         }
       }
-      console.log(ej.isSolved);
     };
     let pendingSpeakId = null;
     const speackAndMoveFocus = (delay) => {
