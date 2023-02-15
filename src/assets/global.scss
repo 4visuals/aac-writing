@@ -212,6 +212,29 @@ button {
   }
 }
 
+.abs {
+  &-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+.modal-dimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #7777774d;
+}
+.text {
+  &-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
 @keyframes anim-rotate {
   0% {
     transform: rotate(90deg);

@@ -115,7 +115,6 @@ export default {
 
     watch(() => user.value, checkAdmin);
     onMounted(() => {
-      store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
       store.commit("ui/setBackgroundVisible", false);
       store.dispatch("user/autoLogin").then((res) => {
         if (res === false) {

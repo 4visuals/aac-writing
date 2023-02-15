@@ -7,7 +7,7 @@
       :class="history.theme"
       @click="$emit('itemClicked', history.section)"
     >
-      <SpanText>학습중</SpanText>
+      <SpanText class="label text-ellipsis">학습중</SpanText>
       <AppButton
         size="chapter"
         :invert="!history.isChallengeSection()"
@@ -35,29 +35,23 @@
           >
         </div>
       </div>
-      <ParaText class="lat">{{ history.lacText(cur) }}전</ParaText>
+      <ParaText class="lat text-ellipsis"
+        >{{ history.lacText(cur) }}전</ParaText
+      >
       <ActionIcon
         class="btn-close"
         icon="cancel"
         @click.stop="deleteHistory(history)"
       />
     </div>
-    <!-- <SectionButton
-        :item="section"
-        :idx="section.level"
-        @itemClicked="$emit('itemClicked', section)"
-        theme="pink"
-      /> -->
   </div>
 </template>
 
 <script>
 import { ParaText, SpanText } from "@/components/text";
 import { ActionIcon } from "@/components/form";
-// import SectionButton from "@/components/SectionButton.vue";
 import { quizDao } from "@/dao";
 import quizHistory from "@/dao/section-history";
-// import { time } from "@/service/util";
 import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { computed } from "@vue/runtime-core";
@@ -113,6 +107,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .histories {
   margin-bottom: 17px;
   .quiz-elem {
@@ -219,6 +214,14 @@ export default {
             padding: 2px 0;
           }
         }
+      }
+    }
+  }
+  @include mobile {
+    .quiz-elem {
+      padding: 4px;
+      .label {
+        display: none;
       }
     }
   }

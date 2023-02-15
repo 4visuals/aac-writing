@@ -70,7 +70,6 @@ export default {
       );
     };
 
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
     store.commit("ui/setBackgroundVisible", false);
 
     onUnmounted(() => {

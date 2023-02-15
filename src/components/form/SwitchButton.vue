@@ -40,6 +40,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/theme";
+@import "~@/assets/resizer";
 .switch-button {
   background: rgba(255, 255, 255);
   border-radius: 30px;
@@ -70,6 +71,7 @@ export default {
     pointer-events: none;
     padding: 8px 24px;
     line-height: 24px;
+    white-space: nowrap;
   }
   label {
     position: absolute;
@@ -112,6 +114,11 @@ export default {
     }
     .label.on {
       color: #898989;
+    }
+  }
+  @include mobile {
+    .label {
+      padding: 6px 12px;
     }
   }
 }

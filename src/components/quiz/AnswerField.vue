@@ -212,6 +212,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .desc {
   font-size: 18px;
   position: relative;
@@ -262,6 +263,9 @@ export default {
     border-radius: 1rem;
     &.hidden {
       padding: 1rem 3.5rem;
+      @include mobile {
+        padding: 4px 3.5rem;
+      }
     }
   }
   input {

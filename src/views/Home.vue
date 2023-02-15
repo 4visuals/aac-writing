@@ -105,7 +105,6 @@ export default {
       // console.log("move to ", url);
       store.commit("exam/setActiveLicense", license);
       router.replace(url);
-      store.commit("ui/setNavSize", { expanded: false, topPadding: 120 });
     };
     const goTo = (uri) => {
       router.push(uri);
@@ -123,7 +122,6 @@ export default {
       },
       { immediate: true }
     );
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
     store.commit("ui/hideMenu");
     onMounted(() => {});
     return {

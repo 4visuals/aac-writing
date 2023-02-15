@@ -45,7 +45,6 @@ export default {
     const onJoinCompleted = (user) => {
       userRef.value = user;
     };
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
     store.commit("ui/setBackgroundVisible", false);
     return { userRef, onJoinCompleted };
   },

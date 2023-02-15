@@ -11,71 +11,74 @@
         :section="ctx.config.section"
         @back="closeQuiz"
       />
-      <input
-        type="search"
-        tabindex="-1"
-        ref="focusing"
-        autocomplete="off"
-        enterkeyhint="done"
-        @keyup="hideReward"
-      />
+
       <template v-if="ctx">
-        <Numbering @speak="speak" :theme="theme" />
-        <div
-          class="answer-view"
-          :class="{ blue: ctx.isLevelQuiz(), brown: ctx.isBookQuiz() }"
-          v-if="ctx.isReadingMode()"
-          @click="speak"
-        >
-          <h3>{{ ctx.currentQuestion.text }}</h3>
-        </div>
-        <HintView v-if="hint && hint.visible" :hint="hint" />
-        <div class="answer">
-          <component
-            :is="ctx.options.answerComponent"
-            :quizContext="ctx"
-            :question="ctx.currentQuestion"
-            :fillHeight="false"
-            @quizEnd="alertForResult"
+        <QuizResult v-if="quizFinished" />
+        <template v-else>
+          <input
+            type="search"
+            tabindex="-1"
+            ref="focusing"
+            autocomplete="off"
+            enterkeyhint="done"
+            @keyup="hideReward"
           />
-        </div>
-        <div class="question">
-          <component
-            :is="ctx.options.questionComponent"
-            :quizContext="ctx"
-            :fillHeight="true"
-            @speaking="sceneClicked"
-          />
-          <ActionIcon
-            v-if="!ctx.isQuizMode() && ctx.currentQuestion.hasPrevQuiz()"
-            class="icon left"
-            icon="chevron_left"
-            @click.stop.prevent="moveQuiz(-1)"
-          />
-          <template v-if="!ctx.isQuizMode()">
-            <ActionIcon
-              class="icon right"
-              icon="chevron_right"
-              @click.stop.prevent="moveQuiz(1)"
+          <Numbering @speak="speak" :theme="theme" />
+          <div
+            class="answer-view"
+            :class="{ blue: ctx.isLevelQuiz(), brown: ctx.isBookQuiz() }"
+            v-if="ctx.isReadingMode()"
+            @click="speak"
+          >
+            <h3>{{ ctx.currentQuestion.text }}</h3>
+          </div>
+          <HintView v-if="hint && hint.visible" :hint="hint" />
+          <div class="answer">
+            <component
+              :is="ctx.options.answerComponent"
+              :quizContext="ctx"
+              :question="ctx.currentQuestion"
+              :fillHeight="false"
+              @quizEnd="alertForResult"
             />
-          </template>
-        </div>
+          </div>
+          <div class="question">
+            <component
+              :is="ctx.options.questionComponent"
+              :quizContext="ctx"
+              :fillHeight="true"
+              @speaking="sceneClicked"
+            />
+            <ActionIcon
+              v-if="!ctx.isQuizMode() && ctx.currentQuestion.hasPrevQuiz()"
+              class="icon left"
+              icon="chevron_left"
+              @click.stop.prevent="moveQuiz(-1)"
+            />
+            <template v-if="!ctx.isQuizMode()">
+              <ActionIcon
+                class="icon right"
+                icon="chevron_right"
+                @click.stop.prevent="moveQuiz(1)"
+              />
+            </template>
+          </div>
+        </template>
       </template>
       <div class="none" v-else>NONE</div>
       <RewardView v-if="reward" />
       <transition name="pop">
         <TtsView v-if="speaking" />
       </transition>
-      <QuizResult v-if="quizFinished" />
     </div>
   </div>
 </template>
 
 <script>
-import { computed, onMounted, onUnmounted, ref } from "@vue/runtime-core";
+import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import quizStore from "./quizStore";
-import quiz from "@/views/quiz";
+import quiz, { Segment } from "@/views/quiz";
 import { useStore } from "vuex";
 import ActionIcon from "@/components/form/ActionIcon.vue";
 import Numbering from "@/views/quiz/Numbering.vue";
@@ -105,11 +108,12 @@ export default {
     const speaking = computed(() => store.state.tts.speaking);
     const theme = computed(() => store.state.ui.theme);
     const focusing = ref(null);
-    const keyConsumer = ref(null);
+    // const keyConsumer = ref(null);
     const quizFinished = computed(() => store.state.quiz.finished);
     const router = useRouter();
     store.commit("ui/hideMenu");
     store.commit("quiz/hideHint");
+    store.commit("ui/setNavVisible", false);
     quiz.loadQuiz();
     /**
      * 모바일에서 soft keyboard가 내려갔다 올라가는 불편을 방지하기 위해서
@@ -139,15 +143,92 @@ export default {
       //   }
       holdSoftKeyboard();
     };
-    const closeQuiz = (dir) => {
-      if (dir === "back") {
-        router.replace(ctx.value.prevPage.close);
-      } else if (dir === "close") {
-        router.replace({ name: ctx.value.prevPage.back });
+    const gotoSection = () => {
+      router.replace(ctx.value.prevPage.close);
+    };
+    const closeQuiz = () => {
+      router.replace({ name: ctx.value.prevPage.back });
+    };
+    /**
+     * 새로운 퀴즈 시작
+     * @param {QuizContext} quizContext - quiz/index.js
+     * @param {Segment} segment - quiz/index.js
+     * @param {object} nextSection
+     */
+    const startQuiz = (quizContext, segment, section) => {
+      const ctx = quizContext.value;
+      const quizMode = ctx.mode;
+      const { answerType } = ctx.config;
+      const { resourceType } = ctx;
+      quiz
+        .prepareQuiz({
+          quizMode,
+          answerType,
+          section: section.seq,
+          quizResource: resourceType,
+          license: ctx.license.seq,
+          prevPage: ctx.prevPage,
+          sentenceFilter: () => segment.getSentences(),
+          ranges: [segment.start, segment.end],
+        })
+        .then(() => {
+          store.commit("ui/hideMenu");
+          store.commit("quiz/hideHint");
+          quiz.loadQuiz();
+        })
+        .catch((e) => {
+          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
+        });
+    };
+    /**
+     * 현재 퀴즈를 다시 한번
+     */
+    const retry = () => {
+      const [s, e] = ctx.value.ranges;
+      const segments = ctx.value.getSegments();
+      const segment = segments.find((seg) => seg.start === s && seg.end === e);
+      startQuiz(ctx, segment, ctx.value.section);
+    };
+    /**
+     * 다음 퀴즈를 시작함.
+     *
+     */
+    const startNext = () => {
+      console.log("다음 문제");
+      const { section, ranges } = ctx.value;
+      const e = ranges[1];
+      let segments = ctx.value.getSegments();
+      let nextSection = section;
+      let nextSegment = segments.find((seg) => seg.start === e);
+      if (!nextSegment) {
+        nextSection = nextSection.next;
+        if (nextSection.level === -1 && ctx.value.isWord()) {
+          // "낱말"인 경우, 다음 section이 도전인 경우(level -1)그 다음 section을 사용함
+          nextSection = nextSection.next;
+        }
+        segments = Segment.createSegments(nextSection, ctx.value.resourceType);
+        nextSegment = segments[0];
+      }
+      if (nextSegment) {
+        // 맨 마지막 chapter의 마지막 section은 다음 section이 없음
+        startQuiz(ctx, nextSegment, nextSection);
       } else {
-        throw new Error("invalid router path: ", dir);
+        alert("마지막 퀴즈입니다.");
       }
     };
+    /**
+     * provide
+     * @method quizProvider.retry - [다시 하기] 현재 퀴즈를 다시
+     * @method quizProvider.startNext - [다음 단계] 다음 문제 시작
+     * @method quizProvider.gotoSection - [학습선택] section 상세 페이지로 이동
+     * @method quizProvider.closeQuiz - 종료. "/level", "/book"으로 이동
+     */
+    provide("quizProvider", {
+      retry,
+      startNext,
+      gotoSection,
+      closeQuiz,
+    });
     onBeforeRouteLeave(() => {
       store.commit("quiz/closeQuiz");
       return true;
@@ -155,11 +236,10 @@ export default {
     onMounted(() => {
       store.commit("ui/hideReward");
       store.commit("ui/setBackgroundVisible", false);
-      store.commit("ui/setNavSize", { expanded: false, topPadding: 56 });
     });
     onUnmounted(() => {
       store.commit("ui/setBackgroundVisible", true);
-      store.commit("ui/setNavSize", { expanded: true, topPadding: 120 });
+      store.commit("ui/setNavVisible", true);
     });
     return {
       ctx,
@@ -167,7 +247,7 @@ export default {
       hint,
       reward,
       focusing,
-      keyConsumer,
+      // keyConsumer,
       quizFinished,
       speaking,
       moveQuiz,
@@ -182,6 +262,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .quiz-wrapper {
   width: 100%;
   height: 100%;
@@ -193,6 +274,9 @@ export default {
   overflow: hidden;
   background-color: white;
   row-gap: 8px;
+  @include mobile {
+    row-gap: 0;
+  }
   > input[type="search"] {
     position: absolute;
     width: 0;

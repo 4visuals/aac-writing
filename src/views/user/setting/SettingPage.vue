@@ -98,7 +98,6 @@ export default {
     ];
     store.registerModule("setting", settingStore);
     store.commit("setting/setMenus", menus);
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
     store.commit("ui/setBackgroundVisible", false);
     const path = useRoute().fullPath.split("/").reverse()[0];
     console.log(useRoute().fullPath);

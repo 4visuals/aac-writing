@@ -165,7 +165,6 @@ export default {
       // console.log("move to ", url);
       store.commit("exam/setActiveLicense", license);
       router.replace(url);
-      store.commit("ui/setNavSize", { expanded: false, topPadding: 120 });
     };
     const showLicenseConfig = (lcs) => {
       modal.value.visible = true;
@@ -210,7 +209,6 @@ export default {
       },
       { immediate: true }
     );
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
     store.commit("ui/setBackgroundVisible", false);
     store.commit("ui/hideMenu");
 

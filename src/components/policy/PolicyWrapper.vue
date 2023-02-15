@@ -65,7 +65,6 @@ export default {
       tou: "TM",
       privacy: "PV",
     };
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
     api.policy.load().then((res) => {
       policies = res;
       const subpath = route.path.split("/")[2];

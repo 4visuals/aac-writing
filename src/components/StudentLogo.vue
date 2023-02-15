@@ -1,27 +1,27 @@
 <template>
   <div class="stud-logo-wrapper">
-    <div class="chr logo" :class="size || ''" @click="openStatView">
+    <div class="chr logo" :class="size || ''" @click="openMenu">
       {{ char() }}
     </div>
   </div>
 </template>
 
 <script>
-import modal from "../components/modal";
-import AcademicProgressView from "@/components/stats/AcademicProgressView.vue";
+import { useStore } from "vuex";
 export default {
   props: ["student", "size"],
   setup(props) {
+    const store = useStore();
     const char = () => {
       return (
         props.student &&
         props.student.name.split("").reverse().slice(0, 2).reverse().join("")
       );
     };
-    const openStatView = () => {
-      modal.showModal(AcademicProgressView, { fill: true, rect: true });
+    const openMenu = () => {
+      store.commit("ui/showMenu");
     };
-    return { char, openStatView };
+    return { char, openMenu };
   },
 };
 </script>
@@ -50,9 +50,9 @@ export default {
       font-size: 10px;
     }
     &.lg {
-      width: 48px;
-      height: 48px;
-      font-size: 10px;
+      width: 40px;
+      height: 40px;
+      font-size: 14px;
     }
   }
 }

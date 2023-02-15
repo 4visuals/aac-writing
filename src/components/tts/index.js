@@ -21,6 +21,9 @@ class TTS {
     if (option.clearPending) {
       clearPendings();
     }
+    if (localStorage.getItem("aac.skip.tts")) {
+      return Promise.resolve(text);
+    }
     const config = ttsStore.getVoiceConfig();
     var syn = new SpeechSynthesisUtterance(text);
     syn.lang = config.lang;
@@ -62,6 +65,9 @@ class PollyTts {
   speak(text) {
     if (text.length === 0) {
       return Promise.resolve();
+    }
+    if (localStorage.getItem("aac.skip.tts")) {
+      return Promise.resolve(text);
     }
     const textHash = md5(text.trim()).toString();
     const url = `${env.TTS_POLLY_PATH}/voices3/${textHash}.mp3`;

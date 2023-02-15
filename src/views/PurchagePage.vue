@@ -91,8 +91,6 @@ export default {
       products.value = res.products;
     });
 
-    store.commit("ui/setNavSize", { expanded: false, topPadding: 0 });
-
     return {
       bannerEl,
       products,

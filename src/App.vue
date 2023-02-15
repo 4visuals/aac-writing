@@ -53,7 +53,7 @@ import env from "@/service/env";
 import { logger } from "@/service/util";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from "vue";
+import { computed, onMounted, ref, shallowRef, watch } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
@@ -88,18 +88,16 @@ export default {
     };
 
     const wrapperEl = shallowRef(null);
-    const scrolling = (e) => {
-      const expanded = e.target.scrollTop < 40;
-      store.commit("ui/setNavSize", { expanded });
-    };
-    const option = {
-      passive: true,
-    };
+
     // eslint-disable-next-line no-unused-vars
     const captureHeight = () => {
       const h = window.visualViewport.height;
-      store.commit("ui/setAppHeight", h);
+      // store.commit("ui/setAppHeight", h);
       document.body.style.height = `${h}px`;
+    };
+    const installHeightResizer = () => {
+      window.visualViewport.addEventListener("resize", captureHeight);
+      captureHeight();
     };
     const hideModal = () => store.commit("modal/clear");
 
@@ -117,13 +115,8 @@ export default {
       { immediate: true }
     );
     onMounted(() => {
-      const el = wrapperEl.value;
-      el.addEventListener("scroll", scrolling, option);
       google.charts.load("50", { packages: ["corechart"] });
-    });
-    onUnmounted(() => {
-      const el = wrapperEl.value;
-      el.removeEventListener("scroll", scrolling, option);
+      installHeightResizer();
     });
     return {
       refreshRequired,

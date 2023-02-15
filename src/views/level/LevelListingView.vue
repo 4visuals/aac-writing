@@ -254,6 +254,9 @@ $border-color: #c1d9e8;
       padding-top: 10px;
       padding-bottom: 10px;
       padding-left: 64px;
+      @include mobile {
+        padding: 12px 0;
+      }
     }
   }
   .chap-title {
@@ -283,6 +286,14 @@ $border-color: #c1d9e8;
           width: 100%;
           height: auto;
           filter: drop-shadow(1px 1px 3px #0000009d);
+        }
+      }
+    }
+    @include mobile {
+      padding: 8px 4px;
+      .title {
+        .arrow {
+          display: none;
         }
       }
     }

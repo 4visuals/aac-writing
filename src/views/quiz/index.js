@@ -1,3 +1,6 @@
+/**
+ * @module quiz
+ */
 import { quizDao } from "../../dao";
 import QuizView from "./QuizView.vue";
 import quizStore from "./quizStore";
@@ -91,7 +94,7 @@ class Question {
      */
     this.data = sentence;
     /**
-     * 답변 리소스. 정답이 가장 마지막 element에 해당함
+     * 답변 리소스.
      */
     this.trials = [];
     this.data.eojeols.forEach((ej) => {
@@ -178,7 +181,21 @@ class QuizConfig {
   get section() {
     return this.options.section;
   }
+  get answerType() {
+    return this.options.answerType;
+  }
 }
+
+const resourceTextMap = {
+  W: "낱말",
+  S: "문장",
+  A: "교과서",
+};
+const modeTextMap = {
+  READING: "보고쓰기",
+  LEARNING: "연습하기",
+  QUIZ: "받아쓰기",
+};
 /**
   [OPTIONS]
   ### questionComponent:VueComponent
@@ -210,6 +227,8 @@ class QuizConfig {
 
   ### rememberAnswer:boolean(default false)
   문제를 앞뒤로 이동할때 이전에 입력한 답을 유지할 것인지. true이면 유지함. false이면 초기화함.
+
+  @module quiz/QuizContext
  */
 class QuizContext {
   /**
@@ -248,37 +267,70 @@ class QuizContext {
   get mode() {
     return this.options.mode;
   }
-  isLevelQuiz() {
-    return this.section.origin === "L";
-  }
-  isBookQuiz() {
-    return this.section.origin === "B";
-  }
   /**
    * @return 'W', 'S', or 'A'
    */
   get resourceType() {
     return this.config.options.quizResource;
   }
+  /**
+   * 낱말(W), 문장(S), 교과서(A) 반환
+   */
+  get resourceText() {
+    const rssType = this.resourceType;
+    return resourceTextMap[rssType];
+  }
   get ranges() {
     return this.config.ranges;
   }
   /**
-   * 낱말읽기, 문장읽기
+   * "1 ~ 10", "31 ~ 40"과 같은 범위를 텍스트료 반환함
+   *
+   * @param {string} delim
+   * @returns 문제의 범위를 나타내는 텍스트 형식
+   */
+  getRangeText(delim = " ~ ") {
+    let [start, end] = this.ranges;
+    start += 1;
+    return `${start < 10 ? "0" + start : start}${delim}${end}`;
+  }
+  /**
+   * 보고쓰기('READING'), 연습하기('LEARNING'), 받아쓰기('QUIZ')
+   * @returns
+   */
+  getModeText() {
+    return modeTextMap[this.mode] || `[${this.mode}]`;
+  }
+  /**
+   * 단계별 문제인지 나타냄
+   * @returns
+   */
+  isLevelQuiz() {
+    return this.section.origin === "L";
+  }
+  /**
+   * 교과서의 문제인지 나타냄
+   * @returns
+   */
+  isBookQuiz() {
+    return this.section.origin === "B";
+  }
+  /**
+   * 보고쓰기, 문장읽기
    * @returns boolean
    */
   isReadingMode() {
     return this.options.mode === "READING";
   }
   /**
-   * 낱말 받아쓰기, 낱말 학습, 문장 받아쓰기, 문장학습 모두
+   * 낱말 보고쓰기, 낱말 학습, 문장 보고쓰기, 문장학습 모두
    * @returns boolean
    */
   isLearningMode() {
     // https://github.com/4visuals/aac-writing/issues/27
-    // 받아쓰기('READING')를 [그림한글/문장/장면과 문장 보고쓰기]로 교체함
+    // 보고쓰기('READING')를 [그림한글/문장/장면과 문장 보고쓰기]로 교체함
     // 맞거나 틀리면 보상 그림이 나오도록 바뀜
-    // 받아쓰기 모드는 이제 의미가 없음
+    // 보고쓰기 모드는 이제 의미가 없음
     return this.options.mode !== "QUIZ";
   }
   /**
@@ -291,8 +343,12 @@ class QuizContext {
   isWord() {
     return this.config.options.quizResource === "W";
   }
+  /**
+   * 문제 형식이 sentence(S) or all(A)인 경우.
+   * 교과서의 모든 문제들도 문장들이지만 단계별 학습의 문장들과 구분하기 위해, S가 아닌 A로 입력되어 있음.
+   * @returns
+   */
   isSentence() {
-    // sentence(S) or all(A)인 경우
     return this.config.options.quizResource !== "W";
   }
   // get currentQuestion() {
@@ -309,27 +365,11 @@ class QuizContext {
   }
   getSegments(resourceType) {
     let type = resourceType || this.resourceType;
-    // "A(교과서)" - 교과서는 낱말이 없고 모두 문장으로 구성된 상태
-    type = type === "A" ? "S" : type;
-    const section = this.section;
-    const sentences = section.sentences.filter((sen) => sen.type === type);
-    const segments = [...Array(sentences.length / 10).keys()].map((index) => {
-      const label = `${index * 10 + 1}-${index * 10 + 10}`;
-      return new Segment(
-        index,
-        10 * index,
-        10,
-        label,
-        colors[index],
-        sentences,
-        this.ranges
-      );
-    });
-
-    return segments;
+    return Segment.createSegments(this.section, type);
   }
   /**
-   * 단게별 문제와 달리 교과서 문제인 경우 각각의 문항은 문장('S')으로 구성됨.
+   * 단게별 문제와 달리 교과서 문제인 경우 A로 입력되어 있음.
+   * 문항의 타입은 문장입니다.
    * @returns 'W' | 'S'
    */
   getQuestionType() {
@@ -338,13 +378,13 @@ class QuizContext {
   }
 }
 /**
- * quizMode - 받아쓰기('READING'), 학습('LEARNING') OR 테스트('QUIZ') 모드
+ * quizMode - 보고쓰기('READING'), 학습('LEARNING') OR 테스트('QUIZ') 모드
  * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
  * section - secion seq
  * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
  * license - 퀴즈 결과를 저장할 수강증 SEQ
  *
- * @param {{quizMode,  answerType, section, quizResource, license, prevPage }} quiz 옵션
+ * @param {{quizMode,  answerType, section, quizResource, prevPage, seqs, license, prevPage }} quiz 옵션
  */
 const loadSentenceQuiz = ({
   quizMode,

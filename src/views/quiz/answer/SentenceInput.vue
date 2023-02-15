@@ -197,7 +197,7 @@ export default {
 .text-input {
   display: flex;
   column-gap: 1rem;
-  padding-bottom: 2rem;
+
   position: relative;
   input.dummy {
     position: absolute;

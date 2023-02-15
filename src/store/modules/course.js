@@ -10,6 +10,21 @@ const assignLevel = (chapters) => {
     });
   });
 };
+/**
+ * section들을 linked list로 연결함
+ * (퀴즈를 끝낸 후 "다음 문제"로 이동하는 기능에 필요함)
+ * @param {object} chapters
+ */
+const assignNext = (chapters) => {
+  const sections = chapters.flatMap((chapter) => chapter.sections);
+  let prevSection = null;
+  sections.forEach((section) => {
+    if (prevSection) {
+      prevSection.next = section;
+    }
+    prevSection = section;
+  });
+};
 export default {
   namespaced: true,
   state: () => ({ chapters }),
@@ -40,6 +55,8 @@ export default {
       // 교과서는 level이 0
       // 위치값으로 level을 부여함
       assignLevel(state.chapters.books);
+      assignNext(state.chapters.levels);
+      assignNext(state.chapters.books);
     },
   },
   actions: {

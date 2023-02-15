@@ -16,6 +16,7 @@
         yellow: theme === 'yellow',
         purple: theme === 'purple',
         brown: theme === 'brown',
+        red: theme === 'red',
       }"
       @click.stop="clicked"
     >
@@ -131,6 +132,15 @@ export default {
         font-size: 14px;
       }
     }
+    @include mobile {
+      button {
+        width: 90px;
+        span.inner {
+          font-weight: 400;
+          font-size: 12px;
+        }
+      }
+    }
   }
   &.section {
     button {
@@ -206,6 +216,16 @@ export default {
       &.invert {
         color: white;
         background-color: #865900;
+      }
+    }
+    &.red {
+      color: #d03c19;
+      &.fill {
+        background-color: #fff;
+      }
+      &.invert {
+        color: white;
+        background-color: #d03c19;
       }
     }
     &.purple {

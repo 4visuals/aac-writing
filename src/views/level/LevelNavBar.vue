@@ -1,21 +1,26 @@
 <template>
   <div class="header">
     <div class="title">
-      <h3>
+      <h3 class="text-ellipsis">
         <ActionIcon
           class="icon"
           icon="expand_circle_down"
           @click="$emit('back', 'back')"
         />
         <span class="main">{{ title() }}</span
-        ><span class="sub">{{ section.description }}</span>
+        ><span class="sub text-ellipsis">{{ section.description }}</span>
       </h3>
-      <SpanText class="overview" @click="$emit('overview')">학습 안내</SpanText>
+      <SpanText class="overview" @click="$emit('overview')"
+        ><AppIcon icon="info" fsize="24px" /><span class="label"
+          >학습 안내</span
+        ></SpanText
+      >
       <SwitchButton
         v-model:selected="wordMode"
         :disabled="quizOnly"
         onText="낱말"
         offText="문장"
+        class="switch"
       />
       <ActionIcon class="icon" icon="cancel" @click="$emit('back', 'close')" />
     </div>
@@ -55,9 +60,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 $padding: 16px;
 .header {
-  padding: 13px $padding;
+  padding: 8px $padding;
   background-color: #4b7bec;
   color: white;
   .title {
@@ -72,7 +78,7 @@ $padding: 16px;
       .main {
         padding-left: 16px;
         font-weight: 600;
-        line-height: 42px;
+        white-space: nowrap;
       }
       .sub {
         margin-left: 16px;
@@ -82,10 +88,40 @@ $padding: 16px;
     }
     .overview {
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      column-gap: 4px;
+      .label {
+        white-space: nowrap;
+      }
+      @include mobile {
+        .label {
+          display: none;
+        }
+      }
+    }
+    .switch {
+      flex: 0 0 auto;
     }
     .icon {
       font-size: 32px;
       transform: rotate(90deg);
+    }
+  }
+}
+@include mobile {
+  .header {
+    padding: 8px;
+    .title {
+      h3 {
+        .main {
+          padding-left: 8px;
+          font-size: 16px;
+        }
+      }
+      .icon {
+        font-size: 24px;
+      }
     }
   }
 }

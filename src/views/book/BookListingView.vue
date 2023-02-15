@@ -228,6 +228,9 @@ $border-color: #a69059;
       padding-top: 10px;
       padding-bottom: 10px;
       padding-left: 64px;
+      @include mobile {
+        padding: 12px 0;
+      }
     }
   }
   .chap-title {

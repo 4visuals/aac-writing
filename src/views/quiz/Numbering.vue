@@ -1,7 +1,7 @@
 <template>
   <div class="numbering" :class="[theme.name]">
-    <div class="desc">
-      <p>{{ rss }} {{ desc }}</p>
+    <div class="desc text-ellipsis">
+      <p class="text-ellipsis">{{ rss }} {{ desc }}</p>
       <button class="nude speaker" @click="$emit('speak')"></button>
     </div>
     <div class="bars">
@@ -62,12 +62,18 @@ $inactive-bgc: #eee9fe;
 
 .numbering {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  column-gap: 16px;
   margin: 0 10%;
   font-size: 2rem;
   font-weight: 600;
   position: relative;
   padding: 16px 0;
+  @include mobile {
+    margin: 0 16px;
+    font-size: 14px;
+    padding: 8px 0;
+  }
 
   &.blue {
     color: #3867d6;
@@ -107,10 +113,15 @@ $inactive-bgc: #eee9fe;
     align-items: center;
     column-gap: 8px;
     .speaker {
-      width: 32px;
-      height: 32px;
       background-size: contain;
       mask-image: url("/img/speaker.svg");
+      width: 32px;
+      height: 32px;
+      mask-size: contain;
+      @include mobile {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
   .bars {
@@ -133,27 +144,17 @@ $inactive-bgc: #eee9fe;
           background-color: $active-bgc;
         }
       }
+      .num {
+        font-size: 16px;
+        @include mobile {
+          font-size: 12px;
+        }
+      }
       .bar {
         height: 10px;
         width: 100%;
         background-color: $inactive-bgc;
       }
-    }
-  }
-
-  @include mobile {
-    .num {
-      font-size: 16px;
-    }
-  }
-  @include tablet {
-    .num {
-      font-size: 16px;
-    }
-  }
-  @include desktop {
-    .num {
-      font-size: 16px;
     }
   }
   .scrollable {

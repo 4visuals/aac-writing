@@ -70,7 +70,7 @@ const themes = {
 };
 class UI {
   constructor() {
-    this.nav = { height: 120, expanded: true };
+    this.nav = { visible: true };
     this.topPadding = 120;
     this.bg = {
       visible: true,
@@ -157,12 +157,8 @@ export default {
     setAppHeight(state, h) {
       state.ui.setAppHeight(h);
     },
-    setNavSize(state, { expanded, topPadding }) {
-      state.ui.nav.expanded = expanded;
-      state.ui.nav.height = expanded ? 120 : 56;
-      if (Number.isInteger(topPadding)) {
-        state.ui.topPadding = topPadding;
-      }
+    setNavVisible(state, visible) {
+      state.ui.nav.visible = visible;
     },
     showReward(state, spec) {
       state.ui.showReward(spec);

@@ -1,7 +1,7 @@
 <template>
   <span
     class="i material-icons-outlined"
-    :style="`--icon-font-size: ${fsize || '18px'} `"
+    :style="`--icon-font-size: ${fsize} `"
   >
     {{ icon }}
   </span>
@@ -16,6 +16,7 @@ export default {
     },
     fsize: {
       type: String,
+      default: "18px",
     },
   },
   setup() {

@@ -1,7 +1,7 @@
 <template>
   <div class="menu-wrapper">
     <Transition name="dimmer">
-      <div class="dimmer" v-if="slider" @click="hide"></div>
+      <div class="modal-dimmer" v-if="slider" @click="hide"></div>
     </Transition>
     <Transition name="slider" @after-leave="store.commit('ui/hideMenu')">
       <div class="menu-body" v-if="slider">
@@ -84,17 +84,11 @@ export default {
   right: 0;
   z-index: 200;
   height: 100%;
-  .dimmer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #7777774d;
-  }
+
   .menu-body {
     height: 100%;
     width: 300px;
+    margin-left: auto;
     background-color: white;
     position: relative;
     box-shadow: 2px 0 6px #0000004d;
@@ -114,7 +108,7 @@ export default {
 
   .slider-enter-from {
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
   .slider-enter-active {
     transition: transform 0.15s ease-out, opacity 0.15s ease-out;
@@ -122,7 +116,7 @@ export default {
 
   .slider-leave-to {
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
   .slider-leave-active {
     transition: transform 0.15s ease-out, opacity 0.15s ease-out;

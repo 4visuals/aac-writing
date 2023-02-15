@@ -1,58 +1,21 @@
 <template>
   <div class="q-result">
-    <div class="result-nav">
-      <div class="chart-view">
-        <StaticButton
-          class="tab-item"
-          text="시험 결과"
-          @click="chart = 'CUR'"
-        />
-        <StaticButton
-          class="tab-item"
-          text="전체 결과"
-          @click="chart = 'SECTION'"
-        />
-      </div>
-    </div>
-    <div class="ready" v-if="chart === 'UPLOADING'">
-      <h3>결과 화면 준비중</h3>
-    </div>
-    <template v-else-if="chart === 'CUR'">
-      <WordExamResult
-        v-if="ctx.isQuizMode() || ctx.isWord()"
-        :questions="ctx.questions"
-        :maxTrial="maxTrial"
-        :getTrialAt="getTrialAt"
-        :answerClass="answerClass"
-      />
-      <SentenceExamResult
-        v-else-if="ctx.isSentence()"
-        :questions="ctx.questions"
-      />
-    </template>
-    <SectionLineChart v-else-if="chart === 'SECTION'" />
-    <div class="footer">
-      <AacButton text="완료" theme="blue" inline @click="closeQuiz" />
-    </div>
+    <div v-if="ctx.isQuizMode()" class="half"><ScoreView /></div>
+    <div :class="{ half: ctx.isQuizMode() }"><NavControllView /></div>
   </div>
 </template>
 
 <script>
-import WordExamResult from "./WordExamResult.vue";
-import SentenceExamResult from "./SentenceExamResult.vue";
-import { SectionLineChart } from "../chart";
-import { AacButton, StaticButton } from "@/components/form";
 import { useStore } from "vuex";
 import api from "@/service/api";
 import { useRouter } from "vue-router";
 import { nextTick, onMounted, ref } from "@vue/runtime-core";
+import ScoreView from "./ScoreView.vue";
+import NavControllView from "./NavControllView.vue";
 export default {
   components: {
-    SentenceExamResult,
-    WordExamResult,
-    AacButton,
-    StaticButton,
-    SectionLineChart,
+    ScoreView,
+    NavControllView,
   },
   setup() {
     const router = useRouter();
@@ -111,6 +74,11 @@ export default {
         chart.value = "CUR";
       });
     };
+    /**
+     * [문장] 어절 단위로 입력받음
+     * [낱말] 한 어절짜리 문장으로 취급. 학생의 입력을 어절로 이동시킴.
+     *
+     */
     const uploadLearning = () => {
       const mode = ctx.mode;
       const exam = {
@@ -184,29 +152,15 @@ export default {
 </script>
 <style lang="scss" scoped>
 .q-result {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white;
-  z-index: 10;
+  flex: 1 1 auto;
   display: flex;
-  flex-direction: column;
-  .result-nav {
+
+  .half {
+    flex: 0 0 50%;
+    position: relative;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    h3 {
-      flex: 1 1 auto;
-    }
-    .chart-view {
-      display: flex;
-      font-size: 1.3rem;
-      .tab-item {
-        padding: 0.25rem 0.6rem;
-      }
-    }
+    overflow: auto;
+    height: 100%;
   }
   .trials {
     flex: 1 1 auto;
