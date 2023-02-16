@@ -1,15 +1,17 @@
 <template>
   <div class="header">
     <div class="title">
-      <h3>
+      <h3 class="text-ellipsis">
         <ActionIcon
           class="icon"
           icon="expand_circle_down"
           @click="$emit('back', 'back')"
         />
-        <span class="main">{{ title() }}</span>
+        <span class="main text-ellipsis">{{ title() }}</span>
       </h3>
-      <SpanText>{{ section.chapter.desc }}</SpanText>
+      <SpanText class="overview text-ellipsis">{{
+        section.chapter.desc
+      }}</SpanText>
       <ActionIcon class="icon" icon="cancel" @click="$emit('back', 'close')" />
     </div>
   </div>
@@ -46,6 +48,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 $padding: 16px;
 .header {
   padding: 13px $padding;
@@ -73,10 +76,40 @@ $padding: 16px;
     }
     .overview {
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      column-gap: 4px;
+      .label {
+        white-space: nowrap;
+      }
+      @include mobile {
+        .label {
+          display: none;
+        }
+      }
+    }
+    .switch {
+      flex: 0 0 auto;
     }
     .icon {
       font-size: 32px;
       transform: rotate(90deg);
+    }
+  }
+}
+@include mobile {
+  .header {
+    padding: 8px;
+    .title {
+      h3 {
+        .main {
+          padding-left: 8px;
+          font-size: 16px;
+        }
+      }
+      .icon {
+        font-size: 24px;
+      }
     }
   }
 }
