@@ -20,7 +20,7 @@ class Trial {
     return trials[0].value === this.text;
   }
   get orderInSection() {
-    const idx = this.q.offsetInSection + 1;
+    const idx = this.q.numberInSection + 1;
     return (idx < 10 ? "0" : "") + idx;
   }
 }

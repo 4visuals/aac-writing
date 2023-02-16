@@ -33,7 +33,7 @@ export default {
     };
     const closeQuiz = () => {
       router.replace({
-        name: ctx.prevPage.back,
+        name: ctx.getMainPath(),
       });
       store.commit("ui/hideReward");
       store.commit("ui/hideMenu");

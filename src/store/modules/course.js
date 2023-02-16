@@ -3,6 +3,29 @@ const chapters = {
   levels: [],
   books: [],
 };
+/**
+ * section을 구성하는 문제들(낱말, 문장)에 문항 번호를 기록함.
+ *
+ * 기존에는 10개씩 segment단위로 퀴즈를 풀었으나,
+ * 오답 다시 풀기 기능이 추가되면서 임의의 문제들만 따로 모아서 퀴즈를 제공해야 함.
+ * 이러한 임의의 문제들마다 원래 section 내에서 문항 번호를 기록해야
+ * 퀴즈 화면에서 현재 풀고 있는 문항 번호를 올바로 출력할 수 있음.
+ *
+ * @param {object} section
+ */
+const assignNumber = (section) => {
+  // 단계별 chapter는 section마다 문장이 10개 등장한 후 나머지는 낱말로 구성됨
+  // 교과서 chapter는 모든 section이 문장으로 구성됨
+  // 문항 번호는 zero-based index로 기록함
+  const sentences = section.sentences.filter((sen) => sen.type === "S");
+  sentences.forEach((sen, index) => {
+    sen.numberInSection = index;
+  });
+  const words = section.sentences.filter((sen) => sen.type === "W");
+  words.forEach((sen, index) => {
+    sen.numberInSection = index;
+  });
+};
 const assignLevel = (chapters) => {
   chapters.forEach((chapter) => {
     chapter.sections.forEach((section, index) => {
@@ -48,6 +71,7 @@ export default {
           sec.origin = chapter.origin;
           // 양방향 바인딩
           sec.chapter = chapter;
+          assignNumber(sec);
         });
       });
       state.chapters.levels = data.filter((chapter) => chapter.origin === "L");

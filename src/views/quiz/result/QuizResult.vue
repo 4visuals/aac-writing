@@ -8,8 +8,7 @@
 <script>
 import { useStore } from "vuex";
 import api from "@/service/api";
-import { useRouter } from "vue-router";
-import { nextTick, onMounted, ref } from "@vue/runtime-core";
+import { onMounted } from "@vue/runtime-core";
 import ScoreView from "./ScoreView.vue";
 import NavControllView from "./NavControllView.vue";
 export default {
@@ -18,37 +17,13 @@ export default {
     NavControllView,
   },
   setup() {
-    const router = useRouter();
     const store = useStore();
-    const chart = ref("UPLOADING");
     const ctx = store.state.quiz.quizContext;
-    const { questions } = ctx;
-    const maxTrial = questions.reduce(
-      (max, q) => Math.max(q.trials.length, max),
-      0
-    );
-    const getTrialAt = (question, index) => {
-      if (question.trials.length === 0) {
-        return "-";
-      }
-      const trial = question.trials[index];
-      return (trial && (trial.value || "미입력")) || "미입력";
-    };
-    const answerClass = (question, index) => {
-      const trial = question.trials[index];
-      return trial ? "" + trial.correct : "";
-    };
-    const sectionTitle = () => {
-      const section = store.getters["course/section"](
-        questions[0].data.sectionRef
-      );
-      return section.description;
-    };
+
     const uploadExam = () => {
       const { resourceType, ranges } = ctx;
       if (resourceType === "A" && ranges[1] === 0) {
         // 교과서 종합(랜덤) 문제이므로 서버에 업로드하지 않아야 함
-        chart.value = "CUR";
         return;
       }
       const mode = ctx.mode;
@@ -70,9 +45,7 @@ export default {
         });
       });
 
-      api.exam.submitExam(exam).then(() => {
-        chart.value = "CUR";
-      });
+      api.exam.submitExam(exam).then(() => {});
     };
     /**
      * [문장] 어절 단위로 입력받음
@@ -117,17 +90,7 @@ export default {
         return question.eojeols.flatMap((ej) => ej.trials);
       });
       exam.submissions = trials;
-      api.exam.submitLearning(exam).then(() => {
-        chart.value = "CUR";
-      });
-    };
-    const closeQuiz = () => {
-      router.replace({
-        name: ctx.prevPage,
-      });
-      nextTick().then(() => {
-        store.commit("quiz/closeQuiz");
-      });
+      api.exam.submitLearning(exam).then(() => {});
     };
     onMounted(() => {
       store.commit("quiz/hideHint");
@@ -139,13 +102,6 @@ export default {
     });
     return {
       ctx,
-      chart,
-      questions,
-      maxTrial,
-      getTrialAt,
-      answerClass,
-      sectionTitle,
-      closeQuiz,
     };
   },
 };

@@ -14,7 +14,6 @@
 
 <script>
 import { useStore } from "vuex";
-// import SentenceExamResult from "./SentenceExamResult.vue";
 import WordExamResult from "./WordExamResult.vue";
 import Scoring from "./scoring";
 import { ref } from "vue";

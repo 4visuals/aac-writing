@@ -58,23 +58,16 @@ import { computed, ref, watch } from "vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { quizDao } from "@/dao";
-// import { SwitchButton } from "@/components/form";
 import QuestionList from "@/components/QuestionList.vue";
-import quiz from "@/views/quiz";
 import { useStore } from "vuex";
-// import { ActionIcon } from "../../components/form";
-// import SpanText from "../../components/text/SpanText.vue";
 import Slide from "@/components/slide/Slide.vue";
 import LevelNavBar from "./LevelNavBar.vue";
+import QuizSpec from "../quiz/type-quiz-spec";
 
 export default {
   components: {
-    // SwitchButton,
     Slide,
     QuestionList,
-    // ParaText,
-    // ActionIcon,
-    // SpanText,
     LevelNavBar,
   },
   setup(props, { emit }) {
@@ -92,7 +85,7 @@ export default {
     const overviewVisible = ref(false);
 
     /**
-     * 받아쓰기("READING"), 학습모드('LEARNING') 또는 시험모드('QUIZ')
+     * 보고쓰기("READING"), 연습하기('LEARNING') 또는 받아쓰기('QUIZ')
      */
     const quizModeRef = ref(null);
     /**
@@ -127,27 +120,18 @@ export default {
         alert("학생을 선택해주세요");
         return;
       }
-      // const quizMode = quizModeRef.value;
+
       const sectionSeq = cate.value.seq;
       const quizResource = wordMode.value ? "W" : "S";
-      /*
-       * 단어 학습인 경우 무조건 받아쓰기 모드
-       */
-      const ansType = quizResource === "W" ? "SEN" : answerType;
-      quiz
-        .prepareQuiz({
-          quizMode,
-          answerType: ansType,
-          section: sectionSeq,
-          quizResource,
-          license: activeLicense.value.seq,
-          prevPage: {
-            back: "LevelListingView",
-            close: `/level/section/${sectionSeq}`,
-          },
-          sentenceFilter: () => group.sentences,
-          ranges: [group.start, group.end],
-        })
+
+      QuizSpec.prepareLevelQuiz(
+        quizMode,
+        answerType,
+        cate.value,
+        quizResource,
+        () => group.sentences,
+        [group.start, group.end]
+      )
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
         })
@@ -165,9 +149,6 @@ export default {
         quizResource,
         mode
       );
-      // .then((res) => {
-      //   quizHistories.value.push(...res);
-      // });
     };
 
     const replace = (arrayRef, elems) => {
@@ -175,7 +156,7 @@ export default {
       arrayRef.value.push(...elems);
     };
     /**
-     * @param quizMode 받아쓰기("READING"), 학습모드('LEARNING') 또는 시험모드('QUIZ')
+     * @param quizMode 보고쓰기("READING"), 연습하기('LEARNING') 또는 받아쓰기('QUIZ')
      * @param answerType 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
      */
     const listQuestions = (quizMode, answerType) => {
@@ -273,32 +254,6 @@ $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
       font-size: 2.5rem;
     }
   }
-  /*
-  &.blue {
-    .header {
-      background-color: #4b7bec;
-      color: white;
-    }
-  }
-  &.brown {
-    .header {
-      background-color: #ffd110;
-      color: #865900;
-    }
-  }
-  &.pink {
-    .header {
-      background-color: var(--aac-color-pink-400);
-      color: var(--aac-color-pink-900);
-    }
-  }
-  &.green {
-    .header {
-      background-color: var(--aac-color-green-400);
-      color: var(--aac-color-green-900);
-    }
-  }
-  */
   .body {
     display: flex;
     flex: 1 1 auto;

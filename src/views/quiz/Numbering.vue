@@ -12,7 +12,7 @@
         :class="{ current: q.index <= currentQuestion.index }"
       >
         <div v-if="q.index <= currentQuestion.index" class="num">
-          {{ q.offsetInSection + 1 }}
+          {{ q.numberInSection + 1 }}
         </div>
         <div v-else class="num"></div>
         <div class="bar"></div>
@@ -24,7 +24,6 @@
 <script>
 import { computed } from "vue";
 import { useStore } from "vuex";
-// import quizStore from "./quizStore";
 
 export default {
   props: ["theme"],

@@ -8,9 +8,8 @@ import ScenePicView from "./question/ScenePicView.vue";
 import EojelInput from "./answer/EojelInput.vue";
 import SentenceInput from "./answer/SentenceInput.vue";
 import { shallowRef, watch } from "vue";
-// import api from "@/service/api";
 import store from "@/store";
-import storage from "@/service/storage";
+import QuizSpec from "./type-quiz-spec";
 
 const answerComponents = new Map();
 answerComponents.set("EJ", shallowRef(EojelInput));
@@ -144,10 +143,10 @@ class Question {
     return correct;
   }
   /**
-   * section내에서의 index. 첫번째 문제는 0
+   * section내에서의 문항 번호. 첫번째 문제는 0
    */
-  get offsetInSection() {
-    return this.config.options.ranges[0] + this.index;
+  get numberInSection() {
+    return this.data.numberInSection;
   }
   get text() {
     return this.data.sentence.trim();
@@ -160,26 +159,18 @@ class QuizConfig {
   /**
    *
    * @param {Array[sentence]} resources
-   * @param {{
-          quizMode,
-          answerType,
-          section,
-          quizResource,
-          ranges
-        }} options
+   * @param {QuizSpec} quizSpec
    */
-  constructor(resources, options) {
+  constructor(resources, section, quizSpec) {
     this.resources = resources;
-    this.options = options;
+    this.section = section;
+    this.options = quizSpec;
   }
   get quizLength() {
     return this.resources.length;
   }
   get ranges() {
     return this.options.ranges;
-  }
-  get section() {
-    return this.options.section;
   }
   get answerType() {
     return this.options.answerType;
@@ -233,6 +224,7 @@ const modeTextMap = {
 class QuizContext {
   /**
    *
+   * @param {QuizConfig} config
    * @param {[Question]} questions
    * @param {{questionComponent, answerCompoent, symbolConfig, maxTrials, autoSlide, rewardForCorrect, rewardForWrong, config}} options
    */
@@ -256,10 +248,10 @@ class QuizContext {
     return this.options.license;
   }
   get sectionSeq() {
-    return this.config.options.section.seq;
+    return this.config.section.seq;
   }
   get section() {
-    return this.config.options.section;
+    return this.config.section;
   }
   get prevPage() {
     return this.config.options.prevPage;
@@ -323,7 +315,10 @@ class QuizContext {
     return this.options.mode === "READING";
   }
   /**
-   * 낱말 보고쓰기, 낱말 학습, 문장 보고쓰기, 문장학습 모두
+   * 낱말 보고쓰기,
+   * 낱말 연습하기,
+   * 문장 보고쓰기,
+   * 문장 보고쓰기
    * @returns boolean
    */
   isLearningMode() {
@@ -351,9 +346,6 @@ class QuizContext {
   isSentence() {
     return this.config.options.quizResource !== "W";
   }
-  // get currentQuestion() {
-  //   return this.currentQuestion;
-  // }
   setQuestionAt(idx) {
     this._currentIndex = idx;
     this.currentQuestion = this.questions[this._currentIndex];
@@ -376,25 +368,26 @@ class QuizContext {
     const type = this.resourceType;
     return type === "A" ? "S" : type;
   }
+  getMainPath() {
+    const { prevPage } = this.config.options;
+    return prevPage.main;
+  }
+  getSectionPath() {
+    const quizSpec = this.config.options;
+    return `${quizSpec.prevPage.section}/${quizSpec.section}`;
+  }
 }
 /**
- * quizMode - 보고쓰기('READING'), 학습('LEARNING') OR 테스트('QUIZ') 모드
- * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
- * section - secion seq
- * quizResource - 'S(sentence)' or 'W(word)' or 'A(all)'
- * license - 퀴즈 결과를 저장할 수강증 SEQ
- *
- * @param {{quizMode,  answerType, section, quizResource, prevPage, seqs, license, prevPage }} quiz 옵션
+ * 새로운 퀴즈 준비
+ * @param {QuizSpec} quizSpec
  */
-const loadSentenceQuiz = ({
-  quizMode,
-  answerType,
-  section,
-  quizResource,
-  prevPage,
-  seqs, // list of sentence seq
-  ranges,
-}) => {
+const loadSentenceQuiz = (quizSpec) => {
+  const {
+    quizMode,
+    answerType,
+    section,
+    seqs, // list of sentence seq
+  } = quizSpec;
   const questionComponent = shallowRef(ScenePicView);
   const answerCompName =
     typeof answerType === "string" ? answerType : answerType.comp;
@@ -418,14 +411,7 @@ const loadSentenceQuiz = ({
         const sentences = seqs.map((seq) =>
           sec.sentences.find((sen) => sen.seq === seq)
         );
-        const config = new QuizConfig(sentences, {
-          quizMode,
-          answerType,
-          section: sec,
-          quizResource,
-          prevPage,
-          ranges,
-        });
+        const config = new QuizConfig(sentences, sec, quizSpec);
         const questions = sentences.map(
           (sen, index) => new Question(config, index, sen)
         );
@@ -452,50 +438,10 @@ const loadSentenceQuiz = ({
     );
   });
 };
-const loadQuiz = () => {
-  const quizSpec = storage.session.read("quizSpec");
-  return loadSentenceQuiz(quizSpec);
-};
-const prepareQuiz = ({
-  quizMode,
-  answerType,
-  section,
-  quizResource,
-  license,
-  prevPage,
-  sentenceFilter,
-  ranges,
-}) => {
-  const sections = store.getters["course/sections"];
-  const sec = sections.find((sec) => sec.seq === section);
-  return new Promise((resolve, reject) => {
-    if (!sec) {
-      reject("NO_SECTION");
-      return;
-    }
-    // const senFilter = sentenceFilters[quizResource];
-    const sentences = sentenceFilter(sec.sentences);
-    if (sentences.length === 0) {
-      reject({ cause: "NO_QUIZ", resource: quizResource });
-      return;
-    }
-    const seqs = sentences.map((sen) => sen.seq);
-    storage.session.write("quizSpec", {
-      quizMode,
-      answerType,
-      section,
-      quizResource,
-      license,
-      prevPage,
-      seqs, // list of sentence seq
-      ranges, // [startOffset, endOffset) in a section
-    });
-    resolve();
-  });
-};
+
+const loadQuiz = () => loadSentenceQuiz(QuizSpec.loadQuizSpec());
+
 export { Segment, Question, QuizContext, QuizView };
 export default {
-  loadSentenceQuiz,
-  prepareQuiz,
   loadQuiz,
 };

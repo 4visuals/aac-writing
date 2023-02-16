@@ -143,11 +143,17 @@ export default {
       //   }
       holdSoftKeyboard();
     };
+    /**
+     * section 상세 페이지 경로
+     */
     const gotoSection = () => {
-      router.replace(ctx.value.prevPage.close);
+      router.replace(ctx.value.getSectionPath());
     };
+    /**
+     * chapter 페이지 경로(단계별, 교과서)
+     */
     const closeQuiz = () => {
-      router.replace({ name: ctx.value.prevPage.back });
+      router.replace({ name: ctx.value.getMainPath() });
     };
     /**
      * 새로운 퀴즈 시작
@@ -156,28 +162,15 @@ export default {
      * @param {object} nextSection
      */
     const startQuiz = (quizContext, segment, section) => {
-      const ctx = quizContext.value;
-      const quizMode = ctx.mode;
-      const { answerType } = ctx.config;
-      const { resourceType } = ctx;
-      quiz
-        .prepareQuiz({
-          quizMode,
-          answerType,
-          section: section.seq,
-          quizResource: resourceType,
-          license: ctx.license.seq,
-          prevPage: ctx.prevPage,
-          sentenceFilter: () => segment.getSentences(),
-          ranges: [segment.start, segment.end],
-        })
+      const quizSpec = quizContext.value.config.options;
+      quizSpec
+        .reload(section, [segment.start, segment.end], () =>
+          segment.getSentences()
+        )
         .then(() => {
           store.commit("ui/hideMenu");
           store.commit("quiz/hideHint");
           quiz.loadQuiz();
-        })
-        .catch((e) => {
-          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
         });
     };
     /**
