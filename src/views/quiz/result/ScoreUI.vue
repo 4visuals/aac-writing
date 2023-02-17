@@ -1,18 +1,25 @@
 <template>
-  <div class="score abs-center">
-    <h3>{{ score }}점!!</h3>
-    <div class="ctrl">
-      <AppButton
-        text="오답확인"
-        theme="red"
-        size="nav"
-        :invert="true"
-        :fill="true"
-        @click="$emit('view-answer')"
-        borderColor="#d03c19"
-      />
+  <Transition name="trs-scale-grow" appear>
+    <div class="score">
+      <video v-if="score === 100" width="100%" autoplay loop muted>
+        <source :src="score100" type="video/webm" />
+      </video>
+      <template v-else>
+        <h3>{{ score.toFixed(0) }}점!!</h3>
+        <div class="ctrl">
+          <AppButton
+            text="오답확인"
+            theme="red"
+            size="nav"
+            :invert="true"
+            :fill="true"
+            @click="$emit('view-answer')"
+            borderColor="#d03c19"
+          />
+        </div>
+      </template>
     </div>
-  </div>
+  </Transition>
 </template>
 
 <script>
@@ -24,7 +31,8 @@ export default {
   },
   emits: ["view-answer"],
   setup() {
-    return {};
+    const score100 = require("@/assets/reward/score-100.webm");
+    return { score100 };
   },
 };
 </script>
@@ -36,6 +44,10 @@ export default {
   align-items: center;
   justify-content: center;
   row-gap: 24px;
+  overflow: hidden;
+  video {
+    width: 90%;
+  }
   h3 {
     font-family: "NanumSquareRound";
     font-size: 10vmin;

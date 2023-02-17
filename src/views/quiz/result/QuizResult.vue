@@ -1,7 +1,9 @@
 <template>
   <div class="q-result">
-    <div v-if="ctx.isQuizMode()" class="half"><ScoreView /></div>
-    <div :class="{ half: ctx.isQuizMode() }"><NavControllView /></div>
+    <div v-if="ctx.isQuizMode()" class="left half"><ScoreView /></div>
+    <div class="right" :class="[ctx.isQuizMode() ? 'half' : 'one']">
+      <NavControllView />
+    </div>
   </div>
 </template>
 
@@ -107,20 +109,35 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .q-result {
   flex: 1 1 auto;
   display: flex;
 
+  .one {
+    flex: 0 0 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    height: 100%;
+  }
   .half {
     flex: 0 0 50%;
     position: relative;
     display: flex;
+    justify-content: center;
     overflow: auto;
     height: 100%;
   }
+  .right {
+    background-color: #f9f9f9;
+  }
   .trials {
     flex: 1 1 auto;
-    overflow: auto;
+  }
+  @include mobile {
+    flex-direction: column;
   }
 }
 </style>

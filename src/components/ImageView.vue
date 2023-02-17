@@ -14,7 +14,6 @@ export default {
     const clicked = (e) => {
       e.stopPropagation();
       e.preventDefault();
-      console.log("[!!]", e);
       emit("clicked", e);
     };
     watch(

@@ -1,9 +1,16 @@
 <template>
   <div class="scene" :class="{ fillH: fillHeight }">
-    <ImageView
-      :imgPath="question.isWord() ? symbolUrl() : sceneUrl()"
-      @click="speak"
-    />
+    <Transition
+      name="trs-scale-grow"
+      mode="out-in"
+      appear
+      :key="question.index"
+    >
+      <ImageView
+        :imgPath="question.isWord() ? symbolUrl() : sceneUrl()"
+        @click="speak"
+      />
+    </Transition>
   </div>
 </template>
 
