@@ -21,7 +21,7 @@ class TTS {
     if (option.clearPending) {
       clearPendings();
     }
-    if (localStorage.getItem("aac.skip.tts")) {
+    if (localStorage.getItem("aac.skip.tts") === "true") {
       return Promise.resolve(text);
     }
     const config = ttsStore.getVoiceConfig();
@@ -66,7 +66,7 @@ class PollyTts {
     if (text.length === 0) {
       return Promise.resolve();
     }
-    if (localStorage.getItem("aac.skip.tts")) {
+    if (localStorage.getItem("aac.skip.tts") === "true") {
       return Promise.resolve(text);
     }
     const textHash = md5(text.trim()).toString();
