@@ -2,8 +2,8 @@ import storage from "@/service/storage";
 
 class QuizSpec {
   /**
-   * quizMode - 보고쓰기('READING'), 연습하기('LEARNING') OR 받아쓰기('QUIZ') 모드
-   * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN')
+   * quizMode - 보고쓰기('READING'), 연습하기('LEARNING'), 받아쓰기('QUIZ'), 듣고쓰기('LISTEN') 모드
+   * answerType -  정답 입력 컴포넌트 종류. 어절 선택('EJ') or 받아쓰기('SEN') 없음('NULL')
    * section - secion sequence(number)
    * quizResource - 'S'(문장) or 'W'(낱말) or 'A'(교과서, 문장으로 해석)
    * prevPage - 퀴즈 종료 후 복귀할 화면 정보
@@ -78,8 +78,8 @@ const prepareQuiz = (
 
 /**
  * 교과서 퀴즈 생성
- * @param {String} quizMode - 보고쓰기('READING'), 연습하기('LEARNING'), 받아쓰기('QUIZ')
- * @param {String} answerType - 'SEN'(문장 입려기), 'EJ'(어절 입력기)
+ * @param {String} quizMode - 보고쓰기('READING'), 연습하기('LEARNING'), 받아쓰기('QUIZ'), 듣고쓰기('LISTEN')
+ * @param {String} answerType - 'SEN'(문장 입려기), 'EJ'(어절 입력기), 'NULL'(없음)
  * @param {object} section
  * @param {Function} sentenceFilter
  * @param {Array<Number>} ranges
@@ -93,6 +93,12 @@ QuizSpec.prepareBookQuiz = (
   ranges
 ) => {
   const quizResource = "A";
+  if (quizMode === "LISTEN") {
+    // 듣고쓰기인 경우 정답 입력기를 사용하지 않음
+    answerType = "NULL";
+  } else {
+    answerType = { comp: answerType, pumsa: "what" };
+  }
   const prevPage = {
     chapter: "BookListingView",
     section: `/book/section`,
@@ -100,7 +106,7 @@ QuizSpec.prepareBookQuiz = (
   const seqs = sentenceFilter(section).map((sen) => sen.seq);
   return prepareQuiz(
     quizMode,
-    { comp: answerType, pumsa: "what" },
+    answerType,
     section.seq,
     quizResource,
     prevPage,
@@ -111,7 +117,7 @@ QuizSpec.prepareBookQuiz = (
 /**
  * 새로운 단계별 학습 퀴즈를 준비함.
  *
- * @param {String} quizMode - 'READING', 'LEARNING', 'QUIZ'
+ * @param {String} quizMode - 'READING', 'LEARNING', 'QUIZ', 'LISTEN'
  * @param {String} answerType
  * @param {Object} section
  * @param {String} quizResource
@@ -130,7 +136,13 @@ QuizSpec.prepareLevelQuiz = (
   /*
    * 낱말인 경우 무조건 낱말 입력기를 사용함
    */
-  answerType = quizResource === "W" ? "SEN" : answerType;
+  if (quizMode === "LISTEN") {
+    // 듣고쓰기인 경우 정답 입력기를 사용하지 않음
+    answerType = "NULL";
+  } else {
+    answerType = quizResource === "W" ? "SEN" : answerType;
+  }
+
   const prevPage = {
     chapter: "LevelListingView",
     section: `/level/section`,

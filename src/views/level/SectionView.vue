@@ -47,6 +47,16 @@
           :sentences="sentencesRef"
           @choosen="startSentenceQuiz"
         />
+        <QuestionList
+          quizMode="LISTEN"
+          answerType="NULL"
+          theme="blue"
+          :wordMode="wordMode"
+          :section="cate"
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          @choosen="startSentenceQuiz"
+        />
       </div>
     </template>
   </div>
@@ -59,6 +69,7 @@ import router from "@/router";
 import { useRoute } from "vue-router";
 import { quizDao } from "@/dao";
 import QuestionList from "@/components/QuestionList.vue";
+import { QuizModeText } from "@/components/quiz/text-map";
 import { useStore } from "vuex";
 import Slide from "@/components/slide/Slide.vue";
 import LevelNavBar from "./LevelNavBar.vue";
@@ -93,11 +104,6 @@ export default {
      */
     const answerTypeRef = ref(null);
 
-    const descritions = {
-      READING: "보고쓰기",
-      LEARNING: "연습하기",
-      QUIZ: "받아쓰기",
-    };
     // if (quizOnly) {
     //   wordMode.value = false;
     // }
@@ -173,7 +179,7 @@ export default {
       const sentences = cate.value.sentences.filter(
         (sen) => sen.type === quizResource
       );
-      examDesc.value = descritions[quizMode];
+      examDesc.value = QuizModeText[quizMode];
       findQuizHistories().then((histories) => {
         replace(sectionHistories, histories);
         replace(sentencesRef, sentences);

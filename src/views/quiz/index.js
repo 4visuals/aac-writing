@@ -7,6 +7,8 @@ import quizStore from "./quizStore";
 import ScenePicView from "./question/ScenePicView.vue";
 import EojelInput from "./answer/EojelInput.vue";
 import SentenceInput from "./answer/SentenceInput.vue";
+import NullInput from "./answer/NullInput.vue";
+import { QuizModeText } from "../../components/quiz/text-map";
 import { shallowRef, watch } from "vue";
 import store from "@/store";
 import QuizSpec from "./type-quiz-spec";
@@ -14,6 +16,7 @@ import QuizSpec from "./type-quiz-spec";
 const answerComponents = new Map();
 answerComponents.set("EJ", shallowRef(EojelInput));
 answerComponents.set("SEN", shallowRef(SentenceInput));
+answerComponents.set("NULL", shallowRef(NullInput));
 
 const colors = [
   ["#f3a600", "#ffd57c"],
@@ -182,11 +185,6 @@ const resourceTextMap = {
   S: "문장",
   A: "교과서",
 };
-const modeTextMap = {
-  READING: "보고쓰기",
-  LEARNING: "연습하기",
-  QUIZ: "받아쓰기",
-};
 /**
   [OPTIONS]
   ### questionComponent:VueComponent
@@ -291,7 +289,7 @@ class QuizContext {
    * @returns
    */
   getModeText() {
-    return modeTextMap[this.mode] || `[${this.mode}]`;
+    return QuizModeText[this.mode] || `[${this.mode}]`;
   }
   /**
    * 단계별 문제인지 나타냄
@@ -319,7 +317,7 @@ class QuizContext {
    * 낱말 연습하기,
    * 문장 보고쓰기,
    * 문장 보고쓰기
-   * @returns boolean
+   * @returns {Boolean}
    */
   isLearningMode() {
     // https://github.com/4visuals/aac-writing/issues/27
@@ -329,11 +327,18 @@ class QuizContext {
     return this.options.mode !== "QUIZ";
   }
   /**
-   * 낱말퀴즈, 문장퀴즈
-   * @returns boolean
+   * 받아쓰기(QUIZ)모드인지 나타냄
+   * @returns {Boolean}
    */
   isQuizMode() {
     return this.options.mode === "QUIZ";
+  }
+  /**
+   * 듣고쓰기 모드(LISTEN)인지 나타냄
+   * @returns {Boolean}
+   */
+  isListenMode() {
+    return this.options.mode === "LISTEN";
   }
   isWord() {
     return this.config.options.quizResource === "W";
@@ -441,7 +446,7 @@ const loadSentenceQuiz = (quizSpec) => {
 
 const loadQuiz = () => loadSentenceQuiz(QuizSpec.loadQuizSpec());
 
-export { Segment, Question, QuizContext, QuizView };
+export { QuizModeText, Segment, Question, QuizContext, QuizView };
 export default {
   loadQuiz,
 };

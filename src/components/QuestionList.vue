@@ -34,6 +34,7 @@ import { useStore } from "vuex";
 import { quizDao } from "@/dao";
 import { AppButton } from "./form";
 import util from "@/service/util";
+import { QuizModeText } from "./quiz/text-map";
 
 export default {
   props: ["theme", "section", "desc", "quizMode", "answerType", "wordMode"],
@@ -43,11 +44,6 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const descritions = {
-      READING: "보고 쓰기",
-      LEARNING: "연습하기",
-      QUIZ: "받아쓰기",
-    };
     const bgMap = {
       blue: "#D2ECFD",
       brown: "#F1EBDB",
@@ -125,7 +121,7 @@ export default {
       const sentences = section.sentences.filter(
         (sen) => sen.type === quizResource
       );
-      examDesc.value = descritions[quizMode];
+      examDesc.value = QuizModeText[quizMode];
       findQuizHistories().then((histories) => {
         replace(sectionHistories, histories);
         replace(sentencesRef, sentences);

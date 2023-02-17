@@ -24,15 +24,11 @@
 <script>
 import { computed } from "vue";
 import { useStore } from "vuex";
+import { QuizModeText } from "./index";
 
 export default {
   props: ["theme"],
   setup() {
-    const descMap = {
-      READING: "보고쓰기",
-      LEARNING: "연습하기",
-      QUIZ: "받아쓰기",
-    };
     const rssTypeMap = {
       W: "낱말",
       S: "문장",
@@ -41,7 +37,7 @@ export default {
     const store = useStore();
     const ctx = computed(() => store.state.quiz.quizContext);
     const currentQuestion = computed(() => store.getters["quiz/currentPara"]);
-    const desc = descMap[ctx.value.mode];
+    const desc = QuizModeText[ctx.value.mode];
     const rss = rssTypeMap[ctx.value.resourceType];
     return {
       ctx,

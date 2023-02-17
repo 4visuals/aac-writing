@@ -96,7 +96,9 @@ export default {
     };
     onMounted(() => {
       store.commit("quiz/hideHint");
-      if (ctx.isQuizMode() || ctx.isWord()) {
+      if (ctx.isListenMode()) {
+        // 듣고쓰기 모드에서는 시험 결과를 업로드하지 않음.
+      } else if (ctx.isQuizMode() || ctx.isWord()) {
         uploadExam();
       } else {
         uploadLearning();
