@@ -370,7 +370,7 @@ class QuizContext {
   }
   getMainPath() {
     const { prevPage } = this.config.options;
-    return prevPage.main;
+    return prevPage.chapter;
   }
   getSectionPath() {
     const quizSpec = this.config.options;

@@ -94,7 +94,7 @@ QuizSpec.prepareBookQuiz = (
 ) => {
   const quizResource = "A";
   const prevPage = {
-    main: "BookListingView",
+    chapter: "BookListingView",
     section: `/book/section`,
   };
   const seqs = sentenceFilter(section).map((sen) => sen.seq);

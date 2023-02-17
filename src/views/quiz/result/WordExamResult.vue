@@ -1,9 +1,27 @@
 <template>
   <div class="trials" :class="[theme.name, mode]">
     <h3>
-      <AppButton :theme="theme.name" text="뒤로" @click="$emit('show-score')" />
+      <AppButton
+        :theme="theme.name"
+        text="뒤로"
+        size="sm"
+        @click="$emit('show-score')"
+      />
+      <AppButton
+        text="오답 다시 풀기"
+        theme="red"
+        size="sm"
+        :invert="true"
+        :fill="true"
+        @click="tryFailedQuestion"
+        borderColor="#d03c19"
+      />
     </h3>
-    <div class="trial" v-for="trial in scoring.trials" :key="trial.index">
+    <div
+      class="trial"
+      v-for="trial in scoring.trials.filter((t) => !t.correct)"
+      :key="trial.index"
+    >
       <div class="e q">
         <SpanText class="mark">Q</SpanText
         ><SpanText class="txt"
@@ -18,6 +36,7 @@
 </template>
 
 <script>
+import { inject } from "vue";
 import { useStore } from "vuex";
 import { SpanText } from "../../../components/text";
 
@@ -28,12 +47,17 @@ export default {
     const store = useStore();
     const theme = store.state.ui.theme;
     const mode = props.resourceType === "A" ? "S" : props.resourceType;
-    return { theme, mode };
+    const quizProvider = inject("quizProvider");
+
+    const tryFailedQuestion = () => quizProvider.retry(true);
+
+    return { theme, mode, tryFailedQuestion };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .trials {
   display: flex;
   flex-direction: column;
@@ -41,9 +65,16 @@ export default {
   width: 100%;
   max-width: 599px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  h3 {
+    display: flex;
+    column-gap: 16px;
+    & > .app-btn {
+      flex: 1 1 50%;
+    }
+  }
+
   &.W {
     row-gap: 8px;
     .trials {

@@ -152,7 +152,7 @@ export default {
     /**
      * chapter 페이지 경로(단계별, 교과서)
      */
-    const closeQuiz = () => {
+    const gotoChapter = () => {
       router.replace({ name: ctx.value.getMainPath() });
     };
     /**
@@ -161,12 +161,10 @@ export default {
      * @param {Segment} segment - quiz/index.js
      * @param {object} nextSection
      */
-    const startQuiz = (quizContext, segment, section) => {
+    const startQuiz = (quizContext, segment, section, sentences) => {
       const quizSpec = quizContext.value.config.options;
       quizSpec
-        .reload(section, [segment.start, segment.end], () =>
-          segment.getSentences()
-        )
+        .reload(section, [segment.start, segment.end], () => sentences)
         .then(() => {
           store.commit("ui/hideMenu");
           store.commit("quiz/hideHint");
@@ -175,19 +173,23 @@ export default {
     };
     /**
      * 현재 퀴즈를 다시 한번
+     * @param {Boolean} failedOnly - true이면 틀린 문제만 다시 시작, false이면 현재 퀴즈를 전부 다시 시작
      */
-    const retry = () => {
-      const [s, e] = ctx.value.ranges;
-      const segments = ctx.value.getSegments();
+    const retry = (failedOnly = false) => {
+      const quizContext = ctx.value;
+      const [s, e] = quizContext.ranges;
+      const segments = quizContext.getSegments();
       const segment = segments.find((seg) => seg.start === s && seg.end === e);
-      startQuiz(ctx, segment, ctx.value.section);
+      const sentences = failedOnly
+        ? quizContext.questions.filter((q) => !q.solved).map((q) => q.data)
+        : segment.getSentences();
+      startQuiz(ctx, segment, quizContext.section, sentences);
     };
     /**
      * 다음 퀴즈를 시작함.
      *
      */
     const startNext = () => {
-      console.log("다음 문제");
       const { section, ranges } = ctx.value;
       const e = ranges[1];
       let segments = ctx.value.getSegments();
@@ -204,9 +206,18 @@ export default {
       }
       if (nextSegment) {
         // 맨 마지막 chapter의 마지막 section은 다음 section이 없음
-        startQuiz(ctx, nextSegment, nextSection);
+        startQuiz(ctx, nextSegment, nextSection, nextSegment.getSentences());
       } else {
         alert("마지막 퀴즈입니다.");
+      }
+    };
+    const closeQuiz = (dir) => {
+      if (dir === "back") {
+        gotoSection();
+      } else if (dir === "close") {
+        gotoChapter();
+      } else {
+        throw new Error("invalid dir", dir);
       }
     };
     /**
@@ -214,13 +225,13 @@ export default {
      * @method quizProvider.retry - [다시 하기] 현재 퀴즈를 다시
      * @method quizProvider.startNext - [다음 단계] 다음 문제 시작
      * @method quizProvider.gotoSection - [학습선택] section 상세 페이지로 이동
-     * @method quizProvider.closeQuiz - 종료. "/level", "/book"으로 이동
+     * @method quizProvider.gotoChapter - 종료. "/level", "/book"으로 이동
      */
     provide("quizProvider", {
       retry,
       startNext,
       gotoSection,
-      closeQuiz,
+      gotoChapter,
     });
     onBeforeRouteLeave(() => {
       store.commit("quiz/closeQuiz");
