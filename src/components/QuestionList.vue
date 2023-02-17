@@ -12,7 +12,8 @@
             :key="group.key"
           >
             <AppButton
-              size="chapter"
+              :fluid="true"
+              size="sm"
               :theme="theme"
               :backgroundColor="getHistoryBg(group)"
               :text="resolveGroupText(group)"
@@ -151,12 +152,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .q-list {
   display: flex;
   padding: 16px;
   flex: 1 1 auto;
   width: 80%;
   margin: 0 auto;
+  @include mobile {
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+  }
   .label {
     flex: 0 0 25%;
     color: inherit;

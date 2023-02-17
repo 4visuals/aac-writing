@@ -25,6 +25,7 @@
           @click="changeCourse(1)"
         />
         <AppButton
+          size="nav"
           text="평가보기"
           theme="none"
           @click="openStatView"

@@ -1,7 +1,7 @@
 <template>
   <div
     class="app-btn"
-    :class="`${size}`"
+    :class="[size, fluid ? 'fluid' : '']"
     :style="`--border-width: ${borderWidth}; --border-color: ${borderColor}; --bg-color: ${backgroundColor}`"
   >
     <button
@@ -57,6 +57,10 @@ export default {
       validator(val) {
         return ["sm", "md", "nav", "chapter"].includes(val);
       },
+    },
+    fluid: {
+      type: Boolean,
+      default: false,
     },
     /**
      * 배경색과 선색을 교환함
@@ -119,22 +123,25 @@ export default {
     }
   }
   &.nav {
+    width: 128px;
     button {
-      width: 128px;
       height: 38px;
     }
   }
+  &.fluid {
+    width: 100%;
+  }
   &.chapter {
+    width: 118px;
     button {
-      width: 118px;
       height: 34px;
       span.inner {
         font-size: 14px;
       }
     }
     @include mobile {
+      width: 90px;
       button {
-        width: 90px;
         span.inner {
           font-weight: 400;
           font-size: 12px;
@@ -143,18 +150,13 @@ export default {
     }
   }
   &.section {
-    button {
-      width: 100%;
-    }
+    width: 100%;
   }
   &.md {
-    button {
-      width: 150px;
-    }
+    width: 150px;
   }
   &.sm {
     button {
-      width: 100%;
       span {
         padding: 6px 16px;
       }
@@ -172,6 +174,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
 
     &.no-rounded {
       border-radius: 0;

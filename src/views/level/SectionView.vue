@@ -260,7 +260,7 @@ $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
     flex-direction: column;
     position: relative;
     // align-items: flex-start;
-    padding: 48px 0;
+    padding: 24px 0;
 
     overflow-y: hidden;
     .desc {
