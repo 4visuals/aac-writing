@@ -73,7 +73,7 @@ import router from "@/router";
 import { ParaText, SpanText } from "../../components/text";
 import { ActionIcon } from "../../components/form";
 import { useRoute } from "vue-router";
-import util, { logger } from "@/service/util";
+import util from "@/service/util";
 
 export default {
   components: {
@@ -90,8 +90,6 @@ export default {
     const store = useStore();
     const route = useRoute();
     const license = computed(() => store.getters["exam/activeLicense"]);
-    const segmentHistory = computed(() => store.getters["exam/segmentHistory"]);
-    logger.log(segmentHistory, "SEG HISTORY");
     const modal = ref(null);
     const activeChapter = ref(null);
     // let chapterEl = null;

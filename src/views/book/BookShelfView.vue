@@ -19,7 +19,6 @@ import { useStore } from "vuex";
 import { computed, ref, watch } from "vue";
 import router from "@/router";
 import QuizHistoryView from "../QuizHistoryView.vue";
-import { logger } from "@/service/util";
 
 export default {
   props: ["cate"],
@@ -32,8 +31,6 @@ export default {
     const store = useStore();
     // const route = useRoute();
     const license = computed(() => store.getters["exam/activeLicense"]);
-    const segmentHistory = computed(() => store.getters["exam/segmentHistory"]);
-    logger.log(segmentHistory, "SEG HISTORY");
     const modal = ref(null);
     const activeChapter = ref(null);
     // let chapterEl = null;
@@ -85,7 +82,6 @@ export default {
       return `${min} - ${max}단계`;
     };
     const gotoSectionView = (e) => {
-      console.log(e);
       router.push("/book/section/" + e.section.seq);
     };
     watch(

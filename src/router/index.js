@@ -26,7 +26,6 @@ import {
   SettingStudent,
   SettingOrder,
 } from "../views/user/setting/viewport";
-import { logger } from "@/service/util";
 
 const routes = [
   {
@@ -179,16 +178,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
-});
-
-router.beforeEach((to, from) => {
-  logger.log(`[${from.path}] -> [${to.path}]`);
-  // if (from.name && to.fullPath === "/") {
-  //   const exit = confirm("앱을 종료합니까?");
-  //   return exit;
-  // } else {
-  //   return true;
-  // }
 });
 
 export default router;
