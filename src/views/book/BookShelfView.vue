@@ -1,8 +1,8 @@
 <template>
   <div class="container layout-h-child w-1190px">
     <QuizHistoryView
-      v-if="$route.path === '/level' && license && chapters.length > 0"
-      origin="L"
+      v-if="$route.path === '/book' && license && chapters.length > 0"
+      origin="B"
       @itemClicked="(section) => gotoSectionView({ section })"
     />
     <router-view

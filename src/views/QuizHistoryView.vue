@@ -79,13 +79,7 @@ export default {
           license: license.value.uuid,
           sectionSeq: sectionHistory.sectionSeq,
         })
-        .then((res) => {
-          console.log(res);
-          const idx = histories.value.findIndex(
-            (elem) => elem === sectionHistory
-          );
-          histories.value.splice(idx, 1);
-        });
+        .then(loadHistory);
     };
 
     const getChapterText = (section) => {
@@ -95,12 +89,20 @@ export default {
         return util.chapter.rangeText(section.chapter, " 단계");
       }
     };
-    quizHistory
-      .createHistories(props.origin, license.value.uuid, sections)
-      .then((res) => {
-        histories.value.push(...res.histories);
-      });
-
+    const loadHistory = () => {
+      quizHistory
+        .createHistories(props.origin, license.value.uuid, sections)
+        .then((res) => {
+          /**
+           * lastAccessTime 의 내램차순으로 정렬 후 4개만 걸러냄
+           */
+          res.histories.sort(
+            (h0, h1) => -1 * (h0.lastAccessTime - h1.lastAccessTime)
+          );
+          histories.value = [...res.histories.slice(0, 4)];
+        });
+    };
+    loadHistory();
     return { cur, license, histories, deleteHistory, getChapterText };
   },
 };
@@ -127,6 +129,17 @@ export default {
     &.blue {
       color: white;
       background-color: #4b7bec;
+      &:active {
+        top: 2px;
+        left: 2px;
+      }
+      .btn-close {
+        color: white;
+      }
+    }
+    &.brown {
+      color: #865900;
+      background-color: #ffd700;
       &:active {
         top: 2px;
         left: 2px;

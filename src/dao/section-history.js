@@ -26,7 +26,7 @@ class SectionHistory {
     return this.section.level < 0 ? "도전" : this.section.level;
   }
   get theme() {
-    return this.section.level < 0 ? "purple" : "blue";
+    return this.section.origin === "B" ? "brown" : "blue";
   }
   get typeText() {
     return this.type === "W" ? "낱말" : "문장";
