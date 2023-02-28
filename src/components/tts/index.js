@@ -34,23 +34,11 @@ class TTS {
     return new Promise((done, failed) => {
       syn.onstart = () => {
         ttsStore.setSpeaking(true);
-        // console.log("[SPEECH] START", e);
       };
       syn.onend = (e) => {
         ttsStore.setSpeaking(false);
-        // console.log("[SPEECH] DONE", e);
         done(text, e);
       };
-      /*
-      syn.onboundary = (e) => {
-        const { charIndex, currentTarget } = e;
-        const { text } = currentTarget;
-        // console.log("[BOUND]", text.substring(charIndex), e);
-      };
-      syn.onmark = (e) => {
-        console.log("[MARK]", e);
-      };
-      */
       syn.onerror = (e) => {
         ttsStore.setSpeaking(false);
         failed(e);
@@ -62,7 +50,7 @@ class TTS {
 const browser = new TTS();
 
 class PollyTts {
-  speak(text) {
+  speak(text, option = { delay: 0 }) {
     if (text.length === 0) {
       return Promise.resolve();
     }
@@ -87,10 +75,19 @@ class PollyTts {
         ttsStore.setSpeaking(false);
         failed(e);
       };
-      audio.play().catch((e) => {
-        console.log(`[${e.name}]`, e);
-        ttsStore.setSpeaking(false);
-      });
+      if (option.delay > 0) {
+        setTimeout(() => {
+          audio.play().catch((e) => {
+            console.log(`[${e.name}]`, e);
+            ttsStore.setSpeaking(false);
+          });
+        }, option.delay);
+      } else {
+        audio.play().catch((e) => {
+          console.log(`[${e.name}]`, e);
+          ttsStore.setSpeaking(false);
+        });
+      }
     });
   }
 }
@@ -101,9 +98,9 @@ const ttsSet = {
   polly,
 };
 const tts = {
-  speak(text) {
+  speak(text, option) {
     const mode = ttsStore.getTtsMode();
-    return ttsSet[mode].speak(text);
+    return ttsSet[mode].speak(text, option);
   },
 };
 export { tts, ttsStore, TtsConfig, VoiceElem };

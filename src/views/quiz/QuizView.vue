@@ -139,9 +139,16 @@ export default {
       return tts.speak(ctx.value.currentQuestion.text);
     };
     const sceneClicked = () => {
-      // if (!ctx.value.isReadingMode()) {
-      //   }
       holdSoftKeyboard();
+      if (ctx.value.isListenMode()) {
+        /**
+         * 듣고쓰기 모드에서 장면 클릭시
+         *
+         * 장면 사진 클릭할때 EojeolInput이나 SentenceInput에서 tts 출력 후 포커스를 관리했음.
+         * 듣고쓰기 모드에서는 정답 입력 컴포넌트가 없으므로 여기서 tts를 출력함
+         */
+        tts.speak(ctx.value.currentQuestion.text, { clearPending: true });
+      }
     };
     /**
      * section 상세 페이지 경로

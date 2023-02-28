@@ -8,7 +8,7 @@
     >
       <ImageView
         :imgPath="question.isWord() ? symbolUrl() : sceneUrl()"
-        @click="speak"
+        @clicked="speak"
       />
     </Transition>
   </div>
