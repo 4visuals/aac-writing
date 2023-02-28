@@ -89,7 +89,7 @@ export default {
       new InputForm({
         wid: "orgName",
         title: "기관명 *",
-        value: "남극",
+        value: "",
         placeholder: "소속 기관명을 입력해주세요.",
       }),
       new InputForm({
@@ -122,7 +122,7 @@ export default {
       {
         type: "EST",
         text: "견적서",
-        selected: true,
+        selected: false,
         value: "",
       },
       {
@@ -145,8 +145,7 @@ export default {
       },
     ]);
     const memo = reactive({
-      value:
-        "이 여섯 살의 왕자가 공립 초등학교에 등록했다는 소식은 모두를 놀라게 했다.",
+      value: "",
     });
     const updateForm = ({ value, commit }) => {
       commit(value);

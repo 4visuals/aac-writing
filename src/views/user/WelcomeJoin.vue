@@ -2,6 +2,7 @@
   <div class="welcome">
     <Logo :imagePath="membership.image" size="md" />
     <h3>계정을 생성했습니다.</h3>
+    <router-link to="/">로그인 페이지로 이동</router-link>
   </div>
 </template>
 

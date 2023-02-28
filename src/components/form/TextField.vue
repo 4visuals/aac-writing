@@ -20,6 +20,7 @@
       :type="typeRef || 'text'"
       :value="value"
       :placeholder="placeholder"
+      :disabled="true"
       @input="debounce"
       @keydown.enter.stop="onEnterDown"
       @keyup.enter="onEnterUp"
@@ -55,6 +56,7 @@ const DEFAULT_OPTION = {
   updated: "blur",
   delay: 1750,
   pendingVisible: true,
+  disabled: false,
 };
 class FieldModel {
   constructor(fieldName, value, option) {
@@ -65,6 +67,7 @@ class FieldModel {
     this.error = null;
     this.success = null;
     this.validator = null;
+    this.disabled = option.disabled || false;
     const current = new Date().getTime();
     this.time = {
       confirmed: current,

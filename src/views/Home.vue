@@ -8,12 +8,10 @@
     <button v-if="member" class="btn logout" @click="doLogout">
       <span>로그</span><span>아웃</span>
     </button>
-    <div class="menu">
+    <div class="menu" style="margin-top: 20vmin">
       <div class="logo main"></div>
       <div class="logo sub"></div>
     </div>
-    <!-- <h1 class="main title">받아쓰기</h1> -->
-
     <div class="menu" v-if="host.isPwaMode()">
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
     </div>
@@ -36,9 +34,9 @@
         />
       </div>
       <div class="login" v-else>
-        <GoogleButton />
-        <div class="hr"><span>OR</span></div>
-        <ManualLoginForm />
+        <GoogleButton @join="showJoinDialog" />
+        <!-- <div class="hr"><span>OR</span></div>
+        <ManualLoginForm /> -->
       </div>
     </div>
     <div class="menu" v-else>
@@ -67,7 +65,7 @@
 <script>
 import { host } from "@/service/util";
 import StudentLoginForm from "./StudentLoginForm.vue";
-import ManualLoginForm from "./ManualLoginForm.vue";
+// import ManualLoginForm from "./ManualLoginForm.vue";
 // import UserProfile from "./menu/UserProfile.vue";
 import { useStore } from "vuex";
 import { watch, ref, onMounted } from "vue";
@@ -79,12 +77,14 @@ import { ActionIcon } from "../components/form";
 import StudentList from "./main/StudentList.vue";
 import GoogleButton from "../components/oauth/GoogleButton.vue";
 import CompanyInfo from "../components/company/CompanyInfo.vue";
+import modals from "@/components/modal";
+import DialogView from "@/components/dialog/DialogView.vue";
 
 export default {
   name: "Home",
   components: {
     StudentLoginForm,
-    ManualLoginForm,
+    // ManualLoginForm,
     // UserProfile,
     LicenseConfigView,
     SpanText,
@@ -112,6 +112,27 @@ export default {
     const doLogout = () => {
       store.commit("user/logoutUser");
     };
+    const showJoinDialog = () => {
+      modals.showModal(DialogView, {
+        width: "sm",
+        props: {
+          title: "회원이 아닙니다.",
+          message: "회원가입 후 이용 가능합니다.",
+          actions: [
+            { cmd: "yes", text: "가입 페이지로 이동합니다." },
+            { cmd: "no", text: "취소" },
+          ],
+        },
+        events: {
+          commit: (cmd) => {
+            modals.closeModal();
+            if (cmd === "yes") {
+              goTo("/join");
+            }
+          },
+        },
+      });
+    };
 
     watch(
       () => member,
@@ -133,6 +154,7 @@ export default {
       goTo,
       host,
       doLogout,
+      showJoinDialog,
     };
   },
 };

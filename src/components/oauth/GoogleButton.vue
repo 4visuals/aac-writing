@@ -15,15 +15,21 @@ export default {
     text: { type: String, default: "signin_with" },
     type: { type: String, default: "standard" },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const btnRef = ref(null);
     const store = useStore();
     const handleResponse = (res) => {
-      store.dispatch("user/checkMembership", {
-        vendor: "google",
-        token: res.credential,
-        type: "id_token",
-      });
+      store
+        .dispatch("user/checkMembership", {
+          vendor: "google",
+          token: res.credential,
+          type: "id_token",
+        })
+        .then((membership) => {
+          if (!membership.user) {
+            emit("join");
+          }
+        });
     };
 
     onMounted(() => {

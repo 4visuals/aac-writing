@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-h" style="padding-top: 16px"><slot /></div>
+  <div class="layout-h"><slot /></div>
 </template>
 
 <script>

@@ -14,7 +14,7 @@
       <div class="inline">
         <router-link class="btn" to="/purchase">이용권 구매</router-link>
       </div>
-      <div class="inline" v-if="member">
+      <div class="inline" v-if="member?.user">
         <BadgeIcon
           :icon="member.image"
           :text="member.user.name"

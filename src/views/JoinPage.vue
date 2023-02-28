@@ -8,8 +8,13 @@
     </WidthLayout>
     <WidthLayout>
       <transition name="trs-scale-grow" mode="out-in">
-        <WelcomeManualJoin v-if="userRef" :user="userRef" key="welcome" />
-        <ManualJoinForm v-else @join="onJoinCompleted" key="form" />
+        <WelcomeJoin v-if="userRef" :user="userRef" key="welcome" />
+        <OauthJoinForm
+          v-else
+          :profile="membership.profile"
+          @join="onJoinCompleted"
+          key="form"
+        />
       </transition>
     </WidthLayout>
     <CompanyInfoDark />
@@ -19,34 +24,35 @@
 <script>
 import TeacherNav from "./nav/TeacherNav.vue";
 import Jumbotron from "../components/Jumbotron.vue";
-import ManualJoinForm from "./ManualJoinForm.vue";
+import OauthJoinForm from "./OauthJoinForm.vue";
 import WidthLayout from "../components/layout/WidthLayout.vue";
-import WelcomeManualJoin from "./user/WelcomeManualJoin.vue";
+import WelcomeJoin from "./user/WelcomeJoin.vue";
 // import api from "../service/api";
 // import toast from "../components/toast";
 
 import { useStore } from "vuex";
 import CompanyInfoDark from "../components/company/CompanyInfoDark.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 export default {
   components: {
     Jumbotron,
     TeacherNav,
     CompanyInfoDark,
-    ManualJoinForm,
+    OauthJoinForm,
     WidthLayout,
-    WelcomeManualJoin,
+    WelcomeJoin,
   },
   setup() {
     const store = useStore();
+    const membership = computed(() => store.state.user.membership);
     const userRef = ref(null);
 
-    const onJoinCompleted = (user) => {
-      userRef.value = user;
+    const onJoinCompleted = (membership) => {
+      userRef.value = membership.user;
     };
     store.commit("ui/setBackgroundVisible", false);
-    return { userRef, onJoinCompleted };
+    return { membership, userRef, onJoinCompleted };
   },
 };
 </script>
