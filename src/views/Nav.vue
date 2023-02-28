@@ -262,7 +262,6 @@ export default {
       &.left {
         flex-basis: 30px;
       }
-
       .mobile {
         display: none;
       }
@@ -280,8 +279,13 @@ export default {
   .nav-bar {
     font-size: 2rem;
     column-gap: 16px;
-    .btn-menu.left {
-      flex-basis: 196px;
+    .btn-menu {
+      &.left {
+        flex-basis: 196px;
+      }
+      .mobile {
+        display: none;
+      }
     }
   }
   .quiz-status {
