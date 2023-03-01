@@ -1,7 +1,11 @@
 <template>
   <div class="q-result">
     <div v-if="ctx.isQuizMode()" class="left half"><ScoreView /></div>
-    <div class="right" :class="[ctx.isQuizMode() ? 'half' : 'one']">
+    <div v-else-if="ctx.isListenMode()" class="left half"><AnswerView /></div>
+    <div
+      class="right"
+      :class="[ctx.isQuizMode() || ctx.isListenMode() ? 'half' : 'one']"
+    >
       <NavControllView />
     </div>
   </div>
@@ -12,11 +16,13 @@ import { useStore } from "vuex";
 import api from "@/service/api";
 import { onMounted } from "@vue/runtime-core";
 import ScoreView from "./ScoreView.vue";
+import AnswerView from "./AnswerView.vue";
 import NavControllView from "./NavControllView.vue";
 export default {
   components: {
     ScoreView,
     NavControllView,
+    AnswerView,
   },
   setup() {
     const store = useStore();
