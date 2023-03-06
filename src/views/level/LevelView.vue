@@ -70,7 +70,6 @@ export default {
       return `${min} - ${max}단계`;
     };
     const gotoSectionView = (e) => {
-      console.log(e);
       router.push("/level/section/" + e.section.seq);
     };
     watch(

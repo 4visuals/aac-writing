@@ -58,19 +58,17 @@ class QuizDao {
     //   mode,
     //   ranges,
     // ]);
-
-    const cnt = await this.db.quizzes.delete([
+    // console.log("[EXISTING]", row);
+    /**
+     * 이전에 풀었던 segment를 삭제 후 새로 넣음.
+     */
+    await this.db.quizzes.delete([
       license.uuid,
       sectionSeq,
       type,
       mode,
       ranges,
     ]);
-    console.log("deleted:", cnt);
-    // if (row) {
-    //   console.log("[found]", row);
-    // } else {
-    // }
     this.db[tableName].put({
       license: license.uuid,
       sectionSeq,
@@ -81,15 +79,15 @@ class QuizDao {
       startTime: quizContext.startTime,
     });
   }
-  async saveQuiz(quizContext) {
-    logger.log("[save]", quizContext);
+  saveQuiz(quizContext) {
     if (!quizContext) {
-      return;
+      return Promise.resolve(false);
     }
     if (!quizContext.isQuizMode()) {
       // 일단 퀴즈일때만
-      return;
+      return Promise.resolve(false);
     }
+    logger.log("[save]", quizContext);
     const { license, sectionSeq } = quizContext;
     const type = quizContext.isWord() ? "W" : "S";
     const mode = quizContext.mode;
@@ -101,7 +99,7 @@ class QuizDao {
         solved: question.solved,
       }));
     const ranges = toRangeId(quizContext);
-    this.db[tableName]
+    return this.db[tableName]
       .where(cols)
       .equals([license.uuid, sectionSeq, type, mode, ranges])
       .modify({ questions });

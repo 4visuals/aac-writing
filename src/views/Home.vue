@@ -104,7 +104,9 @@ export default {
     const moveTo = (url, license) => {
       // console.log("move to ", url);
       store.commit("exam/setActiveLicense", license);
-      router.replace(url);
+      store.dispatch("record/prefetch", license.studentRef).then(() => {
+        router.replace(url);
+      });
     };
     const goTo = (uri) => {
       router.push(uri);

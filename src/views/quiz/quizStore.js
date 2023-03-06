@@ -64,9 +64,10 @@ store.registerModule("quiz", {
       //   // 중간에 그만둠. 상태 저장
       // }
       // 무조건 저장
-      quizDao.saveQuiz(state.quizContext);
-      state.finished = false;
-      state.quizContext = null;
+      quizDao.saveQuiz(state.quizContext).then(() => {
+        state.finished = false;
+        state.quizContext = null;
+      });
     },
     showHint(state, args) {
       const { text, cnt } = args;

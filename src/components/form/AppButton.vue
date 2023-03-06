@@ -17,6 +17,7 @@
         purple: theme === 'purple',
         brown: theme === 'brown',
         red: theme === 'red',
+        green: theme === 'green',
       }"
       @click.stop="clicked"
     >
@@ -229,6 +230,19 @@ export default {
       &.invert {
         color: white;
         background-color: #d03c19;
+      }
+    }
+    &.green {
+      color: #1db270;
+      &:active {
+        background-color: #fff;
+      }
+      &.fill {
+        background-color: #fff;
+        &.invert {
+          color: white;
+          background-color: #1db270;
+        }
       }
     }
     &.purple {

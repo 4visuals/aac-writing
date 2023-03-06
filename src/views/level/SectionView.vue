@@ -25,6 +25,7 @@
           :section="cate"
           :histories="sectionHistories"
           :sentences="sentencesRef"
+          :recordVisible="false"
           @choosen="startSentenceQuiz"
         />
         <QuestionList
@@ -35,6 +36,7 @@
           :section="cate"
           :histories="sectionHistories"
           :sentences="sentencesRef"
+          :recordVisible="false"
           @choosen="startSentenceQuiz"
         />
         <QuestionList
@@ -45,7 +47,9 @@
           :section="cate"
           :histories="sectionHistories"
           :sentences="sentencesRef"
+          :recordVisible="true"
           @choosen="startSentenceQuiz"
+          @retry="retrySentenceQuiz"
         />
         <QuestionList
           quizMode="LISTEN"
@@ -55,6 +59,7 @@
           :section="cate"
           :histories="sectionHistories"
           :sentences="sentencesRef"
+          :recordVisible="false"
           @choosen="startSentenceQuiz"
         />
       </div>
@@ -91,6 +96,9 @@ export default {
     const sectionHistories = ref([]);
     const chapters = computed(() => store.state.course.chapters.levels);
     const cate = ref(null);
+    const records = computed(() =>
+      store.getters["record/wrongAnswers"](cate.value)
+    );
     const theme = "blue";
 
     const overviewVisible = ref(false);
@@ -108,11 +116,16 @@ export default {
     //   wordMode.value = false;
     // }
     const setActiveSection = () => {
-      const seq = Number.parseInt(route.params.sectionSeq);
-      cate.value = store.getters["course/section"](seq);
+      const sectionSeq = Number.parseInt(route.params.sectionSeq);
+      cate.value = store.getters["course/section"](sectionSeq);
       if (cate.value.level === -1) {
         wordMode.value = false;
       }
+      store.dispatch("record/loadRecord", sectionSeq);
+
+      // api.exam.wrongAnswer(seq).then((res) => {
+      //   console.log(res);
+      // });
     };
     const title = () => {
       const { level } = cate.value;
@@ -140,6 +153,39 @@ export default {
       )
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
+        })
+        .catch((e) => {
+          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
+        });
+    };
+    /**
+     * 틀린 문제 다시 시도
+     * @param {*} e
+     */
+    const retrySentenceQuiz = (e) => {
+      const { quizMode, answerType } = e;
+      const quizResource = wordMode.value ? "W" : "S";
+      const retryMode = true; // 틀린 문제 재시도
+      const section = cate.value;
+      const sentenceSeqs = records.value
+        .filter((record) => record.type === quizResource)
+        .flatMap((record) =>
+          record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
+        );
+      const sentences = section.sentences.filter((sen) =>
+        sentenceSeqs.includes(sen.seq)
+      );
+      QuizSpec.prepareLevelQuiz(
+        quizMode,
+        answerType,
+        cate.value,
+        quizResource,
+        () => sentences,
+        [0, sentences.length],
+        retryMode
+      )
+        .then(() => {
+          router.push(`/quiz/${section.seq}`);
         })
         .catch((e) => {
           alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
@@ -212,6 +258,7 @@ export default {
     return {
       overviewVisible,
       cate,
+      records,
       theme,
       // quizOnly,
       path,
@@ -223,6 +270,7 @@ export default {
       sentencesRef,
       sectionHistories,
       startSentenceQuiz,
+      retrySentenceQuiz,
       listQuestions,
       hideQuestionList,
       sourceText,

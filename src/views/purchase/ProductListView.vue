@@ -14,6 +14,11 @@
         />
       </div>
     </div>
+    <div class="row">
+      <div class="col-xs-12 group-order">
+        <button @click="gotoGroupOrder" class="nude red">단체 구매 문의</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -37,18 +42,19 @@ export default {
       /** @type {{method: String, product: Product}} */ evt
     ) => {
       const { method, product } = evt;
-      console.log(router.push);
-      console.log(method, product);
       // new OrderForm(method, product.code).save();
       router.push({
         path: `/purchase/order/${product.code}`,
         params: { method },
       });
     };
+    const gotoGroupOrder = () => {
+      router.push("/purchase/contact");
+    };
     api.product.list().then((res) => {
       products.value = res.products;
     });
-    return { themes, products, gotoOrderForm };
+    return { themes, products, gotoOrderForm, gotoGroupOrder };
   },
 };
 </script>
@@ -64,6 +70,16 @@ export default {
   }
   .product {
     height: 100%;
+  }
+  .group-order {
+    display: flex;
+    button {
+      flex: 1 1 auto;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
   }
 }
 @include mobile {

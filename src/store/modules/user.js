@@ -4,7 +4,10 @@ import storage from "@/service/storage";
 import { time } from "@/service/util";
 import License from "@/entity/license";
 
-const installLoginData = (store, { membership, licenses, jwt, segments }) => {
+const installLoginData = (
+  store,
+  { membership, licenses, jwt, segments, records }
+) => {
   licenses.forEach((lcs) => (lcs.isNew = false));
   membership.licenses = licenses.map((lcs) => new License(lcs));
   store.commit("setMembership", membership);
@@ -18,6 +21,14 @@ const installLoginData = (store, { membership, licenses, jwt, segments }) => {
       const ymd = student.birth.split("-");
       student.birth = time.birthToDate(ymd);
     });
+  }
+
+  if (records) {
+    store.commit(
+      "record/updateRecord",
+      { records, clear: true },
+      { root: true }
+    );
   }
   return membership;
 };
@@ -135,8 +146,9 @@ export default {
     autoLogin(ctx) {
       ctx.commit("initUser");
       if (ctx.state.jwt) {
+        const activeLicense = ctx.rootGetters["exam/activeLicense"];
         return api.user
-          .login()
+          .login(activeLicense?.uuid)
           .then((res) => {
             return installLoginData(ctx, res);
           })

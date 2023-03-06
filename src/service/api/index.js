@@ -6,7 +6,7 @@ const user = {
     POST(`/user/membership`, { vendor, type, token }),
   join: () => POST(`/user/join`),
   joinManually: (form) => POST("/user/join/manual", form),
-  login: () => POST(`/user/login`),
+  login: (lcsUuid) => POST(`/user/login`, { license: lcsUuid }),
   loginManually: (id, password) => POST("/user/login/manual", { id, password }),
   check: {
     id: (userId) => POST(`/user/prop`, { prop: "userId", value: userId }),
@@ -59,6 +59,8 @@ const exam = {
     GET(`/answer/section/${sectionSeq}/${examMode}/${sentenceType}`, {
       license: licenseUuid,
     }),
+  wrongAnswer: (student, sectionSeq) =>
+    GET(`/wrong/student/${student}/section/${sectionSeq}`),
   /**
    * 주어진 라이선스로 시도한 전체 학습 이력
    * @param {string} licenseUuid
@@ -72,6 +74,7 @@ const exam = {
    */
   queryBySegments: (licenseUuid) =>
     GET("/exams/segments", { license: licenseUuid }),
+  getRecords: (studentRef) => GET(`/records/student/${studentRef}`),
 };
 /**
  * 통계 관련 요청

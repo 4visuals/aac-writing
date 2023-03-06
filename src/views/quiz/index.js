@@ -178,6 +178,9 @@ class QuizConfig {
   get answerType() {
     return this.options.answerType;
   }
+  get retryMode() {
+    return this.options.retry;
+  }
 }
 
 const resourceTextMap = {
@@ -339,6 +342,13 @@ class QuizContext {
    */
   isListenMode() {
     return this.options.mode === "LISTEN";
+  }
+  /**
+   * 틀린 문제 재시도 모드인지 나타냄
+   * @returns true
+   */
+  isRetryMode() {
+    return this.config.retryMode;
   }
   isWord() {
     return this.config.options.quizResource === "W";

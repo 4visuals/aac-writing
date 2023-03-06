@@ -166,12 +166,25 @@ export default {
      * 새로운 퀴즈 시작
      * @param {QuizContext} quizContext - quiz/index.js
      * @param {Segment} segment - quiz/index.js
-     * @param {object} nextSection
+     * @param {object} section,
+     * @param {object[]} sentences
+     * @param {Boolean} failedOnly true이면 틀린 문제, false이면 전체 문제 다시 시도
      */
-    const startQuiz = (quizContext, segment, section, sentences) => {
+    const startQuiz = (
+      quizContext,
+      segment,
+      section,
+      sentences,
+      failedOnly
+    ) => {
       const quizSpec = quizContext.value.config.options;
       quizSpec
-        .reload(section, [segment.start, segment.end], () => sentences)
+        .reload(
+          section,
+          [segment.start, segment.end],
+          () => sentences,
+          failedOnly
+        )
         .then(() => {
           store.commit("ui/hideMenu");
           store.commit("quiz/hideHint");
@@ -186,11 +199,19 @@ export default {
       const quizContext = ctx.value;
       const [s, e] = quizContext.ranges;
       const segments = quizContext.getSegments();
-      const segment = segments.find((seg) => seg.start === s && seg.end === e);
-      const sentences = failedOnly
-        ? quizContext.questions.filter((q) => !q.solved).map((q) => q.data)
-        : segment.getSentences();
-      startQuiz(ctx, segment, quizContext.section, sentences);
+      let segment; // = segments.find((seg) => seg.start === s && seg.end === e);
+      let sentences;
+      if (quizContext.isRetryMode()) {
+        // 틀린 문제 다시 풀기
+        sentences = quizContext.questions.map((q) => q.data);
+        segment = { start: 0, end: sentences.length };
+      } else {
+        segment = segments.find((seg) => seg.start === s && seg.end === e);
+        sentences = failedOnly
+          ? quizContext.questions.filter((q) => !q.solved).map((q) => q.data)
+          : segment.getSentences();
+      }
+      startQuiz(ctx, segment, quizContext.section, sentences, failedOnly);
     };
     /**
      * 다음 퀴즈를 시작함.
@@ -213,7 +234,13 @@ export default {
       }
       if (nextSegment) {
         // 맨 마지막 chapter의 마지막 section은 다음 section이 없음
-        startQuiz(ctx, nextSegment, nextSection, nextSegment.getSentences());
+        startQuiz(
+          ctx,
+          nextSegment,
+          nextSection,
+          nextSegment.getSentences(),
+          false
+        );
       } else {
         alert("마지막 퀴즈입니다.");
       }

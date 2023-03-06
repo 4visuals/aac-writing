@@ -20,6 +20,18 @@
               @click="$emit('choosen', { group, quizMode, answerType })"
             ></AppButton>
           </div>
+          <div
+            v-if="recordVisible && hasWrongAnswer"
+            class="cell col-6 col-sm-6 col-md-4 col-lg-3"
+          >
+            <AppButton
+              :fluid="true"
+              size="sm"
+              theme="green"
+              text="오답연습"
+              @click="retryClicked"
+            ></AppButton>
+          </div>
         </div>
       </div>
     </div>
@@ -37,12 +49,20 @@ import util from "@/service/util";
 import { QuizModeText } from "./quiz/text-map";
 
 export default {
-  props: ["theme", "section", "desc", "quizMode", "answerType", "wordMode"],
+  props: [
+    "theme",
+    "section",
+    "desc",
+    "quizMode",
+    "answerType",
+    "wordMode",
+    "recordVisible",
+  ],
   components: {
     SpanText,
     AppButton,
   },
-  setup(props) {
+  setup(props, { emit }) {
     const store = useStore();
     const bgMap = {
       blue: "#D2ECFD",
@@ -52,9 +72,23 @@ export default {
     const sentencesRef = ref([]);
     const examDesc = ref(null);
     const sectionHistories = ref([]);
+    const hasWrongAnswer = computed(() => {
+      const answers = store.getters["record/wrongAnswers"](props.section);
+      const type = props.wordMode ? "W" : "S";
+      const filtered = answers.filter((record) => record.type === type);
+      return filtered.length > 0;
+    });
 
     const groups = ref([]);
     const size = 10;
+
+    const createGroup = (key, start, end, randomQuiz, sentences) => ({
+      key,
+      start,
+      end,
+      random: randomQuiz,
+      sentences,
+    });
     const updateGroups = () => {
       const sentences = sentencesRef.value;
       groups.value = [];
@@ -63,13 +97,7 @@ export default {
       for (let k = 0; k < groupSize; k++) {
         const s = size * k;
         const e = Math.min(sentences.length, s + size);
-        groups.value.push({
-          key: k,
-          start: s,
-          end: e,
-          rand: false,
-          sentences: sentences.slice(s, e),
-        });
+        groups.value.push(createGroup(k, s, e, false, sentences.slice(s, e)));
       }
       if (props.section.origin === "B") {
         // [종합] 버튼 추가
@@ -81,6 +109,10 @@ export default {
           sentences: util.pick(sentences, 10),
         });
       }
+    };
+    const retryClicked = () => {
+      const { answerType, quizMode } = props;
+      emit("retry", { quizMode, answerType });
     };
     const hasHistory = (group) => {
       const { start, end } = group;
@@ -139,9 +171,11 @@ export default {
     return {
       examDesc,
       groups,
+      hasWrongAnswer,
       hasHistory,
       getHistoryBg,
       resolveGroupText,
+      retryClicked,
     };
   },
 };
@@ -152,7 +186,7 @@ export default {
 .q-list {
   display: flex;
   padding: 16px;
-  flex: 1 1 auto;
+  flex: 1 1 25%;
   width: 80%;
   margin: 0 auto;
   @include mobile {

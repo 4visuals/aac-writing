@@ -45,7 +45,9 @@
           :section="cate"
           :histories="sectionHistories"
           :sentences="sentencesRef"
+          :recordVisible="true"
           @choosen="startQuiz"
+          @retry="retrySentenceQuiz"
         />
         <QuestionList
           quizMode="LISTEN"
@@ -90,6 +92,9 @@ export default {
     const sectionHistories = ref([]);
     const chapters = computed(() => store.state.course.chapters.levels);
     const cate = ref(null);
+    const records = computed(() =>
+      store.getters["record/wrongAnswers"](cate.value)
+    );
     const theme = "brown";
     const quizOnly = false;
     const overviewVisible = ref(false);
@@ -104,8 +109,9 @@ export default {
     const answerTypeRef = ref(null);
 
     const setActiveSection = () => {
-      const seq = Number.parseInt(route.params.sectionSeq);
-      cate.value = store.getters["course/section"](seq);
+      const sectionSeq = Number.parseInt(route.params.sectionSeq);
+      cate.value = store.getters["course/section"](sectionSeq);
+      store.dispatch("record/loadRecord", sectionSeq);
     };
     const desc = () => {
       const { level, description } = cate.value;
@@ -124,6 +130,36 @@ export default {
         cate.value,
         () => group.sentences,
         [group.start, group.end]
+      )
+        .then(() => {
+          router.push(`/quiz/${cate.value.seq}`);
+        })
+        .catch((e) => {
+          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
+        });
+    };
+    /**
+     * 틀린 문제 다시 시도
+     * @param {*} e
+     */
+    const retrySentenceQuiz = (e) => {
+      const { quizMode, answerType } = e;
+
+      const retryMode = true; // 틀린 문제 재시도
+      const section = cate.value;
+      const sentenceSeqs = records.value.flatMap((record) =>
+        record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
+      );
+      const sentences = section.sentences.filter((sen) =>
+        sentenceSeqs.includes(sen.seq)
+      );
+      QuizSpec.prepareBookQuiz(
+        quizMode,
+        answerType,
+        cate.value,
+        () => sentences,
+        [0, sentences.length],
+        retryMode
       )
         .then(() => {
           router.push(`/quiz/${cate.value.seq}`);
@@ -198,6 +234,7 @@ export default {
       sentencesRef,
       sectionHistories,
       startQuiz,
+      retrySentenceQuiz,
       listQuestions,
       hideQuestionList,
       sourceText,
