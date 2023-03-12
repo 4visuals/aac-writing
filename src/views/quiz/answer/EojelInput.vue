@@ -202,9 +202,12 @@ export default {
     watch(
       () => question.value,
       () => {
-        eojeols.value = question.value.data.eojeols.map(createEojeolWrapper);
-        speackAndMoveFocus(500);
         store.commit("quiz/hideHint");
+        if (question.value) {
+          // 퀴즈 빠져나갈때 question을 null로 설정함
+          eojeols.value = question.value.data.eojeols.map(createEojeolWrapper);
+          speackAndMoveFocus(500);
+        }
       }
     );
     watch(
