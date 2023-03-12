@@ -13,7 +13,7 @@
         }}</span>
       </h3>
       <SpanText
-        v-if="!section.isChallengeSection()"
+        v-if="!section.isChallengeSection() && !resourceType"
         class="overview"
         @click="$emit('overview')"
         ><AppIcon icon="info" fsize="24px" /><span class="label"
@@ -22,7 +22,7 @@
       >
       <SwitchButton
         v-model:selected="wordMode"
-        :disabled="quizOnly"
+        :disabled="disableSwitch"
         onText="낱말"
         offText="문장"
         class="switch"
@@ -47,10 +47,20 @@ export default {
     section: {
       type: Object,
     },
+    resourceType: {
+      type: String,
+      default: null,
+    },
   },
   setup(props, { emit }) {
     const wordMode = ref(props.section.isChallengeSection() ? false : true);
-    const quizOnly = ref(props.section.isChallengeSection());
+    const disableSwitch = ref(
+      props.section.isChallengeSection() || !!props.quizMode
+    );
+    if (props.resourceType) {
+      wordMode.value = props.resourceType === "W";
+      disableSwitch.value = true;
+    }
     const title = () => {
       const { section } = props;
       const { level } = section;
@@ -59,7 +69,7 @@ export default {
     watch(wordMode, (isWord) => {
       emit("quizMode", isWord);
     });
-    return { quizOnly, wordMode, title };
+    return { disableSwitch, wordMode, title };
   },
 };
 </script>

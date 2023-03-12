@@ -4,6 +4,7 @@
       <LevelNavBar
         v-if="ctx.isLevelQuiz()"
         :section="ctx.config.section"
+        :resourceType="ctx.resourceType"
         @back="closeQuiz"
       />
       <BookNavBar

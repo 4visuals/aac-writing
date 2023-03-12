@@ -12,21 +12,26 @@ export default class Section {
     return this.level < 0;
   }
   /**
-   * 뭔지 모르겠는데 자꾸 바뀜. 그냥 여기서 formatting함..
+   * 자꾸 바뀜. 그냥 여기서 formatting함..
    * @returns
    */
   formatDescription() {
     const desc = this.description;
-    if (this.isChallengeSection()) {
-      /**
-       * 단계별 학습 [도전]
-       * 앞에 "가.", "나.", "다.".. 붙어있는데 떼어달라고 함
-       */
-      const p = desc.indexOf(".");
-      if (p > 0) {
-        return desc.substring(p + 1);
+    if (this.origin === "L") {
+      if (this.isChallengeSection()) {
+        /**
+         * 단계별 학습 [도전]
+         * 앞에 "가.", "나.", "다.".. 붙어있는데 떼어달라고 함
+         */
+        const p = desc.indexOf(".");
+        if (p > 0) {
+          return desc.substring(p + 1);
+        }
       }
+      return desc;
+    } else {
+      // [교과서] 섹션인 경우 앞에 level을 붙여달라고 함.
+      return `${this.level}. ${desc}`;
     }
-    return desc;
   }
 }
