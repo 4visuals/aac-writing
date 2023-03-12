@@ -90,7 +90,7 @@ export default {
     const sentencesRef = ref([]);
     const examDesc = ref(null);
     const sectionHistories = ref([]);
-    const chapters = computed(() => store.state.course.chapters.levels);
+    const chapters = computed(() => store.state.course.chapters.books);
     const cate = ref(null);
     const records = computed(() =>
       store.getters["record/wrongAnswers"](cate.value)
