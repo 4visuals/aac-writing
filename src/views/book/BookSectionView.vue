@@ -1,28 +1,20 @@
 <template>
   <div class="section-detail" :class="theme">
-    <template v-if="cate">
+    <template v-if="section">
       <BookNavBar
-        :section="cate"
+        :section="section"
         @quizMode="(mode) => (wordMode = mode)"
         @back="moveBack"
         @overview="showOverview"
       />
-      <div class="body" v-if="overviewVisible">
-        <Slide
-          class="preview"
-          :resources="cate.notes.map((n) => n.text)"
-          :width="600"
-          height="100%"
-          :resolveUrl="(rss) => path.aacweb.scene(rss)"
-        />
-      </div>
-      <div class="body" v-else>
+
+      <div class="body">
         <QuestionList
           quizMode="READING"
           answerType="EJ"
           theme="brown"
           :wordMode="false"
-          :section="cate"
+          :section="section"
           :histories="sectionHistories"
           :sentences="sentencesRef"
           @choosen="startQuiz"
@@ -32,7 +24,7 @@
           answerType="EJ"
           theme="brown"
           :wordMode="false"
-          :section="cate"
+          :section="section"
           :histories="sectionHistories"
           :sentences="sentencesRef"
           @choosen="startQuiz"
@@ -42,7 +34,7 @@
           answerType="SEN"
           theme="brown"
           :wordMode="false"
-          :section="cate"
+          :section="section"
           :histories="sectionHistories"
           :sentences="sentencesRef"
           :recordVisible="true"
@@ -54,11 +46,12 @@
           answerType="NULL"
           theme="brown"
           :wordMode="false"
-          :section="cate"
+          :section="section"
           :histories="sectionHistories"
           :sentences="sentencesRef"
           @choosen="startQuiz"
         />
+        <BookQuestionView v-if="overviewVisible" :section="section" />
       </div>
     </template>
   </div>
@@ -73,15 +66,15 @@ import { quizDao } from "@/dao";
 import QuestionList from "@/components/QuestionList.vue";
 import { QuizModeText } from "@/components/quiz/text-map";
 import { useStore } from "vuex";
-import Slide from "@/components/slide/Slide.vue";
 import BookNavBar from "./BookNavBar.vue";
 import QuizSpec from "../quiz/type-quiz-spec";
+import BookQuestionView from "./BookQuestionView.vue";
 
 export default {
   components: {
-    Slide,
     QuestionList,
     BookNavBar,
+    BookQuestionView,
   },
   setup(props, { emit }) {
     const store = useStore();
@@ -91,9 +84,9 @@ export default {
     const examDesc = ref(null);
     const sectionHistories = ref([]);
     const chapters = computed(() => store.state.course.chapters.books);
-    const cate = ref(null);
+    const section = ref(null);
     const records = computed(() =>
-      store.getters["record/wrongAnswers"](cate.value)
+      store.getters["record/wrongAnswers"](section.value)
     );
     const theme = "brown";
     const quizOnly = false;
@@ -110,11 +103,11 @@ export default {
 
     const setActiveSection = () => {
       const sectionSeq = Number.parseInt(route.params.sectionSeq);
-      cate.value = store.getters["course/section"](sectionSeq);
+      section.value = store.getters["course/section"](sectionSeq);
       store.dispatch("record/loadRecord", sectionSeq);
     };
     const desc = () => {
-      const { level, description } = cate.value;
+      const { level, description } = section.value;
       return `${level}. ${description}`;
     };
 
@@ -127,12 +120,12 @@ export default {
       QuizSpec.prepareBookQuiz(
         quizMode,
         answerType,
-        cate.value,
+        section.value,
         () => group.sentences,
         [group.start, group.end]
       )
         .then(() => {
-          router.push(`/quiz/${cate.value.seq}`);
+          router.push(`/quiz/${section.value.seq}`);
         })
         .catch((e) => {
           alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
@@ -146,7 +139,7 @@ export default {
       const { quizMode, answerType } = e;
 
       const retryMode = true; // 틀린 문제 재시도
-      const section = cate.value;
+      const section = section.value;
       const sentenceSeqs = records.value.flatMap((record) =>
         record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
       );
@@ -156,13 +149,13 @@ export default {
       QuizSpec.prepareBookQuiz(
         quizMode,
         answerType,
-        cate.value,
+        section.value,
         () => sentences,
         [0, sentences.length],
         retryMode
       )
         .then(() => {
-          router.push(`/quiz/${cate.value.seq}`);
+          router.push(`/quiz/${section.value.seq}`);
         })
         .catch((e) => {
           alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
@@ -174,7 +167,7 @@ export default {
       const mode = quizModeRef.value;
       return quizDao.findByQuiz(
         activeLicense.value.uuid,
-        cate.value.seq,
+        section.value.seq,
         quizResource,
         mode
       );
@@ -197,7 +190,7 @@ export default {
       quizModeRef.value = quizMode;
       answerTypeRef.value = answerType;
       const quizResource = "S";
-      const sentences = cate.value.sentences.filter(
+      const sentences = section.value.sentences.filter(
         (sen) => sen.type === quizResource
       );
       examDesc.value = QuizModeText[quizMode];
@@ -212,7 +205,9 @@ export default {
     };
     const sourceText = () => "문장";
 
-    const showOverview = (visible) => (overviewVisible.value = visible);
+    const showOverview = () => {
+      overviewVisible.value = !overviewVisible.value;
+    };
     const moveBack = () => {
       if (overviewVisible.value) {
         overviewVisible.value = false;
@@ -224,7 +219,7 @@ export default {
     watch(() => chapters.value, setActiveSection, { immediate: true });
     return {
       overviewVisible,
-      cate,
+      section,
       theme,
       quizOnly,
       path,

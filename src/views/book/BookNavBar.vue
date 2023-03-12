@@ -9,6 +9,11 @@
         />
         <span class="main text-ellipsis">{{ title() }}</span>
       </h3>
+      <SpanText class="overview" @click="$emit('overview')"
+        ><AppIcon icon="info" fsize="24px" /><span class="label"
+          >문제 보기</span
+        ></SpanText
+      >
       <SpanText class="overview text-ellipsis">{{
         section.chapter.desc
       }}</SpanText>
