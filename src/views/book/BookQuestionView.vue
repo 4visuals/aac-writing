@@ -75,6 +75,7 @@ $gap: 16px;
   .q-slice {
     background-color: #fffad5;
     padding: 8px;
+    border-radius: 8px;
     .title {
       border: 1px solid #865900;
       padding: 6px 12px;

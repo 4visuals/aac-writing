@@ -9,7 +9,10 @@
         />
         <span class="main text-ellipsis">{{ title() }}</span>
       </h3>
-      <SpanText class="overview" @click="$emit('overview')"
+      <SpanText
+        v-if="overviewVisible"
+        class="overview"
+        @click="$emit('overview')"
         ><AppIcon icon="info" fsize="24px" /><span class="label"
           >문제 보기</span
         ></SpanText
@@ -23,7 +26,7 @@
 </template>
 
 <script>
-import { ref, watch } from "vue";
+import { reactive } from "vue";
 import { ActionIcon } from "../../components/form";
 import { SpanText } from "../../components/text";
 export default {
@@ -36,18 +39,20 @@ export default {
     section: {
       type: Object,
     },
+    resourceType: {
+      type: String,
+      default: null,
+    },
   },
-  setup(props, { emit }) {
-    const quizOnly = false;
-    const wordMode = ref(true);
+  setup(props) {
+    const overviewVisible = reactive(!props.resourceType);
+
     const title = () => {
       const { level, description } = props.section;
       return `${level}. ${description}`;
     };
-    watch(wordMode, (isWord) => {
-      emit("quizMode", isWord);
-    });
-    return { quizOnly, wordMode, title };
+
+    return { overviewVisible, title };
   },
 };
 </script>

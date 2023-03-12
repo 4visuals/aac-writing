@@ -10,6 +10,7 @@
       <BookNavBar
         v-else-if="ctx.isBookQuiz()"
         :section="ctx.config.section"
+        :resourceType="ctx.resourceType"
         @back="closeQuiz"
       />
 
