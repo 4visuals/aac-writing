@@ -116,6 +116,9 @@ export default {
     //   wordMode.value = false;
     // }
     const setActiveSection = () => {
+      if (chapters.value.length === 0) {
+        return;
+      }
       const sectionSeq = Number.parseInt(route.params.sectionSeq);
       cate.value = store.getters["course/section"](sectionSeq);
       if (cate.value.level === -1) {

@@ -38,6 +38,12 @@ export default {
     },
     loadRecord: (ctx, sectionSeq) => {
       const currentStudent = ctx.rootGetters["exam/student"];
+      if (!currentStudent) {
+        /**
+         * 페이지 새로 고침 후 아직 학생이 로드되지 않음.
+         */
+        return;
+      }
       return api.exam
         .wrongAnswer(currentStudent.seq, sectionSeq)
         .then((res) => {
