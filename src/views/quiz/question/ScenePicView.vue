@@ -49,7 +49,7 @@ export default {
       // 교과서 받아쓰기용 문장은 [글쓰기]에서 작성했기때문에 장면 사진이 따로 없다. 볼륨 이미지를 대신 사용함.
       return path
         ? prefix.aacweb.scene + question.value.data.scenePicture
-        : require("@/assets/volume-up.svg");
+        : require("@/assets/default-scene-bg.png");
     };
 
     const speak = () => {
