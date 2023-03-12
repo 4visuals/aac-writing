@@ -20,7 +20,7 @@
       :type="typeRef || 'text'"
       :value="value"
       :placeholder="placeholder"
-      :disabled="true"
+      :disabled="false"
       @input="debounce"
       @keydown.enter.stop="onEnterDown"
       @keyup.enter="onEnterUp"
