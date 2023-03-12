@@ -48,8 +48,23 @@ export default {
     const overviewVisible = reactive(!props.resourceType);
 
     const title = () => {
-      const { level, description } = props.section;
-      return `${level}. ${description}`;
+      const { section } = props;
+      const desc = section.formatDescription();
+      /**
+       * 앞에 [1-2]와 같이 붙여 달라고 함. 1학년 2학기라는 뜻...
+       *
+       * "국어 1학년 1학기"
+       * "국어 1학년 2학기"
+       * "국어 2학년 1학기"
+       * "국어 2학년 2학기"
+       */
+      const chapterDesc = section.chapter.desc;
+      // eslint-disable-next-line no-unused-vars
+      const [_, year, semester] = chapterDesc
+        .split(" ")
+        .map((token) => token.substring(0, 1));
+
+      return `[${year}-${semester}] ${desc}`;
     };
 
     return { overviewVisible, title };
