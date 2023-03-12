@@ -60,10 +60,11 @@ export default {
     @include blue($shadow: false);
   }
   &.disabled {
-    color: #ababab;
+    // color: #ababab;
     label {
       cursor: not-allowed;
     }
+    filter: grayscale(0.8);
   }
   .label {
     flex: 1 1 auto;
@@ -72,6 +73,7 @@ export default {
     padding: 8px 24px;
     line-height: 24px;
     white-space: nowrap;
+    font-weight: 600;
   }
   label {
     position: absolute;
@@ -98,22 +100,18 @@ export default {
     label::before {
       transform: translateX(0);
     }
-    .label.on {
-      font-weight: 500;
-    }
     .label.off {
       color: #4b7bec;
+      font-weight: 500;
     }
   }
   &.off {
     label::before {
       transform: translateX(100%);
     }
-    .label.off {
-      font-weight: 500;
-    }
     .label.on {
-      color: #898989;
+      color: #4b7bec;
+      font-weight: 500;
     }
   }
   @include mobile {

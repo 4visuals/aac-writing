@@ -8,11 +8,16 @@
           @click="$emit('back', 'back')"
         />
         <span class="main">{{ title() }}</span
-        ><span class="sub text-ellipsis">{{ section.description }}</span>
+        ><span class="sub text-ellipsis">{{
+          section.formatDescription()
+        }}</span>
       </h3>
-      <SpanText class="overview" @click="$emit('overview')"
+      <SpanText
+        v-if="!section.isChallengeSection()"
+        class="overview"
+        @click="$emit('overview')"
         ><AppIcon icon="info" fsize="24px" /><span class="label"
-          >학습 안내</span
+          >학습 유형</span
         ></SpanText
       >
       <SwitchButton
@@ -44,8 +49,8 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const quizOnly = false;
-    const wordMode = ref(true);
+    const wordMode = ref(props.section.isChallengeSection() ? false : true);
+    const quizOnly = ref(props.section.isChallengeSection());
     const title = () => {
       const { section } = props;
       const { level } = section;

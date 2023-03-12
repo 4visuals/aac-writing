@@ -32,7 +32,7 @@ class SectionHistory {
     return this.type === "W" ? "낱말" : "문장";
   }
   get desc() {
-    return this.section.description;
+    return this.section.formatDescription();
   }
   get total() {
     return this.section.sentences.filter((sen) => sen.type === this.type)

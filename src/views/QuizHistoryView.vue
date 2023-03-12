@@ -83,10 +83,21 @@ export default {
     };
 
     const getChapterText = (section) => {
-      if (section.level < 0) {
-        return "도전";
+      const { origin } = section;
+      if (origin === "L") {
+        if (section.level < 0) {
+          return "도전";
+        } else {
+          return util.chapter.rangeText(section.chapter, " 단계");
+        }
       } else {
-        return util.chapter.rangeText(section.chapter, " 단계");
+        /**
+         * 교과서의 section은 "1학년 1학기"와 같이 출력해달라고 함.
+         * 이 정보는 chapter에 있는데 "국어 1학년 1학기"와 같은 값을 이용해야함
+         */
+        const { desc } = section.chapter;
+        const p = desc.indexOf(" ");
+        return p > 0 ? desc.substring(p + 1) : desc;
       }
     };
     const loadHistory = () => {
@@ -119,7 +130,6 @@ export default {
     padding: 5px 10px 5px 24px;
     margin-bottom: 12px;
     border-radius: 40px;
-    font-family: Rowdies, monospace, cursive, sans-serif;
     position: relative;
     cursor: pointer;
     .btn-close {

@@ -1,4 +1,5 @@
 import api from "@/service/api";
+import Section from "../../entity/section";
 const chapters = {
   levels: [],
   books: [],
@@ -67,12 +68,14 @@ export default {
     setChapter(state, args) {
       const { data } = args;
       data.forEach((chapter) => {
-        chapter.sections.forEach((sec) => {
+        const sections = chapter.sections.map((sec) => {
           sec.origin = chapter.origin;
           // 양방향 바인딩
           sec.chapter = chapter;
           assignNumber(sec);
+          return new Section(sec);
         });
+        chapter.sections = sections;
       });
       state.chapters.levels = data.filter((chapter) => chapter.origin === "L");
       state.chapters.books = data.filter((chapter) => chapter.origin === "B");

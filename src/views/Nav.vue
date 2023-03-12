@@ -26,7 +26,7 @@
         />
         <AppButton
           size="nav"
-          text="평가보기"
+          text="학습결과"
           theme="none"
           @click="openStatView"
         ></AppButton>
