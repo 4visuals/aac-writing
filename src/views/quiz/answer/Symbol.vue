@@ -150,7 +150,6 @@ export default {
     background-position: center;
   }
   .desc {
-    font-size: 2.5rem;
     position: relative;
     text-align: center;
     .text {
