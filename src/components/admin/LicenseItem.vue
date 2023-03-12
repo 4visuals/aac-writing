@@ -11,9 +11,13 @@
       <div class="bar" :style="`width:${resolveWidth(lcs)}`"></div>
     </div>
     <div class="assigned">
-      <span class="student" v-if="assignee">{{ assignee.name }}</span
-      ><span class="student" v-else>없음</span>
-      <span class="remaining" v-if="size !== 'sm'">{{ remaining(lcs) }}</span>
+      <SpanText size="sm" class="student" v-if="assignee">{{
+        assignee.name
+      }}</SpanText
+      ><SpanText size="sm" class="student" v-else>없음</SpanText>
+      <SpanText size="sm" class="remaining" v-if="size !== 'sm'">{{
+        remaining(lcs)
+      }}</SpanText>
     </div>
     <div class="newlcs" v-if="lcs.isNew">NEW</div>
   </div>
@@ -22,8 +26,10 @@
 <script>
 import { time } from "@/service/util";
 import { ref, watch } from "@vue/runtime-core";
+import { SpanText } from "@/components/text";
 export default {
   props: ["lcs", "students", "current", "active", "mode", "size"],
+  components: { SpanText },
   setup(props) {
     const UNLIMITED = 24 * 365 * 10;
     const assignee = ref(null);
@@ -34,7 +40,7 @@ export default {
       );
     };
     const remaining = (lcs) => {
-      const exp = lcs.expiredAt;
+      const exp = lcs.getExpiredTimeMillis();
       if (lcs.durationInHours === UNLIMITED) {
         return "무제한";
       }
@@ -79,7 +85,7 @@ export default {
 <style lang="scss" scoped>
 .license {
   margin: 4px 0;
-  border-radius: 8px;
+  border-radius: 16px;
   border: 1px solid transparent;
   cursor: pointer;
   position: relative;
@@ -97,7 +103,7 @@ export default {
     left: 0;
     display: flex;
     flex-direction: column;
-    border-radius: 8px;
+    border-radius: 16px;
     overflow: hidden;
     .bar {
       background-color: #ffe546;
@@ -106,7 +112,7 @@ export default {
     }
   }
   .assigned {
-    padding: 4px 8px;
+    padding: 8px 12px;
     user-select: none;
     position: relative;
     display: flex;

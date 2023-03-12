@@ -5,6 +5,7 @@ import { time } from "@/service/util";
 import api from "@/service/api";
 import storage from "@/service/storage";
 import ChapterSummary from "@/components/stats/chapter-summary";
+import License from "../../entity/license";
 
 class ExamSession {
   constructor(license) {
@@ -80,7 +81,7 @@ export default {
     },
     initLicense(state) {
       const license = storage.local.read("active_license");
-      state.activeLicense = license;
+      state.activeLicense = new License(license);
     },
     clear(state) {
       state.activeLicense = null;
