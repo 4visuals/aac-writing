@@ -59,7 +59,7 @@ export default {
   getters: {
     activeLicense: (state) => state.activeLicense,
     student: (state, getters, allState, allGetters) => {
-      const studentSeq = state.activeLicense.studentRef;
+      const studentSeq = state.activeLicense?.studentRef;
       const students = allGetters["user/students"];
       return students.find((stud) => stud.seq === studentSeq);
     },
@@ -81,7 +81,11 @@ export default {
     },
     initLicense(state) {
       const license = storage.local.read("active_license");
-      state.activeLicense = new License(license);
+      if (license) {
+        state.activeLicense = new License(license);
+      } else {
+        state.activeLicense = null;
+      }
     },
     clear(state) {
       state.activeLicense = null;
@@ -117,6 +121,10 @@ export default {
     },
   },
   actions: {
+    loadLicense(ctx) {
+      ctx.commit("initLicense");
+      return ctx.getters["activeLicense"];
+    },
     queryExams(ctx) {
       const license = ctx.getters["activeLicense"];
       api.exam.queryExams(license.uuid).then((res) => {

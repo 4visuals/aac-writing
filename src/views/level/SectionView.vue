@@ -70,8 +70,7 @@
 <script>
 import { path } from "@/service/util";
 import { computed, ref, watch } from "vue";
-import router from "@/router";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { quizDao } from "@/dao";
 import QuestionList from "@/components/QuestionList.vue";
 import { QuizModeText } from "@/components/quiz/text-map";
@@ -79,7 +78,7 @@ import { useStore } from "vuex";
 import Slide from "@/components/slide/Slide.vue";
 import LevelNavBar from "./LevelNavBar.vue";
 import QuizSpec from "../quiz/type-quiz-spec";
-
+import { checkAppState } from "../app-state-validator";
 export default {
   components: {
     Slide,
@@ -89,6 +88,7 @@ export default {
   setup(props, { emit }) {
     const store = useStore();
     const route = useRoute();
+    const router = useRouter();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const wordMode = ref(true);
     const sentencesRef = ref([]);
@@ -112,9 +112,7 @@ export default {
      */
     const answerTypeRef = ref(null);
 
-    // if (quizOnly) {
-    //   wordMode.value = false;
-    // }
+    checkAppState({ router });
     const setActiveSection = () => {
       if (chapters.value.length === 0) {
         return;

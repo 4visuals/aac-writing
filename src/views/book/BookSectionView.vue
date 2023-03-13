@@ -60,8 +60,7 @@
 <script>
 import { path } from "@/service/util";
 import { computed, ref, watch } from "vue";
-import router from "@/router";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { quizDao } from "@/dao";
 import QuestionList from "@/components/QuestionList.vue";
 import { QuizModeText } from "@/components/quiz/text-map";
@@ -69,7 +68,7 @@ import { useStore } from "vuex";
 import BookNavBar from "./BookNavBar.vue";
 import QuizSpec from "../quiz/type-quiz-spec";
 import BookQuestionView from "./BookQuestionView.vue";
-
+import { checkAppState } from "../app-state-validator";
 export default {
   components: {
     QuestionList,
@@ -79,6 +78,7 @@ export default {
   setup(props, { emit }) {
     const store = useStore();
     const route = useRoute();
+    const router = useRouter();
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
     const sentencesRef = ref([]);
     const examDesc = ref(null);
@@ -101,6 +101,7 @@ export default {
      */
     const answerTypeRef = ref(null);
 
+    checkAppState({ router });
     const setActiveSection = () => {
       const sectionSeq = Number.parseInt(route.params.sectionSeq);
       section.value = store.getters["course/section"](sectionSeq);

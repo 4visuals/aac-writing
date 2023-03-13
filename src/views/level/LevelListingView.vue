@@ -43,9 +43,7 @@
               <SectionButton
                 :item="section"
                 :idx="section.level"
-                @itemClicked="
-                  $emit('active-section', { section, theme: 'pink' })
-                "
+                @itemClicked="$emit('active-section', { section })"
                 :history="true"
                 theme="blue"
               />
@@ -56,106 +54,41 @@
                 :item="chapter.sections.filter((sec) => sec.level == -1)[0]"
                 :idx="'도전'"
                 theme="purple"
-                @itemClicked="
-                  (section) =>
-                    $emit('active-section', { section, theme: 'green' })
-                "
+                @itemClicked="(section) => $emit('active-section', { section })"
               />
             </div>
           </div>
         </transition>
       </div>
     </transition-group>
-    <teleport to="body" v-if="activeCate">
-      <Modal ref="modal" height="90%" @hidden="hideModal">
-        <SectionView
-          :cate="activeCate"
-          :theme="themeRef"
-          :quizOnly="activeCate.level === -1"
-        />
-      </Modal>
-    </teleport>
   </div>
 </template>
 
 <script>
-// import sound from "@/service/sound";
 import SectionButton from "@/components/SectionButton.vue";
-import { Modal } from "@/components";
-import SectionView from "./SectionView.vue";
 import { useStore } from "vuex";
 import { computed, ref, watch } from "vue";
-import router from "@/router";
 import { ParaText, SpanText } from "../../components/text";
 import { ActionIcon } from "../../components/form";
-import { useRoute } from "vue-router";
+
 import util from "@/service/util";
 
 export default {
-  props: {
-    /**
-     * levels: 단계별,
-     * books: 교과서
-     */
-    cate: {
-      type: String,
-      validator: (cate) => ["levels", "books"].includes(cate),
-    },
-  },
   components: {
     SectionButton,
-    SectionView,
-    Modal,
     ParaText,
     SpanText,
     ActionIcon,
   },
-  setup(props) {
-    const theme = ref("none");
-    const challenge = ref(true);
+  setup() {
     const store = useStore();
-    const route = useRoute();
-    const license = computed(() => store.getters["exam/activeLicense"]);
-    // const segmentHistory = computed(() => store.getters["exam/segmentHistory"]);
-    const modal = ref(null);
     const activeChapter = ref(null);
-    // let chapterEl = null;
-    const activeCate = ref(null);
-    const themeRef = ref("default");
-    const showDetail = (cate, theme) => {
-      activeCate.value = cate;
-      themeRef.value = theme;
-      // sound.playSound();
-    };
-
-    const chapters = computed(() => store.state.course.chapters[props.cate]);
-    const moveTo = (quiz) => {
-      console.log(quiz);
-      router.push("/quiz/" + quiz.seq);
-    };
-    const hideModal = () => {
-      activeCate.value = null;
-    };
-    const sectionDir = (idx) => {
-      return idx % 2 === 0 ? "ltr" : "rtl";
-    };
-    const collapse = (el) => {
-      if (el) {
-        // const h = el.dataset.height;
-        el.style.height = "";
-      }
-    };
-    const markHeight = (groupEl) => {
-      const h = groupEl.clientHeight;
-      groupEl.dataset.height = h;
-      collapse(groupEl);
-    };
+    const chapters = computed(() => store.state.course.chapters.levels);
 
     const toggleActiveChapter = (chapter) => {
       let seq = null;
       if (activeChapter.value === chapter) {
         activeChapter.value = null;
-        // store.commit('ui/setActiveChapter', {group: 'level', seq: null})
       } else {
         activeChapter.value = chapter;
         seq = chapter.seq;
@@ -163,16 +96,6 @@ export default {
       store.commit("ui/setActiveChapter", { group: "level", seq });
     };
     const chapterText = (chapter) => util.chapter.rangeText(chapter, "단계");
-    watch(
-      () => route.name,
-      () => {
-        const path = route.path.substring(1);
-        const themeValue = path === "level" ? "pink" : "gold";
-        theme.value = themeValue;
-        challenge.value = path === "level";
-      },
-      { immediate: true }
-    );
     watch(
       () => chapters.value,
       (levels) => {
@@ -188,21 +111,10 @@ export default {
       }
     );
     return {
-      theme,
-      challenge,
       activeChapter,
-      modal,
-      license,
       chapters,
       moveTo,
-      showDetail,
-      activeCate,
-      themeRef,
-      hideModal,
-      sectionDir,
       toggleActiveChapter,
-      markHeight,
-      collapse,
       chapterText,
     };
   },
