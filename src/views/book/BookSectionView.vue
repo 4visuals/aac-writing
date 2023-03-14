@@ -105,7 +105,6 @@ export default {
     const setActiveSection = () => {
       const sectionSeq = Number.parseInt(route.params.sectionSeq);
       section.value = store.getters["course/section"](sectionSeq);
-      store.dispatch("record/loadRecord", sectionSeq);
     };
     const desc = () => {
       const { level, description } = section.value;

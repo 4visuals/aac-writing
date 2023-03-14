@@ -1,13 +1,13 @@
 <template>
   <div class="section" :class="{ compact: compact === '', visited }">
-    <!-- <div class="reward">
-      <div class="crown">
-        <img src="@/assets/reward/crown_section_word.png" />
+    <div class="reward">
+      <div v-if="isPerfectSection('W')" class="perfect word">
+        <img src="@/assets/reward/perfect-w.png" />
       </div>
-      <div class="crown">
-        <img src="@/assets/reward/crown_section_sen.png" />
+      <div v-if="isPerfectSection('S')" class="perfect sen">
+        <img src="@/assets/reward/perfect-s.png" />
       </div>
-    </div> -->
+    </div>
     <AppButton
       class="sec-btn"
       size="sm"
@@ -31,9 +31,20 @@ export default {
   props: ["idx", "item", "theme", "compact", "desc", "history"],
   setup(props) {
     const store = useStore();
+    const perfectRecords = computed(() => store.state.record.perfectMap);
     const visited = computed(() =>
       store.getters["quizHistory/hasHistory"](props.item)
     );
+
+    const isPerfectSection = (type) => {
+      const { item } = props;
+
+      /** @type { import("../entity/section-record").default } */
+      let sectionRecord = null;
+
+      sectionRecord = perfectRecords.value.get(item.seq);
+      return sectionRecord && sectionRecord.isPerfect(item, type);
+    };
 
     const title = () => {
       const { item } = props;
@@ -46,6 +57,7 @@ export default {
     return {
       visited,
       title,
+      isPerfectSection,
     };
   },
 };
@@ -89,14 +101,22 @@ export default {
     z-index: 5;
     display: flex;
     column-gap: 8px;
-    transform: translateY(-60%);
-    .crown {
-      width: 24px;
-      height: 24px;
+    transform: translateY(-70%);
+    .perfect {
+      display: inline-flex;
+      align-items: center;
+      &.word {
+        width: 26px;
+        height: 26px;
+      }
+      &.sen {
+        width: 27px;
+        height: 27px;
+      }
       img {
         width: 100%;
         height: auto;
-        filter: drop-shadow(1px 1px 1px #0000004a);
+        // filter: drop-shadow(1px 1px 1px #0000004a);
       }
     }
   }

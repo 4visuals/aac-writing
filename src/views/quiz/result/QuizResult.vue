@@ -53,7 +53,9 @@ export default {
         });
       });
 
-      api.exam.submitExam(exam).then(() => {});
+      api.exam.submitExam(exam).then(() => {
+        store.dispatch("record/loadRecord", ctx.sectionSeq);
+      });
     };
     /**
      * [문장] 어절 단위로 입력받음
@@ -98,7 +100,9 @@ export default {
         return question.eojeols.flatMap((ej) => ej.trials);
       });
       exam.submissions = trials;
-      api.exam.submitLearning(exam).then(() => {});
+      api.exam.submitLearning(exam).then(() => {
+        store.dispatch("record/loadRecord", ctx.sectionSeq);
+      });
     };
     onMounted(() => {
       store.commit("quiz/hideHint");

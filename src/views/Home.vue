@@ -79,13 +79,12 @@ import GoogleButton from "../components/oauth/GoogleButton.vue";
 import CompanyInfo from "../components/company/CompanyInfo.vue";
 import modals from "@/components/modal";
 import DialogView from "@/components/dialog/DialogView.vue";
+import { loadStudentRecords } from "./app-state-validator";
 
 export default {
   name: "Home",
   components: {
     StudentLoginForm,
-    // ManualLoginForm,
-    // UserProfile,
     LicenseConfigView,
     SpanText,
     ParaText,
@@ -102,9 +101,8 @@ export default {
     const member = computed(() => store.getters["user/isMember"]);
     const modal = ref({ visible: false, lcs: null });
     const moveTo = (url, license) => {
-      // console.log("move to ", url);
       store.commit("exam/setActiveLicense", license);
-      store.dispatch("record/prefetch", license.studentRef).then(() => {
+      loadStudentRecords({ store, license }).then(() => {
         router.replace(url);
       });
     };

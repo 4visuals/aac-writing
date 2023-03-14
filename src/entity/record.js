@@ -21,7 +21,9 @@ export default class Record {
   get startTime() {
     return Date.parse(this._data.paper.startTime);
   }
-
+  get numOfCorrectAnswer() {
+    return this.numOfQuestions - this.numOfWrongAnswer;
+  }
   get mode() {
     return modeMap[this.paper.mode];
   }

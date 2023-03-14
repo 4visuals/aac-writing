@@ -12,6 +12,7 @@
         <div
           class="col-12 chap-title"
           @click="toggleActiveChapter(chapter, $event.target)"
+          v-if="chapter.seq >= 0"
         >
           <ParaText :lg="true" class="title">
             <ActionIcon
@@ -29,6 +30,20 @@
             <SpanText class="chapter-name">{{
               chapter.desc.substring(3)
             }}</SpanText>
+            <div class="reward">
+              <div
+                v-if="isPerfectChapter(chapter, perfectInfo, 'word')"
+                class="perfect word"
+              >
+                <img src="@/assets/reward/perfect-w.png" />
+              </div>
+              <div
+                v-if="isPerfectChapter(chapter, perfectInfo, 'sen')"
+                class="perfect sen"
+              >
+                <img src="@/assets/reward/perfect-s.png" />
+              </div>
+            </div>
           </ParaText>
         </div>
         <transition name="section">
@@ -70,7 +85,7 @@ import { useStore } from "vuex";
 import { computed, ref, watch } from "vue";
 import { ParaText, SpanText } from "../../components/text";
 import { ActionIcon } from "../../components/form";
-
+import { listingViewHelper } from "../app-state-validator";
 import util from "@/service/util";
 
 export default {
@@ -84,7 +99,11 @@ export default {
     const store = useStore();
     const activeChapter = ref(null);
     const chapters = computed(() => store.state.course.chapters.levels);
+    const sectionRecordMap = computed(() => store.state.record.perfectMap);
+    const perfectInfo = ref({ mod: 0 });
 
+    const { findActiveChapter, resolvePerfectChapters, isPerfectChapter } =
+      listingViewHelper({ ref });
     const toggleActiveChapter = (chapter) => {
       let seq = null;
       if (activeChapter.value === chapter) {
@@ -95,27 +114,33 @@ export default {
       }
       store.commit("ui/setActiveChapter", { group: "level", seq });
     };
+
     const chapterText = (chapter) => util.chapter.rangeText(chapter, "단계");
     watch(
-      () => chapters.value,
-      (levels) => {
-        if (!levels) {
-          return;
-        }
-        const seq = store.getters["ui/activeChapter"]("level");
-        const chapter = chapters.value.find((chapter) => chapter.seq === seq);
-        activeChapter.value = chapter;
+      () => sectionRecordMap.value,
+      () => {
+        const _chapters = chapters.value;
+        activeChapter.value = findActiveChapter({ store, chapters: _chapters });
+        perfectInfo.value = resolvePerfectChapters({
+          chapters: _chapters,
+          sectionRecordMap: sectionRecordMap.value,
+        });
+        resolvePerfectChapters({
+          store,
+          chapters: chapters.value,
+          sectionRecordMap: sectionRecordMap.value,
+        });
       },
-      {
-        immediate: true,
-      }
+      { immediate: true }
     );
     return {
       activeChapter,
       chapters,
+      perfectInfo,
       moveTo,
       toggleActiveChapter,
       chapterText,
+      isPerfectChapter,
     };
   },
 };
@@ -151,7 +176,6 @@ $border-color: #c1d9e8;
     .chap-title {
       border-bottom: 1px solid $border-color;
       .reward {
-        transform: translateY(-50%);
         .crown {
           width: 32px;
           height: 32px;
@@ -183,12 +207,8 @@ $border-color: #c1d9e8;
       }
     }
     .reward {
-      position: absolute;
       display: flex;
       column-gap: 16px;
-      transform: translateY(-50%);
-      top: 50%;
-      right: 40px;
       z-index: 5;
       .crown {
         width: 28px;

@@ -122,11 +122,6 @@ export default {
       if (cate.value.level === -1) {
         wordMode.value = false;
       }
-      store.dispatch("record/loadRecord", sectionSeq);
-
-      // api.exam.wrongAnswer(seq).then((res) => {
-      //   console.log(res);
-      // });
     };
     const title = () => {
       const { level } = cate.value;

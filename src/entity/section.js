@@ -4,6 +4,15 @@ export default class Section {
     Object.keys(section).forEach((prop) => {
       this[prop] = section[prop];
     });
+
+    this._words = this.sentences.filter((sen) => sen.type === "W");
+    this._sens = this.sentences.filter((sen) => sen.type === "S");
+  }
+  countWords() {
+    return this._words.length;
+  }
+  countSentences() {
+    return this._sens.length;
   }
   /**
    * 단계별 학습의 [도전] 섹션인티 나타냄
