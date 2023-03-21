@@ -24,7 +24,7 @@ import StatNav from "../../components/nav/StatNav.vue";
 import api from "@/service/api";
 
 import examLoader from "./exam-loader";
-import { shallowRef, reactive } from "vue";
+import { shallowRef, reactive, computed, watch } from "vue";
 import { useStore } from "vuex";
 // import { useRouter } from "vue-router";
 import DailyStatView from "../../components/stats/DailyStatView.vue";
@@ -36,9 +36,10 @@ export default {
   setup() {
     const exams = shallowRef(null);
     const store = useStore();
-    const license = store.getters["exam/activeLicense"];
-    const levels = store.getters["course/levels"];
-    const books = store.getters["course/books"];
+    const loginUser = computed(() => store.getters["user/currentUser"]);
+    const license = computed(() => store.getters["exam/activeLicense"]);
+    const levels = computed(() => store.getters["course/levels"]);
+    const books = computed(() => store.getters["course/books"]);
 
     const route = useRoute();
     const router = useRouter();
@@ -72,17 +73,25 @@ export default {
     const gotoMain = () => {
       router.replace(backPath);
     };
+    let dataLoaded = false;
     const loadData = () => {
-      return api.exam.queryBySegments(license.uuid).then((res) => {
+      if (dataLoaded || !loginUser.value || !license.value) {
+        return;
+      }
+      dataLoaded = true;
+      return api.exam.queryBySegments(license.value.uuid).then((res) => {
         exams.value = res.quiz;
         const examMap = createExamMap(exams.value);
-        chapterStats.level = createChapterStats(examMap, levels);
-        chapterStats.book = createChapterStats(examMap, books);
+        chapterStats.level = createChapterStats(examMap, levels.value);
+        chapterStats.book = createChapterStats(examMap, books.value);
         openStatePage("today");
       });
     };
 
-    loadData();
+    // loadData();
+
+    watch(loginUser, loadData, { immediate: true });
+    watch(license, loadData, { immediate: true });
     return { exams, page, openStatePage, gotoMain };
   },
 };
