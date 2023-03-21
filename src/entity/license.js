@@ -37,6 +37,9 @@ class License {
       return Date.parse(exp);
     }
   }
+  isInUse() {
+    return !this.isExpired() && this.alreadyActivated && this.studentRef;
+  }
   isExpired() {
     const { expiredAt } = this;
     if (!expiredAt) {

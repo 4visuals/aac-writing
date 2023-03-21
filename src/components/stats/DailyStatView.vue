@@ -1,33 +1,30 @@
 <template>
   <div class="daily-stat">
-    <div class="summary">
-      <div class="today">
-        <div>
-          <SpanText>{{ now.month }}월 {{ now.date }}일</SpanText>
-        </div>
-        <div>
-          <SpanText>{{ now.dayText }}요일</SpanText>
-        </div>
-      </div>
-      <div class="item orange">
-        <h5>학습 문항</h5>
-        <div class="body" v-if="todayStat">
-          {{ todayStat.questions === 0 ? "---" : `${todayStat.questions}문항` }}
-        </div>
-      </div>
-      <div class="item blue">
-        <h5>학습 시간</h5>
-        <div class="body" v-if="todayStat">{{ timeText(todayStat.times) }}</div>
-      </div>
-      <div class="item green">
-        <h5>평균 점수</h5>
-        <div class="body" v-if="todayStat">{{ todayStat.score }}</div>
-      </div>
-    </div>
     <div class="cal-view">
+      <div class="cal-header">
+        <CalendarNav class="cal-nav" :current="now" @shift="shiftCalendar" />
+        <div class="today-stat">
+          <div class="item left">
+            <h5>학습 문항</h5>
+            <div class="body">
+              {{ formatText(todayStat, "questions", "문항") }}
+            </div>
+          </div>
+          <div class="item">
+            <h5>학습 시간</h5>
+            <div class="body">
+              {{ timeText(todayStat) }}
+            </div>
+          </div>
+          <div class="item right">
+            <h5>평균 점수</h5>
+            <div class="body">{{ formatText(todayStat, "score", "점") }}</div>
+          </div>
+        </div>
+      </div>
       <CalendarView
         class="calendar"
-        :current="new Date()"
+        :current="now"
         @today="showTodayExam"
         @exams="showExamDetail"
       />
@@ -68,9 +65,8 @@
  */
 import { nextTick, ref, shallowRef } from "vue";
 import { time } from "@/service/util";
-import { CalendarView, Day } from "../calendar";
+import { CalendarNav, CalendarView, Day, fromDate } from "../calendar";
 import ExamPaperTableView from "./ExamPaperTableView.vue";
-import { SpanText } from "@/components/text";
 import EojeolSubmissionView from "../quiz/submission/EojeolSubmissionView.vue";
 import SentenceSubmissionView from "../quiz/submission/SentenceSubmissionView.vue";
 import { ActionIcon } from "../../components/form";
@@ -79,14 +75,15 @@ import confetti from "canvas-confetti";
 export default {
   components: {
     ActionIcon,
+    CalendarNav,
     CalendarView,
     ExamPaperTableView,
-    SpanText,
     SentenceSubmissionView,
     EojeolSubmissionView,
   },
   setup() {
-    const now = Day.fromDate(new Date());
+    let current = new Date();
+    const now = shallowRef(Day.fromDate(current));
     const detailEl = shallowRef(null);
     const detail = shallowRef(null);
     const submissions = shallowRef(null);
@@ -113,11 +110,11 @@ export default {
         { questions: 0, times: 0, quiz: { total: 0, correct: 0 } }
       );
       const { total, correct } = stats.quiz;
-      stats.score = total === 0 ? "---" : ((100 * correct) / total).toFixed(1);
+      stats.score = total === 0 ? null : ((100 * correct) / total).toFixed(1);
       todayStat.value = stats;
     };
-    const timeText = (millis) => {
-      return millis === 0 ? "---" : time.readableText(millis);
+    const timeText = (stat) => {
+      return stat ? time.readableText(stat.times) : "---";
     };
     const showSubmissions = (pair) => {
       const { paper, section } = pair;
@@ -173,7 +170,27 @@ export default {
           .then(stop);
       });
     };
+
+    const shiftMonth = (delta) => {
+      const d = fromDate(now.value);
+      const newMonth = delta === 1 ? d.nextMonth() : d.prevMonth();
+      now.value = newMonth;
+    };
+    const formatText = (stat, prop, suffix) => {
+      return stat && stat[prop] ? `${Math.floor(stat[prop])}${suffix}` : "---";
+    };
+    const shiftCalendar = (cal) => {
+      const { type, by } = cal;
+      console.log(type, by);
+      if (type === "month") {
+        shiftMonth(by);
+      } else if (type === "today") {
+        current = new Date();
+        now.value = fromDate(Day.fromDate(current));
+      }
+    };
     return {
+      current,
       now,
       todayStat,
       detail,
@@ -189,6 +206,8 @@ export default {
       closeSubmitView,
       closeDetailView,
       showConfetti,
+      formatText,
+      shiftCalendar,
     };
   },
 };
@@ -200,131 +219,123 @@ export default {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
+  background-color: white;
+  border-radius: 16px;
+  height: 100%;
   .summary {
     display: flex;
     justify-content: flex-start;
     column-gap: 16px;
     padding: 0 16px;
     margin: 16px 0;
-    .today {
-      flex: 1 1 auto;
-    }
-    .item {
-      position: relative;
-      width: 80px;
-      height: 75px;
-      display: flex;
-      flex-direction: column;
-      // padding: 8px;
-      background-color: antiquewhite;
-      border-radius: 8px;
-      box-shadow: 1px 1px 2px;
-      &.orange {
-        background-color: #ffe8a1;
-        color: #69520c;
-        h5 {
-          background-color: #ffc001;
-        }
-      }
-      &.blue {
-        background-color: #93e2ff;
-        color: #084359;
-        h5 {
-          background-color: #01b0f0;
-        }
-      }
-      &.green {
-        background-color: #bbff8e;
-        color: #335f0b;
-        h5 {
-          background-color: #85ec29;
-        }
-      }
-      h5 {
-        padding: 8px;
-        font-size: 12px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-      }
-      .body {
-        flex: 1 1 auto;
-        font-size: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    }
   }
   .cal-view {
     position: relative;
     display: flex;
+    flex-direction: column;
     flex: 1 1 auto;
-    .calendar {
-      flex: 1 1 auto;
-    }
-    .details {
+    .cal-header {
       display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 0;
-      background-color: #0000004d;
-      z-index: 10;
-      padding: 16px;
-    }
-    .submissions {
-      display: flex;
-      flex-direction: row;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      height: 400px;
-      z-index: 20;
-      transform: translate(-50%, -50%);
-      box-shadow: 2px 2px 16px #0000004d;
-      border-radius: 8px;
-      overflow: hidden;
-      .scrollable {
-        position: relative;
-        background-color: white;
-        padding: 16px 0;
-        overflow: auto;
+      padding: 16px 8px;
+      color: #6b7a99;
+      .cal-nav {
         flex: 1 1 auto;
       }
-      .close {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        font-size: 32px;
-        z-index: 30;
-      }
-      .confetti {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
+      .today-stat {
+        border-radius: 40rem;
+        border: 2px solid #7b4799;
+        overflow: hidden;
+        display: flex;
+        font-weight: 600;
+        .item {
+          position: relative;
+          display: flex;
+          // padding: 8px;
+          background-color: white;
+          color: #7b4799;
+          font-size: 1.2rem;
+          h5 {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            padding: 0 16px;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            width: 90px;
+          }
+          .body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #7b4799;
+            color: white;
+            width: 80px;
+          }
+        }
       }
     }
-    @include mobile {
-      .submissions {
-        max-width: 400px;
-        width: 90%;
-      }
+  }
+  .calendar {
+    flex: 1 1 auto;
+  }
+  .details {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+  }
+  .submissions {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 400px;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+    box-shadow: 2px 2px 16px #0000004d;
+    border-radius: 8px;
+    overflow: hidden;
+    .scrollable {
+      position: relative;
+      background-color: white;
+      padding: 18px 0;
+      overflow: auto;
+      flex: 1 1 auto;
     }
-    @include tablet {
-      .submissions {
-        width: 400px;
-      }
+    .close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 32px;
+      z-index: 30;
     }
-    @include desktop {
-      .submissions {
-        width: 400px;
-      }
+    .confetti {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  @include mobile {
+    .submissions {
+      max-width: 400px;
+      width: 90%;
+    }
+  }
+  @include tablet {
+    .submissions {
+      width: 400px;
+    }
+  }
+  @include desktop {
+    .submissions {
+      width: 400px;
     }
   }
 }

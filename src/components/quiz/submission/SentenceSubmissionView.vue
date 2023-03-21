@@ -1,27 +1,19 @@
 <template>
   <div class="sbm-view">
-    <div class="perfect" v-if="submit.sentences.length === 0">100점</div>
+    <ScoreUI v-if="submit.sentences.length === 0" :score="100" />
     <div class="sbm" v-for="sen in submit.sentences" :key="sen.seq">
-      <div
-        class="pic"
-        :style="{ 'background-image': `url('${imagePath(sen)}')` }"
-      ></div>
       <div class="sen">
-        <SpanText size="sm" class="mark q">Q</SpanText
-        ><SpanText size="sm">{{ sen.sentence }}</SpanText>
+        <SpanText>{{ sen.sentence }}</SpanText>
       </div>
-      <div class="answers">
-        <ul v-if="hasSubmissions(sen)">
-          <li
-            v-for="(sbm, idx) in filterSubmissions(sen)"
-            :key="idx"
-            class="answer"
-            :class="{ correct: sbm.correct }"
-          >
-            <SpanText size="sm">{{ sbm.value }}</SpanText>
-          </li>
-        </ul>
-        <div class="empty" v-else>미입력</div>
+      <div class="answer">
+        <div
+          class="pic"
+          :style="{ 'background-image': `url('${imagePath(sen)}')` }"
+        ></div>
+        <div class="text" v-if="hasSubmissions(sen)">
+          <SpanText>{{ filterSubmissions(sen)[0].value }}</SpanText>
+        </div>
+        <div class="text empty" v-else>미입력</div>
       </div>
     </div>
   </div>
@@ -31,13 +23,14 @@
 import { SpanText } from "@/components/text";
 import util from "@/service/util";
 import { onMounted, shallowRef, watch } from "vue";
+import ScoreUI from "../../stats/ScoreUI.vue";
 export default {
-  components: { SpanText },
+  components: { SpanText, ScoreUI },
   props: ["paper", "section"],
   setup(props, { emit }) {
     const image = {
-      passed: require("@/assets/reward/passed.png"),
-      failed: require("@/assets/reward/failed.png"),
+      passed: require("@/assets/reward/face-green.svg"),
+      failed: require("@/assets/reward/face-red.svg"),
     };
     const submit = shallowRef(null);
 
@@ -99,6 +92,9 @@ export default {
 
 <style lang="scss" scoped>
 .sbm-view {
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
   .perfect {
     position: absolute;
     top: 50%;
@@ -111,60 +107,46 @@ export default {
     transition: font-size 0.2s linear 0.3;
   }
   .sbm {
-    display: grid;
-    grid-template-columns: 60px 1fr;
-    grid-template-rows: 24px max-content;
-    column-gap: 8px;
-    margin: 8px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    padding: 0 16px;
     .mark {
       font-family: "Rowdies", monospace, cursive;
-      font-weight: 500;
+      font-weight: 600;
       &.q {
-        margin-right: 4px;
         color: #0596ff;
+        text-align: center;
       }
       &.a {
         color: rgb(0, 190, 0);
       }
     }
-    .pic {
-      width: 60px;
-      height: 60px;
-      background-color: #efefef;
-      background-size: 80%;
-      background-position: center;
-      background-repeat: no-repeat;
-      grid-column: 1/2;
-      grid-row: 1/3;
-      border-radius: 8px;
-      box-shadow: 1px 1px 2px #0000004d;
-    }
     .sen {
       color: #666;
-      grid-column: 2 / 3;
       display: inline-flex;
       align-items: center;
+      font-weight: 600;
+      margin-left: 40px;
     }
-    .answers {
-      grid-column: 2 / 3;
-      ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        column-gap: 8px;
-        .answer {
-          background-color: #ffe370;
-          color: #a54e00;
-          padding: 4px 6px;
-          border-radius: 4px;
-          &.correct {
-            border-left-color: #335f0b;
-            background-color: #b3ff70;
-            color: #335f0b;
-          }
-        }
+    .answer {
+      display: flex;
+      column-gap: 8px;
+      .pic {
+        width: 28px;
+        height: 28px;
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      .text {
+        flex: 1 1 auto;
+        border-radius: 8px;
+        padding: 0 12px;
+        border: 1px solid #df2424;
+        color: #df2424;
+        display: inline-flex;
+        align-items: center;
       }
       .empty {
         color: #999;

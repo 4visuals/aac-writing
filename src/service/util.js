@@ -277,7 +277,9 @@ const chapter = {
     const { sections } = chapter;
     const min = sections[0].level;
     const max = sections[sections.length - 2].level;
-    return `${min} - ${max}${suffix}`;
+    return `${min < 10 ? "0" + min : min} - ${
+      max < 10 ? "0" + max : max
+    }${suffix}`;
   },
 };
 export { key, path, time, host, logger, arr, vue, valid, currency, pick };

@@ -17,7 +17,7 @@ import { useStore } from "vuex";
 import WordExamResult from "./WordExamResult.vue";
 import Scoring from "./scoring";
 import { ref } from "vue";
-import ScoreUI from "./ScoreUI.vue";
+import ScoreUI from "../../../components/stats/ScoreUI.vue";
 
 export default {
   setup() {

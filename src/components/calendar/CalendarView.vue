@@ -1,13 +1,10 @@
 <template>
   <div class="calendar">
-    <div class="cal-head">
-      <ActionIcon class="move" icon="chevron_left" @click="shiftMonth(-1)" />
-      <h3>{{ month.year }}년 {{ month.monthText }}월</h3>
-      <ActionIcon class="move" icon="chevron_right" @click="shiftMonth(1)" />
-    </div>
     <div class="weeks">
       <div class="seven-days">
-        <div class="day" v-for="day in days" :key="day">{{ day }}</div>
+        <div class="day border-rb" v-for="day in days" :key="day">
+          {{ day }}
+        </div>
       </div>
       <div
         class="week"
@@ -15,18 +12,17 @@
         :key="week.index"
       >
         <div
+          class="border-rb"
           :class="`day row-${idx} col-${day.dayOfWeek} ${
             hasData(monthMap, day) ? 'has-data' : ''
-          } ${month.month !== day.month ? 'inactive' : ''}`"
+          } ${current.month !== day.month ? 'inactive' : ''}`"
           v-for="day in week.days"
           :key="day.toYMD()"
         >
           <span
             class="date"
             :class="{
-              today:
-                month.month === current.getMonth() + 1 &&
-                day.date === current.getDate(),
+              today: month.month === today.month && day.date === today.date,
             }"
             >{{ day.date }}</span
           >
@@ -46,20 +42,29 @@ import { logger } from "@/service/util";
 import { computed } from "@vue/reactivity";
 import { shallowRef, watch } from "vue";
 import { useStore } from "vuex";
-import { fromDate, Day } from ".";
-import { ActionIcon } from "../../components/form";
+import { Day, fromDate } from ".";
 export default {
-  components: { ActionIcon },
   emits: ["exams", "today"],
-  props: { current: Date },
+  props: { current: Day },
   setup(props, { emit }) {
     const days = "일월화수목금토".split("");
+    // eslint-disable-next-line vue/no-setup-props-destructure
+    const today = props.current;
     const month = shallowRef(fromDate(props.current));
     const store = useStore();
     const historyMap = computed(() => store.state.exam.histories);
     const monthMap = shallowRef(null);
+    const loginUser = computed(() => store.getters["user/currentUser"]);
+    const license = computed(() => store.getters["exam/activeLicense"]);
+    /**
+     * 새로고침에도 대응해야함.
+     */
+    let dataLoaded = false;
     const loadExamData = () => {
-      store.dispatch("exam/queryExams");
+      if (!dataLoaded && loginUser.value && license.value) {
+        dataLoaded = true;
+        store.dispatch("exam/queryExams");
+      }
     };
 
     const countBy = (day) => {
@@ -84,7 +89,7 @@ export default {
       monthMap.value = map;
     };
     const notifyTodayData = () => {
-      const cur = Day.fromDate(props.current);
+      const cur = props.current;
       const papers = monthMap.value.get(cur.toYMD());
       logger.log(papers);
       emit("today", papers);
@@ -95,13 +100,6 @@ export default {
     };
     const hasData = (_, date) => _ && countExams(_, date) > 0;
 
-    const shiftMonth = (delta) => {
-      const newMonth =
-        delta === 1 ? month.value.nextMonth() : month.value.prevMonth();
-      month.value = newMonth;
-
-      updateMonthData();
-    };
     const showDetail = (day) => {
       const papers = monthMap.value.get(day.toYMD());
       emit("exams", { day, papers });
@@ -111,16 +109,24 @@ export default {
       updateMonthData();
       notifyTodayData();
     });
-    loadExamData();
+    watch(loginUser, loadExamData, { immediate: true });
+    watch(license, loadExamData, { immediate: true });
+    watch(
+      () => props.current,
+      () => {
+        month.value = props.current;
+        updateMonthData();
+      }
+    );
 
     return {
       days,
+      today,
       monthMap,
       month,
       countBy,
       hasData,
       countExams,
-      shiftMonth,
       showDetail,
     };
   },
@@ -128,9 +134,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$border-color: #eeeeee;
+$inner-gap: 12px;
+$fisze: 1em;
 .calendar {
   display: flex;
   flex-direction: column;
+  .border {
+    &-rb {
+      border-right: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
+    }
+    &-none {
+      &-r {
+        border-right: none;
+      }
+      &-l {
+        border-left: none;
+      }
+    }
+  }
   .cal-head {
     display: flex;
     padding: 8px;
@@ -144,29 +167,29 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    row-gap: 1px;
-    padding: 8px;
     .seven-days {
       display: flex;
-      column-gap: 1px;
+      border-top: 1px solid $border-color;
       .day {
         flex: 1;
         display: inline-flex;
         justify-content: center;
-        background-color: #dceaff;
-        padding: 4px 0;
+        padding: 8px 0;
+        &:last-child {
+          border-right: none;
+        }
       }
     }
     .week {
       display: flex;
       flex: 1 1 auto;
-      column-gap: 1px;
       .day {
         flex: 1;
         position: relative;
         cursor: pointer;
         & > .date {
-          position: relative;
+          position: absolute;
+          right: 0;
           display: flex;
           padding: 8px;
           z-index: 10;
@@ -175,12 +198,13 @@ export default {
           height: 28px;
           align-items: center;
           justify-content: center;
-          font-size: 1.1em;
-          margin: 4px;
+          margin: $inner-gap;
           line-height: 1;
+          font-size: $fisze;
+          font-weight: 600;
           &.today {
             border-radius: 30px;
-            background-color: #4c871f;
+            background-color: #9952d6;
             color: white !important;
           }
         }
@@ -189,23 +213,36 @@ export default {
         }
         .inner {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          top: -1px;
+          left: -1px;
+          right: -2px;
+          bottom: -2px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 1px 1px 2px #798438;
-          border-radius: 4px;
+          font-size: $fisze;
+          border-radius: 8px;
         }
         &.has-data {
           .date {
             color: #4e5819;
-            font-weight: 500;
           }
           .inner {
-            background-color: #d9ed64;
+            border: 2px solid #9952d6;
+            font-weight: 600;
+            .cnt {
+              position: absolute;
+              top: 0;
+              left: 0;
+              background-color: #9952d6;
+              color: white;
+              margin: $inner-gap;
+              padding: 2px 8px;
+              border-radius: 6px;
+              border-radius: 6px;
+              font-weight: 600;
+              line-height: 20px;
+            }
           }
         }
         &.inactive {
@@ -213,6 +250,9 @@ export default {
             color: #999;
             font-size: 1em;
           }
+        }
+        &:last-child {
+          border-right: none;
         }
       }
     }

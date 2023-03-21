@@ -36,13 +36,17 @@
 
 <script>
 import adminApi from "../../service/admin-api";
+import License from "../../../../entity/license";
 export default {
   props: ["user"],
   setup(props, { emit }) {
     const issueLicense = (cnt) => {
       adminApi.license.create(props.user.seq, cnt).then((res) => {
         console.log(res);
-        emit("created", res.licenses);
+        emit(
+          "created",
+          res.licenses.map((lcs) => new License(lcs))
+        );
       });
     };
     return {

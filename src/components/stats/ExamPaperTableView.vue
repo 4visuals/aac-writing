@@ -4,68 +4,66 @@
       <ActionIcon icon="chevron_left" @click="$emit('close')" />
       <h3>{{ date.toYMD() }}</h3>
     </div>
-    <TableView class="table" colsize="40px" :colummBased="false">
-      <template v-slot:fcol>
-        <Cell w="w40" class="event"><SpanText size="sm">#</SpanText></Cell>
-        <Cell
-          w="w40"
+    <div class="table">
+      <table>
+        <tr class="header">
+          <th class="min w60 align-center">
+            <SpanText size="sm">NO</SpanText>
+          </th>
+          <th class="nowrap w160">
+            <SpanText size="sm">단계</SpanText>
+          </th>
+          <th class="w160"></th>
+          <th class="min w80"><SpanText size="sm">종류</SpanText></th>
+          <th class="min w100 align-center">
+            <SpanText size="sm">학습유형</SpanText>
+          </th>
+          <th class="min w80"><SpanText size="sm">점수</SpanText></th>
+        </tr>
+        <tr
           v-for="(pair, idx) in sheets"
           :key="pair.paper.seq"
           :class="idx % 2 == 1 ? 'even' : 'odd'"
-          ><SpanText size="sm">{{ idx + 1 }}</SpanText></Cell
+          @click.stop="$emit('view-submissions', pair)"
         >
-      </template>
-      <template v-slot:data>
-        <Row>
-          <Cell w="w160"><SpanText size="sm">단계</SpanText></Cell>
-          <Cell w="w160"></Cell>
-          <Cell w="w60"><SpanText size="sm">종류</SpanText></Cell>
-          <Cell w="w100"><SpanText size="sm">학습형태</SpanText></Cell>
-          <Cell w="w40"><SpanText size="sm">점수</SpanText></Cell>
-        </Row>
-        <Row
-          v-for="(pair, idx) in sheets"
-          :key="pair.paper.seq"
-          :class="idx % 2 == 1 ? 'even' : 'odd'"
-        >
-          <Cell w="w160"
-            ><SpanText size="sm">{{
-              pair.section.chapter.desc
-            }}</SpanText></Cell
-          >
-          <Cell w="w160"
-            ><SpanText size="sm"
+          <td class="min w60 align-center">
+            <SpanText size="sm">{{ idx + 1 }}</SpanText>
+          </td>
+          <td class="nowrap w160">
+            <SpanText class="nowrap" size="sm">{{
+              formatChapterTitle(pair.section.chapter)
+            }}</SpanText>
+          </td>
+          <td class="nowrap w160">
+            <SpanText class="nowrap" size="sm"
               >{{ pair.section.level === -1 ? "도전" : pair.section.level }}.
               {{
                 pair.section.level === -1 ? "" : pair.section.description
               }}</SpanText
-            ></Cell
-          >
-          <Cell w="w60"
-            ><SpanText size="sm">{{ examType(pair.paper) }}</SpanText></Cell
-          >
-          <Cell w="w100"
-            ><SpanText size="sm">{{ mode(pair.paper) }}</SpanText></Cell
-          >
-          <Cell w="w40"
-            ><SpanText size="sm"
-              ><button
-                class="anchor"
-                @click.stop="$emit('view-submissions', pair)"
-              >
+            >
+          </td>
+          <td class="min w80">
+            <SpanText size="sm">{{ examType(pair.paper) }}</SpanText>
+          </td>
+          <td class="min w100 align-center">
+            <SpanText size="sm">{{ mode(pair.paper) }}</SpanText>
+          </td>
+          <td class="min w80">
+            <SpanText size="sm"
+              ><button class="anchor">
                 {{ score(pair.paper) }}
               </button></SpanText
-            ></Cell
-          >
-        </Row>
-      </template>
-    </TableView>
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
 import { ActionIcon } from "../../components/form";
-import { TableView, Row, Cell } from "@/components/table";
+// import { TableView, Row, Cell } from "@/components/table";
 import { shallowRef } from "vue";
 import { SpanText } from "@/components/text";
 import { useStore } from "vuex";
@@ -74,15 +72,15 @@ export default {
   components: {
     ActionIcon,
     SpanText,
-    TableView,
-    Row,
-    Cell,
+    // TableView,
+    // Row,
+    // Cell,
     // SentenceExamResult,
   },
   props: ["date", "papers"],
   setup(props) {
     const types = { W: "낱말", S: "문장", B: "교과서" };
-    const modes = { L: "학습", Q: "퀴즈", R: "보고쓰기" };
+    const modes = { L: "연습하기", Q: "받아쓰기", R: "보고쓰기" };
     const store = useStore();
     const sheets = shallowRef([]);
 
@@ -182,6 +180,15 @@ export default {
       });
       sheets.value = pairs;
     };
+    const formatChapterTitle = (chapter) => {
+      if (chapter.origin === "L") {
+        const range = util.chapter.rangeText(chapter, ". ");
+        const desc = chapter.desc.substring("x. ".length);
+        return range + desc;
+      } else {
+        return chapter.desc;
+      }
+    };
     initSheet();
     return {
       sheets,
@@ -189,6 +196,7 @@ export default {
       mode,
       score,
       showSubmissions,
+      formatChapterTitle,
     };
   },
 };
@@ -196,16 +204,22 @@ export default {
 
 <style lang="scss" scoped>
 .exam-table {
-  flex: 1 1 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 720px;
+  max-height: 500px;
   // margin: 16px;
-  box-shadow: rgb(0 0 0 / 16%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 25px, rgba(0, 0, 0, 0.05) 0px 2px 10px;
   border-radius: 8px;
   background-color: white;
   height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-bottom: 8px;
+
   .head {
     display: flex;
     column-gap: 8px;
@@ -214,14 +228,82 @@ export default {
   }
   .table {
     overflow-y: auto;
+    .nowrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    table {
+      font-size: 12px;
+      width: 100%;
+      color: #6b7a99;
+      padding-bottom: 16px;
+      tr {
+        border-top: 1px solid #f5f6f7;
+        &:hover {
+          background-color: #f1e9f6;
+          cursor: pointer;
+        }
+        &.header {
+          position: sticky;
+          top: -1px;
+          background-color: white;
+          box-shadow: 0 2px 2px #00000010, 0 1px 1px #0000002d;
+        }
+        td,
+        th {
+          padding: 6px 0;
+          &.w160 {
+            max-width: 160px;
+          }
+          &.w100 {
+            max-width: 100px;
+            &.min {
+              width: 100px;
+            }
+          }
+          &.w80 {
+            max-width: 80px;
+            &.min {
+              width: 80px;
+            }
+          }
+          &.w60 {
+            max-width: 60px;
+            &.min {
+              width: 60px;
+            }
+          }
+          &.w40 {
+            max-width: 40px;
+            &.min {
+              width: 40px;
+            }
+          }
+          &.align {
+            &-center {
+              text-align: center;
+            }
+          }
+          &.nowrap {
+            white-space: nowrap;
+          }
+          a {
+            color: #9852d5;
+            text-decoration: none;
+          }
+        }
+      }
+    }
     button {
       border: none;
       outline: none;
       background-color: transparent;
+      font-family: "Roboto";
       &.anchor {
-        text-decoration: underline;
-        text-underline-offset: 2px;
-        color: blue;
+        color: #9852d5;
+        text-decoration: none;
+        font-weight: 600;
       }
     }
   }

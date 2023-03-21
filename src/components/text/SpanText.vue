@@ -1,5 +1,5 @@
 <template>
-  <span :class="{ sm: size === 'sm', lg: size === 'lg' }"><slot /></span>
+  <span :class="[size || 'sm']"><slot /></span>
 </template>
 
 <script>

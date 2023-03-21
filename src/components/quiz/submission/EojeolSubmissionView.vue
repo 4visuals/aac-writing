@@ -3,8 +3,7 @@
     <div class="perfect" v-if="submit.sentences.length === 0">100점</div>
     <div class="sbm" v-for="sen in submit.sentences" :key="sen.seq">
       <div class="sen">
-        <SpanText size="sm" class="mark q">Q</SpanText
-        ><SpanText size="sm">{{ sen.sentence }}</SpanText>
+        <SpanText>{{ sen.sentence }}</SpanText>
       </div>
       <div class="eojeols">
         <div class="eojeol" v-for="eojeol in sen.eojeols" :key="eojeol.seq">
@@ -20,9 +19,9 @@
             :class="{ correct: answer.correct }"
             :key="answer.index"
           >
-            {{ answer.value }}
+            <SpanText size="sm">{{ answer.value }}</SpanText>
           </div>
-          <div class="empty" v-if="isEmptyEojeol(eojeol)">미입력</div>
+          <div class="none val" v-if="isEmptyEojeol(eojeol)">미입력</div>
         </div>
       </div>
     </div>
@@ -40,8 +39,9 @@ export default {
   props: ["paper", "section"],
   setup(props, { emit }) {
     const image = {
-      passed: require("@/assets/reward/passed.png"),
-      failed: require("@/assets/reward/failed.png"),
+      passed: require("@/assets/reward/face-green.svg"),
+      failed: require("@/assets/reward/face-red.svg"),
+      none: require("@/assets/reward/face-gray.svg"),
     };
     const submit = shallowRef(null);
 
@@ -56,7 +56,9 @@ export default {
 
     const imagePathOfEojeol = (ej) => {
       const answers = answerOf(ej);
-      if (answers.length === 1 && answers[0].correct) {
+      if (answers.length === 0) {
+        return image.none;
+      } else if (answers.length === 1 && answers[0].correct) {
         return image.passed;
       } else {
         return image.failed;
@@ -79,6 +81,24 @@ export default {
         sbm.sentenceRef,
         sbm.eojeolRef,
       ]);
+      /**
+       *  문장마다 다음과 같은 구조
+       * {
+       *   문장: { ... },
+       *   문장: {
+       *     어절: [오답,오답, 정답],
+       *     어절: [오답,오답, 정답],
+       *     ...
+       *   }
+       * }
+       */
+      Object.keys(groups).forEach((senSeq) => {
+        Object.keys(groups[senSeq]).forEach((eojeolSeq) => {
+          /** @type {any[]} */
+          const inputs = groups[senSeq][eojeolSeq];
+          inputs.splice(1);
+        });
+      });
       submit.value = { groups };
       // 1. section내에서 낱말과 문장을 따로 분리
       const sentences = section.sentences
@@ -109,6 +129,10 @@ export default {
 
 <style lang="scss" scoped>
 .sbm-view {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  padding: 0 16px;
   .perfect {
     position: absolute;
     top: 50%;
@@ -121,20 +145,18 @@ export default {
     transition: font-size 0.2s linear 0.3;
   }
   .sbm {
-    padding: 0 8px 8px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 6px;
+    .sen {
+      font-weight: 600;
+    }
     .pic {
-      background-size: 80%;
+      width: 28px;
+      height: 28px;
+      background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      grid-column: 1/2;
-      grid-row: 1/3;
-      border-radius: 4px;
-      box-shadow: 1px 1px 2px #0000008f;
-      &.ej {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 4px;
-      }
     }
     .mark {
       font-family: "Rowdies", monospace, cursive;
@@ -153,17 +175,22 @@ export default {
       .eojeol {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         .val {
-          padding: 1px 2px 1px 4px;
-          border-left: 1px solid #a54e00;
-          background-color: #ffe370;
-          color: #a54e00;
-          width: 100%;
+          flex: 1 1 auto;
+          border-radius: 8px;
+          padding: 0 12px;
+          border: 1px solid #df2424;
+          color: #df2424;
+          display: inline-flex;
+          align-items: center;
           &.correct {
-            border-left-color: #335f0b;
-            background-color: #b3ff70;
-            color: #335f0b;
+            border-color: #54b706;
+            color: #54b706;
+          }
+          &.none {
+            border-color: #a5a5a5;
+            color: #a5a5a5;
           }
         }
         .empty {

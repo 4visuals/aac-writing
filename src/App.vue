@@ -1,19 +1,7 @@
 <template>
   <Background />
   <div class="app-wrapper" ref="wrapperEl">
-    <Nav
-      v-if="
-        route.path !== '/' &&
-        route.path !== '/join' &&
-        route.path !== '/login' &&
-        !route.path.startsWith('/console') &&
-        !route.path.startsWith('/purchase') &&
-        route.path !== '/support' &&
-        !route.path.startsWith('/policy') &&
-        !route.path.startsWith('/setting')
-      "
-      ref="nav"
-    />
+    <Nav v-if="route.path == '/level' || route.path == '/book'" ref="nav" />
     <LayoutWrapper>
       <router-view v-slot="{ Component }">
         <transition

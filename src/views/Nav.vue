@@ -28,7 +28,7 @@
           size="nav"
           text="학습결과"
           theme="none"
-          @click="openStatView"
+          @click="changeCourse(2)"
         ></AppButton>
       </div>
       <div class="btn-menu right">
@@ -59,9 +59,9 @@
           />
           <AppButton
             size="sm"
-            text="평가보기"
+            text="학습결과"
             theme="nav"
-            @click="openStatView"
+            @click="changeCourse(2)"
           ></AppButton>
           <div class="close">
             <button class="nude btn-close" @click="setMenuVisible(false)">
@@ -95,34 +95,45 @@ export default {
     const route = useRoute();
     const router = useRouter();
     const loginUser = computed(() => store.getters["user/currentUser"]);
-
     const isStudent = computed(() => store.getters["user/isStudent"]);
-    const ctx = computed(() => store.state.quiz.quizContext);
-
     const topPadding = computed(() => store.getters["ui/topPadding"]);
     const policyPage = computed(() => route.path.startsWith("/policy"));
     const student = computed(() => store.getters["exam/student"]);
 
     const themeRef = computed(() => store.state.ui.theme);
+
+    console.log(store.state.ui.theme);
     const section = ref(null);
     const mobileMenuVisible = ref(false);
     const courses = [
       {
         name: "level",
         path: "/level",
+        route: "LevelListingView",
         text: "단계별 받아쓰기",
         theme: { color: "#d23d70", bgc: "#ffe1ea" },
       },
       {
         name: "book",
         path: "/book",
+        route: "BookListingView",
         text: "교과서 받아쓰기",
+        theme: { color: "#865900", bgc: "#ffec88" },
+      },
+      {
+        name: "stat",
+        path: "/stat",
+        route: "StudentStatWrapper",
         theme: { color: "#865900", bgc: "#ffec88" },
       },
     ];
     const setMenuVisible = (visible) => (mobileMenuVisible.value = visible);
     const changeCourse = (idx) => {
-      router.replace(courses[idx].path);
+      const params = idx < 2 ? {} : { backPath: route.path };
+      router.replace({
+        name: courses[idx].route,
+        params,
+      });
       setMenuVisible(false);
     };
     const openStatView = () => {
@@ -136,7 +147,6 @@ export default {
     };
 
     return {
-      ctx,
       nav,
       route,
       loginUser, // 로그인 사용자(학생, 선생님)

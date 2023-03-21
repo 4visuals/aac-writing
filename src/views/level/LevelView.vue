@@ -1,5 +1,8 @@
 <template>
-  <div class="container layout-h-child w-1190px">
+  <div
+    class="container layout-h-child w-1190px"
+    :class="{ pt16: $route.path !== '/level' }"
+  >
     <QuizHistoryView
       v-if="$route.path === '/level' && license && chapters.length > 0"
       origin="L"
@@ -51,5 +54,8 @@ export default {
 $timing-fn: cubic-bezier(0.5, 0.25, 0, 1);
 .container {
   padding-bottom: 16px;
+  &.pt16 {
+    padding-top: 16px;
+  }
 }
 </style>

@@ -6,6 +6,7 @@ import SectionView from "../views/level/SectionView.vue";
 import BookShelfView from "../views/book/BookShelfView.vue";
 import BookListingView from "../views/book/BookListingView.vue";
 import BookSectionView from "../views/book/BookSectionView.vue";
+import { StudentStatWrapper } from "../views/stat";
 import { PolicyWrapper, PolicyView } from "../components/policy";
 import LoginPage from "../views/LoginPage.vue";
 import JoinPage from "../views/JoinPage.vue";
@@ -63,6 +64,11 @@ const routes = [
         component: BookSectionView,
       },
     ],
+  },
+  {
+    path: "/stat",
+    name: "StudentStatWrapper",
+    component: StudentStatWrapper,
   },
   {
     path: "/quiz/:seq",

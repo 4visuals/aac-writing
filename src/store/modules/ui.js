@@ -24,10 +24,15 @@ const themes = {
   mapper: {
     level: "blue",
     book: "brown",
+    stat: "purple",
   },
   none: {
     name: "none",
     bgc: "transparent",
+    color: {
+      main: "#4B7BEC",
+      sub: "#4B7BEC",
+    },
   },
   blue: {
     name: "blue",
@@ -43,6 +48,14 @@ const themes = {
     color: {
       main: "#FFD700",
       sub: "#865900",
+    },
+  },
+  purple: {
+    name: "purple",
+    bgc: "#f9d7e7",
+    color: {
+      main: "#7b4799",
+      sub: "#4B7BEC",
     },
   },
   brown: {

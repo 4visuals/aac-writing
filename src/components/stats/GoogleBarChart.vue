@@ -8,12 +8,12 @@
 <script>
 import { onMounted, shallowRef, watch } from "vue";
 const colors = [
-  "#f3a600",
-  "#00acc2",
-  "#c2ac88",
-  "#5e97f6",
-  "#db4537",
-  "#0e9d59",
+  "#FBA037",
+  "#E62E7B",
+  "#91CC26",
+  "#5BC5FF",
+  "#9952D6",
+  "#E85BFF",
   "#444444",
 ];
 

@@ -1,57 +1,50 @@
 <template>
   <div class="level-stat">
-    <div class="dimmer" v-if="menuVisible" @click="menuVisible = false"></div>
-    <div class="floating menu" v-if="menuVisible">
+    <div class="nav">
       <h4>
-        <ActionIcon class="menu-btn" icon="chevron_left" />{{
-          origin === "L" ? "단계별" : "교과서"
-        }}
-        학습 통계
+        <ActionIcon class="btn-back" icon="expand_circle_down" /><span
+          class="label"
+          >{{ origin === "L" ? "단계별" : "교과서" }} 학습 통계</span
+        >
+        <ActionIcon class="btn-exit" icon="cancel" @click="$emit('exit')" />
       </h4>
-      <div
-        class="item"
-        v-for="chapter in chapters"
-        :key="chapter.seq"
-        :class="{ active: chapter === activeChapter }"
-        @click="showSectionChart(chapter)"
-      >
-        <div class="wbar"></div>
-        <SpanText class="desc">{{ chapter.desc }}</SpanText>
-      </div>
     </div>
-    <ActionIcon
-      v-else
-      class="btn-unfolding"
-      icon="menu"
-      @click="menuVisible = true"
-    />
-
-    <div class="charts" ref="chartEl" @click="closeDetail">
-      <GoogleBarChart
-        v-if="origin === 'L'"
-        :chartFormat="wordChart"
-        @select="showDetail"
-      />
-      <GoogleBarChart :chartFormat="sentenceChart" @select="showDetail" />
-      <div class="detail" v-if="detailRef" @click.stop="">
-        <div class="info">
-          <div>
-            <SpanText>{{ detailRef.date }}</SpanText>
-          </div>
-          <div>
-            <SpanText>{{ detailRef.segText }}</SpanText>
-          </div>
-          <div>
-            <SpanText>{{ detailRef.score }}</SpanText>
-          </div>
+    <div class="stat-body">
+      <div class="dimmer" v-if="menuVisible" @click="menuVisible = false"></div>
+      <div class="floating menu" v-if="menuVisible">
+        <div
+          class="item"
+          v-for="chapter in chapters"
+          :key="chapter.seq"
+          :class="{ active: chapter === activeChapter }"
+          @click="showSectionChart(chapter)"
+        >
+          <SpanText class="desc">{{ getChapterTitle(chapter) }}</SpanText>
         </div>
-        <SentenceSubmissionView
-          class="submits"
-          :paper="detailRef.exams[0]"
-          :section="detailRef.section"
-          @perfect="showConfetti"
+      </div>
+      <ActionIcon
+        v-else
+        class="btn-unfolding"
+        icon="menu"
+        @click="menuVisible = true"
+      />
+
+      <div class="charts" ref="chartEl" @click="closeDetail">
+        <GoogleBarChart
+          v-if="origin === 'L'"
+          :chartFormat="wordChart"
+          @select="showDetail"
         />
-        <canvas v-if="confettiVisible" class="confetti" ref="canvas"></canvas>
+        <GoogleBarChart :chartFormat="sentenceChart" @select="showDetail" />
+        <div class="detail" v-if="detailRef" @click.stop="">
+          <SentenceSubmissionView
+            class="submits"
+            :paper="detailRef.exams[0]"
+            :section="detailRef.section"
+            @perfect="showConfetti"
+          />
+          <canvas v-if="confettiVisible" class="confetti" ref="canvas"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -76,9 +69,11 @@ import {
   shallowRef,
   watch,
 } from "vue";
+
+import util from "../../service/util";
 const courses = {
-  L: { name: "course/levels", colors: ["#4472c4"] },
-  B: { name: "course/books", colors: ["#4472c4", "#ed7d31", "#a5a5a5"] },
+  L: { name: "course/levels", colors: ["#9952D6"] },
+  B: { name: "course/books", colors: ["#E62E7B", "#91CC26", "#5BC5FF"] },
 };
 export default {
   components: {
@@ -354,6 +349,16 @@ export default {
           .then(stop);
       });
     };
+    const getChapterTitle = (chapter) => {
+      const { origin, desc } = chapter;
+      if (origin === "L") {
+        const p = desc.substring("x. ".length);
+        const range = util.chapter.rangeText(chapter, ". ");
+        return range + p;
+      } else {
+        return desc;
+      }
+    };
 
     watch(() => props.origin, resetChart);
     onMounted(() => {
@@ -378,144 +383,181 @@ export default {
       closeDetail,
       showDetail,
       showConfetti,
+      getChapterTitle,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+$color: #6b7a99;
 @import "~@/assets/resizer";
+$active-fcolor: #7b4799;
+$bgcolor: #f1e9f6;
 .level-stat {
   display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   position: relative;
-  .dimmer {
-    display: none;
-  }
-  .btn-unfolding {
-    position: absolute;
-    z-index: 5;
-    font-size: 20px;
-    padding: 6px;
-    background-color: gold;
-    top: 0px;
-    right: 8px;
-    border-radius: 50%;
-    box-shadow: rgb(0 0 0 / 16%) 2px 2px 4px, rgb(0 0 0 / 23%) 2px 2px 4px;
-  }
-  .menu {
-    flex: 0 0 auto;
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  .nav {
+    background-color: $active-fcolor;
+    color: white;
     h4 {
       font-size: 1.5rem;
-      padding-left: 16px;
-      margin-bottom: 16px;
+      font-weight: 600;
+      padding: 16px;
       display: flex;
+      column-gap: 16px;
       align-items: center;
-    }
-    .menu-btn {
-      display: none;
-    }
-    .item {
-      cursor: pointer;
-      display: flex;
-      min-width: 200px;
-      &:hover {
-        background-color: #ececec;
+      margin: 0;
+      .btn-back {
+        transform: rotate(90deg);
+        font-size: 2rem;
       }
-      &.active {
-        .wbar {
-          background-color: crimson;
-        }
-      }
-      .wbar {
-        width: 4px;
-        flex: 0 0 8px;
-      }
-      .desc {
-        padding: 4px 8px;
-        white-space: nowrap;
-      }
-    }
-  }
-  @include mobile {
-    .dimmer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #0000004d;
-      z-index: 3;
-      display: block;
-    }
-    .floating.menu {
-      position: absolute;
-      z-index: 5;
-      background-color: white;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      box-shadow: #26394d 0px 20px 30px -10px;
-      .menu-btn {
-        display: block;
-      }
-    }
-  }
-  .charts {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    .detail {
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      height: 80%;
-
-      background-color: white;
-      padding: 0;
-      box-shadow: rgb(0 0 0 / 7%) 0px 1px 2px, rgb(0 0 0 / 7%) 0px 2px 4px,
-        rgb(0 0 0 / 7%) 0px 4px 8px, rgb(0 0 0 / 7%) 0px 8px 16px,
-        rgb(0 0 0 / 7%) 0px 16px 32px, rgb(0 0 0 / 7%) 0px 32px 64px;
-      border-radius: 8px;
-      .info {
-        padding: 8px 16px;
-      }
-      .submits {
-        position: relative;
-        background-color: white;
-        padding: 8px;
-        overflow: auto;
+      .label {
         flex: 1 1 auto;
       }
-      .confetti {
+      .btn-exit {
+        font-size: 2rem;
+      }
+    }
+  }
+  .stat-body {
+    display: flex;
+    flex: 1 1 auto;
+    position: relative;
+    .dimmer {
+      display: none;
+    }
+    .btn-unfolding {
+      position: absolute;
+      z-index: 5;
+      font-size: 20px;
+      padding: 6px;
+      background-color: gold;
+      top: 0px;
+      right: 8px;
+      border-radius: 50%;
+      box-shadow: rgb(0 0 0 / 16%) 2px 2px 4px, rgb(0 0 0 / 23%) 2px 2px 4px;
+    }
+    .menu {
+      flex: 0 0 auto;
+      padding-top: 16px;
+
+      .menu-btn {
+        display: none;
+      }
+      .item {
+        cursor: pointer;
+        display: flex;
+        min-width: 200px;
+        padding: 4px 8px;
+        margin: 0 8px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: $color;
+        &:hover {
+          background-color: $bgcolor;
+        }
+        &.active {
+          background-color: $bgcolor;
+          color: $active-fcolor;
+        }
+        .wbar {
+          width: 4px;
+          flex: 0 0 8px;
+        }
+        .desc {
+          padding: 4px 8px;
+          white-space: nowrap;
+          font-size: 1.25rem;
+        }
+      }
+    }
+    @include mobile {
+      .dimmer {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        width: 100%;
-        height: 100%;
+        background-color: #0000004d;
+        z-index: 3;
+        display: block;
+      }
+      .floating.menu {
+        position: absolute;
+        z-index: 5;
+        background-color: white;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        box-shadow: #26394d 0px 20px 30px -10px;
+        .menu-btn {
+          display: block;
+        }
       }
     }
-    @include mobile {
+    .charts {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
       .detail {
-        max-width: 400px;
-        width: 90%;
-      }
-    }
-    @include tablet {
-      .detail {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 2px 2px 16px #0000004d;
+        border-radius: 8px;
+        overflow: hidden;
         width: 400px;
+        height: 400px;
+
+        background-color: white;
+        padding: 0;
+
+        .info {
+          padding: 8px 16px;
+        }
+        .submits {
+          position: relative;
+          background-color: white;
+          padding: 8px;
+          overflow: auto;
+          flex: 1 1 auto;
+        }
+        .confetti {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+        }
       }
-    }
-    @include desktop {
-      .detail {
-        width: 400px;
+      @include mobile {
+        .detail {
+          max-width: 400px;
+          width: 90%;
+        }
+      }
+      @include tablet {
+        .detail {
+          width: 400px;
+        }
+      }
+      @include desktop {
+        .detail {
+          width: 400px;
+        }
       }
     }
   }
