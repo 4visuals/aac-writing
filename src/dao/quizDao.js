@@ -99,11 +99,27 @@ class QuizDao {
         solved: question.solved,
       }));
     const ranges = toRangeId(quizContext);
+    /**
+     * 다 푼것만 이력에 남겨달라고 함
+     * https://github.com/4visuals/aac-writing/issues/123
+     *
+     * 기존에는 이력을 넣은 후에 questions만 업데이트했었음.
+     */
+    return this.db[tableName].put({
+      license: license.uuid,
+      sectionSeq,
+      type,
+      mode,
+      ranges,
+      questions,
+      startTime: quizContext.startTime,
+    });
+    /*
     return this.db[tableName]
       .where(cols)
       .equals([license.uuid, sectionSeq, type, mode, ranges])
       .modify({ questions });
-    // .modify({ questions: JSON.stringify(questions) });
+  */
   }
   async deleteQuiz(quizContext) {
     console.log("[DELETE]", quizContext);

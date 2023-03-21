@@ -64,10 +64,16 @@ store.registerModule("quiz", {
       //   // 중간에 그만둠. 상태 저장
       // }
       // 무조건 저장
-      quizDao.saveQuiz(state.quizContext).then(() => {
-        state.finished = false;
-        state.quizContext = null;
-      });
+      /**
+       * 끝까지 다 풀었을때만 이력에 남겨달라고 함
+       * https://github.com/4visuals/aac-writing/issues/123
+       */
+      if (state.finished) {
+        quizDao.saveQuiz(state.quizContext).then(() => {
+          state.finished = false;
+          state.quizContext = null;
+        });
+      }
     },
     showHint(state, args) {
       const { text, cnt } = args;

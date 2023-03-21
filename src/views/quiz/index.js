@@ -443,7 +443,7 @@ const loadSentenceQuiz = (quizSpec) => {
           rememberAnswer: true,
           license,
         });
-        ctx.syncDb();
+        // ctx.syncDb();
         quizStore.startQuiz(ctx);
         resolve(ctx);
       },
