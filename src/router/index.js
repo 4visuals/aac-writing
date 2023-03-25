@@ -88,7 +88,7 @@ const routes = [
         path: "grouporder",
         component: () =>
           import(
-            /* webpackChunkName: "admin-module" */ "../spa/admin/views/GroupOrderView.vue"
+            /* webpackChunkName: "admin-module" */ "../spa/admin/views/order/GroupOrderView.vue"
           ),
       },
     ],

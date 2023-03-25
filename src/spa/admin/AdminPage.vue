@@ -20,7 +20,7 @@ import LicenseManage from "./views/LicenseManage.vue";
 import OrderListView from "./views/order/OrderListView.vue";
 import PolicyEditor from "./views/PolicyManage.vue";
 import ProductManage from "./views/ProductManage.vue";
-import GroupOrderView from "./views/GroupOrderView.vue";
+import GroupOrderView from "./views/order/GroupOrderView.vue";
 import adminApi from "./service/admin-api";
 import toast from "@/components/toast";
 import { useRouter } from "vue-router";

@@ -1,4 +1,5 @@
 import { GET, POST, PUT } from "@/service/api/request";
+import { GroupOrderForm } from "../../../entity/group-order-form";
 import Product from "../../../entity/product";
 const admin = {
   authenticate: () => POST("/admin/auth"),
@@ -16,7 +17,11 @@ const license = {
 const order = {
   list: () => GET("/admin/orders"),
   group: {
-    list: () => GET("/admin/group-orders"),
+    list: () =>
+      GET("/admin/group-orders").then((res) => {
+        res.orders = res.orders.map((order) => new GroupOrderForm(order));
+        return res;
+      }),
   },
 };
 

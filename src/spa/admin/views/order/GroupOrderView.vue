@@ -52,7 +52,7 @@
 
 <script>
 import { ref } from "vue";
-import adminApi from "../service/admin-api";
+import adminApi from "../../service/admin-api";
 export default {
   setup() {
     const orders = ref(null);
