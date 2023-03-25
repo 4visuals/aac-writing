@@ -26,7 +26,13 @@
             }"
             >{{ day.date }}</span
           >
-          <div class="inner" v-if="hasData(monthMap, day)">
+          <div
+            class="inner"
+            :class="{
+              today: month.month === today.month && day.date === today.date,
+            }"
+            v-if="hasData(monthMap, day)"
+          >
             <div class="cnt" @click="showDetail(day)">
               {{ countExams(monthMap, day) }}건
             </div>
@@ -204,12 +210,13 @@ $fisze: 1em;
           font-weight: 600;
           &.today {
             border-radius: 30px;
-            background-color: #9952d6;
+            background-color: #33bfff;
             color: white !important;
           }
         }
         &:hover {
-          background-color: aliceblue;
+          background-color: #f1e9f6;
+          z-index: 1;
         }
         .inner {
           position: absolute;
@@ -230,6 +237,15 @@ $fisze: 1em;
           .inner {
             border: 2px solid #9952d6;
             font-weight: 600;
+            &.today {
+              border-color: #33bfff;
+              &:hover {
+                background-color: #e6f7ff;
+              }
+              .cnt {
+                background-color: #33bfff;
+              }
+            }
             .cnt {
               position: absolute;
               top: 0;

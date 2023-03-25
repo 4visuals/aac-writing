@@ -44,6 +44,7 @@ export default {
         mode: mode.substring(0, 1),
         questionOffset: ctx.ranges[0],
         numOfQuestions: ctx.quizLength,
+        retry: ctx.isRetryMode(),
         submissions: null,
       };
       exam.submissions = ctx.questions.flatMap((question) => {
@@ -109,6 +110,7 @@ export default {
       if (ctx.isListenMode() || ctx.isRetryMode()) {
         // 듣고쓰기 모드에서는 시험 결과를 업로드하지 않음.
         // 재시도인 경우 업로드하지 않음
+        // 재시도인 경우에도 서버에 업로드해야 오답 정보가 업데이트 된다.
       } else if (ctx.isQuizMode() || ctx.isWord()) {
         uploadExam();
       } else {

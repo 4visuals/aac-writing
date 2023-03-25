@@ -5,19 +5,19 @@
         <CalendarNav class="cal-nav" :current="now" @shift="shiftCalendar" />
         <div class="today-stat">
           <div class="item left">
-            <h5>학습 문항</h5>
+            <h5><span class="prefix">학습</span> <span>문항</span></h5>
             <div class="body">
               {{ formatText(todayStat, "questions", "문항") }}
             </div>
           </div>
           <div class="item">
-            <h5>학습 시간</h5>
+            <h5><span class="prefix">학습</span> <span>시간</span></h5>
             <div class="body">
               {{ timeText(todayStat) }}
             </div>
           </div>
           <div class="item right">
-            <h5>평균 점수</h5>
+            <h5><span class="prefix">평균</span> <span>점수</span></h5>
             <div class="body">{{ formatText(todayStat, "score", "점") }}</div>
           </div>
         </div>
@@ -28,7 +28,12 @@
         @today="showTodayExam"
         @exams="showExamDetail"
       />
-      <div class="details" v-if="detail" ref="detailEl">
+      <div
+        class="details"
+        v-if="detail"
+        ref="detailEl"
+        @click="closeDetailView"
+      >
         <ExamPaperTableView
           :papers="detail.papers"
           :date="detail.day"
@@ -273,6 +278,45 @@ export default {
           }
         }
       }
+      @media (max-width: 860px) {
+        .today-stat {
+          height: 36px;
+          margin-right: 16px;
+          .item {
+            // padding: 0 16px;
+            h5 {
+              width: auto;
+              padding: 8px;
+              .prefix {
+                display: none;
+              }
+            }
+            .body {
+              width: auto;
+              padding: 8px;
+            }
+          }
+        }
+      }
+      @media (max-width: 660px) {
+        flex-direction: column;
+        row-gap: 16px;
+        .today-stat {
+          display: flex;
+          margin: 0 12px;
+          .item {
+            flex: 1 0 auto;
+            // padding: 0 16px;
+            h5 {
+              display: none;
+            }
+            .body {
+              width: 100%;
+              padding: 8px;
+            }
+          }
+        }
+      }
     }
   }
   .calendar {
@@ -285,6 +329,7 @@ export default {
     left: 0;
     bottom: 0;
     z-index: 10;
+    background-color: #ffffffad;
   }
   .submissions {
     display: flex;

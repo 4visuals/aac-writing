@@ -224,7 +224,7 @@ export default {
     display: flex;
     column-gap: 8px;
     font-size: 2rem;
-    padding: 8px;
+    padding: 12px 16px;
   }
   .table {
     overflow-y: auto;
@@ -243,6 +243,7 @@ export default {
         &:hover {
           background-color: #f1e9f6;
           cursor: pointer;
+          color: #9852d5;
         }
         &.header {
           position: sticky;
