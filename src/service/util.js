@@ -259,6 +259,21 @@ const currency = {
     }
     return txt.substring(1);
   },
+  read: (amount) => {
+    const kr = "천백십경천백십억천백십만천백십 ".split("").reverse();
+    const n = " 일이삼사오육칠팔구".split("");
+    const nums = ("" + amount)
+      .split("")
+      .reverse()
+      .map((digit, idx) => {
+        if (idx % 4 === 0) {
+          return (digit === "0" ? "" : n[digit]) + kr[idx];
+        } else {
+          return digit === "0" ? "" : n[digit] + kr[idx];
+        }
+      });
+    return nums.reverse().join(" ");
+  },
 };
 const vue = {
   parsePath: (route) => route.path.split("/").filter((p) => p.length > 0),

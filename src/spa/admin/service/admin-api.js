@@ -17,10 +17,30 @@ const license = {
 const order = {
   list: () => GET("/admin/orders"),
   group: {
+    cancel: (orderSeq) =>
+      PUT(`/admin/group-orders/${orderSeq}/CBS`).then((res) => {
+        res.order = new GroupOrderForm(res.order);
+        return res;
+      }),
     list: () =>
       GET("/admin/group-orders").then((res) => {
         res.orders = res.orders.map((order) => new GroupOrderForm(order));
         return res;
+      }),
+    /**
+     * 단체 주문에 대한 이용권 발급
+     * @param {number} groupOrderSeq
+     * @param {string} productCode
+     * @param {number} qtt
+     * @param {number} contractPrice
+     * @returns
+     */
+    commit: (groupOrderSeq, productCode, qtt, contractPrice) =>
+      POST(`/admin/group-orders/`, {
+        groupOrderSeq,
+        productCode,
+        qtt,
+        contractPrice,
       }),
   },
 };

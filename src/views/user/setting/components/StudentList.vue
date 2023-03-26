@@ -5,10 +5,18 @@
       <div
         v-for="stud in students"
         :key="stud.seq"
-        @click="$emit('student', stud)"
+        @click="setActive(stud)"
         class="each"
+        :class="{ active: activeStudent === stud }"
       >
-        {{ stud.name }}
+        <span class="name">{{ stud.name }}</span>
+        <button
+          v-if="activeStudent === stud"
+          @click="$emit('student', stud)"
+          class="nude blue"
+        >
+          연결
+        </button>
       </div>
       <div class="reg-stud">
         <p>
@@ -25,6 +33,7 @@
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import modal from "@/components/modal";
+import { ref } from "vue";
 
 export default {
   emits: ["student"],
@@ -32,12 +41,16 @@ export default {
     const store = useStore();
     const router = useRouter();
     const students = store.getters["user/unregisterdStudents"];
+    const activeStudent = ref(null);
+    const setActive = (student) => {
+      activeStudent.value = student;
+    };
     const goTo = (uri) => {
       store.commit("setting/setActive", "student");
       modal.closeModal();
       router.replace(uri);
     };
-    return { goTo, students };
+    return { activeStudent, setActive, goTo, students };
   },
 };
 </script>
@@ -52,21 +65,21 @@ export default {
     padding: 4px 0;
     cursor: pointer;
     .each {
-      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      padding: 0px 16px;
+      height: 40px;
+      &.active,
       &:hover {
         background-color: #a4dcff;
+      }
+      .name {
+        flex: 1 1 auto;
       }
     }
     .reg-stud {
       padding: 16px;
       border-top: 1px solid #cdcdcd;
-    }
-    .nude {
-      padding: 4px 0;
-      font-weight: 400;
-      color: var(--aac-color-blue-900);
-      text-decoration: underline;
-      text-underline-offset: 4px;
     }
   }
 }

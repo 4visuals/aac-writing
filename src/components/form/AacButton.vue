@@ -115,6 +115,9 @@ export default {
       &.sm {
         font-size: 0.85rem;
       }
+      &.lg {
+        font-size: 1.2rem;
+      }
     }
   }
   @include tablet {
@@ -128,6 +131,9 @@ export default {
       &.sm {
         font-size: 1.25rem;
       }
+      &.lg {
+        font-size: 1.35rem;
+      }
     }
   }
   @include desktop {
@@ -136,6 +142,9 @@ export default {
       padding: 8px 0.8rem;
       &.sm {
         font-size: 1.25rem;
+      }
+      &.lg {
+        font-size: 1.35rem;
       }
     }
   }

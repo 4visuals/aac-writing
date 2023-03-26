@@ -23,7 +23,7 @@
           <TextField v-model:value="setting.user.name" icon="face" />
         </div>
       </section>
-      <section>
+      <!-- <section>
         <h4>비밀번호 변경</h4>
 
         <div v-if="setting.password.unlock" class="box">
@@ -61,7 +61,7 @@
             @enter="unlockPassword"
           />
         </div>
-      </section>
+      </section> -->
       <section>
         <h4>탈퇴하기</h4>
         <div v-if="setting.unsub.unlock" class="box">

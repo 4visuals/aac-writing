@@ -1,6 +1,12 @@
 /**
  * GroupOrderForm
  */
+export const GroupOrderState = {
+  PND: "대기중",
+  CMT: "결제완료",
+  CBU: "사용자취소",
+  CBS: "시스템취소",
+};
 export class GroupOrderForm {
   constructor(orderDto) {
     this._dto = orderDto;
@@ -17,5 +23,8 @@ export class GroupOrderForm {
         this[prop] = orderDto[prop];
       }
     });
+  }
+  get stateText() {
+    return GroupOrderState[this.state];
   }
 }

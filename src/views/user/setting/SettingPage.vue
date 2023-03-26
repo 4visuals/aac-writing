@@ -70,7 +70,7 @@ export default {
         width: "sm",
         padding: "16px",
         props: {
-          exclude: ["userId", "pass"],
+          exclude: [],
         },
         events: {
           student: registerStudent,
@@ -168,7 +168,7 @@ $mwidth: 220px;
   font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
   // font-weight: 700;
   display: flex;
-  height: 100%;
+  height: 100vh;
   .left-menu {
     position: relative;
     flex: 0 0 $mwidth;

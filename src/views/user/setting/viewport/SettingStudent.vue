@@ -15,7 +15,7 @@
           <ActionIcon
             class="stud-del"
             icon="delete"
-            :disabled="!!asn.license"
+            :disabled="asn.license && asn.license.isInUse()"
             @click.stop="$emit('del-student', asn.student)"
           />
         </div>
@@ -26,7 +26,7 @@
         >
           <span class="icon material-icons-outlined"> sell </span
           ><span class="code">{{
-            asn.license.isExpired() ? "만료됨" : "이용중"
+            asn.license.isExpired() ? "이용권 만료됨" : "이용중"
           }}</span>
         </div>
         <div v-else class="license none">연결된 이용권 없음</div></SectionBox
@@ -67,7 +67,7 @@ export default {
         padding: "16px",
         props: {
           student,
-          exclude: ["userId", "pass"],
+          exclude: [],
         },
       });
     };

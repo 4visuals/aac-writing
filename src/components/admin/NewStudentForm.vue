@@ -139,20 +139,10 @@ export default {
     */
     const wizards = [
       new InputForm({
-        wid: "userId",
-        title: "아이디",
-        desc: "영문자와 숫자로 아이디를 입력헤주세요(최소 4글자 이상).",
-        status: "pending",
-        value: "",
-        error: null,
-        // filter: (val) => val.replace(/[^a-z0-9]/g, ""),
-        // filter: doFilter,
-      }),
-      new InputForm({
         wid: "name",
         title: "이름",
         desc: "학생 이름을 입력해주세요",
-        status: "pending",
+        status: "active",
         value: "",
         error: null,
       }),
@@ -164,6 +154,16 @@ export default {
         value: "",
         error: null,
         filter: (val) => val.replace(/[^0-9-]/g, "").replace(/-{2,}/g, "-"),
+      }),
+      new InputForm({
+        wid: "userId",
+        title: "아이디",
+        desc: "영문자와 숫자로 아이디를 입력헤주세요(최소 4글자 이상).",
+        status: "pending",
+        value: "",
+        error: null,
+        // filter: (val) => val.replace(/[^a-z0-9]/g, ""),
+        // filter: doFilter,
       }),
       new InputForm({
         wid: "pass",
