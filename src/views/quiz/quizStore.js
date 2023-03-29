@@ -41,6 +41,14 @@ store.registerModule("quiz", {
         console.log(res);
       });
     },
+    saveQuiz: (ctx) => {
+      const { state } = ctx;
+      if (state.finished) {
+        return quizDao.saveQuiz(state.quizContext);
+      } else {
+        return Promise.resolve();
+      }
+    },
   },
   mutations: {
     setQuiz(state, args) {
@@ -65,15 +73,13 @@ store.registerModule("quiz", {
       // }
       // 무조건 저장
       /**
-       * 끝까지 다 풀었을때만 이력에 남겨달라고 함
+       * 아니라고 함. 뭔지 모르겠다.
        * https://github.com/4visuals/aac-writing/issues/123
        */
-      if (state.finished) {
-        quizDao.saveQuiz(state.quizContext).then(() => {
-          state.finished = false;
-          state.quizContext = null;
-        });
-      }
+      quizDao.saveQuiz(state.quizContext).then(() => {
+        state.finished = false;
+        state.quizContext = null;
+      });
     },
     showHint(state, args) {
       const { text, cnt } = args;
