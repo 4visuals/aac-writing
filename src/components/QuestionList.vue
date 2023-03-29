@@ -114,11 +114,12 @@ export default {
       const { answerType, quizMode } = props;
       emit("retry", { quizMode, answerType });
     };
-    const hasHistory = (group) => {
+    const findHistory = (group) => {
       const { start, end } = group;
-      return sectionHistories.value.find(
+      const history = sectionHistories.value.find(
         (h) => h.ranges[0] === start && h.ranges[1] === end
       );
+      return history;
     };
 
     const replace = (arrayRef, elems) => {
@@ -141,7 +142,17 @@ export default {
     };
 
     const getHistoryBg = (group) => {
-      if (hasHistory(group)) {
+      const history = findHistory(group);
+      if (!history) {
+        return "";
+      }
+      /**
+       * https://github.com/4visuals/aac-writing/issues/123
+       */
+      const { ranges, questions } = history;
+      const numOfQuiz = ranges[1] - ranges[0];
+      if (numOfQuiz === questions.length) {
+        // questions.length : 제출한 답안 갯수
         return bgMap[props.theme];
       } else {
         return "";
@@ -172,7 +183,6 @@ export default {
       examDesc,
       groups,
       hasWrongAnswer,
-      hasHistory,
       getHistoryBg,
       resolveGroupText,
       retryClicked,
