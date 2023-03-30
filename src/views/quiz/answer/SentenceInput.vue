@@ -117,7 +117,7 @@ export default {
       pendingSpeakId = setTimeout(() => {
         tts
           .speak(question.value.text, { clearPending: true })
-          .then(() => field.value.focus())
+          .then(() => field.value && field.value.focus()) // 퀴즈를 새로 이동할때 field가 없어짐
           .catch((e) => {
             console.log("[stop tts]", e);
           });

@@ -83,16 +83,31 @@ class QuizDao {
     if (!quizContext) {
       return Promise.resolve(false);
     }
+    /*
     if (!quizContext.isQuizMode()) {
       // 일단 퀴즈일때만
       return Promise.resolve(false);
     }
+    */
     logger.log("[save]", quizContext);
-    const { license, sectionSeq } = quizContext;
+    const { license, sectionSeq, mode } = quizContext;
     const type = quizContext.isWord() ? "W" : "S";
-    const mode = quizContext.mode;
+    /**
+     * 문장 입력기에서는 문제마다 question.trials에 답안이 입력됨.(낱말 or 받아쓰기)
+     * 어절 입력기에서는 문제마다 question.eojeols[k].trials에 답안이 입력됨.
+     */
+    const filterFn =
+      quizContext.isWord() || quizContext.isQuizMode()
+        ? (question) => question.trials.length > 0
+        : (question) => {
+            // 어절들(문장: 연습하기)마다 최소한 하나의 입력이라도 있어야 풀었다고 판정함
+            const unsolvedEojeols = question.eojeols.filter(
+              (ej) => ej.trials.length === 0
+            );
+            return unsolvedEojeols.length === 0;
+          };
     const questions = quizContext.questions
-      .filter((questions) => questions.trials.length > 0)
+      .filter(filterFn)
       .map((question) => ({
         dataRef: question.data.seq,
         trials: JSON.parse(JSON.stringify(question.trials)),

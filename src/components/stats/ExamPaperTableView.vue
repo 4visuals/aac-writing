@@ -182,11 +182,13 @@ export default {
     };
     const formatChapterTitle = (chapter) => {
       if (chapter.origin === "L") {
-        const range = util.chapter.rangeText(chapter, ". ");
-        const desc = chapter.desc.substring("x. ".length);
-        return range + desc;
+        const range = util.chapter.rangeText(chapter, "");
+        // const desc = chapter.desc.substring("x. ".length);
+        return range;
       } else {
-        return chapter.desc;
+        const { desc } = chapter;
+        const p = desc.indexOf(" ");
+        return desc.substring(p + 1);
       }
     };
     initSheet();

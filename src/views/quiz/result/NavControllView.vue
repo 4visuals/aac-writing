@@ -13,7 +13,7 @@
           size="nav"
           :theme="theme.name"
           text="다시하기"
-          @click="quizProvider.retry(ctx.isRetryMode())"
+          @click="quizProvider.retry()"
         />
         <AppButton
           size="nav"

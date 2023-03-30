@@ -17,9 +17,6 @@
           >문제 보기</span
         ></SpanText
       >
-      <SpanText class="overview text-ellipsis">{{
-        section.chapter.desc
-      }}</SpanText>
       <ActionIcon class="icon" icon="cancel" @click="$emit('back', 'close')" />
     </div>
   </div>

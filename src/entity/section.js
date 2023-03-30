@@ -20,6 +20,14 @@ export default class Section {
   isChallengeSection() {
     return this.level < 0;
   }
+  getLevelText() {
+    if (this.origin === "L") {
+      // 도전 섹션은 -1이다.
+      return this.level < 0 ? "도전" : `${this.level}`;
+    } else {
+      return this.level;
+    }
+  }
   /**
    * 자꾸 바뀜. 그냥 여기서 formatting함..
    * @returns

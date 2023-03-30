@@ -17,7 +17,7 @@
         class="overview"
         @click="$emit('overview')"
         ><AppIcon icon="info" fsize="24px" /><span class="label"
-          >학습 유형</span
+          >학습 안내</span
         ></SpanText
       >
       <SwitchButton

@@ -14,6 +14,7 @@
           :width="600"
           height="100%"
           :resolveUrl="(rss) => path.aacweb.scene(rss)"
+          @click="showOverview"
         />
       </div>
       <div class="body" v-else>
@@ -49,7 +50,7 @@
           :sentences="sentencesRef"
           :recordVisible="true"
           @choosen="startSentenceQuiz"
-          @retry="retrySentenceQuiz"
+          @failed-question="tryFailedQuestion"
         />
         <QuestionList
           quizMode="LISTEN"
@@ -79,6 +80,8 @@ import Slide from "@/components/slide/Slide.vue";
 import LevelNavBar from "./LevelNavBar.vue";
 import QuizSpec from "../quiz/type-quiz-spec";
 import { checkAppState } from "../app-state-validator";
+import { RetryMode } from "../../components/quiz/retry-mode";
+
 export default {
   components: {
     Slide,
@@ -138,14 +141,16 @@ export default {
 
       const sectionSeq = cate.value.seq;
       const quizResource = wordMode.value ? "W" : "S";
-
+      const failedOnly = false;
       QuizSpec.prepareLevelQuiz(
         quizMode,
         answerType,
         cate.value,
         quizResource,
         () => group.sentences,
-        [group.start, group.end]
+        [group.start, group.end],
+        RetryMode.SEG,
+        failedOnly
       )
         .then(() => {
           router.push(`/quiz/${sectionSeq}`);
@@ -155,13 +160,13 @@ export default {
         });
     };
     /**
-     * 틀린 문제 다시 시도
+     * 오답 연습
      * @param {*} e
      */
-    const retrySentenceQuiz = (e) => {
+    const tryFailedQuestion = (e) => {
       const { quizMode, answerType } = e;
       const quizResource = wordMode.value ? "W" : "S";
-      const retryMode = true; // 틀린 문제 재시도
+      const retryMode = RetryMode.FAILED; // 오답 연습
       const section = cate.value;
       const sentenceSeqs = records.value
         .filter((record) => record.type === quizResource)
@@ -171,6 +176,7 @@ export default {
       const sentences = section.sentences.filter((sen) =>
         sentenceSeqs.includes(sen.seq)
       );
+      const failedOnly = false;
       QuizSpec.prepareLevelQuiz(
         quizMode,
         answerType,
@@ -178,7 +184,8 @@ export default {
         quizResource,
         () => sentences,
         [0, sentences.length],
-        retryMode
+        retryMode,
+        failedOnly
       )
         .then(() => {
           router.push(`/quiz/${section.seq}`);
@@ -266,7 +273,7 @@ export default {
       sentencesRef,
       sectionHistories,
       startSentenceQuiz,
-      retrySentenceQuiz,
+      tryFailedQuestion,
       listQuestions,
       hideQuestionList,
       sourceText,

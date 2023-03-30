@@ -29,7 +29,7 @@
               size="sm"
               theme="green"
               text="오답연습"
-              @click="retryClicked"
+              @click="tryFailedQuestion"
             ></AppButton>
           </div>
         </div>
@@ -110,9 +110,9 @@ export default {
         });
       }
     };
-    const retryClicked = () => {
+    const tryFailedQuestion = () => {
       const { answerType, quizMode } = props;
-      emit("retry", { quizMode, answerType });
+      emit("failed-question", { quizMode, answerType });
     };
     const findHistory = (group) => {
       const { start, end } = group;
@@ -185,7 +185,7 @@ export default {
       hasWrongAnswer,
       getHistoryBg,
       resolveGroupText,
-      retryClicked,
+      tryFailedQuestion,
     };
   },
 };

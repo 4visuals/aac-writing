@@ -1,5 +1,5 @@
 import storage from "@/service/storage";
-
+import { RetryMode } from "../../components/quiz/retry-mode";
 class QuizSpec {
   /**
    * quizMode - 보고쓰기('READING'), 연습하기('LEARNING'), 받아쓰기('QUIZ'), 듣고쓰기('LISTEN') 모드
@@ -9,7 +9,8 @@ class QuizSpec {
    * prevPage - 퀴즈 종료 후 복귀할 화면 정보
    * seqs - 퀴즈를 구성하는 sentence sequence 의 배열
    * ranges - [start, end) section 내에서 문제의 범위
-   * retry - 틀린 문제만 풀고 있음.
+   * retry - [다시풀기]의 대상이 현재 segment인지 오답연습인지 나타냄
+   * failedOnly - 현재 segment에서 틀린 문제만 다시 풀기
    *
    * @param {{quizMode: String,
    *  answerType: String,
@@ -18,7 +19,8 @@ class QuizSpec {
    *  prevPage: Object,
    *  seqs: [Number],
    *  ranges:[Number],
-   * retry: Boolean}} spec - 퀴즈 스펙
+   *  retry: RetryMode,
+   *  failedOnly: Boolean}} spec - 퀴즈 스펙
    */
   constructor({
     quizMode,
@@ -29,6 +31,7 @@ class QuizSpec {
     seqs,
     ranges,
     retry,
+    failedOnly,
   }) {
     this.quizMode = quizMode;
     this.answerType = answerType;
@@ -37,14 +40,16 @@ class QuizSpec {
     this.prevPage = prevPage;
     this.seqs = seqs;
     this.ranges = ranges;
-    this.retry = retry || false;
+    this.retry = retry || RetryMode.SEG;
+    this.failedOnly = failedOnly || false;
   }
   write() {
     storage.session.write("quizSpec", this);
   }
-  reload(section, ranges, sentenceFilter, retry) {
-    retry = retry === undefined ? this.retry : retry;
-    this.retry = retry;
+  reload(section, ranges, sentenceFilter, retryMode, failedOnly) {
+    retryMode = retryMode === undefined ? this.retry : retryMode;
+    this.retry = retryMode;
+    this.failedOnly = failedOnly || false;
     return new Promise((resolve) => {
       this.section = section.seq;
       this.seqs = sentenceFilter().map((sen) => sen.seq);
@@ -63,7 +68,8 @@ const prepareQuiz = (
   prevPage,
   seqs,
   ranges,
-  retry = false
+  retry = RetryMode.SEG,
+  failedOnly = false
 ) =>
   new Promise((resolve, reject) => {
     if (seqs.length === 0) {
@@ -79,6 +85,7 @@ const prepareQuiz = (
       seqs,
       ranges,
       retry,
+      failedOnly,
     });
     spec.write();
     resolve();
@@ -99,7 +106,8 @@ QuizSpec.prepareBookQuiz = (
   section,
   sentenceFilter,
   ranges,
-  retry = false
+  retry = RetryMode.SEG,
+  failedOnly = false
 ) => {
   const quizResource = "A";
   if (quizMode === "LISTEN") {
@@ -121,7 +129,8 @@ QuizSpec.prepareBookQuiz = (
     prevPage,
     seqs,
     ranges,
-    retry
+    retry,
+    failedOnly
   );
 };
 /**
@@ -133,7 +142,7 @@ QuizSpec.prepareBookQuiz = (
  * @param {String} quizResource
  * @param {Function} sentenceFilter
  * @param {[Number]} ranges
- * @param {Boolean} retry - 틀린 문제 재시도인지 나타냄
+ * @param {RetryMode} retry - 오답연습인지 나타냄.
  * @returns
  */
 QuizSpec.prepareLevelQuiz = (
@@ -143,7 +152,8 @@ QuizSpec.prepareLevelQuiz = (
   quizResource,
   sentenceFilter,
   ranges,
-  retry
+  retry,
+  failedOnly = false
 ) => {
   /*
    * 낱말인 경우 무조건 낱말 입력기를 사용함
@@ -168,7 +178,8 @@ QuizSpec.prepareLevelQuiz = (
     prevPage,
     seqs,
     ranges,
-    retry
+    retry,
+    failedOnly
   );
 };
 

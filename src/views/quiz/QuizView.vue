@@ -91,6 +91,8 @@ import QuizResult from "./result/QuizResult.vue";
 import { tts } from "@/components/tts";
 import LevelNavBar from "../level/LevelNavBar.vue";
 import BookNavBar from "../book/BookNavBar.vue";
+import { RetryMode } from "../../components/quiz/retry-mode";
+
 export default {
   components: {
     ActionIcon,
@@ -170,50 +172,115 @@ export default {
      * @param {Segment} segment - quiz/index.js
      * @param {object} section,
      * @param {object[]} sentences
-     * @param {Boolean} failedOnly true이면 틀린 문제, false이면 전체 문제 다시 시도
+     * @param {RetryMode} retryMode 현재 segment인지, 오답연습인지
+     * @param {Boolean} failedOnly segment에서 틀린 문제만 다시 풀기
      */
     const startQuiz = (
       quizContext,
       segment,
       section,
       sentences,
-      failedOnly
+      retryMode,
+      failedOnly = false
     ) => {
-      const quizSpec = quizContext.value.config.options;
-      quizSpec
-        .reload(
-          section,
-          [segment.start, segment.end],
-          () => sentences,
-          failedOnly
-        )
-        .then(() => {
-          store.commit("ui/hideMenu");
-          store.commit("quiz/hideHint");
-          quiz.loadQuiz();
-        });
+      const config = quizContext.value.config; // 지우기 전에 미리 받아놓음.
+      store.dispatch("quiz/closeQuiz").then(() => {
+        const quizSpec = config.options;
+        quizSpec
+          .reload(
+            section,
+            [segment.start, segment.end],
+            () => sentences,
+            retryMode,
+            failedOnly
+          )
+          .then(() => {
+            store.commit("ui/hideMenu");
+            store.commit("quiz/hideHint");
+            quiz.loadQuiz();
+          });
+      });
     };
     /**
      * 현재 퀴즈를 다시 한번
-     * @param {Boolean} failedOnly - true이면 틀린 문제만 다시 시작, false이면 현재 퀴즈를 전부 다시 시작
+     *
+     * @param {RetryMode} retryMode - 'SEG'이면 현재 segment를, 'FAILED'이면 section의 오답들을 다시 풀기
      */
-    const retry = (failedOnly = false) => {
+    const retry = () => {
+      /**
+       * 최초에 특정 segment를 풀고 난 후
+       * 첫 번째 결과화면에서 [틀린 문제 풀기]를 눌러서 두번째 시험을 진행함.
+       * 두 번째 결과 화면에서 [다시하기]를 누르는 경우,
+       *
+       * 현재 문제가 속한 section의 segment를 다시 풀어야 함(보통 10문제).
+       * (방금 풀었던 문제들은, ctx.questions, 더이상 최초에 풀었던 문제들이 아닐 수 있음. 틀린 문제들만 존재함)
+       *
+       * 그런데 최초에 진행한 segment가 [오답풀기]인 경우
+       * 1회 이상의 [틀린 문제 풀기] 진행 후에 결과 화면에서 [다시하기]를 누르는 경우
+       * 현재의 segment가 아니라 오답 자체를 전부 다시 풀어야 함.
+       *
+       */
       const quizContext = ctx.value;
       const [s, e] = quizContext.ranges;
       const segments = quizContext.getSegments();
       let segment; // = segments.find((seg) => seg.start === s && seg.end === e);
       let sentences;
-      if (quizContext.isRetryMode()) {
-        // 틀린 문제 다시 풀기
-        sentences = quizContext.questions.map((q) => q.data);
-        segment = { start: 0, end: sentences.length };
-      } else {
+      const { retryMode } = quizContext;
+      if (retryMode === RetryMode.SEG) {
         segment = segments.find((seg) => seg.start === s && seg.end === e);
-        sentences = failedOnly
-          ? quizContext.questions.filter((q) => !q.solved).map((q) => q.data)
-          : segment.getSentences();
+        sentences = segment.getSentences();
+      } else {
+        const { section } = quizContext;
+        const quizResource = quizContext.isWord() ? "W" : "S";
+        const records = store.getters["record/wrongAnswers"](section);
+        const sentenceSeqs = records
+          .filter((record) => record.type === quizResource)
+          .flatMap((record) =>
+            record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
+          );
+        sentences = section.sentences.filter((sen) =>
+          sentenceSeqs.includes(sen.seq)
+        );
+        segment = { start: 0, end: sentences.length };
       }
-      startQuiz(ctx, segment, quizContext.section, sentences, failedOnly);
+      const failedOnly = false;
+      startQuiz(
+        ctx,
+        segment,
+        quizContext.section,
+        sentences,
+        retryMode,
+        failedOnly
+      );
+    };
+    /**
+     * 틀린 문제 다시 풀기
+     * - [오답 연습]과 다름
+     * - 현재 진행중인 시험 문제에서 틀린 문제만 다시 시도함.
+     * @param {import("./result/scoring").default} scoring
+     */
+    const tryFailedQuestion = (scoring) => {
+      const quizContext = ctx.value;
+      let segment;
+      let sentences = scoring.trials
+        .filter((trial) => !trial.correct)
+        .map((trial) => trial.sentence);
+      if (quizContext.retryMode === RetryMode.SEG) {
+        let segments = quizContext.getSegments();
+        const [s, e] = quizContext.ranges;
+        segment = segments.find((seg) => seg.start === s && seg.end === e);
+      } else {
+        segment = { start: 0, end: sentences.length };
+      }
+      const failedOnly = true;
+      startQuiz(
+        ctx,
+        segment,
+        quizContext.section,
+        sentences,
+        quizContext.retryMode,
+        failedOnly
+      );
     };
     /**
      * 다음 퀴즈를 시작함.
@@ -235,13 +302,15 @@ export default {
         nextSegment = segments[0];
       }
       if (nextSegment) {
+        const failedOnly = false;
         // 맨 마지막 chapter의 마지막 section은 다음 section이 없음
         startQuiz(
           ctx,
           nextSegment,
           nextSection,
           nextSegment.getSentences(),
-          false
+          RetryMode.SEG,
+          failedOnly
         );
       } else {
         alert("마지막 퀴즈입니다.");
@@ -259,18 +328,20 @@ export default {
     /**
      * provide
      * @method quizProvider.retry - [다시 하기] 현재 퀴즈를 다시
+     * @method quizProvider.tryFailedQuestion - 현재 퀴즈에서 틀린 문제만
      * @method quizProvider.startNext - [다음 단계] 다음 문제 시작
      * @method quizProvider.gotoSection - [학습선택] section 상세 페이지로 이동
      * @method quizProvider.gotoChapter - 종료. "/level", "/book"으로 이동
      */
     provide("quizProvider", {
       retry,
+      tryFailedQuestion,
       startNext,
       gotoSection,
       gotoChapter,
     });
     onBeforeRouteLeave(() => {
-      store.commit("quiz/closeQuiz");
+      store.dispatch("quiz/closeQuiz");
       return true;
     });
     onMounted(() => {
@@ -366,11 +437,13 @@ export default {
     &.blue {
       h3 {
         color: #007bff;
+        background-color: #dafdff;
       }
     }
     &.brown {
       h3 {
         color: #865900;
+        background-color: #fffad5;
       }
     }
     h3 {

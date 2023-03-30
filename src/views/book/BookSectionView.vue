@@ -39,7 +39,7 @@
           :sentences="sentencesRef"
           :recordVisible="true"
           @choosen="startQuiz"
-          @retry="retrySentenceQuiz"
+          @failed-question="tryFailedQuestion"
         />
         <QuestionList
           quizMode="LISTEN"
@@ -51,7 +51,11 @@
           :sentences="sentencesRef"
           @choosen="startQuiz"
         />
-        <BookQuestionView v-if="overviewVisible" :section="section" />
+        <BookQuestionView
+          v-if="overviewVisible"
+          :section="section"
+          @click="showOverview"
+        />
       </div>
     </template>
   </div>
@@ -69,6 +73,8 @@ import BookNavBar from "./BookNavBar.vue";
 import QuizSpec from "../quiz/type-quiz-spec";
 import BookQuestionView from "./BookQuestionView.vue";
 import { checkAppState } from "../app-state-validator";
+import { RetryMode } from "../../components/quiz/retry-mode";
+
 export default {
   components: {
     QuestionList,
@@ -117,12 +123,15 @@ export default {
         alert("학생을 선택해주세요");
         return;
       }
+      const failedOnly = false;
       QuizSpec.prepareBookQuiz(
         quizMode,
         answerType,
         section.value,
         () => group.sentences,
-        [group.start, group.end]
+        [group.start, group.end],
+        RetryMode.SEG,
+        failedOnly
       )
         .then(() => {
           router.push(`/quiz/${section.value.seq}`);
@@ -132,13 +141,13 @@ export default {
         });
     };
     /**
-     * 틀린 문제 다시 시도
+     * 오답 연습
      * @param {*} e
      */
-    const retrySentenceQuiz = (e) => {
+    const tryFailedQuestion = (e) => {
       const { quizMode, answerType } = e;
 
-      const retryMode = true; // 틀린 문제 재시도
+      const retryMode = RetryMode.FAILED; // 오답 연습
       const section = section.value;
       const sentenceSeqs = records.value.flatMap((record) =>
         record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
@@ -146,13 +155,15 @@ export default {
       const sentences = section.sentences.filter((sen) =>
         sentenceSeqs.includes(sen.seq)
       );
+      const failedOnly = false;
       QuizSpec.prepareBookQuiz(
         quizMode,
         answerType,
         section.value,
         () => sentences,
         [0, sentences.length],
-        retryMode
+        retryMode,
+        failedOnly
       )
         .then(() => {
           router.push(`/quiz/${section.value.seq}`);
@@ -229,7 +240,7 @@ export default {
       sentencesRef,
       sectionHistories,
       startQuiz,
-      retrySentenceQuiz,
+      tryFailedQuestion,
       listQuestions,
       hideQuestionList,
       sourceText,

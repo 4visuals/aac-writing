@@ -49,7 +49,8 @@ export default {
     const mode = props.resourceType === "A" ? "S" : props.resourceType;
     const quizProvider = inject("quizProvider");
 
-    const tryFailedQuestion = () => quizProvider.retry(true);
+    const tryFailedQuestion = () =>
+      quizProvider.tryFailedQuestion(props.scoring);
 
     return { theme, mode, tryFailedQuestion };
   },

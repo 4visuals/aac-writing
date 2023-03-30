@@ -97,6 +97,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   button {
     position: absolute;
     top: 50%;

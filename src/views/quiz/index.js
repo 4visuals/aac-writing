@@ -12,6 +12,7 @@ import { QuizModeText } from "../../components/quiz/text-map";
 import { shallowRef, watch } from "vue";
 import store from "@/store";
 import QuizSpec from "./type-quiz-spec";
+import { RetryMode } from "../../components/quiz/retry-mode";
 
 const answerComponents = new Map();
 answerComponents.set("EJ", shallowRef(EojelInput));
@@ -181,6 +182,9 @@ class QuizConfig {
   get retryMode() {
     return this.options.retry;
   }
+  get failedOnly() {
+    return this.options.failedOnly;
+  }
 }
 
 const resourceTextMap = {
@@ -257,8 +261,17 @@ class QuizContext {
   get prevPage() {
     return this.config.options.prevPage;
   }
+  /**
+   * 보고쓰기(READING), 연습하기(LEARNING), 받아쓰기(QUIZ), 듣고쓰기(LISTEN)를 나타냄
+   */
   get mode() {
     return this.options.mode;
+  }
+  get retryMode() {
+    return this.config.retryMode;
+  }
+  get failedOnly() {
+    return this.config.failedOnly;
   }
   /**
    * @return 'W', 'S', or 'A'
@@ -344,11 +357,11 @@ class QuizContext {
     return this.options.mode === "LISTEN";
   }
   /**
-   * 틀린 문제 재시도 모드인지 나타냄
+   * 오답 연습인지 나타냄
    * @returns true
    */
   isRetryMode() {
-    return this.config.retryMode;
+    return this.config.retryMode === RetryMode.FAILED;
   }
   isWord() {
     return this.config.options.quizResource === "W";

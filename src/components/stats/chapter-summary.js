@@ -1,3 +1,4 @@
+import util from "../../service/util";
 class ChapterSummary {
   constructor(chapter, word, sentence) {
     this.chapter = chapter;
@@ -8,11 +9,11 @@ class ChapterSummary {
     return this.chapter.origin;
   }
   get desc() {
-    const { desc } = this.chapter;
     if (this.chapter.origin === "L") {
-      return desc.substring(0, 1);
+      return util.chapter.rangeText(this.chapter);
     } else {
-      return desc.substring(3);
+      // 앞에 "국어 "를 떼어냄
+      return this.chapter.desc.substring(3);
     }
   }
   get wordStat() {

@@ -214,7 +214,7 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/resizer";
 .desc {
-  font-size: 18px;
+  font-size: 24px;
   position: relative;
   text-align: center;
   display: flex;
@@ -252,7 +252,7 @@ export default {
     }
   }
   .text {
-    padding: 1rem 3.5rem;
+    padding: 8px 20px;
     border: 2px solid transparent;
     background-color: #f7f7f7;
     color: #4d4d4d;
@@ -262,9 +262,9 @@ export default {
     align-items: center;
     border-radius: 1rem;
     &.hidden {
-      padding: 1rem 3.5rem;
+      padding: 8px 20px;
       @include mobile {
-        padding: 4px 3.5rem;
+        padding: 8px 20px;
       }
     }
   }

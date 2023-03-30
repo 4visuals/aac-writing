@@ -2,8 +2,7 @@
   <div class="level-stat">
     <div class="nav">
       <h4>
-        <ActionIcon class="btn-back" icon="expand_circle_down" /><span
-          class="label"
+        <span class="label"
           >{{ origin === "L" ? "단계별" : "교과서" }} 학습 통계</span
         >
         <ActionIcon class="btn-exit" icon="cancel" @click="$emit('exit')" />
@@ -42,6 +41,7 @@
             :paper="detailRef.exams[0]"
             :section="detailRef.section"
             @perfect="showConfetti"
+            @close="closeDetail"
           />
           <canvas v-if="confettiVisible" class="confetti" ref="canvas"></canvas>
         </div>
@@ -226,7 +226,7 @@ export default {
         const score = (100 * correct) / total;
         return {
           c: [
-            { v: stat.desc.substring(0, 1) },
+            { v: stat.desc },
             {
               v: score,
               f: `정답 ${correct}개 / 전체 ${total}개 (${score.toFixed(1)}%)`,

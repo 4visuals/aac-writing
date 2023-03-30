@@ -23,6 +23,9 @@ class Trial {
     const idx = this.q.numberInSection + 1;
     return (idx < 10 ? "0" : "") + idx;
   }
+  get sentence() {
+    return this.q.data;
+  }
 }
 class Scoring {
   /**

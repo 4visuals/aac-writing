@@ -22,14 +22,14 @@
           <span
             class="date"
             :class="{
-              today: month.month === today.month && day.date === today.date,
+              today: today.equals(day),
             }"
             >{{ day.date }}</span
           >
           <div
             class="inner"
             :class="{
-              today: month.month === today.month && day.date === today.date,
+              today: today.equals(day),
             }"
             v-if="hasData(monthMap, day)"
           >

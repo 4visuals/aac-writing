@@ -20,7 +20,10 @@
         <SpanText>{{ history.desc }}</SpanText>
       </ParaText>
       <div class="stats">
-        <div v-if="!history.isChallengeSection()" class="each">
+        <div
+          v-if="origin !== 'B' && !history.isChallengeSection()"
+          class="each"
+        >
           <SpanText class="text" size="sm">낱말</SpanText>
           <SpanText class="text" size="sm"
             >{{ history.stats.word.solved }} /

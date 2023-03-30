@@ -18,6 +18,7 @@ import { onMounted } from "@vue/runtime-core";
 import ScoreView from "./ScoreView.vue";
 import AnswerView from "./AnswerView.vue";
 import NavControllView from "./NavControllView.vue";
+import { RetryMode } from "../../../components/quiz/retry-mode";
 export default {
   components: {
     ScoreView,
@@ -44,7 +45,7 @@ export default {
         mode: mode.substring(0, 1),
         questionOffset: ctx.ranges[0],
         numOfQuestions: ctx.quizLength,
-        retry: ctx.isRetryMode(),
+        retry: ctx.retryMode === RetryMode.FAILED,
         submissions: null,
       };
       exam.submissions = ctx.questions.flatMap((question) => {
@@ -107,9 +108,9 @@ export default {
     };
     onMounted(() => {
       store.commit("quiz/hideHint");
-      if (ctx.isListenMode() || ctx.isRetryMode()) {
+      if (ctx.isListenMode() || ctx.retryMode === RetryMode.FAILED) {
         // 듣고쓰기 모드에서는 시험 결과를 업로드하지 않음.
-        // 재시도인 경우 업로드하지 않음
+        // 오답 연습인 경우 업로드하지 않음
         // 재시도인 경우에도 서버에 업로드해야 오답 정보가 업데이트 된다.
       } else if (ctx.isQuizMode() || ctx.isWord()) {
         uploadExam();

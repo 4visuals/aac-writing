@@ -87,7 +87,7 @@ export default {
     EojeolSubmissionView,
   },
   setup() {
-    let current = new Date();
+    let current = new Date(); // (new Date().getTime() - 1 * 24 * 60 * 60 * 1000);
     const now = shallowRef(Day.fromDate(current));
     const detailEl = shallowRef(null);
     const detail = shallowRef(null);
@@ -186,7 +186,6 @@ export default {
     };
     const shiftCalendar = (cal) => {
       const { type, by } = cal;
-      console.log(type, by);
       if (type === "month") {
         shiftMonth(by);
       } else if (type === "today") {

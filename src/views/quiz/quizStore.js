@@ -2,6 +2,7 @@ import { quizDao } from "../../dao";
 import store from "@/store";
 import api from "@/service/api";
 import { logger } from "@/service/util";
+import { RetryMode } from "../../components/quiz/retry-mode";
 
 store.registerModule("quiz", {
   namespaced: true,
@@ -49,6 +50,31 @@ store.registerModule("quiz", {
         return Promise.resolve();
       }
     },
+    closeQuiz({ state }) {
+      // if (state.finished) {
+      //   // 현재 퀴즈를 다 풀었음. db에서 삭제
+      //   quizDao.deleteQuiz(state.quizContext);
+      // } else {
+      //   // 중간에 그만둠. 상태 저장
+      // }
+      // 무조건 저장
+      /**
+       * 아니라고 함. 뭔지 모르겠다.
+       * https://github.com/4visuals/aac-writing/issues/123
+       */
+      const { retryMode, failedOnly } = state.quizContext;
+      if (retryMode === RetryMode.FAILED || failedOnly) {
+        // 오답 연습이거나 틀린 문제 다시 풀기는 브라우저 디비에 기록하지 않음.
+        state.finished = false;
+        state.quizContext = null;
+        return Promise.resolve();
+      } else {
+        return quizDao.saveQuiz(state.quizContext).then(() => {
+          state.finished = false;
+          state.quizContext = null;
+        });
+      }
+    },
   },
   mutations: {
     setQuiz(state, args) {
@@ -64,23 +90,7 @@ store.registerModule("quiz", {
     hideResultView(state) {
       state.finished = false;
     },
-    closeQuiz(state) {
-      // if (state.finished) {
-      //   // 현재 퀴즈를 다 풀었음. db에서 삭제
-      //   quizDao.deleteQuiz(state.quizContext);
-      // } else {
-      //   // 중간에 그만둠. 상태 저장
-      // }
-      // 무조건 저장
-      /**
-       * 아니라고 함. 뭔지 모르겠다.
-       * https://github.com/4visuals/aac-writing/issues/123
-       */
-      quizDao.saveQuiz(state.quizContext).then(() => {
-        state.finished = false;
-        state.quizContext = null;
-      });
-    },
+
     showHint(state, args) {
       const { text, cnt } = args;
       state.hint.visible = cnt >= 2;

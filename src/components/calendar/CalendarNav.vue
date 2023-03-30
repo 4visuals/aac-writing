@@ -5,7 +5,7 @@
       icon="chevron_left"
       @click="$emit('shift', { by: -1, type: 'month' })"
     />
-    <h5>{{ current.year }}년 {{ current.monthText }}월</h5>
+    <h5>{{ ym.year }}년 {{ ym.monthText }}월</h5>
     <ActionIcon
       class="move circle"
       icon="chevron_right"
@@ -19,13 +19,25 @@
 
 <script>
 import { ActionIcon } from "../../components/form";
-import { Day } from ".";
+import { Day, fromDate } from ".";
+import { ref, watch } from "vue";
 export default {
   components: {
     ActionIcon,
   },
   emits: ["shift"],
   props: { current: Day },
+  setup(props) {
+    const ym = ref(fromDate(props.current));
+
+    watch(
+      () => props.current,
+      () => (ym.value = fromDate(props.current))
+    );
+    return {
+      ym,
+    };
+  },
 };
 </script>
 

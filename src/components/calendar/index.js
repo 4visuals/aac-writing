@@ -28,6 +28,17 @@ class Day {
   toYMD() {
     return `${this.year}-${padZero(this.month)}-${padZero(this.date)}`;
   }
+  /**
+   *
+   * @param {Day} other
+   */
+  equals(other) {
+    return (
+      this.year === other.year &&
+      this.month === other.month &&
+      this.date === other.date
+    );
+  }
 }
 Day.fromDate = (d) =>
   new Day(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getDay());
