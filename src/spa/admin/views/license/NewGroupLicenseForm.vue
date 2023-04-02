@@ -33,7 +33,7 @@
       </p>
       <p class="col2">
         <span clas="lbl">기관 이메일</span>
-        <span v-if="order.email">{{ order.orgEmail }}</span
+        <span v-if="order.orgEmail">{{ order.orgEmail }}</span
         ><span v-else>미입력</span>
       </p>
       <p class="col2">

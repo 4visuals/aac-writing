@@ -73,7 +73,10 @@
               </tr>
               <tr>
                 <td class="col"></td>
-                <td v-if="order.state === 'PND'">
+                <td v-if="order.state === 'PND'" class="btns">
+                  <button class="nude blue" @click="showSmsForm(order)">
+                    SMS
+                  </button>
                   <button class="nude green" @click="showLicenseForm(order)">
                     발급
                   </button>
@@ -97,6 +100,7 @@ import adminApi from "../../service/admin-api";
 import modal from "@/components/modal";
 import DialogView from "@/components/dialog/DialogView.vue";
 import NewGroupLicenseForm from "../license/NewGroupLicenseForm.vue";
+import SmsPublishingForm from "../../comp/sms/SmsPublishingForm.vue";
 import Product from "../../../../entity/product";
 import { GroupOrderState } from "../../../../entity/group-order-form";
 
@@ -135,6 +139,12 @@ export default {
       }
       modal.closeModal();
     };
+    const showSmsForm = (order) => {
+      modal.showModal(SmsPublishingForm, {
+        width: "sm",
+        props: { order, products },
+      });
+    };
     const showLicenseForm = (order) => {
       modal.showModal(NewGroupLicenseForm, {
         width: "sm",
@@ -147,8 +157,8 @@ export default {
       modal.showModal(DialogView, {
         width: "sm",
         props: {
-          title: "단체 주문 취소",
-          message: "단체 주문을 취소합니까?",
+          title: "시스템 취소",
+          message: "단체 주문을 [시스템 취소]합니까?",
           actions: [
             { cmd: "yes", text: "취소합니다." },
             { cmd: "no", text: "아니오" },
@@ -181,6 +191,7 @@ export default {
       filteredOrders,
       products,
       paperName,
+      showSmsForm,
       showLicenseForm,
       showCancelModal,
       filtered,
@@ -217,6 +228,14 @@ export default {
         &.col {
           white-space: nowrap;
           padding-left: 8px;
+        }
+        &.btns {
+          button {
+            border-radius: 8px;
+          }
+          button + button {
+            margin-left: 8px;
+          }
         }
         .state {
           padding: 4px;

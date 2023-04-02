@@ -42,6 +42,15 @@ const order = {
         qtt,
         contractPrice,
       }),
+    /**
+     * 전송 문자 미리보기
+     */
+    sms: {
+      preview: (uuid, templateName) =>
+        GET(`/admin/sms/group-order/${uuid}/${templateName}/preview`),
+      send: (uuid, templateName) =>
+        POST(`/admin/sms/group-order/${uuid}/${templateName}`),
+    },
   },
 };
 
