@@ -42,7 +42,7 @@ export default {
 
     const registerStudent = (student) => {
       console.log(student);
-      const { name, birth } = student;
+      const { name, birth, userId, pass } = student;
       /**
        * randomProps
        * - true인 경우 userId, password 등에 대해 임의의 값을 지정하도록 함
@@ -52,7 +52,13 @@ export default {
        * - 학생 등록시에는 name, birth 만 받은 후 서버에서 임의의 값을 지정함
        */
       store
-        .dispatch("user/createStudent", { name, birth, randomProps: true })
+        .dispatch("user/createStudent", {
+          name,
+          birth,
+          userId,
+          pass,
+          randomProps: false,
+        })
         .then(() => {
           toast.success("@NEW_USER_SUCCESS", null, 5);
           modal.closeModal();
