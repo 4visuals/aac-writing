@@ -148,11 +148,11 @@ export default {
       const { quizMode, answerType } = e;
 
       const retryMode = RetryMode.FAILED; // 오답 연습
-      const section = section.value;
+      // const section = section.value;
       const sentenceSeqs = records.value.flatMap((record) =>
         record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
       );
-      const sentences = section.sentences.filter((sen) =>
+      const sentences = section.value.sentences.filter((sen) =>
         sentenceSeqs.includes(sen.seq)
       );
       const failedOnly = false;
