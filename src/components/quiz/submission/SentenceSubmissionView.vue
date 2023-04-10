@@ -10,7 +10,9 @@
     <div class="paper-info" v-else>
       <div class="info">
         <h4>
-          <span>[{{ rangeText(section.chapter) }}]</span>
+          <span v-if="section.origin !== 'B'"
+            >[{{ rangeText(section.chapter) }}]</span
+          >
           <span>{{ section.chapter.desc.substring(3) }}</span>
         </h4>
         <h5>

@@ -32,7 +32,7 @@
         class="details"
         v-if="detail"
         ref="detailEl"
-        @click="closeDetailView"
+        @click="detailBackgroundClicked"
       >
         <ExamPaperTableView
           :papers="detail.papers"
@@ -42,13 +42,14 @@
         />
       </div>
       <div class="submissions" v-if="submissions">
-        <ActionIcon class="close" icon="close" @click="closeSubmitView" />
+        <!-- <ActionIcon class="close" icon="close" @click="closeSubmitView" /> -->
         <div class="scrollable" ref="scrollEl">
           <SentenceSubmissionView
             v-if="submissions.isWord"
             :paper="submissions.paper"
             :section="submissions.section"
             @perfect="showConfetti"
+            @close="closeSubmitView"
           />
           <EojeolSubmissionView
             v-else
@@ -74,12 +75,12 @@ import { CalendarNav, CalendarView, Day, fromDate } from "../calendar";
 import ExamPaperTableView from "./ExamPaperTableView.vue";
 import EojeolSubmissionView from "../quiz/submission/EojeolSubmissionView.vue";
 import SentenceSubmissionView from "../quiz/submission/SentenceSubmissionView.vue";
-import { ActionIcon } from "../../components/form";
+// import { ActionIcon } from "../../components/form";
 import confetti from "canvas-confetti";
 
 export default {
   components: {
-    ActionIcon,
+    // ActionIcon,
     CalendarNav,
     CalendarView,
     ExamPaperTableView,
@@ -134,7 +135,9 @@ export default {
 
     const closeSubmitView = () => {
       confettiVisible.value = false;
-      detailEl.value.removeEventListener("click", closeSubmitView, false);
+      if (detailEl.value) {
+        detailEl.value.removeEventListener("click", closeSubmitView, false);
+      }
       submissions.value = null;
     };
     const closeDetailView = () => {
@@ -175,7 +178,15 @@ export default {
           .then(stop);
       });
     };
-
+    /**
+     * ExamTable 모달의 뒷배경 클릭시 table닫음
+     * @param {MouseEvent} e
+     */
+    const detailBackgroundClicked = (e) => {
+      if (e.target === detailEl.value) {
+        closeDetailView();
+      }
+    };
     const shiftMonth = (delta) => {
       const d = fromDate(now.value);
       const newMonth = delta === 1 ? d.nextMonth() : d.prevMonth();
@@ -209,6 +220,7 @@ export default {
       showSubmissions,
       closeSubmitView,
       closeDetailView,
+      detailBackgroundClicked,
       showConfetti,
       formatText,
       shiftCalendar,
@@ -345,7 +357,7 @@ export default {
     .scrollable {
       position: relative;
       background-color: white;
-      padding: 18px 0;
+      padding: 8px;
       overflow: auto;
       flex: 1 1 auto;
     }
