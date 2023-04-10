@@ -50,8 +50,9 @@ export default {
   setup() {
     const store = useStore();
     const students = computed(() => store.getters["user/students"]);
-    const licenses = computed(() => store.state.user.membership.licenses);
-
+    const licenses = computed(() =>
+      store.state.user.membership.licenses.filter((lcs) => lcs.isAvailable())
+    );
     const assignees = ref(null);
 
     const buildAssignees = () => {

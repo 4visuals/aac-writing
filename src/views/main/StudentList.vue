@@ -68,7 +68,9 @@ export default {
     const store = useStore();
 
     const students = computed(() => store.getters["user/students"]);
-    const licenses = computed(() => store.state.user.membership.licenses);
+    const licenses = computed(() =>
+      store.state.user.membership.licenses.filter((lcs) => lcs.isAvailable())
+    );
 
     const activeLcs = ref(null);
 
