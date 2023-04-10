@@ -11,7 +11,13 @@
             <span class="dur">{{ product.durationInDays }}</span>
             <span class="sub">days</span>
           </div>
-          <div v-if="user" class="option">
+          <div class="option">
+            <div class="login">
+              <p>현재는 단체 구매만 가능합니다.</p>
+              <!-- <FormButton text="로그인" @click="$router.push('/')" /> -->
+            </div>
+          </div>
+          <!-- <div v-if="user" class="option">
             <button class="nude" @click="dispatchOrder('card')">
               <AppIcon icon="credit_card" fsize="24px"></AppIcon
               ><span>주문 페이지로 이동</span>
@@ -22,7 +28,7 @@
               <p>로그인 후 구매 가능합니다.</p>
               <FormButton text="로그인" @click="$router.push('/')" />
             </div>
-          </div>
+          </div> -->
         </div>
       </Transition>
       <div class="bg red">
@@ -164,12 +170,12 @@
 </template>
 
 <script setup>
-import { computed, defineProps, ref, defineEmits } from "vue";
+import { defineProps, ref } from "vue";
 import util from "../../service/util";
 import Product from "../../entity/product";
-import { useStore } from "vuex";
-import AppIcon from "../AppIcon.vue";
-import FormButton from "../form/FormButton.vue";
+// import { useStore } from "vuex";
+// import AppIcon from "../AppIcon.vue";
+// import FormButton from "../form/FormButton.vue";
 
 const themes = {
   red: {
@@ -185,24 +191,24 @@ const themes = {
     colorB: "hsl(70, 69%, 40%)",
   },
 };
-const props = defineProps({
+defineProps({
   product: Product,
   theme: String,
   paymentVisible: { type: Boolean, required: false, default: true },
   minified: { type: Boolean, required: false, default: false },
 });
-const emit = defineEmits(["order"]);
-const store = useStore();
-const user = computed(() => store.getters["user/currentUser"]);
+// const emit = defineEmits(["order"]);
+// const store = useStore();
+// const user = computed(() => store.getters["user/currentUser"]);
 const hovering = ref(false);
 const format = (money) => util.currency.format(money);
 const hover = (on) => {
   hovering.value = on;
 };
 
-const dispatchOrder = (method) => {
-  emit("order", { method, product: props.product });
-};
+// const dispatchOrder = (method) => {
+//   emit("order", { method, product: props.product });
+// };
 </script>
 
 <style lang="scss" scoped>
