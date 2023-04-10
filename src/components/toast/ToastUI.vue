@@ -11,7 +11,9 @@
           <h5 :class="{ mg0: !toast.title }">
             <span class="title">{{ toast.title }}</span>
           </h5>
-          <div class="msg">{{ toast.msg }}</div>
+          <div class="msg">
+            <p v-for="(m, idx) in toast.msg" :key="idx">{{ m }}</p>
+          </div>
         </div>
         <div class="right">
           <button class="nude" @click="closeToast(toast)">

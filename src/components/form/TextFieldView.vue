@@ -74,10 +74,9 @@ export default {
       });
     };
     const commit = (formModel, value) => {
-      if (value) {
-        inputEl.value.value = value;
-        formModel.value = value;
-      }
+      const val = value || "";
+      inputEl.value.value = val;
+      formModel.value = val;
       editing.value = false;
     };
     const toggleVisible = () => {

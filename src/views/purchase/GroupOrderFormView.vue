@@ -50,9 +50,12 @@
     </div>
     <div class="elem">
       <h3>문의 내용</h3>
-      <p>상품 종류(이용권, 공책)와 구매 수량, 기타 문의사항을 입력해주세요.</p>
+      <p>이용권 수량(학생 수) 및 기타 문의사항을 입력해주세요</p>
       <div class="desc">
-        <textarea v-model="memo.value"></textarea>
+        <textarea
+          v-model="memo.value"
+          placeholder="예) 이용권 6장 &#10;기타 문의 사항 입력"
+        ></textarea>
         <div class="state">
           <span class="n">{{ memo.value.length }}</span> /
           <span class="n">1000</span>
@@ -75,6 +78,7 @@ import { computed, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import api from "@/service/api";
 import { useRouter } from "vue-router";
+import toast from "../../components/toast";
 
 export default {
   components: {
@@ -150,9 +154,35 @@ export default {
     const updateForm = ({ value, commit }) => {
       commit(value);
     };
+    const validForm = () => {
+      const orgName = forms.find((form) => form.wid === "orgName");
+      const error = [];
+      if (orgName.value.trim() === "") {
+        error.push("소속 기관명을 입력해주세요");
+      }
+      const senderName = forms.find((form) => form.wid === "senderName");
+      if (senderName.value.trim() === "") {
+        error.push("문의자 이름을 입력해주세요");
+      }
+      const senderContactInfo = forms.find(
+        (form) => form.wid === "senderContactInfo"
+      );
+      if (senderContactInfo.value.trim() === "") {
+        error.push("문의자 연락처(전화번호)를 입력해주세요");
+      }
+      if (memo.value.trim() === "") {
+        error.push("문의 내용을 입력해주세요");
+      }
+      if (error.length > 0) {
+        toast.warn(error, "구매 양식", 30);
+      }
+      return error.length === 0;
+    };
     const showPreview = () => {
-      console.log(papers.filter((paper) => paper.selected));
-      editMode.value = false;
+      if (validForm()) {
+        console.log(papers.filter((paper) => paper.selected));
+        editMode.value = false;
+      }
     };
     const showEdit = () => (editMode.value = true);
     const sendForm = () => {

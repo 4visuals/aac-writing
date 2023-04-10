@@ -21,11 +21,18 @@ class Toast {
   }
 }
 const create = (type, title, msg, durationInSeconds) => {
-  if (msg.startsWith("@")) {
-    //
-    const code = msg.substring(1);
-    msg = message.parse(code);
+  if (typeof msg === "string") {
+    msg = [msg];
   }
+  msg = msg.map((msg) => {
+    if (msg.startsWith("@")) {
+      const code = msg.substring(1);
+      return message.parse(code);
+    } else {
+      return msg;
+    }
+  });
+
   const t = new Toast(type, title, msg, durationInSeconds * 1000);
   toastStore.addToast(t);
 };
