@@ -209,41 +209,14 @@ export default {
     const retry = () => {
       /**
        * 최초에 특정 segment를 풀고 난 후
-       * 첫 번째 결과화면에서 [틀린 문제 풀기]를 눌러서 두번째 시험을 진행함.
-       * 두 번째 결과 화면에서 [다시하기]를 누르는 경우,
-       *
-       * 현재 문제가 속한 section의 segment를 다시 풀어야 함(보통 10문제).
-       * (방금 풀었던 문제들은, ctx.questions, 더이상 최초에 풀었던 문제들이 아닐 수 있음. 틀린 문제들만 존재함)
-       *
-       * 그런데 최초에 진행한 segment가 [오답풀기]인 경우
-       * 1회 이상의 [틀린 문제 풀기] 진행 후에 결과 화면에서 [다시하기]를 누르는 경우
-       * 현재의 segment가 아니라 오답 자체를 전부 다시 풀어야 함.
-       *
+       * 뭔지 모르겠다.
        */
       const quizContext = ctx.value;
       const [s, e] = quizContext.ranges;
-      const segments = quizContext.getSegments();
-      let segment; // = segments.find((seg) => seg.start === s && seg.end === e);
-      let sentences;
+      let segment = { start: s, end: e }; // = segments.find((seg) => seg.start === s && seg.end === e);
+      let sentences = quizContext.questions.map((q) => q.data); // list of sentences
       const { retryMode } = quizContext;
-      if (retryMode === RetryMode.SEG) {
-        segment = segments.find((seg) => seg.start === s && seg.end === e);
-        sentences = segment.getSentences();
-      } else {
-        const { section } = quizContext;
-        const quizResource = quizContext.isWord() ? "W" : "S";
-        const records = store.getters["record/wrongAnswers"](section);
-        const sentenceSeqs = records
-          .filter((record) => record.type === quizResource)
-          .flatMap((record) =>
-            record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
-          );
-        sentences = section.sentences.filter((sen) =>
-          sentenceSeqs.includes(sen.seq)
-        );
-        segment = { start: 0, end: sentences.length };
-      }
-      const failedOnly = false;
+      const failedOnly = retryMode === RetryMode.FAILED;
       startQuiz(
         ctx,
         segment,
@@ -278,7 +251,7 @@ export default {
         segment,
         quizContext.section,
         sentences,
-        quizContext.retryMode,
+        RetryMode.FAILED,
         failedOnly
       );
     };

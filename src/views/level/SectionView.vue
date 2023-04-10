@@ -161,6 +161,9 @@ export default {
     };
     /**
      * 오답 연습
+     *
+     * section을 구성하는 segment들마다 틀린 문제들을 모두 모아서 풀기.
+     * 받아쓰기를 모두 틀리면 section의 모든 문제가 다 포함될 수 있음.
      * @param {*} e
      */
     const tryFailedQuestion = (e) => {
