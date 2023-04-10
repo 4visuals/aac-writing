@@ -1,9 +1,9 @@
 <template>
   <div class="answers">
-    <h3>정답 출력</h3>
+    <h3>정답</h3>
     <ul>
       <li v-for="q in questions" :key="q.index">
-        <ParaText>{{ q.text }}</ParaText>
+        <ParaText>{{ `${q.numberInSection + 1}. ${q.text}` }}</ParaText>
       </li>
     </ul>
   </div>
