@@ -9,48 +9,45 @@
       }"
       v-for="lcs in licenses"
       :key="lcs.seq"
+      @mouseover="setActiveLicense(lcs)"
       @click="setActiveLicense(lcs)"
     >
       <SpanText class="name">{{ studentName(lcs) }}</SpanText
       ><template v-if="isActiveLicense(lcs)">
         <div class="cate" v-if="hasStudent(lcs)">
-          <AacButton
+          <AppButton
             text="단계별"
             fill
-            size="xs"
-            theme="pink"
+            size="sm"
+            theme="blue"
+            borderColor="#4b7bec"
             @click="$emit('selected', lcs, '/level')"
           />
-          <AacButton
+          <AppButton
             text="교과서"
             fill
-            size="xs"
-            theme="gold"
+            size="sm"
+            borderColor="#ffd110"
+            theme="yellow"
             @click="$emit('selected', lcs, '/book')"
           />
-          <div class="gutter"></div>
           <ActionIcon
             class="config"
             icon="settings"
             @click="$emit('register', lcs)"
           />
         </div>
-        <AacButton
+        <AppButton
           v-else
-          text="학생 등록"
+          text="학생등록"
+          size="sm"
+          theme="purple"
           fill
-          size="xs"
-          theme="blue"
+          borderColor="#7b4799"
           @click="$emit('register', lcs)"
         />
       </template>
     </div>
-    <!-- <select>
-      <option>[학생 선택]</option>
-      <option v-for="stud in students" :key="stud.seq">
-        {{ stud.name }}
-      </option>
-    </select> -->
   </div>
 </template>
 
@@ -59,10 +56,12 @@ import { computed, ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { SpanText } from "../../components/text";
 import ActionIcon from "../../components/form/ActionIcon.vue";
+import AppButton from "../../components/form/AppButton.vue";
 export default {
   components: {
     SpanText,
     ActionIcon,
+    AppButton,
   },
   setup() {
     const store = useStore();
@@ -76,7 +75,7 @@ export default {
 
     const studentName = (lcs) => {
       const student = students.value.find((s) => s.seq === lcs.studentRef);
-      return student ? student.name : "[미등록]";
+      return student ? student.name : "미등록";
     };
     const setActiveLicense = (lcs) => {
       activeLcs.value = lcs;
@@ -108,8 +107,7 @@ export default {
 <style lang="scss" scoped>
 .stud-list {
   border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  background-color: white;
   max-height: 300px;
   overflow-y: auto;
   .license {
@@ -117,7 +115,8 @@ export default {
     align-items: center;
     padding: 8px 8px 8px 16px;
     column-gap: 16px;
-    color: #aaa;
+    color: #000;
+    font-weight: 600;
     cursor: pointer;
     height: 50px;
     .name {
@@ -125,7 +124,7 @@ export default {
     }
     .cate {
       display: flex;
-      column-gap: 4px;
+      column-gap: 12px;
       .gutter {
         width: 1px;
         margin: 6px 4px 10px 6px;
@@ -141,8 +140,7 @@ export default {
       color: black;
     }
     &.active {
-      background-color: #bcedff;
-      box-shadow: 0 0 8px #586d748a;
+      background-color: #b4dcf9;
     }
   }
 }

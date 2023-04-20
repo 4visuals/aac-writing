@@ -15,6 +15,10 @@ store.registerModule("modal", {
     pushModal: (state, modalConfig) => {
       state.modalStack.push(modalConfig);
     },
+    popModal: (state) => {
+      const lastIdx = state.modalStack.length - 1;
+      state.modalStack.splice(lastIdx, 1);
+    },
     clear: (state) => {
       state.modalStack.splice(0, state.modalStack.length);
     },
@@ -23,5 +27,6 @@ store.registerModule("modal", {
 
 export default {
   startModal: (modalConfig) => store.commit("modal/pushModal", modalConfig),
+  pushModal: (modalConfig) => store.commit("modal/pushModal", modalConfig),
   clear: () => store.commit("modal/clear"),
 };

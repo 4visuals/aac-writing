@@ -1,11 +1,6 @@
 <template>
   <div class="c-info">
     <div class="container" :class="{ max480: maxWidth }">
-      <div class="left" v-if="!hideLogo">
-        <div class="logo">
-          <img src="/img/icons/android-chrome-192x192.png" alt="그림한글" />
-        </div>
-      </div>
       <div class="mid">
         <div class="policy">
           <router-link
@@ -65,13 +60,6 @@ export default {
     padding: 16px;
     display: flex;
     column-gap: 8px;
-    background: linear-gradient(
-      0deg,
-      transparent 0%,
-      #fffdf4 10%,
-      #fffdf4 90%,
-      transparent 100%
-    );
     &.max480 {
       max-width: 480px;
     }
@@ -97,10 +85,12 @@ export default {
       flex: 1 1 auto;
       font-size: 10px;
       .policy {
+        text-align: center;
         a {
           padding: 2px 4px;
           text-decoration: none;
           font-size: 12px;
+          color: #21c2cc;
           &.active {
             background-color: #d0edff;
           }

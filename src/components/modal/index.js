@@ -30,6 +30,11 @@ class ModalConfig {
     return this.option.padding || "0";
   }
 }
+
+const pushModal = (vueComponent, option) => {
+  const config = new ModalConfig(vueComponent, option || {});
+  modalStore.pushModal(config);
+};
 const showModal = (vueComponent, option) => {
   const config = new ModalConfig(vueComponent, option || {});
   modalStore.startModal(config);
@@ -40,4 +45,5 @@ export default {
   ModalConfig,
   showModal,
   closeModal,
+  pushModal,
 };

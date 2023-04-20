@@ -47,69 +47,39 @@
         ><span class="text">로그아웃</span></a
       >
     </div>
-    <teleport to="body" v-if="modalVisible">
-      <Modal width="sm" @hidden="closeJoinModal" v-if="joinRequired()">
-        <JoinView :membership="membership" />
-      </Modal>
-      <Modal width="sm" @hidden="() => {}" v-if="showWelcome">
-        <WelcomeJoin />
-      </Modal>
-    </teleport>
   </div>
 </template>
 
 <script>
-// import env from "@/service/env";
 import Logo from "@/components/oauth/Logo.vue";
 import StudentLogo from "@/components/StudentLogo.vue";
-import JoinView from "@/views/user/JoinView.vue";
-import WelcomeJoin from "@/views/user/WelcomeJoin.vue";
 import DialogView from "@/components/dialog/DialogView.vue";
-import { Modal } from "@/components";
 import modal from "../../components/modal";
 import { ActionIcon } from "@/components/form";
 import { useStore } from "vuex";
 import { computed, ref } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
-// import { onMounted } from "vue";
 export default {
   props: ["loginText"],
   components: {
     Logo,
     StudentLogo,
-    Modal,
-    JoinView,
     ActionIcon,
-    WelcomeJoin,
   },
   setup() {
     const store = useStore();
     const isStudent = computed(() => store.getters["user/isStudent"]);
     const isTeacher = computed(() => store.getters["user/isTeacher"]);
     const membership = computed(() => store.state.user.membership);
-    const modalVisible = ref(false);
-    const showWelcome = computed(() => store.state.user.welcome);
     const router = useRouter();
     const googleRef = ref(null);
-    // const login = () => {
-    //   google.accounts.id.prompt();
-    // };
 
     const resolveClick = () => {
-      if (membership.value) {
-        console.log("사용자 정보");
-      } else {
-        // login();
+      if (membership.value && isTeacher.value) {
+        store.commit("ui/hideMenu");
+        router.push("/setting");
       }
     };
-    /**
-     * 이메일은 존재하지만 회원이 아닌 상태
-     */
-    const joinRequired = () => membership.value && !membership.value.user;
-    const closeJoinModal = () => {
-      modalVisible.value = false;
-    };
-
     const changeStudent = () => {
       router.replace("/");
     };
@@ -119,6 +89,9 @@ export default {
         router.replace("/");
       }
       modal.closeModal();
+    };
+    const goSettings = () => {
+      console.log("ddd");
     };
     const doLogout = () => {
       store.commit("ui/hideMenu");
@@ -145,14 +118,11 @@ export default {
       isStudent,
       isTeacher,
       membership,
-      modalVisible,
-      showWelcome,
       googleRef,
       resolveClick,
-      joinRequired,
-      closeJoinModal,
       changeStudent,
       doLogout,
+      goSettings,
     };
   },
 };

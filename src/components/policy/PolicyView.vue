@@ -1,15 +1,29 @@
 <template>
-  <div
-    class="detail"
-    :style="{ padding: padding || '0' }"
-    v-html="getDetail()"
-  ></div>
+  <div class="detail" :style="{ padding: padding }">
+    <div v-if="controlVisible" class="close">
+      <AppButton text="닫기" :fill="true" @click="$emit('close')" />
+    </div>
+    <div class="content" v-html="getDetail()"></div>
+  </div>
 </template>
 
 <script>
 import { marked } from "marked";
 export default {
-  props: ["mdText", "padding"],
+  props: {
+    mdText: {
+      type: String,
+      require: true,
+    },
+    padding: {
+      type: String,
+      default: "0",
+    },
+    controlVisible: {
+      type: Boolean,
+      default: false,
+    },
+  },
   setup(props) {
     const getDetail = () => {
       return marked.parse(props.mdText);
@@ -24,6 +38,12 @@ export default {
   background-color: #fffdf4;
 }
 .detail {
+  position: relative;
+  .close {
+    position: sticky;
+    top: 16px;
+    background-color: inherit;
+  }
   h1 {
     margin-top: 2rem;
   }

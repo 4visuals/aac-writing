@@ -1,12 +1,8 @@
 <template>
   <div class="login-form">
-    <TextField
-      :field="form.email"
-      v-model:value="form.email.value"
-      icon="email"
-      aria-placeholder="가입 이메일 입력"
-      placeholder="이메일을 입력해주세요."
-    />
+    <ParaText>
+      {{ form.email }}
+    </ParaText>
     <div class="checkbox">
       <input
         type="checkbox"
@@ -24,12 +20,12 @@
       /><label for="consent-privacy">개인정보 처리방침</label
       ><button class="nude" @click="showTOS('PV')">보기</button>
     </div>
-    <AacButton
+    <AppButton
       theme="blue"
       fill
       borderless
-      rect
       muted
+      size="plain"
       :text="modeText"
       @click="tryJoin"
     />
@@ -42,31 +38,25 @@
 
 <script>
 import { Loading } from "@/components";
-import { TextField } from "@/components/form";
+// import { TextField } from "@/components/form";
 import { ref } from "vue";
 import modal from "@/components/modal";
-// import { useRouter } from "vue-router";
-// import { useStore } from "vuex";
 import api from "@/service/api";
 import PolicyView from "@/components/policy/PolicyView.vue";
 import toast from "@/components/toast";
-// import toast from "../components/toast";
+import ParaText from "../components/text/ParaText.vue";
+import AppButton from "../components/form/AppButton.vue";
 
 export default {
   emits: ["join"],
   props: ["profile"],
   components: {
-    TextField,
+    // TextField,
     Loading,
+    ParaText,
+    AppButton,
   },
   setup(props, { emit }) {
-    // const store = useStore();
-    // const router = useRouter();
-    const formOption = {
-      updated: "input",
-      pendingVisible: true,
-      disabled: true,
-    };
     const consent = ref({
       PV: {
         md: "",
@@ -78,15 +68,11 @@ export default {
       },
     });
     const form = ref({
-      email: TextField.toModel("email", props.profile.email, formOption),
+      email: props.profile.email,
     });
     const modeText = "가입";
     const error = ref(null);
     const pending = ref(null);
-    // const clearLoginUser = () => {
-    //   store.commit("user/clearMembership");
-    //   store.commit("exam/clear");
-    // };
     const checkConsent = () => {
       const { PV, TM } = consent.value;
       const consented = PV.checked && TM.checked;
@@ -99,7 +85,6 @@ export default {
       if (!checkConsent()) {
         return;
       }
-      // clearLoginUser();
       pending.value = { state: "LOADING", error: null, msg: "" };
       api.user
         .join()
@@ -113,13 +98,13 @@ export default {
     };
 
     const showTOS = (type) => {
-      console.log(consent.value[type].content);
-      modal.showModal(PolicyView, {
+      modal.pushModal(PolicyView, {
         width: "sm",
         fill: true,
         props: {
           mdText: consent.value[type].content,
           padding: "16px",
+          controlVisible: true,
         },
       });
     };

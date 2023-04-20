@@ -13,12 +13,14 @@
       placeholder="비밀번호"
       v-model:value="form.password"
     />
-    <AacButton
+    <AppButton
       theme="blue"
+      :fluid="true"
       fill
       borderless
       rect
       muted
+      size="student-login"
       text="로그인"
       @click="tryLogin"
     />
@@ -35,9 +37,11 @@ import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { watch } from "@vue/runtime-core";
+import AppButton from "../components/form/AppButton.vue";
 export default {
   components: {
     TextField,
+    AppButton,
   },
   setup() {
     const store = useStore();

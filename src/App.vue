@@ -16,7 +16,7 @@
   </div>
   <RefreshView v-if="refreshRequired" />
   <MenuWrapper v-if="menuVisible" />
-  <teleport to="body" v-if="modalConfig">
+  <teleport to="body" v-if="modalConfig" :key="modalConfig.comp">
     <Modal
       @hidden="hideModal"
       :fill="modalConfig.fill"
@@ -87,7 +87,7 @@ export default {
       window.visualViewport.addEventListener("resize", captureHeight);
       captureHeight();
     };
-    const hideModal = () => store.commit("modal/clear");
+    const hideModal = () => store.commit("modal/popModal");
 
     watch(
       () => route.path,
@@ -102,6 +102,9 @@ export default {
       },
       { immediate: true }
     );
+    watch(modalConfig, (config) => {
+      console.log("[modal]", config);
+    });
     onMounted(() => {
       google.charts.load("50", { packages: ["corechart"] });
       installHeightResizer();

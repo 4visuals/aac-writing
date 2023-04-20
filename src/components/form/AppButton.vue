@@ -12,12 +12,16 @@
         disabled,
         transparent,
         fill,
+        rect,
+        word: theme === 'word',
+        sen: theme === 'sentence',
         blue: theme === 'blue',
         yellow: theme === 'yellow',
         purple: theme === 'purple',
         brown: theme === 'brown',
         red: theme === 'red',
         green: theme === 'green',
+        dark: theme === 'dark',
       }"
       @click.stop="clicked"
     >
@@ -56,10 +60,14 @@ export default {
       type: String,
       default: "md",
       validator(val) {
-        return ["sm", "md", "nav", "chapter"].includes(val);
+        return ["sm", "md", "nav", "chapter", "plain"].includes(val);
       },
     },
     fluid: {
+      type: Boolean,
+      default: false,
+    },
+    rect: {
       type: Boolean,
       default: false,
     },
@@ -130,7 +138,8 @@ export default {
     }
   }
   &.fluid {
-    width: 100%;
+    display: flex;
+    width: 100% !important;
   }
   &.chapter {
     width: 118px;
@@ -150,6 +159,11 @@ export default {
       }
     }
   }
+  &.plain {
+    button {
+      padding: 8px 0;
+    }
+  }
   &.section {
     width: 100%;
   }
@@ -161,6 +175,11 @@ export default {
       span {
         padding: 6px 16px;
       }
+    }
+  }
+  &.student-login {
+    button {
+      height: 48px;
     }
   }
   button {
@@ -176,6 +195,9 @@ export default {
     align-items: center;
     justify-content: center;
     width: 100%;
+    &.rect {
+      border-radius: 0;
+    }
 
     &.no-rounded {
       border-radius: 0;
@@ -188,7 +210,8 @@ export default {
       background-color: transparent !important;
     }
 
-    &.blue {
+    &.blue,
+    &.word {
       border-color: var(--border-color, #4b7bec);
       color: #4b7bec;
       &.fill {
@@ -200,11 +223,23 @@ export default {
         background-color: #4b7bec;
       }
     }
+    &.sen {
+      border-color: var(--border-color, #21c2cc);
+      color: #21c2cc;
+      &.fill {
+        background-color: #21c2cc;
+        color: white;
+      }
+      &.invert {
+        color: white;
+        background-color: #21c2cc;
+      }
+    }
     &.yellow {
       color: var(--text-color, #ffd110);
       &.fill {
         background-color: #ffd110;
-        color: white;
+        color: #865900;
       }
       &.invert {
         color: white;
@@ -225,7 +260,8 @@ export default {
     &.red {
       color: #d03c19;
       &.fill {
-        background-color: #fff;
+        background-color: #d03c19;
+        color: white;
       }
       &.invert {
         color: white;
@@ -248,11 +284,24 @@ export default {
     &.purple {
       color: #7b4799;
       &.fill {
-        background-color: #fff;
+        background-color: #7b4799;
+        color: white;
       }
       &.invert {
         color: white;
         background-color: #7b4799;
+      }
+    }
+    &.dark {
+      color: #32393d;
+      &.fill {
+        background-color: #32393d;
+        border-color: #32393d;
+        color: white;
+      }
+      &.invert {
+        color: white;
+        background-color: #32393d;
       }
     }
     &:active {

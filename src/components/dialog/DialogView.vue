@@ -1,17 +1,22 @@
 <template>
   <div class="dialog">
     <h3 v-if="title">{{ title }}</h3>
-    <div class="body">
-      <ParaText>{{ message }}</ParaText>
+    <div class="body" :class="[align || '']">
+      <ParaText v-for="(para, index) in paras" :key="index">{{
+        para
+      }}</ParaText>
     </div>
-    <div class="footer" v-if="actions">
-      <AacButton
+    <div class="footer" :class="[align || '']" v-if="actions">
+      <AppButton
         v-for="(action, idx) in actions"
         :key="action.cmd"
         :inline="true"
         :text="action.text"
+        :fill="true"
         :theme="themes[idx]"
+        size="plain"
         @click="doAction(action)"
+        class="btn"
       />
     </div>
   </div>
@@ -19,12 +24,15 @@
 
 <script>
 import ParaText from "@/components/text/ParaText.vue";
-import { AacButton } from "@/components/form";
+// import { AacButton } from "@/components/form";
+import { AppButton } from "../form";
 export default {
-  components: { AacButton, ParaText },
-  props: ["title", "message", "actions"],
+  components: { ParaText, AppButton },
+  props: ["title", "message", "actions", "align"],
   setup(props, { emit }) {
     const themes = ["blue", "red"];
+
+    const paras = (props.message || "").split("\n");
     const doAction = (action) => {
       const { cmd, trigger } = action;
       if (cmd) {
@@ -34,7 +42,7 @@ export default {
         action.trigger();
       }
     };
-    return { themes, doAction };
+    return { themes, doAction, paras };
   },
 };
 </script>
@@ -47,13 +55,21 @@ export default {
     padding: 16px;
   }
   .body {
-    padding: 16px;
+    padding: 24px 16px;
+    &.center {
+      text-align: center;
+    }
   }
   .footer {
     display: flex;
     justify-content: flex-end;
     column-gap: 16px;
     padding: 8px 16px;
+    &.center {
+      > .btn {
+        flex: 1 1 50%;
+      }
+    }
   }
 }
 </style>

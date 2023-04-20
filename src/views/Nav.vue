@@ -102,7 +102,6 @@ export default {
 
     const themeRef = computed(() => store.state.ui.theme);
 
-    console.log(store.state.ui.theme);
     const section = ref(null);
     const mobileMenuVisible = ref(false);
     const courses = [

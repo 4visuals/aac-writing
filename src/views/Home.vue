@@ -1,13 +1,20 @@
 <template>
   <div class="home">
     <div class="home-nav" v-if="host.isTeacherMode()">
-      <router-link to="/support">소개</router-link>
-      <router-link to="/join" v-if="!member">가입</router-link>
-      <router-link to="/purchase">이용권구매</router-link>
+      <router-link class="link" to="/support">소개</router-link>
+      <div style="color: #648294; font-weight: 600">|</div>
+      <!-- <router-link to="/join" v-if="!member">가입</router-link> -->
+      <router-link class="link" to="/purchase">이용권구매</router-link>
     </div>
-    <button v-if="member" class="btn logout" @click="doLogout">
-      <span>로그</span><span>아웃</span>
-    </button>
+    <AppButton
+      v-if="member"
+      class="btn logout"
+      text="로그아웃"
+      theme="dark"
+      size="sm"
+      :fill="true"
+      @click="doLogout"
+    />
     <div class="menu" style="margin-top: 20vmin">
       <div class="logo main"></div>
       <div class="logo sub"></div>
@@ -16,6 +23,7 @@
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
     </div>
     <div class="menu" v-else-if="host.isTeacherMode()">
+      <!--로그인 화면-->
       <div class="students" v-if="member">
         <template v-if="students.length === 0">
           <div class="stud-reg">
@@ -34,15 +42,15 @@
         />
       </div>
       <div class="login" v-else>
-        <GoogleButton @join="showJoinDialog" />
-        <!-- <div class="hr"><span>OR</span></div>
-        <ManualLoginForm /> -->
+        <GoogleButton @join="showNotAMemberDialog" />
+        <!-- <div class="hr"></div>
+        <button class="btn" @click="showJoinForm">회원 가입</button> -->
       </div>
     </div>
     <div class="menu" v-else>
       <StudentLoginForm />
     </div>
-    <CompanyInfo />
+    <CompanyInfo v-if="!member" />
     <teleport to="body" v-if="modal.visible">
       <Modal @hidden="modal.visible = false" :fill="true" :rect="true">
         <ModalHeader :shadow="true"
@@ -80,6 +88,7 @@ import CompanyInfo from "../components/company/CompanyInfo.vue";
 import modals from "@/components/modal";
 import DialogView from "@/components/dialog/DialogView.vue";
 import { loadStudentRecords } from "./app-state-validator";
+import JoinView from "./user/JoinView.vue";
 
 export default {
   name: "Home",
@@ -92,6 +101,7 @@ export default {
     StudentList,
     GoogleButton,
     CompanyInfo,
+    // JoinView,
   },
   setup() {
     const store = useStore();
@@ -99,6 +109,7 @@ export default {
     const students = computed(() => store.getters["user/students"]);
     const licenses = computed(() => store.state.user.membership.licenses);
     const member = computed(() => store.getters["user/isMember"]);
+    const membership = computed(() => store.state.user.membership);
     const modal = ref({ visible: false, lcs: null });
     const moveTo = (url, license) => {
       store.commit("exam/setActiveLicense", license);
@@ -112,23 +123,39 @@ export default {
     const doLogout = () => {
       store.commit("user/logoutUser");
     };
-    const showJoinDialog = () => {
+    /**
+     * 구글 로그인 버튼 누른 후 회원이 아니면 보여주는 팝업
+     */
+    const showNotAMemberDialog = () => {
       modals.showModal(DialogView, {
         width: "sm",
         props: {
-          title: "회원이 아닙니다.",
-          message: "회원가입 후 이용 가능합니다.",
+          align: "center",
+          message: "회원이 아닙니다.\n회원가입 후 이용해주세요",
           actions: [
-            { cmd: "yes", text: "가입 페이지로 이동합니다." },
-            { cmd: "no", text: "취소" },
+            { cmd: "yes", text: "가입 페이지로 이동" },
+            { cmd: "no", text: "취소하기" },
           ],
         },
         events: {
           commit: (cmd) => {
             modals.closeModal();
             if (cmd === "yes") {
-              goTo("/join");
+              showJoinForm();
             }
+          },
+        },
+      });
+    };
+
+    const showJoinForm = () => {
+      modals.showModal(JoinView, {
+        width: "sm",
+        props: { membership },
+        events: {
+          commit: (cmd) => {
+            modals.closeModal();
+            console.log(cmd);
           },
         },
       });
@@ -154,7 +181,8 @@ export default {
       goTo,
       host,
       doLogout,
-      showJoinDialog,
+      showNotAMemberDialog,
+      showJoinForm,
     };
   },
 };
@@ -198,6 +226,7 @@ export default {
   height: 100%;
   padding: 0 24px;
   position: relative;
+  background-color: #d2ecfd;
   .home-nav {
     display: flex;
     font-size: 1.5rem;
@@ -206,24 +235,16 @@ export default {
     left: 16px;
     column-gap: 16px;
     a {
+      color: #648294;
+      font-weight: 600;
       text-decoration: none;
     }
   }
   .logout {
-    width: 48px;
-    height: 48px;
-    background-color: crimson;
-    color: white;
     position: fixed;
     top: 16px;
     right: 16px;
     font-size: 1.1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    border-radius: 24px;
   }
 
   .logo {
