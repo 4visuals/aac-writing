@@ -1,48 +1,38 @@
 <template>
   <div class="join-view">
-    <h3>회원가입</h3>
-    <ParaText>아래의 정보로 회원 가입합니다.</ParaText>
-    <div class="userinfo">
-      <Logo
-        class="logo"
-        size="md"
-        :imagePath="membership.image"
-        :vendor="membership.vendor"
-      />
-      <ParaText
-        ><span class="badge">{{ membership.email }}</span></ParaText
-      >
-    </div>
-    <div class="btns">
-      <AacButton text="가입" theme="blue" @click="doJoin" />
-      <AacButton text="닫기" theme="gray" />
-    </div>
-    <Loading
-      v-if="pending"
-      :pending="pending"
-      @close="() => (pending = null)"
+    <WelcomeJoin
+      v-if="userRef"
+      :user="userRef"
+      key="welcome"
+      @close="$emit('close')"
+    />
+    <OauthJoinForm
+      v-else
+      :profile="membership.profile"
+      @join="onJoinCompleted"
+      key="form"
     />
   </div>
 </template>
 
 <script>
-import { Loading } from "@/components";
-import Logo from "@/components/oauth/Logo.vue";
-import { ParaText } from "@/components/text";
-import { AacButton } from "@/components/form";
 import { useStore } from "vuex";
 import { ref } from "@vue/reactivity";
+import OauthJoinForm from "../OauthJoinForm.vue";
+import WelcomeJoin from "./WelcomeJoin.vue";
 export default {
   components: {
-    Logo,
-    ParaText,
-    AacButton,
-    Loading,
+    OauthJoinForm,
+    WelcomeJoin,
   },
   props: ["membership"],
   setup() {
     const store = useStore();
     const pending = ref(null);
+    const userRef = ref(null);
+    const onJoinCompleted = (membership) => {
+      userRef.value = membership.user;
+    };
     const doJoin = () => {
       pending.value = { state: "LOADING" };
       store
@@ -56,8 +46,10 @@ export default {
         });
     };
     return {
+      userRef,
       pending,
       doJoin,
+      onJoinCompleted,
     };
   },
 };

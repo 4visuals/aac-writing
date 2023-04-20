@@ -17,7 +17,7 @@
     />
     <div class="menu" style="margin-top: 20vmin">
       <div class="logo main"></div>
-      <div class="logo sub"></div>
+      <div class="logo sub">받아쓰기</div>
     </div>
     <div class="menu" v-if="host.isPwaMode()">
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
@@ -251,12 +251,16 @@ export default {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    margin-bottom: 32px;
     &.main {
       background-image: url("/img/white_back_02.png");
     }
     &.sub {
-      background-image: url("/img/badassgi.png");
+      font-size: 8vmin;
+      font-weight: 900;
+      margin: 3vmin auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
   .login {
@@ -280,6 +284,7 @@ export default {
   .menu {
     max-width: 480px;
     margin: 0 auto;
+    margin-top: 15vmin;
     width: 100%;
     .students {
       margin-top: 24px;
