@@ -4,9 +4,7 @@
     <GroupOrderOrgView :order="order" />
     <div class="preview">
       <h5>문자 미리보기</h5>
-      <p class="sms-body">
-        {{ preview }}
-      </p>
+      <textarea class="sms-body" v-model="preview"></textarea>
       <p class="bytes">
         <span>{{ preview.length }}글자 / 최대 70글자</span
         ><span v-if="preview.length > 70" class="alert"
@@ -43,7 +41,7 @@ export default {
     };
     const sendOrderPaperSms = () => {
       group.sms
-        .send(props.order.orderUuid, templateName)
+        .sendManual(props.order.orderUuid, preview.value)
         .then(() => {
           toast.success("문자 전송 완료", "[성공]");
         })
@@ -67,12 +65,14 @@ export default {
     font-size: 18px;
     margin-bottom: 6px;
   }
+  .sms-body {
+    background-color: #dff8ff;
+    padding: 8px;
+    font-size: 16px;
+    width: 100%;
+    height: 100px;
+  }
   p {
-    &.sms-body {
-      background-color: #dff8ff;
-      padding: 8px;
-      font-size: 16px;
-    }
     span.alert {
       color: #ba0000;
       margin-left: 8px;

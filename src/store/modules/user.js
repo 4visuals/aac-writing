@@ -13,7 +13,9 @@ const installLoginData = (
   store.commit("setMembership", membership);
   store.commit("updateJwt", jwt);
   if (store.getters.isStudent) {
-    store.commit("exam/setActiveLicense", licenses[0], { root: true });
+    store.commit("exam/setActiveLicense", membership.licenses[0], {
+      root: true,
+    });
     store.commit("exam/setSegmentHistories", segments, { root: true });
   } else if (store.getters.isTeacher) {
     store.getters.students.forEach((student) => {

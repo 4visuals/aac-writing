@@ -2,6 +2,7 @@
   <div class="section-detail" :class="theme">
     <template v-if="cate">
       <LevelNavBar
+        :theme="theme"
         :section="cate"
         @quizMode="(mode) => (wordMode = mode)"
         @back="moveBack"
@@ -21,7 +22,7 @@
         <QuestionList
           quizMode="READING"
           answerType="EJ"
-          theme="blue"
+          :theme="theme"
           :wordMode="wordMode"
           :section="cate"
           :histories="sectionHistories"
@@ -32,7 +33,7 @@
         <QuestionList
           quizMode="LEARNING"
           answerType="EJ"
-          theme="blue"
+          :theme="theme"
           :wordMode="wordMode"
           :section="cate"
           :histories="sectionHistories"
@@ -43,7 +44,7 @@
         <QuestionList
           quizMode="QUIZ"
           answerType="SEN"
-          theme="blue"
+          :theme="theme"
           :wordMode="wordMode"
           :section="cate"
           :histories="sectionHistories"
@@ -55,7 +56,7 @@
         <QuestionList
           quizMode="LISTEN"
           answerType="NULL"
-          theme="blue"
+          :theme="theme"
           :wordMode="wordMode"
           :section="cate"
           :histories="sectionHistories"
@@ -102,7 +103,7 @@ export default {
     const records = computed(() =>
       store.getters["record/wrongAnswers"](cate.value)
     );
-    const theme = "blue";
+    const theme = ref("word");
 
     const overviewVisible = ref(false);
 
@@ -257,6 +258,8 @@ export default {
     watch(
       () => wordMode.value,
       () => {
+        const themValue = wordMode.value ? "word" : "sentence";
+        theme.value = themValue;
         sentencesRef.value.splice(0, sentencesRef.value.length);
       }
     );

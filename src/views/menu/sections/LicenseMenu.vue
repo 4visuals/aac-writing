@@ -1,11 +1,6 @@
 <template>
   <div class="license-menu">
-    <LicenseItem
-      :lcs="activeLicense"
-      :students="students"
-      :current="current"
-      @click="$emit('clicked', lcs)"
-    />
+    <LicenseItem :lcs="activeLicense" :students="students" :current="current" />
     <ul>
       <li>
         <ParaText :small="true"

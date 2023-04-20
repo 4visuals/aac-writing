@@ -1,11 +1,11 @@
 <template>
   <div
     class="switch-button"
-    :class="{
-      on: selected,
-      off: !selected,
-      disabled: disabled === true || disabled === '',
-    }"
+    :class="[
+      selected ? 'on' : 'off',
+      disabled === true || disabled === '' ? 'disabled' : '',
+      theme || 'word',
+    ]"
   >
     <label
       ><input type="checkbox" :checked="selected" @change="changed" />
@@ -19,7 +19,7 @@
 <script>
 import { SpanText } from "@/components/text";
 export default {
-  props: ["selected", "onText", "offText", "disabled"],
+  props: ["selected", "onText", "offText", "disabled", "theme"],
   emits: ["update:selected"],
   components: {
     SpanText,
@@ -91,9 +91,29 @@ export default {
       bottom: 0;
       left: 0;
       width: 50%;
-      background-color: #45aaf2;
+
       border-radius: 30px;
       transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+  }
+  &.word {
+    label::before {
+      background-color: #45aaf2;
+    }
+    &.on {
+      .label.off {
+        color: #4b7bec;
+      }
+    }
+  }
+  &.sentence {
+    label::before {
+      background-color: #21c2cc;
+    }
+    &.off {
+      .label.on {
+        color: #21c2cc;
+      }
     }
   }
   &.on {
@@ -101,7 +121,6 @@ export default {
       transform: translateX(0);
     }
     .label.off {
-      color: #4b7bec;
       font-weight: 500;
     }
   }

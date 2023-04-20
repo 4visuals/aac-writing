@@ -27,7 +27,8 @@
             <AppButton
               :fluid="true"
               size="sm"
-              theme="green"
+              :backgroundColor="section.origin === 'L' ? '#ffd700' : '#DAFDFF'"
+              :theme="section.origin === 'L' ? 'brown' : 'sentence'"
               text="오답연습"
               @click="tryFailedQuestion"
             ></AppButton>
@@ -65,7 +66,8 @@ export default {
   setup(props, { emit }) {
     const store = useStore();
     const bgMap = {
-      blue: "#D2ECFD",
+      word: "#D2ECFD",
+      sentence: "#DAFDFF",
       brown: "#F1EBDB",
     };
     const activeLicense = computed(() => store.getters["exam/activeLicense"]);
@@ -208,8 +210,11 @@ export default {
     flex: 0 0 25%;
     color: inherit;
     font-weight: 600;
-    &.blue {
+    &.word {
       color: #4b7bec;
+    }
+    &.sentence {
+      color: #21c2cc;
     }
     &.brown {
       color: #865900;

@@ -1,5 +1,5 @@
 <template>
-  <div class="header">
+  <div class="header" :class="[theme]">
     <div class="title">
       <h3 class="text-ellipsis">
         <ActionIcon
@@ -22,6 +22,7 @@
       >
       <SwitchButton
         v-model:selected="wordMode"
+        :theme="theme"
         :disabled="disableSwitch"
         onText="낱말"
         offText="문장"
@@ -50,6 +51,10 @@ export default {
     resourceType: {
       type: String,
       default: null,
+    },
+    theme: {
+      type: String,
+      default: "blue",
     },
   },
   setup(props, { emit }) {
@@ -81,6 +86,14 @@ $padding: 16px;
   padding: 8px $padding;
   background-color: #4b7bec;
   color: white;
+  &.word {
+    background-color: #4b7bec;
+    color: white;
+  }
+  &.sentence {
+    background-color: #419fa5;
+    color: white;
+  }
   .title {
     display: flex;
     column-gap: 16px;

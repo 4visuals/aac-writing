@@ -1,5 +1,5 @@
 <template>
-  <div class="numbering" :class="[theme.name]">
+  <div class="numbering" :class="[theme]">
     <div class="desc text-ellipsis">
       <p class="text-ellipsis">{{ rss }} {{ desc }}</p>
       <button class="nude speaker" @click="$emit('speak')"></button>
@@ -70,7 +70,7 @@ $inactive-bgc: #eee9fe;
     padding: 8px 0;
   }
 
-  &.blue {
+  &.word {
     color: #3867d6;
     .desc {
       .speaker {
@@ -82,6 +82,22 @@ $inactive-bgc: #eee9fe;
         color: #4840ee;
         .bar {
           background-color: #4840ee;
+        }
+      }
+    }
+  }
+  &.sentence {
+    color: #21c2cc;
+    .desc {
+      .speaker {
+        background-color: #21c2cc;
+      }
+    }
+    .bars {
+      .current.elem {
+        color: #21c2cc;
+        .bar {
+          background-color: #21c2cc;
         }
       }
     }

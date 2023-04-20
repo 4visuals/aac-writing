@@ -50,6 +50,8 @@ const order = {
         GET(`/admin/sms/group-order/${uuid}/${templateName}/preview`),
       send: (uuid, templateName) =>
         POST(`/admin/sms/group-order/${uuid}/${templateName}`),
+      sendManual: (uuid, body) =>
+        POST(`/admin/sms/group-order/${uuid}/manual`, { body }),
     },
   },
 };

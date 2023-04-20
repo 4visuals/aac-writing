@@ -5,6 +5,7 @@
         v-if="ctx.isLevelQuiz()"
         :section="ctx.config.section"
         :resourceType="ctx.resourceType"
+        :theme="navbarTheme"
         @back="closeQuiz"
       />
       <BookNavBar
@@ -25,7 +26,7 @@
             enterkeyhint="done"
             @keyup="hideReward"
           />
-          <Numbering @speak="speak" :theme="theme" />
+          <Numbering @speak="speak" :theme="navbarTheme" />
           <div
             class="answer-view"
             :class="{ blue: ctx.isLevelQuiz(), brown: ctx.isBookQuiz() }"
@@ -111,6 +112,7 @@ export default {
     const reward = computed(() => store.getters["ui/reward"]);
     const speaking = computed(() => store.state.tts.speaking);
     const theme = computed(() => store.state.ui.theme);
+    const navbarTheme = ref("word");
     const focusing = ref(null);
     // const keyConsumer = ref(null);
     const quizFinished = computed(() => store.state.quiz.finished);
@@ -320,6 +322,11 @@ export default {
     onMounted(() => {
       store.commit("ui/hideReward");
       store.commit("ui/setBackgroundVisible", false);
+      navbarTheme.value = ctx.value.isBookQuiz()
+        ? "brown"
+        : ctx.value.isWord()
+        ? "word"
+        : "sentence";
     });
     onUnmounted(() => {
       store.commit("ui/setBackgroundVisible", true);
@@ -328,6 +335,7 @@ export default {
     return {
       ctx,
       theme,
+      navbarTheme,
       hint,
       reward,
       focusing,

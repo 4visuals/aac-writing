@@ -73,14 +73,22 @@
               </tr>
               <tr>
                 <td class="col"></td>
-                <td v-if="order.state === 'PND'" class="btns">
+                <td class="btns">
                   <button class="nude blue" @click="showSmsForm(order)">
                     SMS
                   </button>
-                  <button class="nude green" @click="showLicenseForm(order)">
+                  <button
+                    v-if="order.state === 'PND'"
+                    class="nude green"
+                    @click="showLicenseForm(order)"
+                  >
                     발급
                   </button>
-                  <button class="nude red" @click="showCancelModal(order)">
+                  <button
+                    v-if="order.state === 'PND'"
+                    class="nude red"
+                    @click="showCancelModal(order)"
+                  >
                     취소
                   </button>
                 </td>
