@@ -235,6 +235,15 @@ button {
     white-space: nowrap;
   }
 }
+ul.nude {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  &.hor {
+    display: flex;
+    align-items: center;
+  }
+}
 @keyframes anim-rotate {
   0% {
     transform: rotate(90deg);

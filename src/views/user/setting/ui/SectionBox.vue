@@ -25,6 +25,7 @@ section {
   font-size: 1.15rem;
   transition: box-shadow 0.2s linear, transform 0.2s linear;
   cursor: pointer;
+  background-color: white;
   &:hover {
     box-shadow: 0px 0px 8px #2f8ed87a, 0 0 2px #2f8ed8c7;
     transform: scale(1.01);

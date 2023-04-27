@@ -1,68 +1,79 @@
 <template>
   <div>
-    <WidthLayout>
+    <WidthLayout align="left" maxWidth="480px">
       <!--{ 
         "seq": 395, 
         "email": "yeori@gmail.com", "name": "yeori", "vendor": "MANUAL", "creationTime": "2022-12-01T06:20:52Z", "role": "TEACHER", "students": [], "student": false }-->
-      <section class="account">
-        <h4>기본 정보</h4>
+      <main class="account">
         <table>
-          <tr>
-            <td>아이디</td>
-            <td>{{ user.userId }}</td>
-          </tr>
-          <tr>
-            <td>이메일</td>
-            <td>{{ user.email }}</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td><SpanText class="label">이름</SpanText></td>
+              <td>
+                <SpanText>{{ user.name }}</SpanText>
+              </td>
+              <td><!--<SpanText>회원 탈퇴</SpanText>--></td>
+            </tr>
+            <tr>
+              <td><SpanText class="label">이메일</SpanText></td>
+              <td>
+                <SpanText>{{ user.email }}</SpanText>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><SpanText class="label">학생</SpanText></td>
+              <td>
+                <SpanText
+                  >{{ user.students ? user.students.length : 0 }}명</SpanText
+                >
+              </td>
+              <td>
+                <AppButton
+                  theme="yellow"
+                  size="setting"
+                  fill
+                  text="학생 등록"
+                  borderColor="#ffd110"
+                  @click="settingNav.goTo('student')"
+                ></AppButton>
+              </td>
+            </tr>
+            <tr>
+              <td><SpanText class="label">이용권</SpanText></td>
+              <td>
+                <SpanText>미등록 {{ notUsedLcs.length }}장</SpanText>/
+                <SpanText>이용중 {{ activatedLcs.length }}장</SpanText>
+              </td>
+              <td>
+                <AppButton
+                  theme="indigo"
+                  size="setting"
+                  fill
+                  text="이용권 등록"
+                  @click="settingNav.goTo('license')"
+                ></AppButton>
+              </td>
+            </tr>
+            <tr>
+              <td><SpanText class="label">구매내역</SpanText></td>
+              <td>
+                <SpanText>{{ orders.length }}건</SpanText>
+              </td>
+              <td>
+                <AppButton
+                  theme="mono-blue"
+                  fill
+                  size="setting"
+                  text="구매내역 보기"
+                  @click="settingNav.goTo('order')"
+                ></AppButton>
+              </td>
+            </tr>
+          </tbody>
         </table>
-
-        <div class="hr-dash"></div>
-        <div class="box">
-          <h5>이름</h5>
-          <TextField v-model:value="setting.user.name" icon="face" />
-        </div>
-      </section>
+      </main>
       <!-- <section>
-        <h4>비밀번호 변경</h4>
-
-        <div v-if="setting.password.unlock" class="box">
-          <p>비밀번호를 변경합니다.</p>
-          <p>영문자와 숫자를 모두 포함해야 합니다.</p>
-          <p>비밀번호는 6 ~ 16글자이어야 합니다.</p>
-          <TextField
-            v-model:value="setting.password.form.newPass"
-            type="password"
-            icon="password"
-            placeholder="새로운 비밀번호"
-          />
-          <TextField
-            v-model:value="setting.password.form.auxPass"
-            type="password"
-            icon="password"
-            placeholder="비밀번호 확인"
-          />
-          <div class="btns">
-            <FormButton :round="false" text="비밀번호 변경" @click="changePw" />
-            <FormButton
-              :round="false"
-              text="취소"
-              theme="red"
-              @click="hidePw"
-            />
-          </div>
-        </div>
-        <div v-else class="box">
-          <p>현재 비밀번호를 입력 후 새로운 비밀번호를 설정할 수 있습니다.</p>
-          <TextField
-            type="password"
-            icon="password"
-            placeholder="비밀번호 입력 후 엔터"
-            @enter="unlockPassword"
-          />
-        </div>
-      </section> -->
-      <section>
         <h4>탈퇴하기</h4>
         <div v-if="setting.unsub.unlock" class="box">
           <p>
@@ -88,32 +99,38 @@
             @enter="unlockUnSub"
           />
         </div>
-      </section>
+      </section> -->
     </WidthLayout>
   </div>
 </template>
 
 <script>
-import { computed, reactive } from "vue";
+import api from "@/service/api";
+import { computed, reactive, ref, inject } from "vue";
 import { useStore } from "vuex";
 import WidthLayout from "../../../../components/layout/WidthLayout.vue";
-import TextField from "../../../../components/form/TextField.vue";
-import FormButton from "../../../../components/form/FormButton.vue";
+// import TextField from "../../../../components/form/TextField.vue";
+// import FormButton from "../../../../components/form/FormButton.vue";
+import { SpanText } from "@/components/text";
 
-import api from "@/service/api";
 import toast from "../../../../components/toast";
 import { useRouter } from "vue-router";
 
 export default {
   components: {
     WidthLayout,
-    TextField,
-    FormButton,
+    SpanText,
   },
   setup() {
     const router = useRouter();
     const store = useStore();
     const user = computed(() => store.getters["user/currentUser"]);
+    const licenses = store.getters["user/validLicenses"];
+    const activatedLcs = licenses.filter((lcs) => lcs.isInUse());
+    const notUsedLcs = licenses.filter((lcs) => !lcs.isInUse());
+    const orders = ref([]);
+    const settingNav = inject("settingNav");
+
     const setting = reactive({
       user: {
         name: user.value.name,
@@ -186,14 +203,25 @@ export default {
         router.replace("/");
       });
     };
+    const loadOrders = () => {
+      api.order.list().then((res) => {
+        orders.value = res.orders;
+      });
+    };
+
+    loadOrders();
     return {
       setting,
       user,
+      activatedLcs,
+      notUsedLcs,
+      orders,
       unlockUnSub,
       unlockPassword,
       changePw,
       hidePw,
       doUnsubscription,
+      settingNav,
     };
   },
 };
@@ -207,6 +235,7 @@ section {
   margin-top: 16px;
   font-size: 1.15rem;
   transition: box-shadow 0.2s linear, transform 0.2s linear;
+  background-color: white;
   &:hover {
     box-shadow: 0px 0px 8px #2f8ed87a, 0 0 2px #2f8ed8c7;
     transform: scale(1.01);
@@ -224,13 +253,16 @@ section {
     column-gap: 8px;
   }
 }
+.label {
+  font-weight: 600;
+}
 .account {
   table {
     font-size: 1.15rem;
     tr {
       padding-bottom: 4px;
       td {
-        padding: 0 4px;
+        padding: 1rem;
       }
     }
   }

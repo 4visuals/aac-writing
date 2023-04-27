@@ -1,22 +1,27 @@
 <template>
   <div class="setting">
-    <section class="left-menu">
-      <SettingNav :menus="menus" />
-    </section>
-    <section class="viewport">
-      <SettingJumbo @action="handleAction" />
-      <div class="view">
-        <router-view
-          @new-student="showNewStudentForm"
-          @del-student="startStudentRemoval"
-        />
-      </div>
-    </section>
+    <SettingBg :activeMenu="activeMenu" />
+    <SettingGnb />
+    <SettingJumbo @action="handleAction" />
+    <main>
+      <section class="left-menu">
+        <SettingNav :menus="menus" />
+      </section>
+      <section class="viewport">
+        <div class="view">
+          <router-view
+            @new-student="showNewStudentForm"
+            @del-student="startStudentRemoval"
+          />
+        </div>
+      </section>
+    </main>
+    <CompanyInfoDark />
   </div>
 </template>
 
 <script>
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, provide } from "vue";
 import { useStore } from "vuex";
 import SettingNav from "./SettingNav.vue";
 import MenuItem from "./menu-item";
@@ -28,10 +33,16 @@ import DialogView from "@/components/dialog/DialogView.vue";
 import NewStudentForm from "@/components/admin/NewStudentForm.vue";
 import toast from "@/components/toast";
 import { useRoute, useRouter } from "vue-router";
+import SettingGnb from "./SettingGnb.vue";
+import SettingBg from "./SettingBg.vue";
+import CompanyInfoDark from "../../../components/company/CompanyInfoDark.vue";
 export default {
   components: {
     SettingNav,
     SettingJumbo,
+    SettingGnb,
+    SettingBg,
+    CompanyInfoDark,
   },
 
   setup() {
@@ -91,14 +102,14 @@ export default {
       "new-order": goToOrder,
     };
     const menus = [
-      new MenuItem("", "home", "마이페이지"),
-      new MenuItem("account", "account_circle", "내 정보"),
-      new MenuItem("license", "badge", "이용권", [
-        new NavAction("new-order", "이용권 구매", "add"),
-      ]),
+      new MenuItem("account", "account_circle", "마이페이지"),
       new MenuItem("student", "face", "학생 관리", [
         new NavAction("new-student", "학생 추가", "add"),
       ]),
+      new MenuItem("license", "badge", "이용권", [
+        new NavAction("new-order", "이용권 구매", "add"),
+      ]),
+
       new MenuItem("order", "monetization_on", "구매 내역"),
       // new MenuItem("students", "people", "학생들"),
     ];
@@ -106,7 +117,7 @@ export default {
     store.commit("setting/setMenus", menus);
     store.commit("ui/setBackgroundVisible", false);
     const path = useRoute().fullPath.split("/").reverse()[0];
-    console.log(useRoute().fullPath);
+    // console.log(useRoute().fullPath);
     const active = menus.find((m) => m.path === path);
     store.commit("setting/setActive", active || menus[0]);
     const handleAction = (action) => {
@@ -150,6 +161,17 @@ export default {
       });
     };
 
+    const goTo = (menu) => {
+      if (typeof menu === "string") {
+        menu = menus.find((m) => m.path === menu);
+      }
+      store.commit("setting/setActive", menu);
+      router.replace(menu.getFullPath());
+    };
+    provide("settingNav", {
+      goTo,
+    });
+
     onMounted(() => {});
     onUnmounted(() => {
       store.unregisterModule("setting");
@@ -171,35 +193,37 @@ export default {
 @import "~@/assets/resizer";
 $mwidth: 220px;
 .setting {
+  position: relative;
   font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
   // font-weight: 700;
-  display: flex;
+
   height: 100vh;
-  .left-menu {
-    position: relative;
-    flex: 0 0 $mwidth;
-    width: $mwidth;
-    background-color: azure;
-  }
-  .viewport {
-    position: relative;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    .view {
-      margin: 16px;
-    }
-  }
-}
-@include mobile {
-  .setting {
+  main {
+    display: flex;
     .left-menu {
-      width: 44px;
-      flex: 0 0 44px;
+      position: relative;
+      margin: 16px;
+      flex: 0 0 $mwidth;
+      width: $mwidth;
+    }
+    .viewport {
+      position: relative;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      .view {
+        margin: 16px;
+      }
+    }
+    @include mobile {
+      .left-menu {
+        width: 48px;
+        flex: 0 0 44px;
+      }
+    }
+    @include tablet {
+    }
+    @include desktop {
     }
   }
-}
-@include tablet {
-}
-@include desktop {
 }
 </style>

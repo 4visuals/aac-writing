@@ -1,5 +1,14 @@
 <template>
-  <div class="layout-w" :class="{ fixed }" :style="`--max-width: ${maxw}`">
+  <div
+    class="layout-w"
+    :class="{
+      fixed,
+      left: align === 'left',
+      right: align === 'right',
+      center: align === 'center',
+    }"
+    :style="`--max-width: ${maxw}`"
+  >
     <slot />
   </div>
 </template>
@@ -9,6 +18,10 @@ import { computed } from "vue";
 
 export default {
   props: {
+    align: {
+      type: String,
+      default: "center",
+    },
     maxWidth: {
       type: String,
       default: "400px",
@@ -29,7 +42,15 @@ export default {
 .layout-w {
   max-width: var(--max-width);
   width: 100%;
-  margin: 0 auto;
+  &.left {
+    margin: 0 auto 0 0;
+  }
+  &.center {
+    margin: 0 auto;
+  }
+  &.right {
+    margin: 0 auto 0 0;
+  }
   &.fixed {
     position: sticky;
     top: 0;

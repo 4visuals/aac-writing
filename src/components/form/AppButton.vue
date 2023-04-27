@@ -22,6 +22,8 @@
         red: theme === 'red',
         green: theme === 'green',
         dark: theme === 'dark',
+        indigo: theme === 'indigo',
+        'mono-blue': theme === 'mono-blue',
       }"
       @click.stop="clicked"
     >
@@ -60,7 +62,7 @@ export default {
       type: String,
       default: "md",
       validator(val) {
-        return ["sm", "md", "nav", "chapter", "plain"].includes(val);
+        return ["sm", "md", "nav", "chapter", "plain", "setting"].includes(val);
       },
     },
     fluid: {
@@ -141,6 +143,7 @@ export default {
     display: flex;
     width: 100% !important;
   }
+  &.setting,
   &.chapter {
     width: 118px;
     button {
@@ -223,6 +226,18 @@ export default {
         background-color: #4b7bec;
       }
     }
+    &.mono-blue {
+      border-color: var(--border-color, #2ab6c0);
+      color: #2ab6c0;
+      &.fill {
+        background-color: #2ab6c0;
+        color: white;
+      }
+      &.invert {
+        background-color: #2ab6c0;
+        color: white;
+      }
+    }
     &.sen {
       border-color: var(--border-color, #21c2cc);
       color: #21c2cc;
@@ -244,6 +259,17 @@ export default {
       &.invert {
         color: white;
         background-color: #ffd110;
+      }
+    }
+    &.indigo {
+      color: var(--text-color, #2356a0);
+      &.fill {
+        background-color: #2356a0;
+        color: white;
+      }
+      &.invert {
+        color: white;
+        background-color: #2356a0;
       }
     }
     &.brown {

@@ -37,8 +37,22 @@ class License {
       return Date.parse(exp);
     }
   }
+  /**
+   * 이용 중인 수강증인지 나타냄
+   * 1) 만료되지 않아야 하고
+   * 2) 연결된 학생이 있음.
+   * @returns
+   */
   isInUse() {
-    return !this.isExpired() && this.alreadyActivated && this.studentRef;
+    /**
+     * 이용권 활성화 규칙이 변경됨
+     * 이전에는 이용권에 학생을 연결할때 활성화되었으나,
+     * 이용권이 발급된 직후에 곧바로 활성화시킴.
+     *
+     * 여기서의 [활성화]는 구매한 이용권의 사용 시작 시간을 의미함.
+     * 학생 등록과 상관없이 구매 직후부터 사용중 처리됨
+     */
+    return !this.isExpired() && /* this.alreadyActivated && */ this.studentRef;
   }
   isExpired() {
     const { expiredAt } = this;

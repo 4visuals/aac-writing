@@ -36,16 +36,15 @@ export default {
 .jumbo {
   position: sticky;
   top: 0;
-  height: 60px;
+  height: 180px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 0 16px;
-  box-shadow: 0 0 8px #00000022, 0 0 2px #00000044;
-  background-color: white;
-  z-index: 10;
+  justify-content: center;
+  padding: 60px 0;
   h3 {
+    font-size: 6vmin;
     font-weight: 900;
-    flex: 1 1 auto;
   }
   button.action {
     display: flex;

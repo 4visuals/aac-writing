@@ -38,6 +38,8 @@ export default {
   namespaced: true,
   state: () => ({ membership: null, jwt: null, welcome: false }),
   getters: {
+    validLicenses: (state) =>
+      state.membership.licenses.filter((lcs) => !lcs.isExpired()),
     oauthed: (state) => state.membership && state.membership.profile,
     currentUser: (state) => state.membership?.user,
     isMember: (state) => state.membership && state.membership.user,
