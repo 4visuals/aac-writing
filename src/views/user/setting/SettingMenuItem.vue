@@ -21,7 +21,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~@/assets/resizer";
 .menu {
   font-size: 20px;
   display: flex;
@@ -37,16 +36,12 @@ export default {
     background-color: #a4dcff;
   }
 }
-@include mobile {
+@media (max-width: 767px) {
   .menu {
     padding: 12px;
     .label {
       display: none;
     }
   }
-}
-@include tablet {
-}
-@include desktop {
 }
 </style>

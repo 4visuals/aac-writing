@@ -100,6 +100,7 @@ export default {
     const actionMap = {
       "new-student": showNewStudentForm,
       "new-order": goToOrder,
+      purchase: goToOrder,
     };
     const menus = [
       new MenuItem("account", "account_circle", "마이페이지"),
@@ -110,7 +111,9 @@ export default {
         new NavAction("new-order", "이용권 구매", "add"),
       ]),
 
-      new MenuItem("order", "monetization_on", "구매 내역"),
+      new MenuItem("order", "monetization_on", "구매 내역", [
+        new NavAction("purchase", "구매하기", "shopping_cart"),
+      ]),
       // new MenuItem("students", "people", "학생들"),
     ];
     store.registerModule("setting", settingStore);
@@ -170,6 +173,7 @@ export default {
     };
     provide("settingNav", {
       goTo,
+      deleteStudent: startStudentRemoval,
     });
 
     onMounted(() => {});
@@ -214,15 +218,11 @@ $mwidth: 220px;
         margin: 16px;
       }
     }
-    @include mobile {
+    @media (max-width: 767px) {
       .left-menu {
         width: 48px;
         flex: 0 0 44px;
       }
-    }
-    @include tablet {
-    }
-    @include desktop {
     }
   }
 }

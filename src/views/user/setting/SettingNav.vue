@@ -38,7 +38,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~@/assets/resizer";
 .setting-nav {
   display: flex;
   flex-direction: column;
@@ -63,7 +62,7 @@ export default {
     background-color: white;
   }
 }
-@include mobile {
+@media (max-width: 767px) {
   .setting-nav {
     .user-info {
       padding: 12px;

@@ -1,11 +1,14 @@
 <template>
-  <LicenseItemUI
-    v-for="lcs in filterValidLicense()"
-    :key="lcs.uuid"
-    :license="lcs"
-    :current="now"
-    @clicked="showBindingForm"
-  />
+  <div class="lcs-view">
+    <SectionBox
+      padding="0"
+      v-for="lcs in filterValidLicense()"
+      :key="lcs.uuid"
+      class="lcs"
+    >
+      <LicenseItemUI :license="lcs" :current="now" @clicked="showBindingForm" />
+    </SectionBox>
+  </div>
 </template>
 
 <script>
@@ -15,9 +18,11 @@ import LicenseItemUI from "../ui/LicenseItemUI.vue";
 import modal from "@/components/modal";
 import StudentList from "../components/StudentList.vue";
 import toast from "@/components/toast";
+import SectionBox from "../ui/SectionBox.vue";
 export default {
   components: {
     LicenseItemUI,
+    SectionBox,
   },
   setup() {
     const store = useStore();
@@ -49,4 +54,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.lcs-view {
+  max-width: 560px;
+  .lcs {
+    margin-bottom: 16px;
+  }
+}
+</style>

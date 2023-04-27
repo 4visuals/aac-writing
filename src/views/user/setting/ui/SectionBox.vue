@@ -1,14 +1,18 @@
 <template>
-  <WidthLayout
-    ><section><slot /></section
-  ></WidthLayout>
+  <section :style="`padding: ${padding}`"><slot /></section>
 </template>
 
 <script>
-import WidthLayout from "@/components/layout/WidthLayout.vue";
+// import WidthLayout from "@/components/layout/WidthLayout.vue";
 export default {
+  props: {
+    padding: {
+      type: String,
+      default: "16px",
+    },
+  },
   components: {
-    WidthLayout,
+    // WidthLayout,
   },
   setup() {
     return {};

@@ -5,10 +5,11 @@
       expired: license.isExpired(),
     }"
   >
-    <h5>{{ license.uuid }}</h5>
+    <!-- <h5>{{ license.uuid }}</h5> -->
     <div class="dates">
       <div class="date">구매일: {{ toYMD(license.createdAt) }}</div>
-      <div class="date">만료일: {{ toYMD(license.expiredAt) }}</div>
+      <div class="date">시작일: {{ toYMD(license.activatedAt) }}</div>
+      <div class="date">종료일: {{ toYMD(license.expiredAt) }}</div>
     </div>
     <div class="assigned">
       <span v-if="assignee" class="student"
@@ -103,8 +104,6 @@ export default {
   gap: 10px;
   max-width: 600px;
 
-  background: #feffbc;
-  border: 1px solid #98995b;
   cursor: pointer;
   position: relative;
   margin-bottom: 8px;
@@ -113,22 +112,6 @@ export default {
   .ticket {
     font-size: 16px;
     padding: 4px 8px;
-  }
-  .progress-bar {
-    height: 100%;
-    position: absolute;
-    top: 0px;
-    width: 100%;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    border-radius: 8px;
-    overflow: hidden;
-    .bar {
-      background-color: #ffe546;
-      flex: 1 1 auto;
-      border-radius: 4px;
-    }
   }
   .assigned {
     user-select: none;
@@ -150,15 +133,6 @@ export default {
     }
   }
   &.normal {
-    background-color: #fff9ac;
-
-    border: 1px solid transparent;
-    .progress-bar {
-      // background-color: #b2d3dd;
-      .bar {
-        background-color: #ffe546;
-      }
-    }
   }
   .newlcs {
     color: #fff9ac;
@@ -191,21 +165,23 @@ export default {
     position: absolute;
     right: 0;
     top: 0;
+    display: flex;
     font-size: 14px;
     font-weight: 600;
     color: white;
-
-    display: flex;
+    border-radius: 8px;
+    border-bottom-right-radius: 0;
+    overflow: hidden;
     .item {
       padding: 8px;
       &.expired {
         background-color: #898989;
       }
       &.trial {
-        background-color: #fc0000;
+        background-color: #4b7bec;
       }
       &.purchased {
-        background-color: var(--aac-color-blue-900);
+        background-color: #e23c3c;
       }
     }
   }
