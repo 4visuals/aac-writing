@@ -1,12 +1,13 @@
 <template>
   <div class="bg">
-    <img
-      v-for="s in activeShapes"
-      :key="s.id"
-      :src="`/img/bg/shape${s.id}.svg`"
-      alt=""
-      :style="s.toStyle()"
-    />
+    <template v-for="s in activeShapes" :key="s.id">
+      <img
+        :src="`/img/bg/shape${s.id}.svg`"
+        alt=""
+        :style="s.toStyle()"
+        :class="[s.trs.dir, s.menuRef === activeMenu.path ? 'on' : 'off']"
+      />
+    </template>
   </div>
 </template>
 
@@ -17,10 +18,9 @@ const valueOf = (val) => {
   return typeof val === "number" ? `${val}px` : val;
 };
 class Shape {
-  constructor(id, pos, menuRef) {
+  constructor(id, trs, pos, menuRef) {
     this.id = id;
-    // this.width = width;
-    // this.height = height;
+    this.trs = trs;
     this.pos = pos;
     this.menuRef = menuRef;
   }
@@ -41,34 +41,34 @@ export default {
   },
   setup(props) {
     const shapes = [
-      new Shape("00", { left: 32, top: 96 }, "account"),
-      new Shape("01", { left: -480, top: 60 }, "account"),
-      new Shape("02", { right: -32, top: 76 }, "account"),
-      new Shape("03", { right: -193, top: 163 }, "account"),
+      new Shape("00", { dir: "lr" }, { left: 32, top: 96 }, "account"),
+      new Shape("01", { dir: "lr" }, { left: -480, top: 60 }, "account"),
+      new Shape("02", { dir: "rl" }, { right: -32, top: 76 }, "account"),
+      new Shape("03", { dir: "rl" }, { right: -193, top: 163 }, "account"),
 
-      new Shape("13", { right: -50, bottom: -120 }, "student"),
-      new Shape("12", { left: -30, bottom: 0 }, "student"),
-      new Shape("11", { left: 0, top: 175 }, "student"),
-      new Shape("10", { left: -42, top: 87 }, "student"),
+      new Shape("13", { dir: "rl" }, { right: -50, bottom: -120 }, "student"),
+      new Shape("12", { dir: "lr" }, { left: -30, bottom: 0 }, "student"),
+      new Shape("11", { dir: "lr" }, { left: 0, top: 175 }, "student"),
+      new Shape("10", { dir: "lr" }, { left: -42, top: 87 }, "student"),
 
-      new Shape("20", { left: -300, bottom: -300 }, "license"),
-      new Shape("21", { left: -600, bottom: -220 }, "license"),
+      new Shape("20", { dir: "lr" }, { left: -300, bottom: -300 }, "license"),
+      new Shape("21", { dir: "lr" }, { left: -600, bottom: -220 }, "license"),
 
-      new Shape("33", { right: -53, bottom: -23 }, "order"),
-      new Shape("32", { right: -110, top: 128 }, "order"),
-      new Shape("31", { right: 0, top: 128 }, "order"),
-      new Shape("30", { left: -280, top: 80 }, "order"),
+      new Shape("33", { dir: "rl" }, { right: -53, bottom: -23 }, "order"),
+      new Shape("32", { dir: "rl" }, { right: -110, top: 128 }, "order"),
+      new Shape("31", { dir: "rl" }, { right: 0, top: 128 }, "order"),
+      new Shape("30", { dir: "lr" }, { left: -280, top: 80 }, "order"),
     ];
 
-    const activeShapes = reactive([]);
+    const activeShapes = reactive(shapes);
 
     watch(
       () => props.activeMenu,
-      (menu) => {
-        activeShapes.splice(0, activeShapes.length);
-        activeShapes.push(
-          ...shapes.filter((shape) => shape.menuRef === menu.path)
-        );
+      () => {
+        // activeShapes.splice(0, activeShapes.length);
+        // activeShapes.push(
+        //   ...shapes.filter((shape) => shape.menuRef === menu.path)
+        // );
       },
       { immediate: true }
     );
@@ -86,6 +86,21 @@ export default {
 
   img {
     position: absolute;
+    user-select: none;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.01, 0.6, 0.58, 1);
+    &.on {
+      opacity: 1;
+    }
+    &.off {
+      opacity: 0;
+      // &.lr {
+      //   transform: translateX(-100%);
+      // }
+      // &.rl {
+      //   transform: translateX(100%);
+      // }
+    }
   }
 }
 </style>
