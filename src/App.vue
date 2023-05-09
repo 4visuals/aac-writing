@@ -40,9 +40,9 @@
 <script>
 import env from "@/service/env";
 import { logger } from "@/service/util";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { computed, onMounted, ref, shallowRef, watch } from "vue";
+import { computed, onMounted, ref, shallowRef, watch, provide } from "vue";
 import Nav from "@/views/Nav.vue";
 import Background from "./views/Background.vue";
 import MenuWrapper from "./views/menu/MenuWrapper.vue";
@@ -51,6 +51,8 @@ import ToastUI from "./components/toast/ToastUI.vue";
 import CompanyInfo from "./components/company/CompanyInfo.vue";
 import LayoutWrapper from "./components/layout/LayoutWrapper.vue";
 import util from "./service/util";
+import modal from "@/components/modal";
+import DialogView from "@/components/dialog/DialogView.vue";
 
 export default {
   components: {
@@ -69,6 +71,7 @@ export default {
     const topPadding = computed(() => store.getters["ui/topPadding"]);
     const refreshRequired = computed(() => store.state.config.refreshing);
     const route = useRoute();
+    const router = useRouter();
     const companyVisible = ref(false);
     const modalConfig = computed(() => store.getters["modal/currentModal"]);
     const visiblePathes = [/^\/$/, /^\/policy.*/];
@@ -89,6 +92,33 @@ export default {
       captureHeight();
     };
     const hideModal = () => store.commit("modal/popModal");
+
+    const doLogout = (cmd) => {
+      if (cmd === "yes") {
+        store.commit("user/logoutUser");
+        router.replace("/");
+      }
+      modal.closeModal();
+    };
+
+    const confirmLogout = () => {
+      modal.showModal(DialogView, {
+        width: "sm",
+        props: {
+          title: "로그아웃",
+          message: "로그아웃합니까?",
+          actions: [
+            { cmd: "yes", text: "네, 로그아웃합니다" },
+            { cmd: "no", text: "아니오" },
+          ],
+        },
+        events: { commit: doLogout },
+      });
+    };
+
+    provide("appProvider", {
+      logout: confirmLogout,
+    });
 
     watch(
       () => route.path,

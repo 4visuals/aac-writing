@@ -1,7 +1,6 @@
 <template>
   <div class="purchase" @scroll="detectScroll">
-    <TeacherNav :fixed="fixedMenu" />
-    <!-- <ProductBanner v-if="products" :products="products" /> -->
+    <UserGnb />
     <Jumbotron title="이용권 구매" />
     <router-view />
     <CompanyInfoDark />
@@ -11,7 +10,7 @@
 <script>
 import Jumbotron from "../../components/Jumbotron.vue";
 import { computed, onUnmounted, ref } from "vue";
-import TeacherNav from "../nav/TeacherNav.vue";
+import UserGnb from "../nav/UserGnb.vue";
 import toast from "../../components/toast";
 
 import { useStore } from "vuex";
@@ -20,7 +19,7 @@ import CompanyInfoDark from "../../components/company/CompanyInfoDark.vue";
 export default {
   components: {
     Jumbotron,
-    TeacherNav,
+    UserGnb,
     CompanyInfoDark,
   },
   setup() {

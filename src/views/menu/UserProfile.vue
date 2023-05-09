@@ -107,11 +107,6 @@ export default {
         },
         events: { commit: handleLogout },
       });
-      if (isStudent.value) {
-        console.log("학생");
-      } else {
-        console.log("교사");
-      }
     };
 
     return {

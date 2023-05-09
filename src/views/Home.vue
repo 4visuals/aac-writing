@@ -13,7 +13,7 @@
       theme="dark"
       size="sm"
       :fill="true"
-      @click="doLogout"
+      @click="delegateLogout"
     />
     <div class="menu" style="margin-top: 20vmin">
       <div class="logo main"></div>
@@ -73,10 +73,8 @@
 <script>
 import { host } from "@/service/util";
 import StudentLoginForm from "./StudentLoginForm.vue";
-// import ManualLoginForm from "./ManualLoginForm.vue";
-// import UserProfile from "./menu/UserProfile.vue";
 import { useStore } from "vuex";
-import { watch, ref, onMounted } from "vue";
+import { watch, ref, onMounted, inject } from "vue";
 import { useRouter } from "vue-router";
 import { computed } from "@vue/reactivity";
 import { LicenseConfigView } from "@/components/admin";
@@ -111,6 +109,8 @@ export default {
     const member = computed(() => store.getters["user/isMember"]);
     const membership = computed(() => store.state.user.membership);
     const modal = ref({ visible: false, lcs: null });
+
+    const appProvider = inject("appProvider");
     const moveTo = (url, license) => {
       store.commit("exam/setActiveLicense", license);
       loadStudentRecords({ store, license }).then(() => {
@@ -120,9 +120,7 @@ export default {
     const goTo = (uri) => {
       router.push(uri);
     };
-    const doLogout = () => {
-      store.commit("user/logoutUser");
-    };
+    const delegateLogout = () => appProvider.logout();
     /**
      * 구글 로그인 버튼 누른 후 회원이 아니면 보여주는 팝업
      */
@@ -180,7 +178,7 @@ export default {
       moveTo,
       goTo,
       host,
-      doLogout,
+      delegateLogout,
       showNotAMemberDialog,
       showJoinForm,
     };

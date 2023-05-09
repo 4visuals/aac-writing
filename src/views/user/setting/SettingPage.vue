@@ -1,7 +1,7 @@
 <template>
   <div class="setting">
     <SettingBg :activeMenu="activeMenu" />
-    <SettingGnb />
+    <UserGnb />
     <SettingJumbo @action="handleAction" />
     <main>
       <section class="left-menu">
@@ -33,14 +33,14 @@ import DialogView from "@/components/dialog/DialogView.vue";
 import NewStudentForm from "@/components/admin/NewStudentForm.vue";
 import toast from "@/components/toast";
 import { useRoute, useRouter } from "vue-router";
-import SettingGnb from "./SettingGnb.vue";
+import UserGnb from "@/views/nav/UserGnb.vue";
 import SettingBg from "./SettingBg.vue";
 import CompanyInfoDark from "../../../components/company/CompanyInfoDark.vue";
 export default {
   components: {
     SettingNav,
     SettingJumbo,
-    SettingGnb,
+    UserGnb,
     SettingBg,
     CompanyInfoDark,
   },
