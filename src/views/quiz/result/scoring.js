@@ -37,9 +37,19 @@ class Scoring {
     this.trials = this.ctx.questions.map((q) => new Trial(q));
   }
   getScore() {
-    const total = this.trials.length;
+    /**
+     * #132 오답연습 표기방식 변경
+     * https://github.com/4visuals/aac-writing/issues/132
+     *
+     * 무조건 10개 기준으로 채점함
+     */
+    // 이전까지 맞춘 문제의 갯수
+    const alreadyCorrect = 10 - this.trials.length;
+    // 틀린 문제 중 이번에 맞춘 문제의 갯수
     const correct = this.trials.filter((t) => t.correct).length;
-    return (100 * correct) / total;
+    const total = 10; // this.trials.length;
+
+    return (100 * (alreadyCorrect + correct)) / total;
   }
 }
 
