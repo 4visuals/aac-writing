@@ -89,7 +89,6 @@ export default {
 @import "~@/assets/resizer";
 .purchase {
   height: 100%;
-  overflow-y: auto;
   .banner {
     margin-top: 5rem;
     margin-bottom: 5rem;

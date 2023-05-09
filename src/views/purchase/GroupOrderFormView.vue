@@ -8,8 +8,15 @@
         적용됩니다.
       </p>
     </div>
-
-    <div v-if="userRef" class="form">
+    <div v-if="formSent" class="form-sent">
+      <h3>접수완료</h3>
+      <section>
+        <p>문의사항이 접수되었습니다.</p>
+        <p>확인 후 빠른 시일 안에 연락을 드리겠습니다.</p>
+        <p>감사합니다.</p>
+      </section>
+    </div>
+    <div v-else-if="userRef" class="form">
       <div class="elem" v-for="form in forms" :key="form.wid">
         <TextFieldView
           v-if="editMode"
@@ -115,10 +122,12 @@ export default {
   setup() {
     const store = useStore();
     const userRef = computed(() => store.getters["user/currentUser"]);
+    // eslint-disable-next-line no-unused-vars
     const router = useRouter();
     const editMode = ref(true);
     const appProvider = inject("appProvider");
     const forms = reactive([]);
+    const formSent = ref(false);
     const papers = reactive([
       {
         type: "EST",
@@ -263,8 +272,11 @@ export default {
           orderForm.papers.push(p);
         });
       api.order.group.sendForm(orderForm).then(() => {
-        alert("접수완료");
-        router.replace("/");
+        formSent.value = true;
+        setTimeout(() => {
+          router.replace("/");
+        }, 5000);
+        // router.replace("/");
       });
     };
     const delegateLogin = () => appProvider.login();
@@ -284,6 +296,7 @@ export default {
       papers,
       memo,
       editMode,
+      formSent,
       showPreview,
       showEdit,
       sendForm,
@@ -304,6 +317,21 @@ export default {
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 12px;
+    }
+  }
+  .form-sent {
+    margin: 24px 0;
+    h3 {
+      font-weight: 600;
+      font-size: 2rem;
+    }
+    section {
+      margin-top: 16px;
+      p {
+        font-size: 1.2rem;
+        font-weight: 400;
+        margin-bottom: 16px;
+      }
     }
   }
   .login-required {
