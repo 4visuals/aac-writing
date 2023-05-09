@@ -121,6 +121,12 @@ export default {
         value: "",
         placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
       }),
+      new InputForm({
+        wid: "orgContactInfo",
+        title: "행정실(학교) 전화번호",
+        value: "",
+        placeholder: "기관 연락처(전화번호)",
+      }),
     ];
     const papers = reactive([
       {

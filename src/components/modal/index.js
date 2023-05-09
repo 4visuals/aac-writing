@@ -17,6 +17,9 @@ class ModalConfig {
   get fill() {
     return this.option.fill || false;
   }
+  get height() {
+    return this.option.height || false;
+  }
   get rect() {
     return this.option.rect || false;
   }

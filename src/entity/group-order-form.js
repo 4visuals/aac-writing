@@ -27,4 +27,10 @@ export class GroupOrderForm {
   get stateText() {
     return GroupOrderState[this.state];
   }
+  get orgEmailText() {
+    return this.orgEmail || "미입력";
+  }
+  get orgContactInfoText() {
+    return this.orgContactInfo || "미입력";
+  }
 }

@@ -43,17 +43,51 @@
               <tr>
                 <td class="col">요청인</td>
                 <td>
-                  <ul>
-                    <li>{{ order.senderName }}</li>
-                    <li>이메일: {{ order.sender.email }}</li>
-                    <li>{{ order.senderContactInfo }}</li>
+                  <ul class="info">
+                    <li>
+                      <AppIcon icon="account_circle"></AppIcon
+                      ><span>{{ order.senderName }}</span>
+                    </li>
+                    <li>
+                      <AppIcon icon="mail"></AppIcon
+                      ><span>{{ order.sender.email }}</span>
+                    </li>
+                    <li>
+                      <AppIcon icon="smartphone"></AppIcon
+                      ><span>{{ order.senderContactInfo }}</span
+                      ><a
+                        v-if="order.senderContactInfo"
+                        class="call"
+                        :href="`tel:${order.senderContactInfo}`"
+                        >CALL</a
+                      >
+                    </li>
                   </ul>
                 </td>
               </tr>
               <tr>
                 <td class="col">조직</td>
                 <td>
-                  {{ order.orgName }}(email: {{ order.orgEmail || "미입력" }})
+                  <ul class="info">
+                    <li>
+                      <AppIcon icon="apartment"></AppIcon
+                      ><span>{{ order.orgName }}</span>
+                    </li>
+                    <li>
+                      <AppIcon icon="mail"></AppIcon
+                      ><span>{{ order.orgEmailText }}</span>
+                    </li>
+                    <li>
+                      <AppIcon icon="smartphone"></AppIcon
+                      ><span>{{ order.orgContactInfoText }}</span
+                      ><a
+                        v-if="order.orgContactInfo"
+                        class="call"
+                        :href="`tel:${order.orgContactInfo}`"
+                        >CALL</a
+                      >
+                    </li>
+                  </ul>
                 </td>
               </tr>
               <tr>
@@ -156,6 +190,7 @@ export default {
     const showLicenseForm = (order) => {
       modal.showModal(NewGroupLicenseForm, {
         width: "sm",
+        height: "90%",
         props: { order, products },
       });
     };
@@ -267,6 +302,25 @@ export default {
           list-style: none;
           padding: 0;
           margin: 0;
+        }
+      }
+      ul.info {
+        li {
+          display: flex;
+          align-items: center;
+          column-gap: 8px;
+          a {
+            text-decoration: none;
+            border-radius: 24px;
+            padding: 4px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1;
+            &.call {
+              background-color: #346dff;
+              color: white;
+            }
+          }
         }
       }
     }

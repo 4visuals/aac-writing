@@ -25,6 +25,7 @@
       :noBgc="modalConfig.noBgc"
       :noShadow="modalConfig.noShadow"
       :padding="modalConfig.padding"
+      :height="modalConfig.height"
     >
       <component
         :is="modalConfig.comp"
