@@ -66,7 +66,7 @@
           6매)
         </p>
         <p>
-          세금계산서 발행을 위한 고유번호증은은
+          세금계산서 발행을 위한 고유번호증은
           <a
             class="mail"
             target="mail"
@@ -185,7 +185,7 @@ export default {
         new InputForm({
           wid: "senderEmail",
           title: "문의자 이메일",
-          desc: "이용권 발급 시 현재 계정으로 이룡권이 발급됩니다.",
+          desc: "이용권 발급 시 현재 계정으로 이용권이 발급됩니다.",
           value: userRef.value?.email,
           readOnly: true,
           placeholder: "접수 후 이메일로 알려드립니다.",
