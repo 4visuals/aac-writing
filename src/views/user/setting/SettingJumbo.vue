@@ -34,8 +34,6 @@ export default {
 
 <style lang="scss" scoped>
 .jumbo {
-  position: sticky;
-  top: 0;
   height: 180px;
   display: flex;
   flex-direction: column;

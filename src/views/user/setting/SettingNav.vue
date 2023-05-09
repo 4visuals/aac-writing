@@ -39,6 +39,8 @@ export default {
 
 <style lang="scss" scoped>
 .setting-nav {
+  position: sticky;
+  top: 90px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

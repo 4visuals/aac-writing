@@ -3,7 +3,7 @@
     <div class="stud-info">
       <nav>
         <div class="logo">
-          <Pavicon class="icon" path="/student/stud-pavicon.svg"></Pavicon>
+          <Pavicon class="icon" path="/img/stud-pavicon.svg"></Pavicon>
         </div>
 
         <div class="ctrl">

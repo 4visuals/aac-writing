@@ -200,8 +200,6 @@ $mwidth: 220px;
   position: relative;
   font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
   // font-weight: 700;
-
-  height: 100vh;
   main {
     display: flex;
     .left-menu {
@@ -222,6 +220,8 @@ $mwidth: 220px;
       .left-menu {
         width: 48px;
         flex: 0 0 44px;
+        margin-left: 0;
+        margin-right: 0;
       }
     }
   }

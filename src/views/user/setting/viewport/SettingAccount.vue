@@ -255,6 +255,7 @@ section {
 }
 .label {
   font-weight: 600;
+  white-space: nowrap;
 }
 .account {
   table {
@@ -263,6 +264,16 @@ section {
       padding-bottom: 4px;
       td {
         padding: 1rem;
+      }
+    }
+  }
+  @media (max-width: 767px) {
+    table {
+      tr {
+        td {
+          padding-left: 0;
+          padding-right: 0;
+        }
       }
     }
   }
