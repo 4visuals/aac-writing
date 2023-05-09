@@ -18,6 +18,7 @@ class InputForm {
     desc = "",
     status,
     value,
+    required,
     error,
     type = "text",
     placeholder,
@@ -28,6 +29,7 @@ class InputForm {
     this.desc = desc;
     this.status = status;
     this.value = value;
+    this.required = required || false;
     this.error = error;
     this.type = type;
     this.placeholder = placeholder;

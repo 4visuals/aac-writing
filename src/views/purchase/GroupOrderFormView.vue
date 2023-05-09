@@ -1,80 +1,108 @@
 <template>
   <div class="container">
     <div class="jumbo">
-      <h3>단체 구매 양식</h3>
+      <h3>단체 구매 문의</h3>
       <p>단체 구매는 계좌이체로 결제합니다.</p>
-      <p>이용권 단체 구매는 1년 이용권만 구매 가능합니다.</p>
+      <p>
+        이용권 단체 구매는 1년 이용권만 구매 가능하며, 5매 이상일 경우
+        적용됩니다.
+      </p>
     </div>
 
-    <div class="elem" v-for="form in forms" :key="form.wid">
-      <TextFieldView
-        v-if="editMode"
-        :formModel="form"
-        :readOnly="form.wid === 'senderEmail'"
-        @value="updateForm"
-      >
-        <template #title
-          ><h3>{{ form.title }}</h3></template
+    <div v-if="userRef" class="form">
+      <div class="elem" v-for="form in forms" :key="form.wid">
+        <TextFieldView
+          v-if="editMode"
+          :formModel="form"
+          :readOnly="form.wid === 'senderEmail'"
+          @value="updateForm"
         >
-      </TextFieldView>
-      <div v-else class="preview">
-        <h3>{{ form.title }}</h3>
-        <div v-if="form.value" class="value">{{ form.value }}</div>
-        <div v-else class="empty value">미입력</div>
-      </div>
-    </div>
-    <div class="elem">
-      <h3>필요 서류</h3>
-      <div v-if="editMode" class="papers">
-        <div class="each" v-for="paper in papers" :key="paper.type">
-          <label>
-            <input type="checkbox" v-model="paper.selected" />
-            <span>{{ paper.text }}</span>
-          </label>
-          <input
-            v-if="paper.type === 'ETC' && papers[3].selected"
-            type="text"
-            v-model="papers[3].value"
-          />
+          <template #title
+            ><h3>{{ form.title }}</h3></template
+          >
+        </TextFieldView>
+        <div v-else class="preview">
+          <h3>{{ form.title }}</h3>
+          <div v-if="form.value" class="value">{{ form.value }}</div>
+          <div v-else class="empty value">미입력</div>
         </div>
       </div>
-      <div v-else class="papers">
-        <div
-          class="each"
-          v-for="paper in papers.filter((p) => p.selected)"
-          :key="paper.type"
-        >
-          <div class="value">{{ paper.value || paper.text }}</div>
+      <div class="elem">
+        <h3>필요 서류</h3>
+        <div v-if="editMode" class="papers">
+          <div class="each" v-for="paper in papers" :key="paper.type">
+            <label>
+              <input type="checkbox" v-model="paper.selected" />
+              <span>{{ paper.text }}</span>
+            </label>
+            <input
+              v-if="paper.type === 'ETC' && papers[3].selected"
+              type="text"
+              v-model="papers[3].value"
+            />
+          </div>
+        </div>
+        <div v-else class="papers">
+          <div
+            class="each"
+            v-for="paper in papers.filter((p) => p.selected)"
+            :key="paper.type"
+          >
+            <div class="value">{{ paper.value || paper.text }}</div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="elem">
-      <h3>문의 내용</h3>
-      <p>이용권 수량(학생 수) 및 기타 문의사항을 입력해주세요</p>
-      <div class="desc">
-        <textarea
-          v-model="memo.value"
-          placeholder="예) 이용권 6장 &#10;기타 문의 사항 입력"
-        ></textarea>
-        <div class="state">
-          <span class="n">{{ memo.value.length }}</span> /
-          <span class="n">1000</span>
+      <div class="elem">
+        <h3><span>문의 내용</span><span class="required">[필수]</span></h3>
+        <p>
+          이용권 수량(학생 수) 및 기타 문의사항을 입력해 주세요. (예: 이용권
+          6매)
+        </p>
+        <p>
+          세금계산서 발행을 위한 고유번호증은은
+          <a
+            class="mail"
+            target="mail"
+            href="mailto:contact@kdict.kr?subject=[세금계산서]고유번호증%20문의"
+            >contact@kdict.kr</a
+          >로 보내주세요.
+        </p>
+        <div class="desc">
+          <textarea
+            v-model="memo.value"
+            placeholder="예) 이용권 6장 &#10;기타 문의 사항 입력"
+          ></textarea>
+          <div class="state">
+            <span class="n">{{ memo.value.length }}</span> /
+            <span class="n">1000</span>
+          </div>
         </div>
       </div>
+      <div v-if="editMode" class="elem">
+        <button @click="showPreview" class="nude blue">미리보기</button>
+      </div>
+      <div v-else class="elem">
+        <button @click="showEdit" class="nude red">수정하기</button>
+        <button @click="sendForm" class="nude blue">전송하기</button>
+      </div>
     </div>
-    <div v-if="editMode" class="elem">
-      <button @click="showPreview" class="nude blue">미리보기</button>
-    </div>
-    <div v-else class="elem">
-      <button @click="showEdit" class="nude red">수정하기</button>
-      <button @click="sendForm" class="nude blue">전송하기</button>
+    <div v-else class="login-required">
+      <p>로그인 후 문의해주세요.</p>
+      <AppButton
+        theme="blue"
+        fill
+        size="chapter"
+        text="로그인"
+        borderColor="#4b7bec"
+        @click="delegateLogin"
+      ></AppButton>
     </div>
   </div>
 </template>
 
 <script>
 import { TextFieldView, InputForm } from "@/components/form";
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, inject, watch } from "vue";
 import { useStore } from "vuex";
 import api from "@/service/api";
 import { useRouter } from "vue-router";
@@ -89,45 +117,8 @@ export default {
     const userRef = computed(() => store.getters["user/currentUser"]);
     const router = useRouter();
     const editMode = ref(true);
-    const forms = [
-      new InputForm({
-        wid: "orgName",
-        title: "기관명 *",
-        value: "",
-        placeholder: "소속 기관명을 입력해주세요.",
-      }),
-      new InputForm({
-        wid: "senderName",
-        title: "문의자 이름 *",
-        value: userRef.value?.name,
-        placeholder: "이름을 입력해주세요.",
-      }),
-      new InputForm({
-        wid: "senderContactInfo",
-        title: "문의자 연락처 * ",
-        value: "",
-        placeholder: "010-0000-0000",
-      }),
-      new InputForm({
-        wid: "senderEmail",
-        title: "문의자 이메일",
-        value: userRef.value?.email,
-        readOnly: true,
-        placeholder: "접수 후 이메일로 알려드립니다.",
-      }),
-      new InputForm({
-        wid: "orgEmail",
-        title: "행정실(학교) 이메일 (필요 서류를 받을 이메일 주소)",
-        value: "",
-        placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
-      }),
-      new InputForm({
-        wid: "orgContactInfo",
-        title: "행정실(학교) 전화번호",
-        value: "",
-        placeholder: "기관 연락처(전화번호)",
-      }),
-    ];
+    const appProvider = inject("appProvider");
+    const forms = reactive([]);
     const papers = reactive([
       {
         type: "EST",
@@ -157,6 +148,57 @@ export default {
     const memo = reactive({
       value: "",
     });
+
+    const initForm = () => {
+      const frm = [
+        new InputForm({
+          wid: "orgName",
+          title: "기관명",
+          value: "",
+          required: true,
+          placeholder: "소속 기관명을 입력해주세요.",
+        }),
+        new InputForm({
+          wid: "senderName",
+          title: "문의자 이름",
+          value: userRef.value?.name,
+          required: true,
+          placeholder: "이름을 입력해주세요.",
+        }),
+        new InputForm({
+          wid: "senderContactInfo",
+          title: "문의자 연락처",
+          value: "",
+          required: true,
+          desc: "서류 발송 및 이용권 발급 후 문자로 안내드립니다.",
+          placeholder: "010-0000-0000",
+        }),
+        new InputForm({
+          wid: "senderEmail",
+          title: "문의자 이메일",
+          desc: "이용권 발급 시 현재 계정으로 이룡권이 발급됩니다.",
+          value: userRef.value?.email,
+          readOnly: true,
+          placeholder: "접수 후 이메일로 알려드립니다.",
+        }),
+        new InputForm({
+          wid: "orgEmail",
+          title: "행정실 이메일",
+          desc: "필요 서류를 받을 이메일 주소를 입력해 주세요.",
+          value: "",
+          placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
+        }),
+        new InputForm({
+          wid: "orgContactInfo",
+          title: "행정실 연락처",
+          desc: "행정실 담당자의 전화번호를 입력해 주세요.",
+          value: "",
+          placeholder: "기관 연락처(전화번호)",
+        }),
+      ];
+      forms.splice(0, forms.length);
+      forms.push(...frm);
+    };
     const updateForm = ({ value, commit }) => {
       commit(value);
     };
@@ -225,7 +267,19 @@ export default {
         router.replace("/");
       });
     };
+    const delegateLogin = () => appProvider.login();
+
+    watch(
+      userRef,
+      (loginUer) => {
+        if (loginUer) {
+          initForm();
+        }
+      },
+      { immediate: true }
+    );
     return {
+      userRef,
       forms,
       papers,
       memo,
@@ -234,6 +288,7 @@ export default {
       showEdit,
       sendForm,
       updateForm,
+      delegateLogin,
     };
   },
 };
@@ -251,12 +306,34 @@ export default {
       margin-bottom: 12px;
     }
   }
+  .login-required {
+    background-color: white;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: 16px;
+    padding: 24px 0;
+  }
+  .form {
+    position: relative;
+    margin-bottom: 32px;
+  }
   .elem {
     margin-top: 16px;
     h3 {
-      font-size: 1rem;
+      font-size: 1.2rem;
       margin-bottom: 4px;
       font-weight: 600;
+      .required {
+        margin-left: 8px;
+        color: red;
+        font-size: 1rem;
+      }
+    }
+    a.mail {
+      text-decoration: none;
     }
 
     .papers {

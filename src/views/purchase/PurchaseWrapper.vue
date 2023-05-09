@@ -1,14 +1,13 @@
 <template>
   <div class="purchase" @scroll="detectScroll">
     <UserGnb />
-    <Jumbotron title="이용권 구매" />
     <router-view />
     <CompanyInfoDark />
   </div>
 </template>
 
 <script>
-import Jumbotron from "../../components/Jumbotron.vue";
+// import Jumbotron from "../../components/Jumbotron.vue";
 import { computed, onUnmounted, ref } from "vue";
 import UserGnb from "../nav/UserGnb.vue";
 import toast from "../../components/toast";
@@ -18,7 +17,7 @@ import CompanyInfoDark from "../../components/company/CompanyInfoDark.vue";
 
 export default {
   components: {
-    Jumbotron,
+    // Jumbotron,
     UserGnb,
     CompanyInfoDark,
   },

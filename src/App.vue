@@ -51,8 +51,10 @@ import ToastUI from "./components/toast/ToastUI.vue";
 import CompanyInfo from "./components/company/CompanyInfo.vue";
 import LayoutWrapper from "./components/layout/LayoutWrapper.vue";
 import util from "./service/util";
+import googleLogin from "./components/oauth/google";
 import modal from "@/components/modal";
 import DialogView from "@/components/dialog/DialogView.vue";
+import JoinView from "@/views/user/JoinView.vue";
 
 export default {
   components: {
@@ -75,6 +77,7 @@ export default {
     const companyVisible = ref(false);
     const modalConfig = computed(() => store.getters["modal/currentModal"]);
     const visiblePathes = [/^\/$/, /^\/policy.*/];
+    const membership = computed(() => store.state.user.membership);
     const tr = {
       name: "route",
     };
@@ -92,6 +95,58 @@ export default {
       captureHeight();
     };
     const hideModal = () => store.commit("modal/popModal");
+
+    const showJoinForm = () => {
+      modal.showModal(JoinView, {
+        width: "sm",
+        props: { membership },
+        events: {
+          commit: () => {
+            modal.closeModal();
+          },
+        },
+      });
+    };
+
+    const showNotAMemberDialog = () => {
+      modal.showModal(DialogView, {
+        width: "sm",
+        props: {
+          align: "center",
+          message: "회원이 아닙니다.\n회원가입 후 이용해주세요",
+          actions: [
+            { cmd: "yes", text: "가입 페이지로 이동" },
+            { cmd: "no", text: "취소하기" },
+          ],
+        },
+        events: {
+          commit: (cmd) => {
+            modal.closeModal();
+            if (cmd === "yes") {
+              showJoinForm();
+            }
+          },
+        },
+      });
+    };
+
+    const handleLoginRespone = (res) => {
+      store
+        .dispatch("user/checkMembership", {
+          vendor: "google",
+          token: res.credential,
+          type: "id_token",
+        })
+        .then((membership) => {
+          if (!membership.user) {
+            showNotAMemberDialog();
+          }
+        });
+    };
+
+    const startGoogleLogin = () => {
+      googleLogin.initGoogleSignIn(handleLoginRespone, true);
+    };
 
     const doLogout = (cmd) => {
       if (cmd === "yes") {
@@ -118,6 +173,7 @@ export default {
 
     provide("appProvider", {
       logout: confirmLogout,
+      login: startGoogleLogin,
     });
 
     watch(

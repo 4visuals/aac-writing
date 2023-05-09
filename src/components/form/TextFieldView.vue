@@ -1,11 +1,9 @@
 <template>
   <div :class="`text-form ${formModel.status || ''}`">
-    <slot v-if="formModel.title" name="title"
-      ><h3>
-        {{ formModel.title }}
-      </h3></slot
-    >
-
+    <h3 v-if="formModel.title">
+      <span>{{ formModel.title }}</span
+      ><span v-if="formModel.required" class="required">[필수]</span>
+    </h3>
     <div class="desc mg8" v-if="formModel.desc">
       {{ formModel.desc }}
     </div>
@@ -37,10 +35,11 @@
 
 <script>
 import { nextTick, onMounted, ref, watch } from "vue";
+import { InputForm } from ".";
 
 export default {
   props: {
-    formModel: { type: Object },
+    formModel: { type: InputForm },
     readOnly: { type: Boolean, default: false },
   },
   setup(props, { emit }) {
@@ -127,7 +126,17 @@ export default {
     margin-bottom: 8px;
   }
   h3 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+    font-weight: 600;
+    .required {
+      margin-left: 8px;
+      color: red;
+      font-size: 1rem;
+    }
+  }
+  .desc {
+    color: #292c2e;
   }
   input {
     padding: 6px 12px;
