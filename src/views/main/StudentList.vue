@@ -1,5 +1,26 @@
 <template>
   <div class="stud-list">
+    <div v-if="licenses.length === 0" class="no-lcs">
+      <h3>이용권이 없습니다</h3>
+      <div>
+        <AppButton
+          text="이용권 구매"
+          fill
+          size="sm"
+          theme="blue"
+          borderColor="#4b7bec"
+          @click="$router.push('/purchase')"
+        />
+        <AppButton
+          text="마이 페이지"
+          fill
+          size="sm"
+          theme="yellow"
+          borderColor="#ffd110"
+          @click="$router.push('/setting')"
+        />
+      </div>
+    </div>
     <div
       class="license"
       :class="{
@@ -110,6 +131,19 @@ export default {
   background-color: white;
   max-height: 300px;
   overflow-y: auto;
+  .no-lcs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: 16px;
+    padding: 16px 0;
+    & > div {
+      display: flex;
+      justify-content: center;
+      column-gap: 16px;
+    }
+  }
   .license {
     display: flex;
     align-items: center;
