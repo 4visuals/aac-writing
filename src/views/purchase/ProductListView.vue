@@ -1,6 +1,13 @@
 <template>
   <div class="prod-list container">
     <div class="row">
+      <div class="col-12">
+        <section>
+          <h1>구매하기</h1>
+        </section>
+      </div>
+    </div>
+    <div class="row">
       <div
         v-for="(prod, index) in products"
         :key="prod.code"
@@ -26,7 +33,6 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import ProductView from "../../components/product/ProductView.vue";
-// import { OrderForm } from "./order-form";
 import api from "../../service/api";
 
 export default {
@@ -36,7 +42,7 @@ export default {
   setup() {
     const router = useRouter();
     const products = ref(null);
-    const themes = ["red", "blue", "green", "red", "blue", "green"];
+    const themes = ["green", "picton-blue", "yellow", "violet", "green"];
 
     const gotoOrderForm = (
       /** @type {{method: String, product: Product}} */ evt
@@ -64,6 +70,15 @@ export default {
 .prod-list {
   margin-top: 5rem;
   margin-bottom: 5rem;
+  section {
+    text-align: center;
+    margin-bottom: 6rem;
+    h1 {
+      font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
+
+      font-weight: 900;
+    }
+  }
   .row > * {
     padding-top: 8px;
     padding-bottom: 8px;

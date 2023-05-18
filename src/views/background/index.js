@@ -18,6 +18,9 @@ export class Shape {
 }
 
 const shapes = {
+  "/purchase": [
+    new Shape("purchase01", { dir: "lr" }, { left: -190, top: 180 }, ""),
+  ],
   "/purchase/contact": [
     new Shape("purchase00", { dir: "lr" }, { left: -190, top: 180 }, ""),
   ],
