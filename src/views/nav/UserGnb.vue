@@ -66,6 +66,7 @@ nav {
   z-index: 100;
   .logo {
     width: 180px;
+    cursor: pointer;
     > img {
       width: 100%;
       height: auto;

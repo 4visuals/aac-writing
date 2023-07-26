@@ -1,5 +1,11 @@
 <template>
-  <div class="layout-h" :style="`padding-top: ${styles.topPadding}px`">
+  <div
+    class="layout-h"
+    :style="{
+      'padding-top': styles.topPadding + 'px',
+      height: height || 'unset',
+    }"
+  >
     <slot />
   </div>
 </template>
@@ -9,6 +15,12 @@ import { reactive, watch } from "vue";
 import { useRoute } from "vue-router";
 
 export default {
+  props: {
+    height: {
+      type: String,
+      default: undefined,
+    },
+  },
   setup() {
     const route = useRoute();
     const styles = reactive({ topPadding: 0 });

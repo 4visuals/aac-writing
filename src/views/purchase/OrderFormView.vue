@@ -19,9 +19,9 @@
           <button class="btn-purchase nude blue" @click="startOrder('card')">
             <AppIcon icon="credit_card" /><span>신용카드</span>
           </button>
-          <button class="btn-purchase nude green" @click="startOrder('phone')">
+          <!-- <button class="btn-purchase nude green" @click="startOrder('phone')">
             <AppIcon icon="phone_android" /><span>휴대폰</span>
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
@@ -40,42 +40,18 @@
           <div class="hr"></div>
         </div>
         <section class="guide">
-          <h3>이용 안내</h3>
+          <h3>{{ info.usage.title }}</h3>
           <ul>
-            <li>이용권 1개당 2명의 자녀 등록이 가능합니다.</li>
-            <li>이용권은 구매 즉시 적용됩니다.</li>
-            <li>
-              이용권 적용 후 남은 무료 체험 기간이 적용됩니다. (예, 3일 무료
-              체험 후 이용권 신청시 100일 이용 후 + 4일 무료 체험일 추가됨)
-            </li>
-            <li>
-              사용 중인 이용권이 있는 경우, 동일 계정에서 이용권 추가 구매시
-              사용기간이 연장됩니다.
-            </li>
-            <li>이용권 상품은 기한이 끝나도 자동 연장되지 않습니다.</li>
-            <li>
-              이용권 되팔기로 인해 발생하는 모든 분쟁 요소는 책임지지 않습니다.
+            <li v-for="(elem, idx) in info.usage.elems" :key="idx">
+              {{ elem }}
             </li>
           </ul>
         </section>
         <section class="refound">
-          <h3>환불 정책 안내</h3>
+          <h3>{{ info.refund.title }}</h3>
           <ul>
-            <li>
-              환불 요청은 승인일로부터 7일 이내에 제기해 주셔야 하며,이 경우
-              결제와 동일한 수단으로 환불됩니다.
-            </li>
-            <li>
-              7일 이후 환불은 결제금액의 10%의 위약금과 정상가를 기준으로 한
-              사용일수에 따른 이용금액을 제한 후 환불됩니다. 예 : 90일 사용권
-              구매 후 20일 사용후 환불시 19,000원 - (1,900원 + 330원 * 20일) =
-              10,500원 환불
-            </li>
-            <li>
-              콘텐츠의 내용이 표시ㆍ광고 내용과 다르거나 계약내용과 다르게
-              이행된 경우에는 당해 콘텐츠를 공급받은 날로부터 3월 이내, 그
-              사실을 안 날 또는 알 수 있었던 날로부터 30일 이내에 환불받으실 수
-              있으며 납입한 금액의 2/3에 대해서 환불합니다.
+            <li v-for="(elem, idx) in info.refund.elems" :key="idx">
+              {{ elem }}
             </li>
           </ul>
         </section>
@@ -83,9 +59,9 @@
           <button class="btn-purchase nude blue" @click="startOrder('card')">
             <AppIcon icon="credit_card" /><span>신용카드</span>
           </button>
-          <button class="btn-purchase nude green" @click="startOrder('phone')">
+          <!-- <button class="btn-purchase nude green" @click="startOrder('phone')">
             <AppIcon icon="phone_android" /><span>휴대폰 결제</span>
-          </button>
+          </button> -->
         </section>
       </div>
     </div>
@@ -116,6 +92,25 @@ export default {
     const router = useRouter();
     const order = ref(null);
     const product = computed(() => order.value && order.value.product);
+
+    const info = {
+      usage: {
+        title: "이용 안내",
+        elems: `이용권 1개당 1명의 학생을 등록합니다.
+이용권은 구매 즉시 적용됩니다.
+사용중인 이용권이 있는 경우, 동일 계정에서 이용권 추가 구매시 사용기간이 연장됩니다.
+이용권 상품은 기한이 끝나도 자동 연장되지 않습니다.
+이용권 되팔기로 인해 발생하는 모든 분쟁 요소는 책임지지 않습니다.`.split("\n"),
+      },
+      refund: {
+        title: "환불 정책 안내",
+        elems:
+          `환불 요청은 승인일로 부터 7일 이내에 제기해 주셔야 하며, 이 경우 결제와 동일한 수단으로 환불됩니다.
+콘텐츠의 내용이 표시 ・ 광고 내용과 다르거나 계약 내용과 다르게 이행된 경우에는 당해 콘텐츠를 공급받은 날로 부터 3월 이내, 그 사실을 안 날 또는 알 수 있었던 날로부터 30일 이내에 환불 받으실 수 있으며 납입한 금액의 2/3에 대해서 환불합니다.`.split(
+            "\n"
+          ),
+      },
+    };
 
     const gotoPurchasePage = () => router.replace("/purchase");
     const format = (money) => util.currency.format(money);
@@ -176,7 +171,7 @@ export default {
       .catch((err) => {
         toast.error("@" + err.cause, "상품 정보 오류", 10);
       });
-    return { product, gotoPurchasePage, format, startOrder };
+    return { info, product, gotoPurchasePage, format, startOrder };
   },
 };
 </script>

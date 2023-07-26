@@ -2,7 +2,7 @@
   <Background />
   <div class="app-wrapper" ref="wrapperEl">
     <Nav v-if="route.path == '/level' || route.path == '/book'" ref="nav" />
-    <LayoutWrapper>
+    <LayoutWrapper :height="route.path === '/support' ? '100%' : undefined">
       <router-view v-slot="{ Component }">
         <transition
           :name="tr.name"

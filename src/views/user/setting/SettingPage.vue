@@ -16,7 +16,7 @@
         </div>
       </section>
     </main>
-    <CompanyInfoDark />
+    <!-- <CompanyInfoDark /> -->
   </div>
 </template>
 
@@ -35,14 +35,14 @@ import toast from "@/components/toast";
 import { useRoute, useRouter } from "vue-router";
 import UserGnb from "@/views/nav/UserGnb.vue";
 import SettingBg from "./SettingBg.vue";
-import CompanyInfoDark from "../../../components/company/CompanyInfoDark.vue";
+// import CompanyInfoDark from "../../../components/company/CompanyInfoDark.vue";
 export default {
   components: {
     SettingNav,
     SettingJumbo,
     UserGnb,
     SettingBg,
-    CompanyInfoDark,
+    // CompanyInfoDark,
   },
 
   setup() {

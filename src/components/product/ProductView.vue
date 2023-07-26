@@ -1,5 +1,5 @@
 <template>
-  <div class="product">
+  <div class="product" @click="dispatchOrder('card')">
     <Transition name="tr-fade">
       <div
         v-if="paymentVisible && hovering"
@@ -48,16 +48,19 @@ import Jaum04 from "../../components/char/Jaum04.vue";
 import Jaum05 from "../../components/char/Jaum05.vue";
 import Jaum13 from "../../components/char/Jaum13.vue";
 import Baloon from "../../components/char/Baloon.vue";
-import { defineProps, ref } from "vue";
+import { defineProps, ref, defineEmits } from "vue";
 import util from "../../service/util";
 import Product from "../../entity/product";
 
-defineProps({
+// eslint-disable-next-line no-unused-vars
+const props = defineProps({
   product: Product,
   theme: String,
   paymentVisible: { type: Boolean, required: false, default: true },
   minified: { type: Boolean, required: false, default: false },
 });
+// eslint-disable-next-line no-unused-vars
+const emit = defineEmits(["order"]);
 const logoComponent = {
   green: Jaum13,
   "picton-blue": Jaum01,
@@ -69,6 +72,13 @@ const format = (money) => util.currency.format(money);
 const hover = (on) => {
   hovering.value = on;
 };
+const dispatchOrder = (method) => {
+  emit("order", { method, product: props.product });
+};
+// const dispatchOrder = () => {
+//   // emit("order", { method, product: props.product });
+//   alert("현재는 단체 구매만 가능합니다.");
+// };
 </script>
 
 <style lang="scss" scoped>
@@ -80,6 +90,7 @@ $bsize: 4px;
   overflow: hidden;
   padding: 0;
   border-radius: 16px;
+  cursor: pointer;
 
   h3 {
     margin: 0;
