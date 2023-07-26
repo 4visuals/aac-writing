@@ -1,5 +1,6 @@
 <template>
   <div
+    :data-lcs="lcs.uuid"
     class="license normal effect pressed"
     :class="{
       active,

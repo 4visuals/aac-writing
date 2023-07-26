@@ -5,6 +5,7 @@
     @mouseleave="subOn = false"
   >
     <div class="box">
+      <h5 v-if="article.caption">{{ article.caption }}</h5>
       <h3>{{ article.title }}</h3>
       <ul v-if="article.desc">
         <li v-for="(para, idx) in article.desc" :key="idx">{{ para }}</li>
@@ -24,13 +25,15 @@
           class="thumbnail"
           :class="[md.type]"
         >
-          <div
-            v-if="md.type === 'thumbnail'"
-            class="img"
-            :style="`background-image: url('/img/intro/${md.imageUrl}')`"
-          ></div>
+          <div v-if="md.type === 'thumbnail'" class="img">
+            <img :src="`/img/intro/${md.imageUrl}`" />
+          </div>
           <div class="desc">
-            <p v-for="(para, idx) in md.desc.split('\n')" :key="idx">
+            <p
+              :class="{ center: md.type === 'thumbnail' }"
+              v-for="(para, idx) in md.desc.split('\n')"
+              :key="idx"
+            >
               {{ para }}
             </p>
           </div>
@@ -89,11 +92,20 @@ article {
       font-weight: 900;
       text-align: center;
     }
+    h5 {
+      font-size: 2vmin;
+      margin-bottom: 2vmin;
+      text-align: center;
+    }
     ul {
       list-style: none;
       padding: 0;
-      margin: 32px;
+      margin: 60px 0;
       font-size: 2vmin;
+      text-align: center;
+      li {
+        margin-bottom: 8px;
+      }
     }
     .subtitle {
       position: absolute;
@@ -105,7 +117,8 @@ article {
     .video {
       justify-content: center;
       display: flex;
-      width: 720px;
+      width: 100%;
+      max-width: 720px;
       margin: auto;
       // height: 500px;
       video {
@@ -171,16 +184,19 @@ article {
           }
         }
         .img {
-          height: 240px;
-          background-size: 125%;
-          background-position: center;
-          background-repeat: no-repeat;
+          & > img {
+            width: 100%;
+            height: auto;
+          }
         }
         .desc {
           margin: 16px 0;
           text-align: center;
           font-size: 1.25rem;
           font-weight: 600;
+          p.center {
+            text-align: center;
+          }
         }
       }
     }
