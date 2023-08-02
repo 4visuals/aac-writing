@@ -40,7 +40,7 @@
       <!-- <StudentLogo v-if="!policyPage" :student="student" size="lg" /> -->
     </div>
     <div v-if="mobileMenuVisible" class="mobile-menu">
-      <div class="modal-dimmer"></div>
+      <div class="modal-dimmer" @click="closeMobileMenu"></div>
       <div class="inner">
         <AppButton
           size="nav"
@@ -48,7 +48,7 @@
           :theme="themeRef.name"
           :fill="true"
           :invert="menu === 'today'"
-          @click="$emit('page', 'today')"
+          @click="changeView('today')"
         ></AppButton>
         <AppButton
           size="nav"
@@ -56,14 +56,14 @@
           :theme="themeRef.name"
           :fill="true"
           :invert="menu === 'level'"
-          @click="$emit('page', 'level')"
+          @click="changeView('level')"
         /><AppButton
           size="nav"
           text="교과서"
           :theme="themeRef.name"
           :fill="true"
           :invert="menu === 'book'"
-          @click="$emit('page', 'book')"
+          @click="changeView('book')"
         />
       </div>
     </div>
@@ -83,7 +83,7 @@ export default {
       default: "today",
     },
   },
-  setup() {
+  setup(_, { emit }) {
     const store = useStore();
     const nav = computed(() => store.getters["ui/nav"]);
     const route = useRoute();
@@ -96,6 +96,13 @@ export default {
     const themeRef = computed(() => store.state.ui.theme);
     const mobileMenuVisible = ref(false);
 
+    const closeMobileMenu = () => {
+      mobileMenuVisible.value = false;
+    };
+    const changeView = (viewName) => {
+      emit("page", viewName);
+      closeMobileMenu();
+    };
     store.commit("ui/setTheme", ["stat"]);
     return {
       ctx,
@@ -107,6 +114,8 @@ export default {
       topPadding,
       themeRef,
       mobileMenuVisible,
+      changeView,
+      closeMobileMenu,
     };
   },
   components: { SpanText },
