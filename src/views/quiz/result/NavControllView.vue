@@ -4,7 +4,7 @@
       {{ ctx.getModeText() }} 완료!</ParaText
     >
     <ParaText
-      >{{ ctx.section.level }}단계 {{ ctx.resourceText }}
+      >{{ ctx.section.getLevelText() }} 단계 {{ ctx.resourceText }}
       {{ ctx.getRangeText() }} 완료</ParaText
     >
     <Transition name="trs-scales" mode="out-in" appear>
