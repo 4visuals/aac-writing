@@ -118,7 +118,6 @@ article {
       justify-content: center;
       display: flex;
       width: 100%;
-      max-width: 720px;
       margin: auto;
       // height: 500px;
       video {
