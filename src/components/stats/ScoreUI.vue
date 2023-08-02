@@ -31,7 +31,7 @@ export default {
   },
   emits: ["view-answer"],
   setup() {
-    const score100 = require("@/assets/reward/score-100.webm");
+    const score100 = require("@/assets/reward/score-100.mp4");
     return { score100 };
   },
 };
