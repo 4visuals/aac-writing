@@ -11,6 +11,7 @@
     "staging": "vue-cli-service build --mode staging"
   },
   "dependencies": {
+    "aos": "^2.3.4",
     "apexcharts": "^3.35.0",
     "axios": "^0.26.0",
     "bootstrap": "^5.1.3",

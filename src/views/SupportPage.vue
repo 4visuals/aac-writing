@@ -57,12 +57,14 @@
 <script>
 import { host } from "@/service/util";
 import { useStore } from "vuex";
-import { watch, ref } from "vue";
+import { watch, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { computed } from "@vue/reactivity";
 import UserGnb from "./nav/UserGnb.vue";
 import ArticlePart from "./main/ArticlePart.vue";
 import CompanyInfoDark from "@/components/company/CompanyInfoDark.vue";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 export default {
   name: "Home",
@@ -271,6 +273,7 @@ export default {
     const detectScroll = (e) => {
       const scroll = e.target.scrollTop;
       fixedMenu.value = scroll > 180;
+      AOS.refresh(false);
     };
     const handleRes = (res) => {
       console.log(res);
@@ -287,6 +290,10 @@ export default {
     );
     store.commit("ui/setBackgroundVisible", false);
     store.commit("ui/hideMenu");
+
+    onMounted(() => {
+      AOS.init({ delay: 0, duration: 700, easing: "ease-out", once: true });
+    });
 
     return {
       modal,

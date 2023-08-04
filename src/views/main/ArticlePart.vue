@@ -6,11 +6,20 @@
   >
     <div class="box">
       <h5 v-if="article.caption">{{ article.caption }}</h5>
-      <h3>{{ article.title }}</h3>
-      <ul v-if="article.desc">
+      <h3 data-aos="flip-up" data-aos-delay="200" data-aos-duration="200">
+        {{ article.title }}
+      </h3>
+      <ul
+        v-if="article.desc"
+        data-aos="flip-up"
+        data-aos-delay="400"
+        data-aos-duration="200"
+      >
         <li v-for="(para, idx) in article.desc" :key="idx">{{ para }}</li>
       </ul>
-      <h4>{{ article.subtitle }}</h4>
+      <h4 data-aos="flip-up" data-aos-delay="600" data-aos-duration="200">
+        {{ article.subtitle }}
+      </h4>
       <div v-if="article.video" class="video">
         <video playsinline autoplay loop muted :src="article.video.url"></video>
       </div>
@@ -24,6 +33,8 @@
           :key="idx"
           class="thumbnail"
           :class="[md.type]"
+          :data-aos="idx === 0 ? 'fade-right' : 'fade-left'"
+          :data-aos-delay="500 * idx"
         >
           <div v-if="md.type === 'thumbnail'" class="img">
             <img :src="`/img/intro/${md.imageUrl}`" />
