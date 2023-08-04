@@ -174,9 +174,9 @@ export default {
       const section = cate.value;
       const sentenceSeqs = records.value
         .filter((record) => record.type === quizResource)
-        .flatMap((record) =>
-          record.paper.submissions.flatMap((sbm) => sbm.sentenceRef)
-        );
+        .flatMap((record) => record.paper.submissions.flatMap((sbm) => sbm))
+        .filter((submission) => !submission.correct)
+        .map((submission) => submission.sentenceRef);
       const sentences = section.sentences.filter((sen) =>
         sentenceSeqs.includes(sen.seq)
       );
