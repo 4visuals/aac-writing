@@ -2,7 +2,7 @@
   <Transition name="trs-scale-grow" appear>
     <div class="score">
       <video v-if="score === 100" width="100%" autoplay loop muted>
-        <source :src="score100" type="video/webm" />
+        <source :src="score100" type="video/mp4" />
       </video>
       <template v-else>
         <h3>{{ score.toFixed(0) }}점!!</h3>
