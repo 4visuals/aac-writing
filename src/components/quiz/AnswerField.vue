@@ -26,7 +26,7 @@
 
 <script>
 import { ref } from "@vue/reactivity";
-import { watch, nextTick } from "vue";
+import { watch, nextTick, computed } from "vue";
 import { logger } from "@/service/util";
 import { useStore } from "vuex";
 export default {
@@ -41,7 +41,7 @@ export default {
   emits: ["commit", "update:inputText", "reset", "clicked"],
   setup(props, { emit }) {
     const store = useStore();
-    const theme = store.state.ui.theme;
+    const theme = computed(() => store.state.ui.theme);
     let startTime = [];
     const inputEl = ref(null);
     const flashing = ref(true);

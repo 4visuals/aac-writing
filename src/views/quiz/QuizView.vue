@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { computed, onMounted, onUnmounted, provide, ref } from "vue";
+import { computed, onMounted, onUnmounted, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import quizStore from "./quizStore";
 import quiz, { Segment } from "@/views/quiz";
@@ -322,16 +322,28 @@ export default {
     onMounted(() => {
       store.commit("ui/hideReward");
       store.commit("ui/setBackgroundVisible", false);
-      navbarTheme.value = ctx.value.isBookQuiz()
-        ? "brown"
-        : ctx.value.isWord()
-        ? "word"
-        : "sentence";
     });
     onUnmounted(() => {
       store.commit("ui/setBackgroundVisible", true);
       store.commit("ui/setNavVisible", true);
     });
+    watch(
+      ctx,
+      () => {
+        if (ctx.value) {
+          const themePath = ctx.value.isBookQuiz() ? "book" : "level";
+          store.commit("ui/setTheme", [themePath]);
+          navbarTheme.value = ctx.value.isBookQuiz()
+            ? "brown"
+            : ctx.value.isWord()
+            ? "word"
+            : "sentence";
+        }
+      },
+      {
+        immediate: true,
+      }
+    );
     return {
       ctx,
       theme,
