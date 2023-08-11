@@ -216,7 +216,7 @@ export default {
       const quizContext = ctx.value;
       const [s, e] = quizContext.ranges;
       let segment = { start: s, end: e }; // = segments.find((seg) => seg.start === s && seg.end === e);
-      let sentences = quizContext.questions.map((q) => q.data); // list of sentences
+      let sentences = quizContext.getRetrySentences();
       const { retryMode } = quizContext;
       const failedOnly = retryMode === RetryMode.FAILED;
       startQuiz(

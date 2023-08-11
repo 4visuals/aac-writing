@@ -43,6 +43,13 @@ class QuizSpec {
     this.retry = retry || RetryMode.SEG;
     this.failedOnly = failedOnly || false;
   }
+  /**
+   * session storage로부터 새로 로드함
+   */
+  loadRetryQuestion() {
+    const seqs = storage.session.read("quizSpec.origin", []);
+    return seqs;
+  }
   write() {
     storage.session.write("quizSpec", this);
   }
@@ -88,6 +95,11 @@ const prepareQuiz = (
       failedOnly,
     });
     spec.write();
+    /**
+     * [다시 풀기] session storage 안에 원본 문제의 seq를 캡쳐해서 저장함
+     * spec.loadRetryQuestion() 에서 원본 문제의 seq들을 읽어들임
+     */
+    storage.session.write("quizSpec.origin", seqs);
     resolve();
   });
 

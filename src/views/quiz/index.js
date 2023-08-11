@@ -404,6 +404,22 @@ class QuizContext {
     const quizSpec = this.config.options;
     return `${quizSpec.prevPage.section}/${quizSpec.section}`;
   }
+  /**
+   * 다시하기에서 원본 문제를 반환함.
+   * 틀린 문제만 다시 풀기를 여러번 했을때 현재 sentence들은 최초의 sentence들과 다르다.
+   * 맨 처음 학습을 시작할때의 원본 문제를 따로 보관하고 있어야 함
+   */
+  getRetrySentences() {
+    const { section, options } = this.config;
+    /*
+     * 최초의 원본 문제를 다시 불러와야 함
+     */
+    const seqs = options.loadRetryQuestion();
+    const sentences = seqs.map((seq) =>
+      section.sentences.find((sen) => sen.seq === seq)
+    );
+    return sentences;
+  }
 }
 /**
  * 새로운 퀴즈 준비
