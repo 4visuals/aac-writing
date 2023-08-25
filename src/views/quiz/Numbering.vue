@@ -118,6 +118,22 @@ $inactive-bgc: #eee9fe;
       }
     }
   }
+  &.trial {
+    color: #ff114a;
+    .desc {
+      .speaker {
+        background-color: #ff114a;
+      }
+    }
+    .bars {
+      .current.elem {
+        color: #ff114a;
+        .bar {
+          background-color: #ff114a;
+        }
+      }
+    }
+  }
   .desc {
     flex: 1 1 50%;
     display: flex;

@@ -3,6 +3,7 @@ import Section from "../../entity/section";
 const chapters = {
   levels: [],
   books: [],
+  trials: [],
 };
 /**
  * section을 구성하는 문제들(낱말, 문장)에 문항 번호를 기록함.
@@ -35,6 +36,29 @@ const assignLevel = (chapters) => {
   });
 };
 /**
+ * 소개 페이지에서 사용할 체험용 section 준비
+ */
+const prepareTrialChapter = (chapter) => {
+  const section = chapter.sections[0];
+  const trialSection = Object.assign({}, section);
+  trialSection.seq = -1;
+  trialSection.origin = "T";
+  assignNumber(trialSection);
+  trialSection.sentences = trialSection.sentences.map((sen) => {
+    const copied = Object.assign({}, sen);
+    copied.sectionRef = -1;
+    copied.origin = "T";
+    return copied;
+  });
+  const trialChapter = {
+    desc: "가. 체험용",
+    origin: "T",
+    sections: [new Section(trialSection)],
+  };
+  trialSection.chapter = trialChapter;
+  return trialChapter;
+};
+/**
  * section들을 linked list로 연결함
  * (퀴즈를 끝낸 후 "다음 문제"로 이동하는 기능에 필요함)
  * @param {object} chapters
@@ -55,8 +79,10 @@ export default {
   getters: {
     levels: (state) => state.chapters["levels"],
     books: (state) => state.chapters["books"],
+    trials: (state) => state.chapters["trials"],
     sections: (state) => {
-      const courses = [...state.chapters.levels, ...state.chapters.books];
+      const { levels, books, trials } = state.chapters;
+      const courses = [...levels, ...books, ...trials];
       return courses.flatMap((chapter) => chapter.sections);
     },
     section: (_, getters) => (sectionSeq) => {
@@ -67,6 +93,10 @@ export default {
   mutations: {
     setChapter(state, args) {
       const { data } = args;
+      // 1. trial chapter - 소개 페이지 체험용
+      const trialChapter = prepareTrialChapter(args.data[0]);
+      state.chapters.trials = [trialChapter];
+
       data.forEach((chapter) => {
         const sections = chapter.sections.map((sec) => {
           sec.origin = chapter.origin;
@@ -79,6 +109,7 @@ export default {
       });
       state.chapters.levels = data.filter((chapter) => chapter.origin === "L");
       state.chapters.books = data.filter((chapter) => chapter.origin === "B");
+
       // 교과서는 level이 0
       // 위치값으로 level을 부여함
       assignLevel(state.chapters.books);

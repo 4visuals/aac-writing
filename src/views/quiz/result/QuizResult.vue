@@ -6,7 +6,8 @@
       class="right"
       :class="[ctx.isQuizMode() || ctx.isListenMode() ? 'half' : 'one']"
     >
-      <NavControllView />
+      <TrialQuizResult v-if="ctx.isTrialQuiz()" />
+      <NavControllView v-else />
     </div>
   </div>
 </template>
@@ -19,11 +20,13 @@ import ScoreView from "./ScoreView.vue";
 import AnswerView from "./AnswerView.vue";
 import NavControllView from "./NavControllView.vue";
 import { RetryMode } from "../../../components/quiz/retry-mode";
+import TrialQuizResult from "./TrialQuizResult.vue";
 export default {
   components: {
     ScoreView,
     NavControllView,
     AnswerView,
+    TrialQuizResult,
   },
   setup() {
     const store = useStore();
@@ -108,7 +111,11 @@ export default {
     };
     onMounted(() => {
       store.commit("quiz/hideHint");
-      if (ctx.isListenMode() || ctx.retryMode === RetryMode.FAILED) {
+      if (
+        ctx.isTrialQuiz() ||
+        ctx.isListenMode() ||
+        ctx.retryMode === RetryMode.FAILED
+      ) {
         // 듣고쓰기 모드에서는 시험 결과를 업로드하지 않음.
         // 오답 연습인 경우 업로드하지 않음
         // 재시도인 경우에도 서버에 업로드해야 오답 정보가 업데이트 된다.

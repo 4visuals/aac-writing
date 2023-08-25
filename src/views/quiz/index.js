@@ -321,6 +321,9 @@ class QuizContext {
   isBookQuiz() {
     return this.section.origin === "B";
   }
+  isTrialQuiz() {
+    return this.section.origin === "T";
+  }
   /**
    * 보고쓰기, 문장읽기
    * @returns boolean

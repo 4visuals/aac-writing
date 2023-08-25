@@ -14,6 +14,13 @@
         :resourceType="ctx.resourceType"
         @back="closeQuiz"
       />
+      <TrialNavBar
+        v-if="ctx.isTrialQuiz()"
+        :section="ctx.config.section"
+        :resourceType="ctx.resourceType"
+        :theme="navbarTheme"
+        @back="closeQuiz"
+      />
 
       <template v-if="ctx">
         <QuizResult v-if="quizFinished" />
@@ -35,7 +42,7 @@
           >
             <h3>{{ ctx.currentQuestion.text }}</h3>
           </div>
-          <HintView v-if="hint && hint.visible" :hint="hint" />
+          <HintView v-if="hint?.visible" :hint="hint" />
           <div class="answer">
             <component
               :is="ctx.options.answerComponent"
@@ -68,7 +75,10 @@
           </div>
         </template>
       </template>
-      <div class="none" v-else>NONE</div>
+      <div class="none" v-else></div>
+      <div v-if="ctx.isTrialQuiz()" class="trial-info">
+        <ParaText>실제 학습 화면입니다</ParaText>
+      </div>
       <RewardView v-if="reward" />
       <transition name="pop">
         <TtsView v-if="speaking" />
@@ -92,7 +102,9 @@ import QuizResult from "./result/QuizResult.vue";
 import { tts } from "@/components/tts";
 import LevelNavBar from "../level/LevelNavBar.vue";
 import BookNavBar from "../book/BookNavBar.vue";
+import TrialNavBar from "../level/TrialNavBar.vue";
 import { RetryMode } from "../../components/quiz/retry-mode";
+import { ParaText } from "../../components/text";
 
 export default {
   components: {
@@ -104,8 +116,10 @@ export default {
     QuizResult,
     LevelNavBar,
     BookNavBar,
+    TrialNavBar,
+    ParaText,
   },
-  setup() {
+  setup(_, { emit }) {
     const store = useStore();
     const ctx = computed(() => store.state.quiz.quizContext);
     const hint = computed(() => store.state.quiz.hint);
@@ -296,6 +310,9 @@ export default {
         gotoSection();
       } else if (dir === "close") {
         gotoChapter();
+      } else if (dir === "trial") {
+        // TODO - 체험 모드 종료
+        emit("close");
       } else {
         throw new Error("invalid dir", dir);
       }
@@ -338,6 +355,9 @@ export default {
             : ctx.value.isWord()
             ? "word"
             : "sentence";
+          if (ctx.value.isTrialQuiz()) {
+            navbarTheme.value = "trial";
+          }
         }
       },
       {
@@ -451,6 +471,17 @@ export default {
       font-weight: 600;
       line-height: 1.2;
     }
+  }
+  .trial-info {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -8px);
+    background-color: #f3ff09;
+    padding: 6px 12px;
+    border-radius: 24px;
+    box-shadow: 0 0 1px #555107cc;
+    animation: bouncing-updown 2s cubic-bezier(0.5, 0, 0.5, 1) 0s infinite;
   }
   .pop-enter-from,
   .pop-leave-to {

@@ -51,6 +51,12 @@
       <ArticlePart :article="articles.pg6" :col2="true" />
     </section>
     <CompanyInfoDark />
+    <button class="nude trial" @click="startTrial">체험하기</button>
+    <Transition name="tr-fade">
+      <div v-if="trialEnabled" class="trial-screen">
+        <QuizView @close="closeTrial" />
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -65,6 +71,9 @@ import ArticlePart from "./main/ArticlePart.vue";
 import CompanyInfoDark from "@/components/company/CompanyInfoDark.vue";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import QuizSpec from "./quiz/type-quiz-spec";
+import { RetryMode } from "../components/quiz/retry-mode";
+import QuizView from "./quiz/QuizView.vue";
 
 export default {
   name: "Home",
@@ -72,6 +81,7 @@ export default {
     UserGnb,
     ArticlePart,
     CompanyInfoDark,
+    QuizView,
   },
   setup() {
     const store = useStore();
@@ -81,6 +91,7 @@ export default {
     const member = computed(() => store.getters["user/isMember"]);
     const modal = ref({ visible: false, lcs: null });
     const fixedMenu = ref(false);
+    const trialEnabled = ref(false);
     const articles = {
       main: {
         style: {
@@ -278,6 +289,38 @@ export default {
     const handleRes = (res) => {
       console.log(res);
     };
+    const startTrial = () => {
+      const trials = store.getters["course/trials"];
+      const trialSeciton = trials[0].sections[0];
+      // 5개만 하겠다!
+      const testQuizSize = 5;
+
+      const group = {
+        key: 0,
+        start: 0,
+        end: testQuizSize,
+        rand: false,
+        sentences: trialSeciton.sentences.slice(0, testQuizSize),
+      };
+      const quizMode = "READING";
+      const answerType = "EJ";
+      const quizResource = "S";
+      const failedOnly = false;
+
+      QuizSpec.prepareLevelQuiz(
+        quizMode,
+        answerType,
+        trialSeciton,
+        quizResource,
+        () => group.sentences,
+        [group.start, group.end],
+        RetryMode.SEG,
+        failedOnly
+      ).then(() => {
+        trialEnabled.value = true;
+      });
+    };
+    const closeTrial = () => (trialEnabled.value = false);
 
     watch(
       () => member,
@@ -308,6 +351,9 @@ export default {
       doLogout,
       detectScroll,
       handleRes,
+      trialEnabled,
+      closeTrial,
+      startTrial,
     };
   },
 };
@@ -360,6 +406,28 @@ $trasition: all 1s ease;
       background-position: left top;
     }
   }
+  .trial {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1000;
+    background-color: #fffa8d;
+    border-radius: 8px;
+    box-shadow: 4px 4px 16px #0000004d, 1px 1px 4px #0000004d;
+    font-weight: 500;
+    padding: 8px 16px;
+    font-size: 1.8rem;
+    animation: bouncing 2s cubic-bezier(0.5, 0, 0.5, 1) 0s infinite;
+  }
+  .trial-screen {
+    position: fixed;
+    background-color: white;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    padding: 60px 0;
+    background-color: #0000004d;
+  }
 }
 @include mobile {
   .support {
@@ -408,6 +476,17 @@ $trasition: all 1s ease;
         height: 100px;
       }
     }
+  }
+}
+@keyframes bouncing {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translate(0px);
   }
 }
 .support {
