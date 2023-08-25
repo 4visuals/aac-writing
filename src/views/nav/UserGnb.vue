@@ -1,15 +1,15 @@
 <template>
   <nav>
     <div class="logo" @click="goTo('/')">
-      <img src="/img/bdsg_logo_sm.png" alt="" srcset="" />
+      <!-- <img src="/img/bdsg_logo_sm.png" alt="" srcset="" /> -->
     </div>
     <div class="items">
       <ul class="nude hor">
-        <li>
+        <!-- <li>
           <button class="nude" @click="goTo('/')">
             <span>그림한글 받아쓰기</span>
           </button>
-        </li>
+        </li> -->
         <li>
           <button class="nude purchase" @click="goTo('/purchase')">
             <span>구매하기</span>
@@ -55,21 +55,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 nav {
   position: sticky;
   top: 0;
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 8px 16px;
   background-color: white;
   box-shadow: 0 0 16px #0000002d, 0 0 8px #0000004d;
   z-index: 100;
   .logo {
     width: 180px;
+    height: 36px;
+    background-image: url("/img/bdsg_logo_sm.png");
+    background-size: 180px 36px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    transition: width 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
     cursor: pointer;
     > img {
       width: 100%;
       height: auto;
+    }
+    @include mobile {
+      width: 28px;
     }
   }
   .items {
