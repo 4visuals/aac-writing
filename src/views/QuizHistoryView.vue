@@ -19,28 +19,7 @@
       <ParaText class="desc">
         <SpanText>{{ history.desc }}</SpanText>
       </ParaText>
-      <div class="stats">
-        <div
-          v-if="origin !== 'B' && !history.isChallengeSection()"
-          class="each"
-        >
-          <SpanText class="text" size="sm">낱말</SpanText>
-          <SpanText class="text" size="sm"
-            >{{ history.stats.word.solved }} /
-            {{ history.stats.word.total }}</SpanText
-          >
-        </div>
-        <div class="each">
-          <SpanText class="text" size="sm">문장</SpanText>
-          <SpanText class="text" size="sm"
-            >{{ history.stats.sentence.solved }} /
-            {{ history.stats.sentence.total }}</SpanText
-          >
-        </div>
-      </div>
-      <ParaText class="lat text-ellipsis"
-        >{{ history.lacText(cur) }}전</ParaText
-      >
+      <ParaText class="lat">{{ history.lacText(cur) }}전</ParaText>
       <ActionIcon
         class="btn-close"
         icon="cancel"
@@ -129,7 +108,7 @@ export default {
   .quiz-elem {
     display: flex;
     align-items: center;
-    column-gap: 12px;
+    column-gap: 8px;
     padding: 5px 10px 5px 24px;
     margin-bottom: 12px;
     border-radius: 40px;
@@ -198,6 +177,7 @@ export default {
     }
     .desc {
       overflow: hidden;
+      font-weight: 500;
       white-space: nowrap;
       text-overflow: ellipsis;
       flex: 1 1 auto;
@@ -207,40 +187,10 @@ export default {
     }
     .lat {
       text-align: right;
-      margin: 2px;
       font-family: "Noto Sans KR", Avenir, Helvetica, Arial, sans-serif;
       font-size: 12px;
-    }
-    .stats {
-      display: flex;
-      column-gap: 8px;
-      & > .each {
-        flex: 1;
-        display: flex;
-        column-gap: 2px;
-        align-items: center;
-        .text {
-          flex: 1 1 auto;
-          white-space: nowrap;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          border-radius: 4px;
-          overflow: hidden;
-          .bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-          }
-          .text {
-            position: relative;
-            font-size: 0.9rem;
-            padding: 2px 0;
-          }
-        }
-      }
+      white-space: nowrap;
+      font-weight: 500;
     }
   }
   @include mobile {
