@@ -325,6 +325,7 @@ $trasition: all 1s ease;
   position: relative;
   font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
   height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 0;
   position: relative;
