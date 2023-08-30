@@ -45,6 +45,7 @@ const router = useRouter();
       font-size: 1.8rem;
     }
     p {
+      text-align: center;
       margin-bottom: 1.25rem;
     }
   }
