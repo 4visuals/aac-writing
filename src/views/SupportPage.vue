@@ -214,7 +214,7 @@ export default {
           },
           {
             type: "thumbnail",
-            imageUrl: "5-3.jpg",
+            imageUrl: "5-3.jpeg",
             desc: `블루투스 키보드로 입력하면 편리해요.`,
           },
         ],
