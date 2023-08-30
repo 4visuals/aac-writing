@@ -226,8 +226,9 @@ export default {
 
 <style lang="scss" scoped>
 .eojeol-list {
+  flex: 1 1 auto;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   column-gap: 6px;
   overflow-x: auto;
   padding: 16px;
