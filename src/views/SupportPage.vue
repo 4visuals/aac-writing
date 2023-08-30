@@ -292,8 +292,8 @@ export default {
     const startTrial = () => {
       const trials = store.getters["course/trials"];
       const trialSeciton = trials[0].sections[0];
-      // 5개만 하겠다!
-      const testQuizSize = 5;
+
+      const testQuizSize = trialSeciton.sentences.length;
 
       const group = {
         key: 0,
@@ -302,7 +302,7 @@ export default {
         rand: false,
         sentences: trialSeciton.sentences.slice(0, testQuizSize),
       };
-      const quizMode = "READING";
+      const quizMode = "LEARNING";
       const answerType = "EJ";
       const quizResource = "S";
       const failedOnly = false;

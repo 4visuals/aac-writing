@@ -253,3 +253,14 @@ ul.nude {
     transform: rotate(-270deg);
   }
 }
+@keyframes bouncing-updown {
+  0% {
+    transform: translate(-50%, -8px);
+  }
+  50% {
+    transform: translate(-50%, -12px);
+  }
+  100% {
+    transform: translate(-50%, -8px);
+  }
+}

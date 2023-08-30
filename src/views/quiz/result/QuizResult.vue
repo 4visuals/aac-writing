@@ -1,13 +1,17 @@
 <template>
   <div class="q-result">
-    <div v-if="ctx.isQuizMode()" class="left half"><ScoreView /></div>
+    <div v-if="ctx.isTrialQuiz()" class="right one">
+      <TrialQuizResult />
+    </div>
+    <div v-else-if="ctx.isQuizMode()" class="left half">
+      <ScoreView />
+    </div>
     <div v-else-if="ctx.isListenMode()" class="left half"><AnswerView /></div>
     <div
       class="right"
       :class="[ctx.isQuizMode() || ctx.isListenMode() ? 'half' : 'one']"
     >
-      <TrialQuizResult v-if="ctx.isTrialQuiz()" />
-      <NavControllView v-else />
+      <NavControllView />
     </div>
   </div>
 </template>

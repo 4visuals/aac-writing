@@ -38,9 +38,34 @@ const assignLevel = (chapters) => {
 /**
  * 소개 페이지에서 사용할 체험용 section 준비
  */
-const prepareTrialChapter = (chapter) => {
-  const section = chapter.sections[0];
-  const trialSection = Object.assign({}, section);
+const prepareTrialChapter = (chapters) => {
+  const sentenceSeq = [1, 93, 163, 287, 555];
+  const map = chapters
+    .flatMap((chp) => chp.sections.flatMap((section) => section.sentences))
+    .reduce((senMap, sentence) => {
+      senMap.set(sentence.seq, sentence);
+      return senMap;
+    }, new Map());
+  console.log(sentenceSeq, map);
+  const sentences = sentenceSeq.map((seq) => map.get(seq));
+  console.log(sentences);
+  const trialSection = new Section({
+    basketRef: -1,
+    chapterRef: -1,
+    origin: "T",
+    description: " 쉬운 자음 + 쉬운 모음",
+    level: 1,
+    sentences,
+  });
+  /*
+  (1단계-1) 아기 나무
+  (9단계-3) 숫자를 썼다.
+  (15단계-3) 개구리가 시끄럽게 개굴개굴
+  (25단계-7) 귀여운 토끼가 귀를 쫑긋거렸다.
+  (47단계-5) 집에 가는 길인데 아직 멀었대.
+*/
+  // const section = chapters[0].sections[0];
+  // const trialSection = Object.assign({}, section);
   trialSection.seq = -1;
   trialSection.origin = "T";
   assignNumber(trialSection);
@@ -94,7 +119,7 @@ export default {
     setChapter(state, args) {
       const { data } = args;
       // 1. trial chapter - 소개 페이지 체험용
-      const trialChapter = prepareTrialChapter(args.data[0]);
+      const trialChapter = prepareTrialChapter(args.data);
       state.chapters.trials = [trialChapter];
 
       data.forEach((chapter) => {
