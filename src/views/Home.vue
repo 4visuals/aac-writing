@@ -5,6 +5,9 @@
       <div style="color: #648294; font-weight: 600">|</div>
       <!-- <router-link to="/join" v-if="!member">가입</router-link> -->
       <router-link class="link" to="/purchase">이용권구매</router-link>
+      <button class="nude guide" @click="showVideoGuid">
+        <AppIcon icon="play_circle_filled" /><span>가입안내</span>
+      </button>
     </div>
     <AppButton
       v-if="member"
@@ -45,6 +48,16 @@
         <GoogleButton @join="showNotAMemberDialog" />
         <!-- <div class="hr"></div>
         <button class="btn" @click="showJoinForm">회원 가입</button> -->
+      </div>
+      <div class="notice">
+        <div class="info">
+          <ParaText>12월 31일까지 무료체험(개인)!!</ParaText>
+        </div>
+        <div class="info">
+          <ParaText>공공(교육) 기관이나 </ParaText>
+          <ParaText>영리 목적의 개인 및 기업은</ParaText>
+          <ParaText>이용권을 구매해주세요.</ParaText>
+        </div>
       </div>
     </div>
     <div class="menu" v-else>
@@ -87,6 +100,7 @@ import modals from "@/components/modal";
 import DialogView from "@/components/dialog/DialogView.vue";
 import { loadStudentRecords } from "./app-state-validator";
 import JoinView from "./user/JoinView.vue";
+import TutorialVideoView from "../components/TutorialVideoView.vue";
 
 export default {
   name: "Home",
@@ -158,6 +172,13 @@ export default {
         },
       });
     };
+    const showVideoGuid = () => {
+      modals.showModal(TutorialVideoView, {
+        width: "lg",
+        padding: "0px",
+        props: { videoUrl: "ULJj9PJIzGM?si=r5NwKZRbOXfWDXTI" },
+      });
+    };
 
     watch(
       () => member,
@@ -181,6 +202,7 @@ export default {
       delegateLogout,
       showNotAMemberDialog,
       showJoinForm,
+      showVideoGuid,
     };
   },
 };
@@ -237,6 +259,18 @@ export default {
       font-weight: 600;
       text-decoration: none;
     }
+    .guide {
+      display: inline-flex;
+      align-items: center;
+      padding: 0;
+      color: #003b5f;
+      border: 1px solid;
+      padding: 0 8px 0 5px;
+      border-radius: 24px;
+      &:active {
+        transform: translate(1px, 1px);
+      }
+    }
   }
   .logout {
     position: fixed;
@@ -291,6 +325,17 @@ export default {
         display: flex;
         align-items: center;
         flex-direction: column;
+      }
+    }
+    .notice {
+      .info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .info + .info {
+        margin-top: 16px;
       }
     }
   }

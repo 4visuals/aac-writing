@@ -10,6 +10,7 @@
       <section class="viewport">
         <div class="view">
           <router-view
+            @howto="showHowto"
             @new-student="showNewStudentForm"
             @del-student="startStudentRemoval"
           />
@@ -35,6 +36,7 @@ import toast from "@/components/toast";
 import { useRoute, useRouter } from "vue-router";
 import UserGnb from "@/views/nav/UserGnb.vue";
 import SettingBg from "./SettingBg.vue";
+import TutorialVideoView from "@/components/TutorialVideoView.vue";
 // import CompanyInfoDark from "../../../components/company/CompanyInfoDark.vue";
 export default {
   components: {
@@ -42,7 +44,6 @@ export default {
     SettingJumbo,
     UserGnb,
     SettingBg,
-    // CompanyInfoDark,
   },
 
   setup() {
@@ -78,6 +79,14 @@ export default {
           toast.error(`@${e.cause}`, `실패`, 15);
         });
     };
+    const showHowto = (props) => {
+      console.log("튜토리얼", props);
+      modal.showModal(TutorialVideoView, {
+        width: "lg",
+        padding: "0px",
+        props: { videoUrl: props.url },
+      });
+    };
     /**
      * 학생 등록 양식 시작
      */
@@ -101,11 +110,17 @@ export default {
       "new-student": showNewStudentForm,
       "new-order": goToOrder,
       purchase: goToOrder,
+      "howto-reg-stud": showHowto,
     };
     const menus = [
       new MenuItem("account", "account_circle", "마이페이지"),
       new MenuItem("student", "face", "학생 관리", [
         new NavAction("new-student", "학생 추가", "add"),
+        new NavAction("howto-reg-stud", "사용 방법", "play_circle_filled", {
+          type: "video/youtube",
+          // url: "https://youtu.be/DGI_aKld0Jg?si=HozwWw6BNYFtapr1",
+          url: "o2AfyGr8I3Y?si=wSn3q2jTDCZqiKFs",
+        }),
       ]),
       new MenuItem("license", "badge", "이용권", [
         new NavAction("new-order", "이용권 구매", "add"),
@@ -126,7 +141,7 @@ export default {
     const handleAction = (action) => {
       const fn = actionMap[action.id];
       if (fn) {
-        fn();
+        fn(action.props);
       }
     };
 
@@ -188,6 +203,7 @@ export default {
       showNewStudentForm,
       startStudentRemoval,
       handleAction,
+      showHowto,
     };
   },
 };

@@ -44,10 +44,15 @@ export default {
     font-size: 6vmin;
     font-weight: 900;
   }
-  button.action {
+  .actions {
     display: flex;
-    align-items: center;
-    font-size: 1.2rem;
+    justify-content: center;
+    button.action {
+      display: flex;
+      align-items: center;
+      column-gap: 2px;
+      font-size: 1.2rem;
+    }
   }
 }
 </style>
