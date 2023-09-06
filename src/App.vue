@@ -143,9 +143,23 @@ export default {
           }
         });
     };
-
+    /**
+     * session이 없는 경우(시크릿칭 또는 구글 로그인 이력이 없는 브라우저)
+     */
+    const googleSignInFailed = () => {
+      const btn = document.querySelector("[data-login-btn]");
+      console.log(btn);
+      google.accounts.id.renderButton(
+        btn,
+        { theme: "outline", size: "medium", shape: "pill", text: "signin" } // customization attributes
+      );
+    };
     const startGoogleLogin = () => {
-      googleLogin.initGoogleSignIn(handleLoginRespone, true);
+      googleLogin.initGoogleSignIn(
+        handleLoginRespone,
+        googleSignInFailed,
+        true
+      );
     };
 
     const doLogout = (cmd) => {

@@ -26,7 +26,7 @@
           </button>
         </li>
         <li v-else>
-          <button class="nude" @click="delegateLogin">
+          <button data-login-btn class="nude" @click="delegateLogin">
             <span>로그인</span>
           </button>
         </li>

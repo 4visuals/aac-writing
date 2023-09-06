@@ -14,7 +14,7 @@ const resolveUrl = (option) => {
   return google.authUrl + "?" + queryString;
 };
 
-const initGoogleSignIn = (callback, showPrompt = false) => {
+const initGoogleSignIn = (callback, failedCallback, showPrompt = false) => {
   window.google.accounts.id.initialize({
     client_id: env.GOOGLE_CLIENT_ID,
     callback,
@@ -24,7 +24,14 @@ const initGoogleSignIn = (callback, showPrompt = false) => {
     ux_mode: "popup",
   });
   if (showPrompt) {
-    window.google.accounts.id.prompt();
+    window.google.accounts.id.prompt((notification) => {
+      if (
+        notification.isNotDisplayed() &&
+        notification.getNotDisplayedReason() === "opt_out_or_no_session"
+      ) {
+        failedCallback(notification.getNotDisplayedReason());
+      }
+    });
   }
   return Promise.resolve(true);
 };
