@@ -76,6 +76,11 @@ button {
     &:focus {
       outline: 3px solid #1369ff5e;
     }
+    &[disabled] {
+      color: #efefef;
+      background-color: #91baff;
+      cursor: not-allowed;
+    }
   }
   &.red {
     background-color: crimson;

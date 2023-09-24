@@ -113,7 +113,16 @@ const order = {
   create: (productCode) => POST("/order", { productCode }),
   cancel: (orderUuid) => PUT("/order", { orderUuid }),
   get: (orderUuid) => GET(`/order/${orderUuid}`),
-  list: () => GET("/orders"),
+  list: () =>
+    GET("/orders").then((res) => {
+      res.orders.forEach((order) => {
+        const tx = order.transactionDetail;
+        if (tx) {
+          order.transactionDetail = JSON.parse(tx);
+        }
+      });
+      return res;
+    }),
   group: {
     sendForm: (orderForm) => POST("/group-order/contact", orderForm),
   },

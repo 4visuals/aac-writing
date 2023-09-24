@@ -56,7 +56,7 @@
         >
           {{ assigned.license.isExpired() ? "이용권 만료" : "이용중" }}
         </button>
-        <button :disabled="true" class="nude history">학습 결과</button>
+        <!-- <button :disabled="true" class="nude history">학습 결과</button> -->
       </div>
       <div v-else class="license">
         <button class="nude red">이용권 없음</button>
