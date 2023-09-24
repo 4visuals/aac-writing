@@ -16,13 +16,18 @@
           :minified="true"
         />
         <div class="inline buy">
-          <button class="btn-purchase nude blue" @click="startOrder('card')">
+          <button
+            :disabled="!user"
+            class="btn-purchase nude blue"
+            @click="startOrder('card')"
+          >
             <AppIcon icon="credit_card" /><span>신용카드</span>
           </button>
           <!-- <button class="btn-purchase nude green" @click="startOrder('phone')">
             <AppIcon icon="phone_android" /><span>휴대폰</span>
           </button> -->
         </div>
+        <div class="alert">로그인 후 결제 가능합니다.</div>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
         <div class="product">
@@ -56,13 +61,18 @@
           </ul>
         </section>
         <section class="buy">
-          <button class="btn-purchase nude blue" @click="startOrder('card')">
+          <button
+            :disabled="!user"
+            class="btn-purchase nude blue"
+            @click="startOrder('card')"
+          >
             <AppIcon icon="credit_card" /><span>신용카드</span>
           </button>
           <!-- <button class="btn-purchase nude green" @click="startOrder('phone')">
             <AppIcon icon="phone_android" /><span>휴대폰 결제</span>
           </button> -->
         </section>
+        <div class="alert">로그인 후 결제 가능합니다.</div>
       </div>
     </div>
   </div>
@@ -90,15 +100,16 @@ export default {
     const store = useStore();
     const route = useRoute();
     const router = useRouter();
+    const user = computed(() => store.getters["user/currentUser"]);
     const order = ref(null);
     const product = computed(() => order.value && order.value.product);
 
     const info = {
       usage: {
         title: "이용 안내",
-        elems: `이용권 1개당 1명의 학생을 등록합니다.
-이용권은 구매 즉시 적용됩니다.
-사용중인 이용권이 있는 경우, 동일 계정에서 이용권 추가 구매시 사용기간이 연장됩니다.
+        elems: `이용권 1매당 1명의 학생을 등록합니다.
+이용권은 학생과 연결될 때부터 적용됩니다.
+사용중인 이용권이 만료된 후 새 이용권에 기존 학생을 연결하여 사용합니다.
 이용권 상품은 기한이 끝나도 자동 연장되지 않습니다.
 이용권 되팔기로 인해 발생하는 모든 분쟁 요소는 책임지지 않습니다.`.split("\n"),
       },
@@ -171,7 +182,7 @@ export default {
       .catch((err) => {
         toast.error("@" + err.cause, "상품 정보 오류", 10);
       });
-    return { info, product, gotoPurchasePage, format, startOrder };
+    return { user, info, product, gotoPurchasePage, format, startOrder };
   },
 };
 </script>
@@ -287,6 +298,12 @@ export default {
         flex: 1 1 auto;
       }
     }
+  }
+  .alert {
+    color: crimson;
+    font-weight: 600;
+    padding-left: 8px;
+    margin: 8px 0;
   }
 }
 </style>
