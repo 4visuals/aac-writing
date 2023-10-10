@@ -9,16 +9,11 @@
     </div>
     <div class="row">
       <div
-        v-for="(prod, index) in products"
+        v-for="prod in products"
         :key="prod.code"
-        class="col-xs-12 col-sm-6 col-md-6 col-lg-6"
+        class="col-xs-12 col-sm-12 col-md-6 col-lg-6"
       >
-        <ProductView
-          :product="prod"
-          :theme="themes[index]"
-          @order="gotoOrderForm"
-          class="product"
-        />
+        <ProductView :product="prod" @order="gotoOrderForm" class="product" />
       </div>
     </div>
     <div class="row">
@@ -42,7 +37,6 @@ export default {
   setup() {
     const router = useRouter();
     const products = ref(null);
-    const themes = ["green", "picton-blue", "yellow", "violet", "green"];
 
     const gotoOrderForm = (
       /** @type {{method: String, product: Product}} */ evt
@@ -60,7 +54,7 @@ export default {
     api.product.list().then((res) => {
       products.value = res.products;
     });
-    return { themes, products, gotoOrderForm, gotoGroupOrder };
+    return { products, gotoOrderForm, gotoGroupOrder };
   },
 };
 </script>

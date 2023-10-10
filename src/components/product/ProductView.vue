@@ -14,7 +14,7 @@
         </div>
       </div>
     </Transition>
-    <section class="detail" :class="[theme]">
+    <section class="detail" :class="[product.theme]">
       <h3 class="duration">
         <span class="dur">{{ product.durationInDays }}</span>
         <span class="sub">DAYS</span>
@@ -35,7 +35,7 @@
           </div>
         </Baloon>
         <div class="logo">
-          <component :is="logoComponent[theme]" />
+          <component :is="logoComponent[product.theme]" />
         </div>
       </div>
     </section>
@@ -55,7 +55,6 @@ import Product from "../../entity/product";
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
   product: Product,
-  theme: String,
   paymentVisible: { type: Boolean, required: false, default: true },
   minified: { type: Boolean, required: false, default: false },
 });

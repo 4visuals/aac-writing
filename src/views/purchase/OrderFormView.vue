@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="row v-top" v-if="product">
-      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
         <ProductView
           :product="product"
           theme="red"
@@ -27,9 +27,9 @@
             <AppIcon icon="phone_android" /><span>휴대폰</span>
           </button> -->
         </div>
-        <div class="alert">로그인 후 결제 가능합니다.</div>
+        <div v-if="!user" class="alert">로그인 후 결제 가능합니다.</div>
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
         <div class="product">
           <h3 class="title">{{ product.name }}</h3>
           <div class="hr"></div>
@@ -72,7 +72,7 @@
             <AppIcon icon="phone_android" /><span>휴대폰 결제</span>
           </button> -->
         </section>
-        <div class="alert">로그인 후 결제 가능합니다.</div>
+        <div v-if="!user" class="alert">로그인 후 결제 가능합니다.</div>
       </div>
     </div>
   </div>
