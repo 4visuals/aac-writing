@@ -51,7 +51,10 @@
       <ArticlePart :article="articles.pg6" :col2="true" />
     </section>
     <CompanyInfoDark />
-    <button class="nude trial" @click="startTrial">체험하기</button>
+    <button class="nude trial" @click="startTrial">
+      <span>무료 체험하기</span
+      ><AppIcon class="icon" icon="arrow_forward_ios" fsize="14px" />
+    </button>
     <Transition name="tr-fade">
       <div v-if="trialEnabled" class="trial-screen">
         <QuizView @close="closeTrial" />
@@ -74,6 +77,7 @@ import "aos/dist/aos.css";
 import QuizSpec from "./quiz/type-quiz-spec";
 import { RetryMode } from "../components/quiz/retry-mode";
 import QuizView from "./quiz/QuizView.vue";
+import AppIcon from "../components/AppIcon.vue";
 
 export default {
   name: "Home",
@@ -82,6 +86,7 @@ export default {
     ArticlePart,
     CompanyInfoDark,
     QuizView,
+    AppIcon,
   },
   setup() {
     const store = useStore();
@@ -102,7 +107,7 @@ export default {
         desc: "",
         video: {
           mime: "video/mp4",
-          url: "/img/intro/intro.mp4",
+          url: "https://kr.object.ncloudstorage.com/aac-dict-bucket/video/dict_main.mp4",
         },
         media: [],
       },
@@ -411,13 +416,24 @@ $trasition: all 1s ease;
     right: 16px;
     bottom: 16px;
     z-index: 1000;
-    background-color: #fffa8d;
-    border-radius: 8px;
-    box-shadow: 4px 4px 16px #0000004d, 1px 1px 4px #0000004d;
-    font-weight: 500;
-    padding: 8px 16px;
-    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    background-color: #6f4995;
+    color: white;
+    font-weight: 600;
+    border: 1px solid white;
+    border-radius: 24px;
+    font-size: 1.4rem;
+    box-shadow: 2px 2px 16px #0000008d, 1px 1px 4px #0000004d;
+    padding: 8px 10px 8px 16px;
     animation: bouncing 2s cubic-bezier(0.5, 0, 0.5, 1) 0s infinite;
+    .icon {
+      background-color: white;
+      color: #6f4995;
+      border-radius: 30px;
+      padding: 6px;
+    }
   }
   .trial-screen {
     position: fixed;

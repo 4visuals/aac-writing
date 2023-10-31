@@ -20,9 +20,7 @@
       <h4 data-aos="flip-up" data-aos-delay="600" data-aos-duration="200">
         {{ article.subtitle }}
       </h4>
-      <div v-if="article.video" class="video">
-        <video playsinline autoplay loop muted :src="article.video.url"></video>
-      </div>
+      <VideoWrappger v-if="article.video" :videoUrl="article.video.url" />
       <div
         v-if="article.media.length > 0"
         class="media"
@@ -59,13 +57,21 @@
 
 <script>
 import { ref } from "vue";
+import VideoWrappger from "./VideoWrappger.vue";
 
 export default {
   props: ["width", "theme", "article", "col1", "col2", "col3"],
   setup() {
     const subOn = ref(false);
-    return { subOn };
+    /** @type { import("vue").Ref<HTMLVideoElement> } */
+    const videoEl = ref(undefined);
+    const toggleSound = () => {
+      console.log(videoEl.value);
+      videoEl.value.muted = false;
+    };
+    return { videoEl, subOn, toggleSound };
   },
+  components: { VideoWrappger },
 };
 </script>
 
@@ -125,17 +131,17 @@ article {
       font-size: 0.7em;
       margin-top: 12px;
     }
-    .video {
-      justify-content: center;
-      display: flex;
-      width: 100%;
-      margin: auto;
-      // height: 500px;
-      video {
-        width: 100%;
-        flex: 1 1 auto;
-      }
-    }
+    // .video {
+    //   justify-content: center;
+    //   display: flex;
+    //   width: 100%;
+    //   margin: auto;
+    //   // height: 500px;
+    //   video {
+    //     width: 100%;
+    //     flex: 1 1 auto;
+    //   }
+    // }
     .media {
       width: 100%;
       justify-content: space-between;

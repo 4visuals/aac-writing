@@ -5,6 +5,7 @@
       selected ? 'on' : 'off',
       disabled === true || disabled === '' ? 'disabled' : '',
       theme || 'word',
+      shadow ? 'shadow' : '',
     ]"
   >
     <label
@@ -19,7 +20,7 @@
 <script>
 import { SpanText } from "@/components/text";
 export default {
-  props: ["selected", "onText", "offText", "disabled", "theme"],
+  props: ["selected", "onText", "offText", "disabled", "theme", "shadow"],
   emits: ["update:selected"],
   components: {
     SpanText,
@@ -50,6 +51,9 @@ export default {
   display: flex;
   align-items: center;
   cursor: pointer;
+  &.shadow {
+    box-shadow: 0 0 8px #0000004d, 0 0 4px #0000002d;
+  }
   &.pink {
     @include pink($shadow: false);
   }
@@ -81,6 +85,7 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+    cursor: pointer;
     input {
       opacity: 0;
     }
