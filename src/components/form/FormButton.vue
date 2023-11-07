@@ -44,6 +44,9 @@ button {
   display: inline-flex;
   align-items: center;
   font-size: 1rem;
+  &:active {
+    transform: translate(1px, 1px);
+  }
   .icon {
     font-size: 1.25rem;
   }

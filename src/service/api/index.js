@@ -95,7 +95,7 @@ const stats = {
  */
 const product = {
   list: () =>
-    GET("/products").then((res) => {
+    GET("/products/retail").then((res) => {
       {
         res.products = res.products.map((prod) => new Product(prod));
         return res;

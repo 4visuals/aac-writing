@@ -33,4 +33,31 @@ export class GroupOrderForm {
   get orgContactInfoText() {
     return this.orgContactInfo || "미입력";
   }
+  /**
+   * 공동구매 참여 가격
+   */
+  getPrice() {
+    if (typeof this.content === "object") {
+      return this.content.price;
+    } else {
+      return "No Price";
+    }
+  }
+  /**
+   * 공동구매 참여 수량
+   */
+  getQtt() {
+    if (typeof this.content === "object") {
+      return this.content.qtt;
+    } else {
+      return "No Qtt";
+    }
+  }
 }
+
+GroupOrderForm.fromGroupBuying = (formDto) => {
+  const content = JSON.parse(formDto.content);
+  formDto.content = content;
+  formDto.forms = [];
+  return new GroupOrderForm(formDto);
+};

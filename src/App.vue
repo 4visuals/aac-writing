@@ -203,9 +203,6 @@ export default {
       },
       { immediate: true }
     );
-    watch(modalConfig, (config) => {
-      console.log("[modal]", config);
-    });
     onMounted(() => {
       google.charts.load("50", { packages: ["corechart"] });
       installHeightResizer();

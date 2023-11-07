@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="ctrl">
+      <button class="nude blue" @click="$emit('create')">소매 상품 추가</button>
+    </div>
     <table class="product">
       <tr>
         <th>판매용</th>
@@ -39,13 +42,18 @@
 </template>
 
 <script setup>
+import { defineProps } from "vue";
+/**
+ * 소매 상품 리스트
+ */
+defineProps({
+  products: {
+    /** @type { import('vue').PropType<Array<import('../../../../entity/product').default>>} */
+    type: Array,
+    required: true,
+  },
+});
 const asDay = (hours) => hours / 24;
-</script>
-<script>
-export default {
-  props: ["products"],
-  setup() {},
-};
 </script>
 
 <style lang="scss" scoped>

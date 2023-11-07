@@ -260,7 +260,7 @@ const currency = {
     return txt.substring(1);
   },
   read: (amount) => {
-    const kr = "천백십경천백십억천백십만천백십 ".split("").reverse();
+    const kr = "천백십조천백십억천백십만천백십 ".split("").reverse();
     const n = " 일이삼사오육칠팔구".split("");
     const nums = ("" + amount)
       .split("")

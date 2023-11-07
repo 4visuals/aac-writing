@@ -5,6 +5,7 @@
         type="text"
         :placeholder="placeholder"
         v-model="textField"
+        @click="setVisible(true)"
         @input="typed"
         @keydown.down.stop="navigate"
       />
@@ -49,7 +50,9 @@ export default {
       }
       containerVisible.value = visible;
       // prevent current click to call 'click'
-      document.addEventListener("click", close, false);
+      setTimeout(() => {
+        document.addEventListener("click", close, false);
+      }, 0);
     };
     const typed = (e) => {
       emit("typing", e.target.value);

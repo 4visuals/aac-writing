@@ -23,6 +23,7 @@ class InputForm {
     type = "text",
     placeholder,
     filter,
+    readOnly = false,
   }) {
     this.wid = wid;
     this.title = title;
@@ -34,6 +35,7 @@ class InputForm {
     this.type = type;
     this.placeholder = placeholder;
     this.filter = filter || DEFAULT_FILTER;
+    this.readOnly = readOnly;
   }
   getErrorMessage() {
     if (!this.error) {
