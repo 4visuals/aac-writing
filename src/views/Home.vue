@@ -18,9 +18,8 @@
       :fill="true"
       @click="delegateLogout"
     />
-    <div class="menu" style="margin-top: 20vmin">
-      <div class="logo main"></div>
-      <div class="logo sub">받아쓰기</div>
+    <div class="menu top">
+      <div class="logo"></div>
     </div>
     <div class="menu" v-if="host.isPwaMode()">
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
@@ -212,33 +211,33 @@ export default {
 @include mobile {
   .home {
     // font-size: 2rem;
+    .menu.top {
+      margin-top: 20vmin;
+    }
     .logo {
-      height: 75px;
-      &.sub {
-        height: 60px;
-      }
+      height: 240px;
     }
   }
 }
 @include tablet {
   .home {
+    .menu.top {
+      margin-top: 12vmin;
+    }
     // font-size: 2.5rem;
     .logo {
-      height: 120px;
-      &.sub {
-        height: 100px;
-      }
+      height: 400px;
     }
   }
 }
 @include desktop {
   .home {
+    .menu.top {
+      margin-top: 10vmin;
+    }
     // font-size: 2.5rem;
     .logo {
-      height: 120px;
-      &.sub {
-        height: 100px;
-      }
+      height: 400px;
     }
   }
 }
@@ -283,24 +282,14 @@ export default {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    &.main {
-      background-image: url("/img/white_back_02.png");
-    }
-    &.sub {
-      font-size: 8vmin;
-      font-weight: 900;
-      margin: 3vmin auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    background-image: url("/img/logo/main-logo.svg");
   }
   .login {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 4rem auto;
+    margin: 0 auto 2rem;
     max-width: 300px;
   }
   .title {
@@ -308,18 +297,12 @@ export default {
     &.main {
       font-size: 2em;
     }
-    &.sub {
-      font-size: 1em;
-      color: #146b27;
-    }
   }
   .menu {
     max-width: 480px;
     margin: 0 auto;
-    margin-top: 15vmin;
     width: 100%;
     .students {
-      margin-top: 24px;
       .stud-reg {
         margin: 24px 0;
         display: flex;

@@ -1,8 +1,6 @@
 <template>
   <nav>
-    <div class="logo" @click="goTo('/')">
-      <!-- <img src="/img/bdsg_logo_sm.png" alt="" srcset="" /> -->
-    </div>
+    <LogoView @click="goTo('/')" />
     <div class="items">
       <ul class="nude hor">
         <!-- <li>
@@ -39,6 +37,7 @@
 import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import LogoView from "../../components/LogoView.vue";
 
 export default {
   setup() {
@@ -51,6 +50,7 @@ export default {
     const delegateLogout = () => appProvider.logout();
     return { loginUser, goTo, delegateLogin, delegateLogout };
   },
+  components: { LogoView },
 };
 </script>
 
@@ -65,23 +65,23 @@ nav {
   background-color: white;
   box-shadow: 0 0 16px #0000002d, 0 0 8px #0000004d;
   z-index: 100;
-  .logo {
-    width: 180px;
-    height: 36px;
-    background-image: url("/img/bdsg_logo_sm.png");
-    background-size: 180px 36px;
-    background-repeat: no-repeat;
-    background-position: left center;
-    transition: width 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
-    cursor: pointer;
-    > img {
-      width: 100%;
-      height: auto;
-    }
-    @include mobile {
-      width: 28px;
-    }
-  }
+  // .logo {
+  //   width: 180px;
+  //   height: 36px;
+  //   background-image: url("/img/bdsg_logo_sm.png");
+  //   background-size: 180px 36px;
+  //   background-repeat: no-repeat;
+  //   background-position: left center;
+  //   transition: width 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+  //   cursor: pointer;
+  //   > img {
+  //     width: 100%;
+  //     height: auto;
+  //   }
+  //   @include mobile {
+  //     width: 28px;
+  //   }
+  // }
   .items {
     flex: 1 1 auto;
     justify-content: flex-end;
