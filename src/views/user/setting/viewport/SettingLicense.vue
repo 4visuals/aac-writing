@@ -14,9 +14,9 @@
 <script>
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import LicenseItemUI from "../ui/LicenseItemUI.vue";
 import modal from "@/components/modal";
 import StudentList from "../components/StudentList.vue";
+import LicenseItemUI from "../ui/LicenseItemUI.vue";
 import toast from "@/components/toast";
 import SectionBox from "../ui/SectionBox.vue";
 export default {
@@ -48,7 +48,10 @@ export default {
     };
 
     const filterValidLicense = () =>
-      licenses.value.filter((lcs) => !lcs.isExpired());
+      licenses.value.filter(
+        (/** @type {import('../../../../entity/license').default} */ lcs) =>
+          !lcs.isExpired()
+      );
     return { now, licenses, filterValidLicense, showBindingForm };
   },
 };

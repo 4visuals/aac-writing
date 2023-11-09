@@ -132,8 +132,6 @@ export default {
       padding: 4px 8px;
     }
   }
-  &.normal {
-  }
   .newlcs {
     color: #fff9ac;
     background-color: crimson;

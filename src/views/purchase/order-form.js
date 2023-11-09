@@ -12,6 +12,11 @@ class OrderForm {
     this.product = null;
     this._order = null;
   }
+  /**
+   *
+   * @param {string} method 결제 수단 ("card")
+   * @returns
+   */
   prepare(method) {
     this.method = method;
     return api.order.create(this.productCode).then((res) => {
@@ -47,6 +52,11 @@ class OrderForm {
     return this._order?.error;
   }
 }
+/**
+ *
+ * @param {OrderForm} orderForm
+ * @returns {Promise<OrderForm>}
+ */
 const loadProduct = (orderForm) =>
   api.product
     .detail({ code: orderForm.productCode })
@@ -59,7 +69,11 @@ const loadProduct = (orderForm) =>
       orderForm.error = err;
       throw err;
     });
-
+/**
+ *
+ * @param {string} code
+ * @returns {Promise<OrderForm>}
+ */
 OrderForm.load = (code) => {
   if (code) {
     const form = new OrderForm("card", code);

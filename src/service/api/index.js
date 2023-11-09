@@ -1,5 +1,6 @@
 import { DELETE, GET, POST, PUT } from "./request";
 import Product from "../../entity/product";
+import Order from "../../entity/order";
 
 const user = {
   membership: (vendor, type, token) =>
@@ -108,6 +109,7 @@ const product = {
     }),
 };
 const order = {
+  prepare: (orderUuid) => POST(`/order/${orderUuid}/prepare`),
   createBeta: (productCode, quantity) =>
     POST("/order/beta", { productCode, quantity }),
   create: (productCode) => POST("/order", { productCode }),
@@ -121,6 +123,7 @@ const order = {
           order.transactionDetail = JSON.parse(tx);
         }
       });
+      res.orders = res.orders.map((orderDto) => new Order(orderDto));
       return res;
     }),
   group: {

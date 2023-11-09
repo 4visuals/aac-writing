@@ -1,5 +1,9 @@
 <template>
-  <button type="button" :disabled="disabled">
+  <button
+    type="button"
+    :disabled="disabled"
+    :style="`--font-size: ${fsize}; --font-color: ${fcolor}`"
+  >
     <span class="material-icons-outlined">{{ icon }}</span>
   </button>
 </template>
@@ -8,6 +12,8 @@
 export default {
   props: {
     icon: { type: String, default: "add" },
+    fsize: { type: String, default: "inherit" },
+    fcolor: { type: String, default: "inherit" },
     disabled: {
       type: Boolean,
       default: false,
@@ -20,7 +26,8 @@ export default {
 <style lang="scss" scoped>
 button {
   color: inherit;
-  font-size: inherit;
+  font-size: var(--font-size, inherit);
+  color: var(--font-color, inherit);
   background: transparent;
   border: none;
   display: block;

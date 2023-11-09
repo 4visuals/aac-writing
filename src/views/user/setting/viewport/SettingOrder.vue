@@ -3,22 +3,13 @@
     <SectionBox v-if="orders && orders.length === 0"
       ><p>구매 내역이 없습니다.</p></SectionBox
     >
-    <SectionBox v-for="order in orders" :key="order.seq">
-      <div class="order">
-        <div class="floating">
-          <a v-if="order.receipt_url" target="_blank" :href="order.receipt_url">
-            <AppIcon icon="receipt" fsze="20px" /><span>매출전표</span>
-          </a>
-          <a nohref v-else>
-            <AppIcon icon="receipt" fsze="20px" /><span>전표없음</span>
-          </a>
-        </div>
-        <h3>₩{{ formatCurrency(order.totalAmount) }}</h3>
-        <ul>
-          <li>상품명: {{ order.product?.name }}</li>
-          <li>결제일: {{ formatTime(order.paidTime) }}</li>
-        </ul>
-      </div>
+    <SectionBox v-for="order in orders" :key="order.seq" padding="8px">
+      <GBuyingOrderView
+        v-if="order.isGroupBuyingOrder()"
+        :order="order"
+        @payment="startPayment"
+      />
+      <RetailOrderView v-else :order="order" />
     </SectionBox>
     <div class="refund">
       <h3>환불 규정</h3>
@@ -32,87 +23,61 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import api from "@/service/api";
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import SectionBox from "../ui/SectionBox.vue";
-import util from "@/service/util";
+import GBuyingOrderView from "./order/GBuyingOrderView.vue";
+import RetailOrderView from "./order/RetailOrderView.vue";
+import { PortOne } from "@/service/payment/portone";
+import { useStore } from "vuex";
 
-class Order {
-  constructor(data) {
-    Object.keys(data).forEach((prop) => {
-      this[prop] = data[prop];
-    });
-  }
-  get receipt_url() {
-    return this.transactionDetail?.receipt_url;
-  }
-}
-
-export default {
-  components: {
-    SectionBox,
+const store = useStore();
+const loginUser = computed(() => store.getters["user/currentUser"]);
+const orders = ref(null);
+const refunds = [
+  {
+    id: "00",
+    title: "이용권 상품",
+    descs: ["이용권 구매 후 7일 이내 환불 가능합니다."],
   },
-  setup() {
-    const orders = ref(null);
-    const refunds = [
-      {
-        id: "00",
-        title: "이용권 상품",
-        descs: ["이용권 구매 후 7일 이내 환불 가능합니다."],
-      },
-    ];
-    /*
-    {
-        id: "01",
-        title: "패키지(이용권+인쇄물) 상품",
-        descs: [
-          "단순 변심에 의한 환불은 제품 수령 후 7일 이내 가능하며, 훼손하지 않은 인쇄물을 반환한 이후 환불 가능합니다. (왕복 택배비 고객 부담)",
-          "제품 수령 7일 이후에는 이용권 만 환불 되며 결제금액의 10%의 위약금과 정상가를 기준으로 한 사용일수에 따른 이용금액을 제한 후 환불됩니다.",
-          "제품 불량으로 인한 교환 및 환불은 제품 수령 후 7일까지 무료로 가능합니다. (7일 이후 요청시 왕복 택배비 고객 부담)",
-        ],
-      },
-      {
-        id: "02",
-        title: "인쇄물",
-        descs: [
-          "제품 불량으로 인한 교환 및 환불은 제품 수령 후 7일까지 무료로 가능합니다.",
-          "인쇄상 발생한 동일 색상의 미세한 색상 차이는 불량이 아니며, 이로 인한 교환 및 환불은 단순 변심으로 처리되어 왕복 배송비가 발생 되며 이는 고객 부담입니다. (7일 이후 요청시 왕복 택배비 고객 부담)",
-        ],
-      },
-      */
-    const formatCurrency = (money) => util.currency.format(money);
-    const formatTime = (utcText) => {
-      const date = new Date(utcText);
-      const [yy, mm, dd] = util.time.toYMD(date).split("-");
-      const [h, m] = util.time.toHMS(date).split("-");
-      return `${yy}년 ${mm}월 ${dd}일 ${h}시 ${m}분`;
-    };
-    api.order.list().then((res) => {
-      orders.value = res.orders.map((order) => new Order(order));
-    });
-    return { orders, refunds, formatCurrency, formatTime };
-  },
+];
+const loadOrders = () => {
+  api.order.list().then((res) => {
+    orders.value = res.orders; // .map((order) => new Order(order));
+  });
 };
+
+const startPayment = (order) => {
+  new PortOne({
+    loginUser: loginUser.value,
+    product: order.product,
+    order,
+    method: "card",
+  })
+    .sendVerificationCode()
+    .then((portOne) => portOne.startPayment())
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+watch(
+  loginUser,
+  (user) => {
+    if (user) {
+      loadOrders();
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>
 .orders {
   max-width: 580px;
-  .order {
-    position: relative;
-    .floating {
-      position: absolute;
-      right: 0px;
-      top: 0px;
-      a {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        column-gap: 4px;
-      }
-    }
-  }
   .refund {
     margin-top: 24px;
     h3 {

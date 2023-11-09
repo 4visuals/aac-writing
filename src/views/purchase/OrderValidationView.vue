@@ -36,7 +36,16 @@
                   </p>
                   <p v-if="lcs.student_ref">사용 중</p>
                   <p v-else>
-                    <AppIcon icon="account_circle" />학생을 등록해주세요
+                    <AppIcon icon="account_circle" /><span
+                      >학생을 연결해주세요</span
+                    ><AppButton
+                      text="학생 연결"
+                      size="sm"
+                      theme="purple"
+                      fill
+                      borderColor="#7b4799"
+                      @click="goTo('/setting/license')"
+                    />
                   </p>
                 </div>
               </li>
@@ -69,11 +78,14 @@ import toast from "../../components/toast";
 import util from "../../service/util";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import AppButton from "../../components/form/AppButton.vue";
+// import { AacButton } from "../../components/form";
 
 export default {
   components: {
     ProductView,
     Loading,
+    AppButton,
   },
   setup() {
     const store = useStore();
@@ -81,6 +93,7 @@ export default {
     const order = ref(null);
     const pending = reactive({ error: null, state: "LOADING", done: false });
 
+    const goTo = (uri) => router.push(uri);
     const ymd = (time) => {
       const t = typeof time === "string" ? Date.parse(time) : time;
       return util.time.toYMD(t);
@@ -128,6 +141,7 @@ export default {
     return {
       order,
       pending,
+      goTo,
       ymd,
     };
   },

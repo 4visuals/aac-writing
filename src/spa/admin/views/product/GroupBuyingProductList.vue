@@ -21,12 +21,12 @@
               @forms="(forms) => bindOrderForms(prod, forms)"
             />
             <div class="setting">
-              <button
-                class="btn-add nude red round"
-                @click="$emit('show-reg-form', product)"
-              >
-                설정
-              </button>
+              <ActionIcon
+                icon="settings"
+                fsize="24px"
+                fcolor="#777"
+                @click="showProductSettingForm(prod)"
+              />
             </div>
           </SectionBox>
         </div>
@@ -36,17 +36,29 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { defineEmits, defineProps } from "vue";
 import SectionBox from "@/components/SectionBox.vue";
 import GroupBuyingDetailView from "./GroupBuyingDetailView.vue";
+import { ActionIcon } from "../../../../components/form";
+import modal from "@/components/modal";
+import GbuyingProductSetting from "./GbuyingProductSetting.vue";
 defineProps({
   products: {
-    /** @type { import('vue').PropType<Array<import('../../../../entity/product').default>>} */
+    /** @type { import('vue').PropType<Array<import('../../../../entity/product').default>> } */
     type: Array,
     required: true,
   },
 });
-
+const emit = defineEmits({
+  /**
+   * 상품 만료 시킴
+   */
+  expire: Object,
+  /**
+   * 공구 참여자들에게 결제 링크 발송
+   */
+  ordering: Object,
+});
 /**
  * 공구 참여 편집창 열기
  * @param {{product: Product, form: GroupOrderForm}} param0
@@ -54,6 +66,19 @@ defineProps({
 
 const bindOrderForms = (product, forms) => {
   product.forms = forms;
+};
+
+const showProductSettingForm = (product) => {
+  modal.showModal(GbuyingProductSetting, {
+    width: "sm",
+    props: {
+      product,
+    },
+    events: {
+      delete: () => emit("expire", product),
+      ordering: () => emit("ordering", product),
+    },
+  });
 };
 </script>
 
@@ -64,8 +89,8 @@ const bindOrderForms = (product, forms) => {
     height: calc(100% - 16px);
     .setting {
       position: absolute;
-      top: 0px;
-      right: 0px;
+      top: 4px;
+      right: 4px;
     }
   }
 }

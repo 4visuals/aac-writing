@@ -85,13 +85,26 @@ const order = {
         GroupOrderForm.fromGroupBuying(res.form)
       ),
     deleteForm: (formSeq) => DELETE(`/admin/gbuying/form/${formSeq}`),
+    /**
+     * 공구 참여자들에게 실제 주문을 생성함
+     * @param {number} productSeq
+     * @returns
+     */
+    createOrders: (productCode) =>
+      POST(`/admin/gbuying/product/${productCode}/orders`),
   },
 };
 
 const product = {
   list: () =>
     GET("/admin/products").then((res) => {
-      res.products = res.products.map((prod) => new Product(prod));
+      /*
+       * 단종된 상품 목록도 일단 전부 가져옴.
+       * 여기서 필터링해주자
+       */
+      res.products = res.products
+        .filter((prod) => !(prod.salesType === "GB" && !!prod.expiredAt))
+        .map((prod) => new Product(prod));
       return res;
     }),
   create: (product) =>
@@ -104,5 +117,6 @@ const product = {
       res.product = new Product(res.product);
       return res;
     }),
+  delete: (productSeq) => DELETE(`/admin/product/${productSeq}`),
 };
 export default { admin, member, license, order, product };

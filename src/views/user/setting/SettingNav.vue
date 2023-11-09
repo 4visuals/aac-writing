@@ -2,7 +2,7 @@
   <div class="setting-nav">
     <div class="menu user-info" to="/">
       <AppIcon icon="person" fsize="20px" /><span class="text">{{
-        user.name
+        user ? user.name : ""
       }}</span>
     </div>
     <SettingMenuItem

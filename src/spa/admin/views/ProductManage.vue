@@ -18,6 +18,8 @@
             v-if="productsRef.gbuying"
             :products="productsRef.gbuying"
             @create="showNewProductForm('GB')"
+            @expire="deleteProduct"
+            @ordering="createGbuyingOrders"
           />
         </div>
       </div>
@@ -33,7 +35,11 @@ import NewProductForm from "./product/NewProductForm.vue";
 import GrouBuyingProductList from "./product/GroupBuyingProductList.vue";
 import ProductListView from "./product/ProductListView.vue";
 import { ref } from "vue";
+import toast from "../../../components/toast";
 
+const ERRORS = {
+  NO_FORMS_REGSITERED: "등록된 문의가 없습니다.",
+};
 /** @type { import('../../../components/tab').TabModel } */
 const tabModel = TabModel.create([
   { text: "소매상품", cmd: "RT", clazz: "retail" },
@@ -78,6 +84,22 @@ const updateProduct = (product) => {
   });
 };
 /**
+ * 상품을 삭제함
+ * @param {Product} product
+ */
+const deleteProduct = (product) => {
+  const { salesType } = product;
+  if (salesType !== "GB") {
+    throw new Error("공구 상품만 삭제 가능함");
+  }
+  api.product.delete(product.seq).then(() => {
+    const { gbuying } = productsRef.value;
+    const idx = gbuying.findIndex((prod) => prod.seq === product.seq);
+    gbuying.splice(idx, 1);
+    modal.closeModal();
+  });
+};
+/**
  *
  * @param {'RT' | 'GB'} salesType 소매 또는 공구
  */
@@ -100,6 +122,21 @@ const showEditForm = (product) => {
     },
     events: { product: updateProduct },
   });
+};
+/**
+ * 공구 상품에 접수된 구매 양식들마자 실제 주문을 생성함
+ * @param {Product} product
+ */
+const createGbuyingOrders = (product) => {
+  api.order.gbuying
+    .createOrders(product.code)
+    .then((res) => {
+      console.log(res);
+    })
+    .then(() => {})
+    .catch((err) => {
+      toast.error(ERRORS[err.desc] || err.desc);
+    });
 };
 </script>
 

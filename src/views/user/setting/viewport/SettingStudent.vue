@@ -28,7 +28,7 @@
 <script>
 import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
-import SectionBox from "../ui/SectionBox.vue";
+import SectionBox from "@/components/SectionBox.vue";
 
 import modal from "@/components/modal";
 import StudentRegForm from "@/components/admin/StudentRegForm.vue";

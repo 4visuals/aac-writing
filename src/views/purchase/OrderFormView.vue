@@ -101,6 +101,7 @@ export default {
     const route = useRoute();
     const router = useRouter();
     const user = computed(() => store.getters["user/currentUser"]);
+    /** @type {import('vue').Ref<OrderForm>} */
     const order = ref(null);
     const product = computed(() => order.value && order.value.product);
 
@@ -133,11 +134,11 @@ export default {
     const handleFailedOrder = (res) => {
       order.value.reset();
       console.log("[FAILURE]", res);
-      toast.warn("결제를 취소했습니다", "결제 취소", 5);
+      toast.warn("결제를 취소했습니다", "결제 취소", 10);
     };
     const startPgOrder = () => {
       const imp = window.IMP;
-      imp.init("imp20450844");
+      imp.init(env.IMPORT_ACCOUNT);
       const { method } = order.value;
       const merchant_uid = order.value.getUuid();
       const loginUser = store.getters["user/currentUser"];

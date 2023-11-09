@@ -27,7 +27,7 @@ import { defineEmits, defineProps, ref } from "vue";
 import modal from "@/components/modal";
 import adminApi from "../../service/admin-api";
 import LoadingIcon from "../../../../components/LoadingIcon.vue";
-import GroupBuyingFormView from "../../../../views/purchase/GroupBuyingFormView.vue";
+import GroupBuyingFormView from "@/views/purchase/GroupBuyingFormView.vue";
 import GroupBuyingEditForm from "./GroupBuyingEditForm.vue";
 
 const props = defineProps({
