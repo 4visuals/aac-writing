@@ -31,6 +31,7 @@ import GBuyingOrderView from "./order/GBuyingOrderView.vue";
 import RetailOrderView from "./order/RetailOrderView.vue";
 import { PortOne } from "@/service/payment/portone";
 import { useStore } from "vuex";
+import toast from "@/components/toast";
 
 const store = useStore();
 const loginUser = computed(() => store.getters["user/currentUser"]);
@@ -57,11 +58,17 @@ const startPayment = (order) => {
   })
     .sendVerificationCode()
     .then((portOne) => portOne.startPayment())
-    .then((res) => {
-      console.log(res);
+    .then(() => {
+      toast.success("페이지를 새로고침합니다.", "[결제 완료]");
+      setTimeout(() => {
+        document.location.reload();
+      }, 1500);
     })
     .catch((err) => {
-      console.log(err);
+      const { error_msg } = err;
+      if (error_msg) {
+        toast.warn(error_msg);
+      }
     });
 };
 watch(

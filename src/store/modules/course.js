@@ -46,9 +46,7 @@ const prepareTrialChapter = (chapters) => {
       senMap.set(sentence.seq, sentence);
       return senMap;
     }, new Map());
-  console.log(sentenceSeq, map);
   const sentences = sentenceSeq.map((seq) => map.get(seq));
-  console.log(sentences);
   const trialSection = new Section({
     basketRef: -1,
     chapterRef: -1,

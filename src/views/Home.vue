@@ -2,29 +2,30 @@
   <div class="home">
     <div class="home-nav" v-if="host.isTeacherMode()">
       <router-link class="link" to="/support">소개</router-link>
-      <div style="color: #648294; font-weight: 600">|</div>
       <!-- <router-link to="/join" v-if="!member">가입</router-link> -->
       <router-link class="link" to="/purchase">이용권구매</router-link>
+      <router-link v-if="member" class="link" to="/setting"
+        >마이페이지</router-link
+      >
       <button class="nude guide" @click="showVideoGuid">
         <AppIcon icon="play_circle_filled" /><span>가입안내</span>
       </button>
     </div>
-    <AppButton
-      v-if="member"
-      class="btn logout"
-      text="로그아웃"
-      theme="dark"
-      size="sm"
-      :fill="true"
-      @click="delegateLogout"
-    />
+    <button v-if="member" @click="delegateLogout" class="nude btn logout">
+      <span>로그아웃</span>
+    </button>
     <div class="menu top">
       <div class="logo"></div>
     </div>
-    <div class="menu" v-if="host.isPwaMode()">
+    <div v-if="host.isPwaMode()" class="menu">
       <AacButton text="시작" theme="pink" @click="moveTo('/level')" />
     </div>
-    <div class="menu" v-else-if="host.isTeacherMode()">
+    <div v-else-if="host.isTeacherMode()" class="menu">
+      <ParaText
+        >학생 등록 후
+        <a class="btn student" href="https://student.kdict.kr">학생 로그인</a>
+        에서 학습을 시작할 수 있습니다.
+      </ParaText>
       <!--로그인 화면-->
       <div class="students" v-if="member">
         <template v-if="students.length === 0">
@@ -43,7 +44,7 @@
           @register="goTo('/setting/student')"
         />
       </div>
-      <div class="login" v-else>
+      <div v-else class="login">
         <GoogleButton @join="showNotAMemberDialog" />
         <!-- <div class="hr"></div>
         <button class="btn" @click="showJoinForm">회원 가입</button> -->
@@ -59,7 +60,7 @@
         </div>
       </div>
     </div>
-    <div class="menu" v-else>
+    <div v-else class="menu">
       <StudentLoginForm />
     </div>
     <CompanyInfo v-if="!member" />
@@ -248,11 +249,13 @@ export default {
   background-color: #d2ecfd;
   .home-nav {
     display: flex;
-    font-size: 1.5rem;
+    font-size: 1.15rem;
     position: fixed;
     top: 16px;
     left: 16px;
-    column-gap: 16px;
+    column-gap: 8px;
+    font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
+    font-weight: 600;
     a {
       color: #648294;
       font-weight: 600;
@@ -264,18 +267,30 @@ export default {
       padding: 0;
       color: #003b5f;
       border: 1px solid;
-      padding: 0 8px 0 5px;
+      padding: 0 8px 0 1px;
       border-radius: 24px;
       &:active {
         transform: translate(1px, 1px);
       }
     }
   }
-  .logout {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    font-size: 1.1rem;
+  .btn {
+    font-size: 1rem;
+    border-radius: 20px;
+    &.logout {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      background-color: #32393d;
+      color: white;
+    }
+    &.student {
+      display: inline-flex;
+      padding: 4px 8px;
+      text-decoration: none;
+      background-color: darkgreen;
+      color: white;
+    }
   }
 
   .logo {
@@ -289,7 +304,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 2rem;
+    margin: 2rem auto;
     max-width: 300px;
   }
   .title {
@@ -303,6 +318,7 @@ export default {
     margin: 0 auto;
     width: 100%;
     .students {
+      margin-top: 8px;
       .stud-reg {
         margin: 24px 0;
         display: flex;

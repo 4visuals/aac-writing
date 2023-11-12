@@ -133,7 +133,10 @@ const createGbuyingOrders = (product) => {
     .then((res) => {
       console.log(res);
     })
-    .then(() => {})
+    .then(() => {
+      toast.info("[성공] 메일 발송 완료");
+      modal.closeModal();
+    })
     .catch((err) => {
       toast.error(ERRORS[err.desc] || err.desc);
     });

@@ -22,7 +22,6 @@ export default {
     const store = useStore();
     const themeRef = computed(() => store.state.ui.theme);
     const shapes = reactive([]);
-    console.log(route);
 
     watch(
       () => route.path,
