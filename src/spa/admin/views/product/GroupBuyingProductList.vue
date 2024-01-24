@@ -40,8 +40,9 @@ import { defineEmits, defineProps } from "vue";
 import SectionBox from "@/components/SectionBox.vue";
 import GroupBuyingDetailView from "./GroupBuyingDetailView.vue";
 import { ActionIcon } from "../../../../components/form";
-import modal from "@/components/modal";
 import GbuyingProductSetting from "./GbuyingProductSetting.vue";
+import modal from "@/components/modal";
+
 defineProps({
   products: {
     /** @type { import('vue').PropType<Array<import('../../../../entity/product').default>> } */

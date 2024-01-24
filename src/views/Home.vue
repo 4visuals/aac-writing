@@ -51,12 +51,11 @@
       </div>
       <div class="notice">
         <div class="info">
-          <ParaText>12월 31일까지 무료체험(개인)!!</ParaText>
+          <ParaText>가입 시 7일간 무료체험(개인)!!</ParaText>
         </div>
         <div class="info">
-          <ParaText>공공(교육) 기관이나 </ParaText>
-          <ParaText>영리 목적의 개인 및 기업은</ParaText>
-          <ParaText>이용권을 구매해주세요.</ParaText>
+          <ParaText>그림으로 시작하고 교과서로 다지는</ParaText>
+          <ParaText>그림한글 받아쓰기</ParaText>
         </div>
       </div>
     </div>

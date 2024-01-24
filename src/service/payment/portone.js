@@ -29,7 +29,7 @@ export class PortOne {
     const merchant_uid = order.getUuid();
     const { origin } = document.location;
     const redirectUrl = `${origin}/purchase/order/checking`;
-    return new Promise((success, failed) => {
+    return new Promise((resolve, failed) => {
       imp.request_pay(
         {
           // param
@@ -46,7 +46,7 @@ export class PortOne {
         (res) => {
           // callback
           if (res.success) {
-            success(res);
+            resolve(res);
             // 결제 성공 시 로직,
           } else {
             failed(res);

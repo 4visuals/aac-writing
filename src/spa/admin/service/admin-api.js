@@ -31,6 +31,21 @@ const order = {
         return res;
       }),
     /**
+     * 단체 구메 문의로부터 고객 전용 주문 링크를 생성함
+     * @param {number} formSeq PK of GroupOrderForm
+     * @param {*} productCode
+     * @param {*} qtt 이용권 수량
+     * @param {*} contractPrice 약정 금액
+     * @returns
+     */
+    issueGroupOrderLink: (formSeq, productCode, qtt, contractPrice) =>
+      POST("/admin/group-order-link", {
+        groupOrderSeq: formSeq,
+        productCode,
+        qtt,
+        contractPrice,
+      }),
+    /**
      * 단체 주문에 대한 이용권 발급
      * @param {number} groupOrderSeq
      * @param {string} productCode

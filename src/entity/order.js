@@ -8,7 +8,8 @@ export default class Order {
     const props = new Set(["receipt_url"]);
     const getters = new Set([
       "isGroupBuyingOrder",
-      "isRetailgOrder",
+      "isGroupOrder",
+      "isRetailOrder",
       "isPaidOrder",
       "isPendingOrder",
       "getUuid",
@@ -42,13 +43,27 @@ export default class Order {
   getUuid() {
     return this._dto.orderUuid;
   }
-  isGroupBuyingOrder() {
-    const { salesType } = this._dto.product;
-    return salesType === "GB";
+  /**
+   * 단체구매인지(단체 구매 문의에 대한 주문)
+   */
+  isGroupOrder() {
+    const { product, licenseQtt } = this._dto;
+    return product.salesType === "RT" && licenseQtt > 1;
   }
-  isRetailgOrder() {
-    const { salesType } = this._dto.product;
-    return salesType === "RT";
+  /**
+   * 공동구매인지
+   * @returns
+   */
+  isGroupBuyingOrder() {
+    const { product } = this._dto;
+    return product.salesType === "GB";
+  }
+  /**
+   * 개별 구매인지(구매 페이지에서 1장씩 구매함)
+   */
+  isRetailOrder() {
+    const { product, licenseQtt } = this._dto;
+    return product.salesType === "RT" && licenseQtt === 1;
   }
   /**
    * 결제 완료된 주문인지

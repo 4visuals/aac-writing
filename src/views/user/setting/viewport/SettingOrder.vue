@@ -4,12 +4,8 @@
       ><p>구매 내역이 없습니다.</p></SectionBox
     >
     <SectionBox v-for="order in orders" :key="order.seq" padding="8px">
-      <GBuyingOrderView
-        v-if="order.isGroupBuyingOrder()"
-        :order="order"
-        @payment="startPayment"
-      />
-      <RetailOrderView v-else :order="order" />
+      <RetailOrderView v-if="order.isRetailOrder()" :order="order" />
+      <GBuyingOrderView v-else :order="order" @payment="startPayment" />
     </SectionBox>
     <div class="refund">
       <h3>환불 규정</h3>

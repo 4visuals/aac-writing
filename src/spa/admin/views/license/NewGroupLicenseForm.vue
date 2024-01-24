@@ -1,6 +1,6 @@
 <template>
   <div class="lcs-form">
-    <h3>단체 이용권 발급 화면</h3>
+    <h3>결제 생성 화면</h3>
 
     <div class="elem">
       <h5>요청인</h5>
@@ -114,7 +114,7 @@
     </div>
     <div class="elem">
       <hr />
-      <p>아래 버튼을 누르면 수강증이 발급됩니다.</p>
+      <p>아래 버튼을 누르면 전용 결제 링크가 생성됩니다.</p>
       <p>
         정상 가격 : <span>{{ currency.format(activeProduct.price * cnt) }}</span
         >원, 납부 금액
@@ -125,10 +125,10 @@
         class="btn-purchase"
         borderless
         theme="gold"
-        :text="`총 ${cnt} 매 발급`"
+        :text="`총 ${cnt} 매 결제링크 생성`"
         size="lg"
         muted
-        @click="issueLicense"
+        @click="generateGroupOrder"
       ></AacButton>
     </div>
   </div>
@@ -138,6 +138,7 @@
 import adminApi from "../../service/admin-api";
 import util from "../../../../service/util";
 import { ref, shallowRef } from "vue";
+import toast from "../../../../components/toast";
 export default {
   props: ["order", "products"],
   setup(props) {
@@ -150,16 +151,19 @@ export default {
      * 고객이 납부할 금액
      */
     const contractPrice = ref(0);
-    const issueLicense = () => {
+    const generateGroupOrder = () => {
       adminApi.order.group
-        .commit(
+        .issueGroupOrderLink(
           props.order.seq,
           activeProduct.value.code,
           cnt.value,
           contractPrice.value
         )
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          toast.success("[성공] 사용자에게 결제 링크를 전송했습니다.");
+        })
+        .catch((e) => {
+          toast.error("[실패]" + e.cause, 10 * 1000);
         });
     };
     const inc = (qtt) => {
@@ -176,7 +180,7 @@ export default {
       activeProduct,
       contractPrice,
       user: props.order.sender,
-      issueLicense,
+      generateGroupOrder,
       inc,
       currency: util.currency,
     };

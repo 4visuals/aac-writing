@@ -6,7 +6,9 @@
       </a>
     </div>
     <h5>
-      <span class="sales">공동구매</span
+      <span :class="['sales', order.product.salesType]"
+        ><span v-if="order.product.salesType === 'GB'">공동구매</span
+        ><span v-else>단체구매</span></span
       ><span class="pay" :class="[order.getPaymentClass()]">{{
         order.getPaymentText()
       }}</span
@@ -19,7 +21,10 @@
       <li>결제일: {{ formatTime(order.paidTime) }}</li>
     </ul>
     <div v-else>
-      <p>{{ teacher.name }}님이 신청하신 공동구매 결제를 완료해주세요.</p>
+      <p v-if="order.product.salesType === 'GB'">
+        {{ teacher.name }}님이 신청하신 공동구매 결제를 완료해주세요.
+      </p>
+      <p v-else>이용권 : {{ order.licenseQtt }} 매</p>
       <p style="text-align: center">
         <FormButton
           v-if="order.isPendingOrder()"
@@ -71,11 +76,18 @@ const { formatCurrency, formatTime } = useOrderFunction();
     .sales {
       padding: 4px 8px;
       display: inline-flex;
-      background-color: #b8230b;
-      color: white;
+
       font-weight: 600;
       border-radius: 4px;
       font-size: 1rem;
+      &.GB {
+        background-color: #b8230b;
+        color: white;
+      }
+      &.RT {
+        background-color: #0b45b8;
+        color: white;
+      }
     }
     .pay {
       font-weight: 600;
