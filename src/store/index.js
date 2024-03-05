@@ -7,10 +7,12 @@ import config from "./modules/app-config";
 // import quizHistory from "../dao/quiz-history-store";
 import record from "./modules/record-store";
 
+/** @type {import('vuex').Store<any> }*/
 const store = createStore({
   modules: { user, course, ui, exam, config, record },
 });
 
 store.commit("exam/initLicense");
 
+export { store };
 export default store;

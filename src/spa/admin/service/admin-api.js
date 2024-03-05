@@ -1,6 +1,7 @@
 import { GET, POST, PUT, DELETE } from "@/service/api/request";
 import { GroupOrderForm } from "../../../entity/group-order-form";
 import Product from "../../../entity/product";
+import { VoiceFile } from "../../../entity/voice";
 const admin = {
   authenticate: () => POST("/admin/auth"),
 };
@@ -134,4 +135,24 @@ const product = {
     }),
   delete: (productSeq) => DELETE(`/admin/product/${productSeq}`),
 };
-export default { admin, member, license, order, product };
+
+const voice = {
+  all: () =>
+    GET("/admin/voices").then((res) => {
+      res.paging.elems = res.paging.elems.map((voice) => new VoiceFile(voice));
+      return res.paging;
+    }),
+  alternateVoice: (voiceSeq, alternativeText) =>
+    POST("/admin/voice", { voiceSeq, alternativeText }).then((res) => {
+      return new VoiceFile(res.voice);
+    }),
+  replaceVoice: (originVoiceSeq, altVoiceSeq) =>
+    PUT(`/admin/voice/${originVoiceSeq}/alternative/${altVoiceSeq}`).then(
+      (res) => new VoiceFile(res.origin)
+    ),
+  confirm: (voiceSeq) =>
+    PUT(`/admin/voice/${voiceSeq}/confirm`).then(
+      (res) => new VoiceFile(res.voice)
+    ),
+};
+export default { admin, member, license, order, product, voice };

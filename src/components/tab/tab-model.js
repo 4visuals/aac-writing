@@ -58,7 +58,7 @@ class BodyComp {
 /**
  * tab model 생성
  * @param {[{text:string, cmd:string}]} items
- * @returns { TabModel[] }
+ * @returns { TabModel }
  */
 TabModel.create = (items) => {
   let activeIndex = -1;

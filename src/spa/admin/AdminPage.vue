@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import { computed, ref, onMounted, shallowRef, watch } from "vue";
-import { useStore } from "vuex";
+import { computed, ref, onMounted, shallowRef, watch, onUnmounted } from "vue";
+// import { useStore } from "vuex";
 import AdminMenu from "./views/AdminMenu.vue";
 import LevelAnalysis from "./views/LevelAnalysis.vue";
 import LicenseManage from "./views/LicenseManage.vue";
@@ -21,16 +21,18 @@ import OrderListView from "./views/order/OrderListView.vue";
 import PolicyEditor from "./views/PolicyManage.vue";
 import ProductManage from "./views/ProductManage.vue";
 import GroupOrderView from "./views/order/GroupOrderView.vue";
+import TtsFileList from "./views/tts/TtsFileList.vue";
 import adminApi from "./service/admin-api";
 import toast from "@/components/toast";
 import { useRouter } from "vue-router";
+import { store } from "@/store";
+import voiceStore from "./views/tts/voice-store";
 
 export default {
   components: {
     AdminMenu,
   },
   setup() {
-    const store = useStore();
     const user = computed(() => store.getters["user/currentUser"]);
     const authCheck = ref("LOADING");
     const router = useRouter();
@@ -84,6 +86,13 @@ export default {
         path: "/console/grouporder",
         comp: GroupOrderView,
       },
+      {
+        id: "tts",
+        icon: "volume_up",
+        title: "TTS",
+        path: "/console/tts",
+        comp: TtsFileList,
+      },
     ];
     menus.forEach((menu) => {
       router.addRoute("AdminConsole", {
@@ -122,6 +131,12 @@ export default {
           router.replace("/");
         }
       });
+      store.registerModule("voice-store", voiceStore);
+      store.dispatch("voice-store/loadVoices");
+    });
+
+    onUnmounted(() => {
+      store.unregisterModule("voice-store");
     });
     return {
       user,

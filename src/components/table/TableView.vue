@@ -1,11 +1,12 @@
 <template>
   <div class="sheet" :style="`--sheet-col-width: ${colsize}`">
     <div v-if="fitBy !== 'row'" class="fixed-column"><slot name="fcol" /></div>
+    <div v-else><slot name="fcol" /></div>
     <div
       class="scrollable"
       :class="{ 'fit-row': fitBy === 'row' }"
       :ref="bindScrollable"
-      @wheel.prevent.stop="pageScroll"
+      @wheel.prevent="pageScroll"
     >
       <div class="dataview" :class="{ 'column-based': columnBased }">
         <slot name="data" />
@@ -14,7 +15,17 @@
   </div>
 </template>
 <script setup>
+import { defineProps } from "vue";
+
+const props = defineProps({
+  colsize: { type: String },
+  fitBy: { type: String },
+});
 const pageScroll = (e) => {
+  if (props.fitBy === "row") {
+    return;
+  }
+  e.stopPropagation();
   const { deltaY } = e;
   const el = e.currentTarget;
   const { scrollLeft, offsetWidth, scrollWidth } = el;
@@ -62,6 +73,13 @@ export default {
     display: flex;
     &.fit-row {
       position: relative;
+      margin: 0;
+      .dataview {
+        margin: 0;
+        .row {
+          margin: 0;
+        }
+      }
     }
     &::-webkit-scrollbar {
       width: 2px;

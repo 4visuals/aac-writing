@@ -50,12 +50,15 @@ class TTS {
 const browser = new TTS();
 
 class PollyTts {
-  speak(text, option = { delay: 0 }) {
+  speak(text, option = { delay: 0, closePending: false }) {
     if (text.length === 0) {
       return Promise.resolve();
     }
     if (localStorage.getItem("aac.skip.tts") === "true") {
       return Promise.resolve(text);
+    }
+    if (option.closePending && this.pendingAudio) {
+      this.pendingAudio.pause();
     }
     const textHash = md5(text.trim()).toString();
     const url = `${env.TTS_POLLY_PATH}/voices3/${textHash}.mp3`;
@@ -68,11 +71,13 @@ class PollyTts {
     return new Promise((done, failed) => {
       audio.onended = (e) => {
         ttsStore.setSpeaking(false);
+        this.pendingAudio = undefined;
         done(text, e);
       };
       audio.onerror = (e) => {
         console.log("[AUDIO ERROR]", e);
         ttsStore.setSpeaking(false);
+        this.pendingAudio = undefined;
         failed(e);
       };
       if (option.delay > 0) {
@@ -80,14 +85,17 @@ class PollyTts {
           audio.play().catch((e) => {
             console.log(`[${e.name}]`, e);
             ttsStore.setSpeaking(false);
+            this.pendingAudio = undefined;
           });
         }, option.delay);
       } else {
         audio.play().catch((e) => {
           console.log(`[${e.name}]`, e);
           ttsStore.setSpeaking(false);
+          this.pendingAudio = undefined;
         });
       }
+      this.pendingAudio = audio;
     });
   }
 }

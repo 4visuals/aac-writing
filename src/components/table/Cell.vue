@@ -62,6 +62,9 @@ export default {
   &.w160 {
     width: 160px;
   }
+  &.w200 {
+    width: 200px;
+  }
   &.nowrap {
     white-space: nowrap;
     overflow: hidden;

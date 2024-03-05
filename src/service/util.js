@@ -204,7 +204,7 @@ const arr = {
   },
   /**
    * 주어진 배열을 Map 안에 grouping함.
-   * @param {object[]} arr - Map안에 grouping할 원본 배열
+   * @param {any[]} arr - Map안에 grouping할 원본 배열
    * @param {(any) => string} keyResolver - arr의 각각의 원소에 대해서 Map의 key를 반환함.
    * @param {(key:string) => any} valueResolver - 주어진 key로 저장할 value의 초기값 반환.
    * @returns {Map}
