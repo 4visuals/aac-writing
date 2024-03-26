@@ -26,17 +26,29 @@ const order = {
         res.order = new GroupOrderForm(res.order);
         return res;
       }),
+    /**
+     * 단체주문 양식 완료 처리함
+     * @param {*} orderSeq
+     * @param stateCode - 'CBS', 'CMT'
+     * @returns
+     */
+    changeState: (orderSeq, stateCode) =>
+      PUT(`/admin/group-orders/${orderSeq}/${stateCode}`).then((res) => {
+        res.order = new GroupOrderForm(res.order);
+        return res;
+      }),
     list: () =>
       GET("/admin/group-orders").then((res) => {
         res.orders = res.orders.map((order) => new GroupOrderForm(order));
+        res.orders.sort((a, b) => -1 * (a.seq - b.seq));
         return res;
       }),
     /**
      * 단체 구메 문의로부터 고객 전용 주문 링크를 생성함
      * @param {number} formSeq PK of GroupOrderForm
-     * @param {*} productCode
-     * @param {*} qtt 이용권 수량
-     * @param {*} contractPrice 약정 금액
+     * @param {string} productCode
+     * @param {number} qtt 이용권 수량
+     * @param {number} contractPrice 약정 금액
      * @returns
      */
     issueGroupOrderLink: (formSeq, productCode, qtt, contractPrice) =>

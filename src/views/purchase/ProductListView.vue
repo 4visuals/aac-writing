@@ -18,7 +18,9 @@
     </div>
     <div class="row">
       <div class="col-xs-12 group-order">
-        <button @click="gotoGroupOrder" class="nude red">단체 구매 문의</button>
+        <button @click="gotoGroupOrder" class="nude red">
+          단체이용권 및 연습공책 구매 문의
+        </button>
       </div>
     </div>
   </div>

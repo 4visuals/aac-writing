@@ -200,7 +200,7 @@ const setAlternativeText = (e, voiceFile) => {
         inputEl.disabled = false;
         altVoiceRef.value = altVoice;
         inputEl.focus();
-        audioEl.value.src = `http://localhost:8899/lf/voice/${altVoice.filePath}`;
+        audioEl.value.src = `https://kdict.kr/lf/voice/${altVoice.filePath}`;
         audioEl.value.play();
       });
     } else {
@@ -221,7 +221,7 @@ const moveByArrowKey = (e) => {
   }
 };
 const speakOriginalText = (voice) => {
-  tts.speak(voice.text, { closePending: true }).then(() => {
+  tts.speak(voice.originText, { closePending: true }).then(() => {
     store.commit("voice-store/markAsSopken", voice);
     voice.spoken = true;
   });

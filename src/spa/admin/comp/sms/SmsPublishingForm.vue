@@ -27,7 +27,8 @@
 import { ref } from "vue";
 import { SmsFormType } from "./sms";
 import PaperNotificationForm from "./PaperNotificationForm.vue";
-import LicenseNotificationForm from "./LicenseNotificationForm.vue";
+// import LicenseNotificationForm from "./LicenseNotificationForm.vue";
+import BookNotificationForm from "./BookNotificationForm.vue";
 
 export default {
   props: {
@@ -40,15 +41,15 @@ export default {
     const formTypes = [
       new SmsFormType(
         "paper-notif",
-        "필요 서류 통보",
-        "주문 관련 서류를 이메일로 전송한 후 문자를 보냅니다.",
+        "이용권 결제 안내",
+        "결제 안내 내용을 이메일로 전송한 후 문자를 보냅니다.",
         PaperNotificationForm
       ),
       new SmsFormType(
         "license-notif",
-        "이용권 발급 통보",
-        "입금 확인 및 이용권 발급 후 문자를 보냅니다.",
-        LicenseNotificationForm
+        "연습공책 결제 안내",
+        "연습공책 발송 안내 문자를 보냅니다.",
+        BookNotificationForm
       ),
     ];
     const activeForm = ref(null);

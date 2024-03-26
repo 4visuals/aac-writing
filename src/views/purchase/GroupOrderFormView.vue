@@ -1,11 +1,23 @@
 <template>
   <div class="container">
     <div class="jumbo">
-      <h3>단체 구매 문의</h3>
-      <p>단체 구매는 계좌이체로 결제합니다.</p>
+      <h3>단체 이용권 및 연습공책 구매 문의</h3>
       <p>
-        이용권 단체 구매는 1년 이용권만 구매 가능하며, 5매 이상일 경우
-        적용됩니다.
+        단체 이용권은 1년 이용권만 구매 가능하며, 이용권 5매 이상 시 적용됩니다.
+      </p>
+      <p>단체 구매 문의 후 이메일로 견적서와 카드 결제 안내문이 발송됩니다.</p>
+      <p>
+        견적서 발급 문자메시지 수령 후
+        <span class="hl">마이페이지 > 구매내역</span> 에서 신용카드로 결제할 수
+        있습니다.
+      </p>
+      <p>
+        카드 결제 완료 후 <span class="hl">마이페이지>구매내역</span>에서
+        신용카드 매출 전표를 출력할 수 있습니다.
+      </p>
+      <p>
+        거래명세서, 이용권발급증명서 신청 시 카드 결제 완료 후 이메일로
+        발송됩니다.
       </p>
     </div>
     <div v-if="formSent" class="form-sent">
@@ -60,12 +72,11 @@
         </div>
       </div>
       <div class="elem">
-        <h3><span>문의 내용</span><span class="required">[필수]</span></h3>
-        <p>
-          이용권 수량(학생 수) 및 기타 문의사항을 입력해 주세요. (예: 이용권
-          6매)
-        </p>
-        <p>
+        <h3><span>주문 내용</span><span class="required">[필수]</span></h3>
+        <p>1. 이용권 수, 받아쓰기 연습공책 수를 입력해 주세요.</p>
+        <p>2. 그림한글 책꽂이 이용 신청 시 교사의 아이디를 입력해 주세요.</p>
+        <p>3. 기타 문의 사항을 입력해 주세요.</p>
+        <!-- <p>
           세금계산서 발행을 위한 고유번호증은
           <a
             class="mail"
@@ -73,11 +84,11 @@
             href="mailto:contact@kdict.kr?subject=[세금계산서]고유번호증%20문의"
             >contact@kdict.kr</a
           >로 보내주세요.
-        </p>
+        </p> -->
         <div class="desc">
           <textarea
             v-model="memo.value"
-            placeholder="예) 이용권 6장 &#10;기타 문의 사항 입력"
+            placeholder="예) 1. 이용권 5매, 연습공책 5세트&#10;    2. 그림한글 아이디: teacher@gmail.com "
           ></textarea>
           <div class="state">
             <span class="n">{{ memo.value.length }}</span> /
@@ -131,19 +142,19 @@ export default {
     const papers = reactive([
       {
         type: "EST",
-        text: "견적서",
+        text: "견적서(결제 전 발급)",
         selected: false,
         value: "",
       },
       {
-        type: "CBR",
-        text: "사업자등록증",
+        type: "SPC",
+        text: "거래명세서(카드 결제 완료 후 발급)",
         selected: false,
         value: "",
       },
       {
-        type: "BNK",
-        text: "통장사본",
+        type: "CRT",
+        text: "이용권발급증명서(카드 결제 완료 후 발급)",
         selected: false,
         value: "",
       },
@@ -179,30 +190,30 @@ export default {
           title: "문의자 연락처",
           value: "",
           required: true,
-          desc: "서류 발송 및 이용권 발급 후 문자로 안내드립니다.",
+          desc: "신청 서류 발송 및 이용권 발급 후 문자로 안내드립니다.",
           placeholder: "010-0000-0000",
         }),
         new InputForm({
           wid: "senderEmail",
           title: "문의자 이메일",
-          desc: "이용권 발급 시 현재 계정으로 이용권이 발급됩니다.",
+          desc: "이용권 발급 시 현재 계정으로 이용권이 발급됩니다. 요청하신 서류가 현재 계정으로 발송됩니다.",
           value: userRef.value?.email,
           readOnly: true,
           placeholder: "접수 후 이메일로 알려드립니다.",
         }),
-        new InputForm({
-          wid: "orgEmail",
-          title: "행정실 이메일",
-          desc: "필요 서류를 받을 이메일 주소를 입력해 주세요.",
-          value: "",
-          placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
-        }),
+        // new InputForm({
+        //   wid: "orgEmail",
+        //   title: "행정실 이메일",
+        //   desc: "필요 서류를 받을 이메일 주소를 입력해 주세요.",
+        //   value: "",
+        //   placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
+        // }),
         new InputForm({
           wid: "orgContactInfo",
-          title: "행정실 연락처",
-          desc: "행정실 담당자의 전화번호를 입력해 주세요.",
+          title: "기관 주소 [연습공책 주문 시 필수]",
+          desc: "받아쓰기 연습공책이 배송될 주소를 입력해 주세요.",
           value: "",
-          placeholder: "기관 연락처(전화번호)",
+          placeholder: "기관 주소",
         }),
       ];
       forms.splice(0, forms.length);
@@ -317,6 +328,10 @@ export default {
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 12px;
+    }
+    .hl {
+      color: crimson;
+      font-weight: 600;
     }
   }
   .form-sent {

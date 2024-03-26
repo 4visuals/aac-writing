@@ -125,6 +125,13 @@
                   >
                     취소
                   </button>
+                  <button
+                    v-if="order.state === 'PND'"
+                    class="nude gray"
+                    @click="showActivateModal(order)"
+                  >
+                    완료처리
+                  </button>
                 </td>
               </tr>
             </table>
@@ -165,16 +172,21 @@ export default {
     const paperNames = {
       EST: "견적서",
       CBR: "사업자등록증",
+      SPC: "거래명세서",
+      CRT: "이용권발급증명서",
       BNK: "통장 사본",
     };
     const paperName = (paper) => paper.desc || paperNames[paper.paperType];
     adminApi.order.group.list().then((res) => {
       orders.value = res.orders;
     });
-    const doCancelOrder = (cmd, order) => {
-      console.log("[cancel]");
+    /**
+     * 주문 요청 상태 변경 - 취소, 완료
+     * @param stateOrder - 'CBS' 'CMT'
+     */
+    const changeOrderFormState = (cmd, order, stateCode) => {
       if (cmd === "yes") {
-        adminApi.order.group.cancel(order.seq).then(() => {
+        adminApi.order.group.changeState(order.seq, stateCode).then(() => {
           const idx = orders.value.findIndex((odr) => odr.seq === order.seq);
           orders.value.splice(idx, 1);
         });
@@ -207,7 +219,22 @@ export default {
             { cmd: "no", text: "아니오" },
           ],
         },
-        events: { commit: (cmd) => doCancelOrder(cmd, order) },
+        events: { commit: (cmd) => changeOrderFormState(cmd, order, "CBS") },
+      });
+    };
+    const showActivateModal = (order) => {
+      store.commit("ui/hideMenu");
+      modal.showModal(DialogView, {
+        width: "sm",
+        props: {
+          title: "결제 완료 처리",
+          message: "주문을 [완료 처리]합니까?",
+          actions: [
+            { cmd: "yes", text: "완료 처리" },
+            { cmd: "no", text: "아니오" },
+          ],
+        },
+        events: { commit: (cmd) => changeOrderFormState(cmd, order, "CMT") },
       });
     };
     const filtered = () => {
@@ -237,6 +264,7 @@ export default {
       showSmsForm,
       showLicenseForm,
       showCancelModal,
+      showActivateModal,
       filtered,
     };
   },

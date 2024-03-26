@@ -110,6 +110,20 @@ button {
       outline: 3px solid #a5ff65;
     }
   }
+  &.gray {
+    background-color: #efefef;
+    color: #777;
+    padding: 6px 8px;
+    &:hover {
+      box-shadow: 0 0 3px #cdcdcd;
+    }
+    &:active {
+      background-color: #ababab;
+    }
+    &:focus {
+      outline: 3px solid #efefef;
+    }
+  }
   &.round {
     border-radius: 4px;
   }
