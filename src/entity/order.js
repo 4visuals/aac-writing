@@ -7,6 +7,7 @@ export default class Order {
     this._dto = orderDto;
     const props = new Set(["receipt_url"]);
     const getters = new Set([
+      "isDigitalType",
       "isGroupBuyingOrder",
       "isGroupOrder",
       "isRetailOrder",
@@ -31,6 +32,9 @@ export default class Order {
   }
   get receipt_url() {
     return this._dto.transactionDetail?.receipt_url;
+  }
+  isDigitalType() {
+    return this._dto.product.digitalType === "Y";
   }
   getPaymentClass() {
     const map = statesMap[this._dto.orderState];

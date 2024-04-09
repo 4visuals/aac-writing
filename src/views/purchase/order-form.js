@@ -5,21 +5,29 @@ import License from "../../entity/license";
 
 // ['imp_uid', 'merchant_uid', 'imp_success', 'error_msg']
 class OrderForm {
+  /** @type {import("../../components/map/map-search").DeliveryInfo} */
+  delivery;
   constructor(method, productCode, startTime) {
     this.method = method;
     this.productCode = productCode;
     this.startTime = startTime || new Date().getTime();
-    this.product = null;
+    this.product = undefined;
     this._order = null;
+    this.delivery = undefined;
   }
   /**
    *
    * @param {string} method 결제 수단 ("card")
+   * @param {import("../../components/map/map-search").DeliveryInfo} 배송정보
    * @returns
    */
-  prepare(method) {
+  prepare(method, delivery) {
     this.method = method;
-    return api.order.create(this.productCode).then((res) => {
+    this.delivery = delivery;
+    if (this.product.offline && !delivery) {
+      throw new Error("DELIVERY_REQUIRED");
+    }
+    return api.order.create(this.productCode, this.delivery).then((res) => {
       const { order } = res;
       this._order = order;
       storage.session.write("kdict.order", {

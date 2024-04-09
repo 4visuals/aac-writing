@@ -15,6 +15,9 @@ class Product {
       this[prop] = data[prop];
     });
   }
+  get offline() {
+    return this.digitalType === "N";
+  }
   get price() {
     const { discountKrWon, priceKrWon } = this;
     return priceKrWon - discountKrWon;

@@ -10,6 +10,9 @@
       <button class="nude guide" @click="showVideoGuid">
         <AppIcon icon="play_circle_filled" /><span>가입안내</span>
       </button>
+      <router-link v-if="member && member.admin" class="link" to="/console"
+        >콘솔</router-link
+      >
     </div>
     <button v-if="member" @click="delegateLogout" class="nude btn logout">
       <span>로그아웃</span>

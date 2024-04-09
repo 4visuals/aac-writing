@@ -17,7 +17,7 @@
         />
         <div class="inline buy">
           <button
-            :disabled="!user"
+            :disabled="!user || (product.offline && !deliveryInfo)"
             class="btn-purchase nude blue"
             @click="startOrder('card')"
           >
@@ -26,6 +26,9 @@
           <!-- <button class="btn-purchase nude green" @click="startOrder('phone')">
             <AppIcon icon="phone_android" /><span>휴대폰</span>
           </button> -->
+        </div>
+        <div v-if="product.offline && !deliveryInfo" class="alert">
+          배송 정보 입력 후 주문 가능합니다.
         </div>
         <div v-if="!user" class="alert">로그인 후 결제 가능합니다.</div>
       </div>
@@ -60,9 +63,30 @@
             </li>
           </ul>
         </section>
+        <section v-if="product.offline" class="refound">
+          <h3>배송 정보 입력</h3>
+          <div class="delivery">
+            <div v-if="deliveryInfo" class="info">
+              <p>
+                {{ deliveryInfo.baseAddress }} {{ deliveryInfo.detailAddress }}
+              </p>
+              <p>{{ deliveryInfo.receiverName }}</p>
+              <p>우){{ deliveryInfo.zipCode }}</p>
+              <button class="nude sm blue" @click="resetDelivery">
+                재입력
+              </button>
+            </div>
+            <div v-else>
+              <p class="alert">배송 정보 입력 후 주문 가능합니다.</p>
+              <button class="nude sm blue" @click="loadAddressMap">
+                배송정보
+              </button>
+            </div>
+          </div>
+        </section>
         <section class="buy">
           <button
-            :disabled="!user"
+            :disabled="!user || (product.offline && !deliveryInfo)"
             class="btn-purchase nude blue"
             @click="startOrder('card')"
           >
@@ -78,8 +102,8 @@
   </div>
 </template>
 
-<script>
-import { computed, ref } from "vue";
+<script setup>
+import { computed, ref, shallowRef } from "vue";
 import ProductView from "../../components/product/ProductView.vue";
 import ActionIcon from "../../components/form/ActionIcon.vue";
 import { OrderForm } from "./order-form";
@@ -89,103 +113,119 @@ import { useStore } from "vuex";
 import toast from "../../components/toast";
 import env from "../../service/env";
 import AppIcon from "../../components/AppIcon.vue";
+import modal from "@/components/modal";
+import AddressMapView from "../../components/map/AddressMapView.vue";
 
-export default {
-  components: {
-    AppIcon,
-    ActionIcon,
-    ProductView,
-  },
-  setup() {
-    const store = useStore();
-    const route = useRoute();
-    const router = useRouter();
-    const user = computed(() => store.getters["user/currentUser"]);
-    /** @type {import('vue').Ref<OrderForm>} */
-    const order = ref(null);
-    const product = computed(() => order.value && order.value.product);
+const store = useStore();
+const route = useRoute();
+const router = useRouter();
+const user = computed(() => store.getters["user/currentUser"]);
+/** @type {import('vue').Ref<OrderForm>} */
+const order = ref(null);
+const product = computed(() => order.value && order.value.product);
+const deliveryInfo = shallowRef(undefined);
 
-    const info = {
-      usage: {
-        title: "이용 안내",
-        elems: `이용권 1매당 1명의 학생을 등록합니다.
+const info = {
+  usage: {
+    title: "이용 안내",
+    elems: `이용권 1매당 1명의 학생을 등록합니다.
 이용권은 학생과 연결될 때부터 적용됩니다.
 사용중인 이용권이 만료된 후 새 이용권에 기존 학생을 연결하여 사용합니다.
 이용권 상품은 기한이 끝나도 자동 연장되지 않습니다.
 이용권 되팔기로 인해 발생하는 모든 분쟁 요소는 책임지지 않습니다.`.split("\n"),
-      },
-      refund: {
-        title: "환불 정책 안내",
-        elems:
-          `환불 요청은 승인일로 부터 7일 이내에 제기해 주셔야 하며, 이 경우 결제와 동일한 수단으로 환불됩니다.
+  },
+  refund: {
+    title: "환불 정책 안내",
+    elems:
+      `환불 요청은 승인일로 부터 7일 이내에 제기해 주셔야 하며, 이 경우 결제와 동일한 수단으로 환불됩니다.
 콘텐츠의 내용이 표시 ・ 광고 내용과 다르거나 계약 내용과 다르게 이행된 경우에는 당해 콘텐츠를 공급받은 날로 부터 3월 이내, 그 사실을 안 날 또는 알 수 있었던 날로부터 30일 이내에 환불 받으실 수 있으며 납입한 금액의 2/3에 대해서 환불합니다.`.split(
-            "\n"
-          ),
-      },
-    };
-
-    const gotoPurchasePage = () => router.replace("/purchase");
-    const format = (money) => util.currency.format(money);
-
-    const handlePaidOrder = () => {
-      router.push("/purchase/order/checking");
-    };
-
-    const handleFailedOrder = (res) => {
-      order.value.reset();
-      console.log("[FAILURE]", res);
-      toast.warn("결제를 취소했습니다", "결제 취소", 10);
-    };
-    const startPgOrder = () => {
-      const imp = window.IMP;
-      imp.init(env.IMPORT_ACCOUNT);
-      const { method } = order.value;
-      const merchant_uid = order.value.getUuid();
-      const loginUser = store.getters["user/currentUser"];
-      const prod = product.value;
-      const { origin } = document.location;
-
-      const redirectUrl = `${origin}/purchase/order/checking`;
-
-      imp.request_pay(
-        {
-          // param
-          pg: env.IMPORT_PGNAME,
-          pay_method: method,
-          merchant_uid,
-          name: prod.name,
-          amount: prod.price,
-          buyer_email: loginUser.email,
-          buyer_name: loginUser.name,
-          m_redirect_url: redirectUrl,
-          notice_url: env.IMPORT_HOOK,
-        },
-        (res) => {
-          // callback
-          if (res.success) {
-            handlePaidOrder(res);
-            // 결제 성공 시 로직,
-          } else {
-            handleFailedOrder(res);
-          }
-        }
-      );
-    };
-    const startOrder = (method) => {
-      order.value.prepare(method).then(startPgOrder);
-      // imp20450844
-    };
-
-    OrderForm.load(route.params.code)
-      .then((orderForm) => {
-        order.value = orderForm;
-      })
-      .catch((err) => {
-        toast.error("@" + err.cause, "상품 정보 오류", 10);
-      });
-    return { user, info, product, gotoPurchasePage, format, startOrder };
+        "\n"
+      ),
   },
 };
+
+const gotoPurchasePage = () => router.replace("/purchase");
+const format = (money) => util.currency.format(money);
+
+const handlePaidOrder = () => {
+  router.push("/purchase/order/checking");
+};
+
+const handleFailedOrder = (res) => {
+  order.value.reset();
+  console.log("[FAILURE]", res);
+  toast.warn("결제를 취소했습니다", "결제 취소", 10);
+};
+const startPgOrder = () => {
+  const imp = window.IMP;
+  imp.init(env.IMPORT_ACCOUNT);
+  const { method } = order.value;
+  const merchant_uid = order.value.getUuid();
+  const loginUser = store.getters["user/currentUser"];
+  const prod = product.value;
+  const { origin } = document.location;
+
+  const redirectUrl = `${origin}/purchase/order/checking`;
+
+  imp.request_pay(
+    {
+      // param
+      pg: env.IMPORT_PGNAME,
+      pay_method: method,
+      merchant_uid,
+      name: prod.name,
+      amount: prod.price,
+      buyer_email: loginUser.email,
+      buyer_name: loginUser.name,
+      m_redirect_url: redirectUrl,
+      notice_url: env.IMPORT_HOOK,
+    },
+    (res) => {
+      // callback
+      if (res.success) {
+        handlePaidOrder(res);
+        // 결제 성공 시 로직,
+      } else {
+        handleFailedOrder(res);
+      }
+    }
+  );
+};
+
+const startOrder = (method) => {
+  order.value
+    .prepare(method, deliveryInfo.value)
+    .then(startPgOrder)
+    .catch((e) => {
+      console.log(e);
+    });
+  // imp20450844
+};
+
+const resetDelivery = () => {
+  // deliveryInfo.value = undefined;
+  loadAddressMap();
+};
+const updateDeliveryInfo = (
+  /** @type {import('../../components/map/map-search').DeliveryInfo} */ delivery
+) => {
+  deliveryInfo.value = delivery;
+  modal.closeModal();
+};
+const loadAddressMap = () => {
+  modal.showModal(AddressMapView, {
+    width: "md",
+    fill: false,
+    events: { delivery: updateDeliveryInfo },
+  });
+};
+OrderForm.load(route.params.code)
+  .then((orderForm) => {
+    order.value = orderForm;
+  })
+  .catch((err) => {
+    toast.error("@" + err.cause, "상품 정보 오류", 10);
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -276,6 +316,11 @@ export default {
       font-size: 1.3rem;
       border-radius: 2rem;
       padding: 8px 16px;
+      &.sm {
+        font-size: 1rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
     }
     &.buy {
       margin-bottom: 16px;
@@ -298,6 +343,14 @@ export default {
         font-size: 1rem;
         flex: 1 1 auto;
       }
+    }
+  }
+  .delivery {
+    .info {
+      border: 1px solid #2b70ea;
+      border-radius: 4px;
+      padding: 4px;
+      font-size: 1.2rem;
     }
   }
   .alert {

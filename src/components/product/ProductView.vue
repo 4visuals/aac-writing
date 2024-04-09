@@ -14,7 +14,11 @@
         </div>
       </div>
     </Transition>
-    <section class="detail" :class="[product.theme]">
+    <section
+      v-if="product.digitalType === 'Y'"
+      class="detail"
+      :class="[product.theme]"
+    >
       <h3 class="duration">
         <span class="dur">{{ product.durationInDays }}</span>
         <span class="sub">DAYS</span>
@@ -38,6 +42,9 @@
           <component :is="logoComponent[product.theme]" />
         </div>
       </div>
+    </section>
+    <section v-else class="detail offline">
+      <img src="/img/textbook.png" />
     </section>
   </div>
 </template>
@@ -167,6 +174,13 @@ $bsize: 4px;
       }
       .desc {
         color: #1f1339;
+      }
+    }
+    &.offline {
+      padding: 0;
+      & > img {
+        width: 100%;
+        height: auto;
       }
     }
     .duration {

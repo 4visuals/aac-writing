@@ -6,7 +6,11 @@
         <span class="state" :class="[order.orderState]">{{
           stateText(order)
         }}</span>
-        <div class="prod">{{ order.product.name }}</div>
+        <div class="prod">
+          <span v-if="order.isDigitalType()" class="digital true">이용권</span
+          ><span v-else class="digital false">교보재</span>
+          <span class="name">{{ order.product.name }}</span>
+        </div>
         <div class="time init">{{ toTimeText(order.orderTime) }}</div>
         <div class="qtt">{{ order.itemCount }}매</div>
         <div class="customer">
@@ -14,16 +18,21 @@
           ><span class="email">{{ order.customer.email }}</span>
         </div>
         <div class="price">{{ order.totalAmount }}</div>
+        <div v-if="order.deliveryInfo" class="delivery">
+          <DeliveryInfoView :delivery-info="order.deliveryInfo" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { time } from "@/service/util";
 
 import api from "../../service/admin-api";
 import { ref } from "vue";
+import Order from "../../../../entity/order";
+import DeliveryInfoView from "../../../../components/map/DeliveryInfoView.vue";
 
 const stateTextMap = {
   RDY: "결제 대기",
@@ -31,24 +40,24 @@ const stateTextMap = {
   CNU: "사용자 취소",
   CNE: "결제 오류",
 };
-export default {
-  setup() {
-    const ordersRef = ref(null);
+const ordersRef = ref(null);
 
-    const toTimeText = (millis) => time.toYMD(Date.parse(millis));
-    const loadOrders = () => {
-      api.order.list().then((res) => {
-        ordersRef.value = res.orders;
-        console.log(res.orders);
-      });
-    };
-    const stateText = (order) => {
-      return stateTextMap[order.orderState] || order.orderState;
-    };
-    loadOrders();
-    return { ordersRef, toTimeText, stateText };
-  },
+const toTimeText = (millis) => time.toYMD(Date.parse(millis));
+const loadOrders = () => {
+  api.order.list().then((res) => {
+    ordersRef.value = res.orders.map((order) => new Order(order));
+  });
 };
+const stateText = (order) => {
+  return stateTextMap[order.orderState] || order.orderState;
+};
+loadOrders();
+// export default {
+//   setup() {
+
+//     return { ordersRef, toTimeText, stateText };
+//   },
+// };
 </script>
 
 <style lang="scss" scoped>
@@ -80,6 +89,25 @@ export default {
         &.CNU {
           background-color: #ef5800;
           color: white;
+        }
+      }
+      .prod {
+        display: inline-flex;
+        column-gap: 8px;
+        align-items: center;
+        .digital {
+          color: white;
+          padding: 2px 4px;
+          &.true {
+            background-color: darkgreen;
+          }
+          &.false {
+            background-color: crimson;
+          }
+        }
+        .name {
+          font-size: 1.1rem;
+          font-weight: 600;
         }
       }
     }

@@ -1,5 +1,11 @@
 <template>
   <div class="container">
+    <PurchaseJumbo />
+    <div class="row">
+      <div class="col-xs-12">
+        <ProductTabNav :tabs="productTabs" />
+      </div>
+    </div>
     <div class="jumbo">
       <h3>단체 이용권 및 연습공책 구매 문의</h3>
       <p>
@@ -118,209 +124,226 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { TextFieldView, InputForm } from "@/components/form";
 import { computed, reactive, ref, inject, watch } from "vue";
 import { useStore } from "vuex";
+import ProductTabNav from "./tab/ProductTabNav.vue";
+import { productTabs } from "./tab";
 import api from "@/service/api";
 import { useRouter } from "vue-router";
 import toast from "../../components/toast";
+import PurchaseJumbo from "./PurchaseJumbo.vue";
+const store = useStore();
+const userRef = computed(() => store.getters["user/currentUser"]);
+// eslint-disable-next-line no-unused-vars
+const router = useRouter();
+const editMode = ref(true);
+const appProvider = inject("appProvider");
+const forms = reactive([]);
+const formSent = ref(false);
 
-export default {
-  components: {
-    TextFieldView,
+const { activeTab } = productTabs;
+const papers = reactive([
+  {
+    type: "EST",
+    text: "견적서(결제 전 발급)",
+    selected: false,
+    value: "",
   },
-  setup() {
-    const store = useStore();
-    const userRef = computed(() => store.getters["user/currentUser"]);
-    // eslint-disable-next-line no-unused-vars
-    const router = useRouter();
-    const editMode = ref(true);
-    const appProvider = inject("appProvider");
-    const forms = reactive([]);
-    const formSent = ref(false);
-    const papers = reactive([
-      {
-        type: "EST",
-        text: "견적서(결제 전 발급)",
-        selected: false,
-        value: "",
-      },
-      {
-        type: "SPC",
-        text: "거래명세서(카드 결제 완료 후 발급)",
-        selected: false,
-        value: "",
-      },
-      {
-        type: "CRT",
-        text: "이용권발급증명서(카드 결제 완료 후 발급)",
-        selected: false,
-        value: "",
-      },
-      {
-        type: "ETC",
-        text: "기타",
-        selected: false,
-        value: "",
-      },
-    ]);
-    const memo = reactive({
+  {
+    type: "SPC",
+    text: "거래명세서(카드 결제 완료 후 발급)",
+    selected: false,
+    value: "",
+  },
+  {
+    type: "CRT",
+    text: "이용권발급증명서(카드 결제 완료 후 발급)",
+    selected: false,
+    value: "",
+  },
+  {
+    type: "ETC",
+    text: "기타",
+    selected: false,
+    value: "",
+  },
+]);
+const memo = reactive({
+  value: "",
+});
+
+const initForm = () => {
+  const frm = [
+    new InputForm({
+      wid: "orgName",
+      title: "기관명",
       value: "",
-    });
-
-    const initForm = () => {
-      const frm = [
-        new InputForm({
-          wid: "orgName",
-          title: "기관명",
-          value: "",
-          required: true,
-          placeholder: "소속 기관명을 입력해주세요.",
-        }),
-        new InputForm({
-          wid: "senderName",
-          title: "문의자 이름",
-          value: userRef.value?.name,
-          required: true,
-          placeholder: "이름을 입력해주세요.",
-        }),
-        new InputForm({
-          wid: "senderContactInfo",
-          title: "문의자 연락처",
-          value: "",
-          required: true,
-          desc: "신청 서류 발송 및 이용권 발급 후 문자로 안내드립니다.",
-          placeholder: "010-0000-0000",
-        }),
-        new InputForm({
-          wid: "senderEmail",
-          title: "문의자 이메일",
-          desc: "이용권 발급 시 현재 계정으로 이용권이 발급됩니다. 요청하신 서류가 현재 계정으로 발송됩니다.",
-          value: userRef.value?.email,
-          readOnly: true,
-          placeholder: "접수 후 이메일로 알려드립니다.",
-        }),
-        // new InputForm({
-        //   wid: "orgEmail",
-        //   title: "행정실 이메일",
-        //   desc: "필요 서류를 받을 이메일 주소를 입력해 주세요.",
-        //   value: "",
-        //   placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
-        // }),
-        new InputForm({
-          wid: "orgContactInfo",
-          title: "기관 주소 [연습공책 주문 시 필수]",
-          desc: "받아쓰기 연습공책이 배송될 주소를 입력해 주세요.",
-          value: "",
-          placeholder: "기관 주소",
-        }),
-      ];
-      forms.splice(0, forms.length);
-      forms.push(...frm);
-    };
-    const updateForm = ({ value, commit }) => {
-      commit(value);
-    };
-    const validForm = () => {
-      const orgName = forms.find((form) => form.wid === "orgName");
-      const error = [];
-      if (orgName.value.trim() === "") {
-        error.push("소속 기관명을 입력해주세요");
-      }
-      const senderName = forms.find((form) => form.wid === "senderName");
-      if (senderName.value.trim() === "") {
-        error.push("문의자 이름을 입력해주세요");
-      }
-      const senderContactInfo = forms.find(
-        (form) => form.wid === "senderContactInfo"
-      );
-      if (senderContactInfo.value.trim() === "") {
-        error.push("문의자 연락처(전화번호)를 입력해주세요");
-      }
-      if (memo.value.trim() === "") {
-        error.push("문의 내용을 입력해주세요");
-      }
-      if (error.length > 0) {
-        toast.warn(error, "구매 양식", 30);
-      }
-      return error.length === 0;
-    };
-    const showPreview = () => {
-      if (validForm()) {
-        console.log(papers.filter((paper) => paper.selected));
-        editMode.value = false;
-      }
-    };
-    const showEdit = () => (editMode.value = true);
-    const sendForm = () => {
-      const orderForm = {
-        seq: null,
-        orgName: null,
-        senderName: null,
-        senderContactInfo: null,
-        senderEmail: null,
-        orgEmail: null,
-        content: null,
-        papers: [],
-      };
-      const paperSpec = {
-        paperType: null,
-        desc: null,
-      };
-      forms.reduce((order, form) => {
-        order[form.wid] = form.value;
-        return order;
-      }, orderForm);
-      orderForm.content = memo.value;
-
-      papers
-        .filter((p) => p.selected)
-        .forEach((paper) => {
-          const p = Object.assign({}, paperSpec);
-          p.paperType = paper.type;
-          p.desc = paper.value;
-          orderForm.papers.push(p);
-        });
-      api.order.group.sendForm(orderForm).then(() => {
-        formSent.value = true;
-        setTimeout(() => {
-          router.replace("/");
-        }, 5000);
-        // router.replace("/");
-      });
-    };
-    const delegateLogin = () => appProvider.login();
-
-    watch(
-      userRef,
-      (loginUer) => {
-        if (loginUer) {
-          initForm();
-        }
-      },
-      { immediate: true }
-    );
-    return {
-      userRef,
-      forms,
-      papers,
-      memo,
-      editMode,
-      formSent,
-      showPreview,
-      showEdit,
-      sendForm,
-      updateForm,
-      delegateLogin,
-    };
-  },
+      required: true,
+      placeholder: "소속 기관명을 입력해주세요.",
+    }),
+    new InputForm({
+      wid: "senderName",
+      title: "문의자 이름",
+      value: userRef.value?.name,
+      required: true,
+      placeholder: "이름을 입력해주세요.",
+    }),
+    new InputForm({
+      wid: "senderContactInfo",
+      title: "문의자 연락처",
+      value: "",
+      required: true,
+      desc: "신청 서류 발송 및 이용권 발급 후 문자로 안내드립니다.",
+      placeholder: "010-0000-0000",
+    }),
+    new InputForm({
+      wid: "senderEmail",
+      title: "문의자 이메일",
+      desc: "이용권 발급 시 현재 계정으로 이용권이 발급됩니다. 요청하신 서류가 현재 계정으로 발송됩니다.",
+      value: userRef.value?.email,
+      readOnly: true,
+      placeholder: "접수 후 이메일로 알려드립니다.",
+    }),
+    // new InputForm({
+    //   wid: "orgEmail",
+    //   title: "행정실 이메일",
+    //   desc: "필요 서류를 받을 이메일 주소를 입력해 주세요.",
+    //   value: "",
+    //   placeholder: "서류를 전달받을 기관 이메일을 입력해주세요.",
+    // }),
+    new InputForm({
+      wid: "orgContactInfo",
+      title: "기관 주소 [연습공책 주문 시 필수]",
+      desc: "받아쓰기 연습공책이 배송될 주소를 입력해 주세요.",
+      value: "",
+      placeholder: "기관 주소",
+    }),
+  ];
+  forms.splice(0, forms.length);
+  forms.push(...frm);
 };
+const updateForm = ({ value, commit }) => {
+  commit(value);
+};
+const validForm = () => {
+  const orgName = forms.find((form) => form.wid === "orgName");
+  const error = [];
+  if (orgName.value.trim() === "") {
+    error.push("소속 기관명을 입력해주세요");
+  }
+  const senderName = forms.find((form) => form.wid === "senderName");
+  if (senderName.value.trim() === "") {
+    error.push("문의자 이름을 입력해주세요");
+  }
+  const senderContactInfo = forms.find(
+    (form) => form.wid === "senderContactInfo"
+  );
+  if (senderContactInfo.value.trim() === "") {
+    error.push("문의자 연락처(전화번호)를 입력해주세요");
+  }
+  if (memo.value.trim() === "") {
+    error.push("문의 내용을 입력해주세요");
+  }
+  if (error.length > 0) {
+    toast.warn(error, "구매 양식", 30);
+  }
+  return error.length === 0;
+};
+const showPreview = () => {
+  if (validForm()) {
+    console.log(papers.filter((paper) => paper.selected));
+    editMode.value = false;
+  }
+};
+const showEdit = () => (editMode.value = true);
+const sendForm = () => {
+  const orderForm = {
+    seq: null,
+    orgName: null,
+    senderName: null,
+    senderContactInfo: null,
+    senderEmail: null,
+    orgEmail: null,
+    content: null,
+    papers: [],
+  };
+  const paperSpec = {
+    paperType: null,
+    desc: null,
+  };
+  forms.reduce((order, form) => {
+    order[form.wid] = form.value;
+    return order;
+  }, orderForm);
+  orderForm.content = memo.value;
+
+  papers
+    .filter((p) => p.selected)
+    .forEach((paper) => {
+      const p = Object.assign({}, paperSpec);
+      p.paperType = paper.type;
+      p.desc = paper.value;
+      orderForm.papers.push(p);
+    });
+  api.order.group.sendForm(orderForm).then(() => {
+    formSent.value = true;
+    setTimeout(() => {
+      router.replace("/");
+    }, 5000);
+    // router.replace("/");
+  });
+};
+const delegateLogin = () => appProvider.login();
+
+productTabs.setActiveAt(2);
+watch(
+  userRef,
+  (loginUer) => {
+    if (loginUer) {
+      initForm();
+    }
+  },
+  { immediate: true }
+);
+watch(activeTab, (tab) => {
+  const { cmd } = tab;
+  if (cmd === "license") {
+    router.push("/purchase");
+  } else if (cmd === "book") {
+    router.push("/purchase");
+  }
+});
+
+// export default {
+//   components: {
+//     TextFieldView,
+//     ProductTabNav,
+//   },
+//   setup() {
+
+//     return {
+//       userRef,
+//       forms,
+//       papers,
+//       memo,
+//       editMode,
+//       formSent,
+//       productTabs,
+//       showPreview,
+//       showEdit,
+//       sendForm,
+//       updateForm,
+//       delegateLogin,
+//     };
+//   },
+// };
 </script>
 
 <style lang="scss" scoped>
 .container {
-  max-width: 600px;
+  margin-top: 5rem;
   .jumbo {
     text-align: center;
     margin-top: 24px;
@@ -362,6 +385,8 @@ export default {
   .form {
     position: relative;
     margin-bottom: 32px;
+    max-width: 600px;
+    margin: auto;
   }
   .elem {
     margin-top: 16px;

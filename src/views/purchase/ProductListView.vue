@@ -1,13 +1,12 @@
 <template>
   <div class="prod-list container">
+    <PurchaseJumbo />
     <div class="row">
-      <div class="col-12">
-        <section>
-          <h1>구매하기</h1>
-        </section>
+      <div class="col-xs-12">
+        <ProductTabNav :tabs="productTabs" />
       </div>
     </div>
-    <div class="row">
+    <div v-if="activeTab.cmd === 'license'" class="row">
       <div
         v-for="prod in products"
         :key="prod.code"
@@ -16,49 +15,54 @@
         <ProductView :product="prod" @order="gotoOrderForm" class="product" />
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-12 group-order">
-        <button @click="gotoGroupOrder" class="nude red">
-          단체이용권 및 연습공책 구매 문의
-        </button>
+    <div v-else-if="activeTab.cmd === 'book'" class="row">
+      <div class="col-xs-12">
+        <h3>교재 구매 페이지로</h3>
+      </div>
+    </div>
+    <div v-else-if="activeTab.cmd === 'groupOrder'" class="row">
+      <div class="col-xs-12">
+        <h3>단체구매 양식</h3>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script setup>
+import { computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import ProductView from "../../components/product/ProductView.vue";
-import api from "../../service/api";
+// import api from "../../service/api";
+import ProductTabNav from "./tab/ProductTabNav.vue";
+import { productTabs } from "./tab";
+import PurchaseJumbo from "./PurchaseJumbo.vue";
+import "./product-store";
+import { useStore } from "vuex";
+const store = useStore();
+const { activeTab } = productTabs;
+productTabs.setActiveAt(0);
 
-export default {
-  components: {
-    ProductView,
-  },
-  setup() {
-    const router = useRouter();
-    const products = ref(null);
+const router = useRouter();
+const products = computed(() => store.getters["product/onlineProducts"]);
 
-    const gotoOrderForm = (
-      /** @type {{method: String, product: Product}} */ evt
-    ) => {
-      const { method, product } = evt;
-      // new OrderForm(method, product.code).save();
-      router.push({
-        path: `/purchase/order/${product.code}`,
-        params: { method },
-      });
-    };
-    const gotoGroupOrder = () => {
-      router.push("/purchase/contact");
-    };
-    api.product.list().then((res) => {
-      products.value = res.products;
-    });
-    return { products, gotoOrderForm, gotoGroupOrder };
-  },
+const gotoOrderForm = (
+  /** @type {{method: String, product: Product}} */ evt
+) => {
+  const { method, product } = evt;
+  router.push({
+    path: `/purchase/order/${product.code}`,
+    params: { method },
+  });
 };
+watch(activeTab, (tab) => {
+  const { cmd } = tab;
+  if (cmd === "book") {
+    const book = store.getters["product/bookProduct"];
+    router.push(`/purchase/order/${book.code}`);
+  } else if (cmd === "groupOrder") {
+    router.push("/purchase/contact");
+  }
+});
 </script>
 
 <style lang="scss" scoped>
