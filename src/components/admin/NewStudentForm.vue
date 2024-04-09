@@ -158,7 +158,7 @@ export default {
       new InputForm({
         wid: "userId",
         title: "아이디",
-        desc: "영문자와 숫자로 아이디를 입력헤주세요(최소 4글자 이상).",
+        desc: "영문자와 숫자로 아이디를 입력해주세요(최소 4글자 이상).",
         status: "pending",
         value: "",
         error: null,

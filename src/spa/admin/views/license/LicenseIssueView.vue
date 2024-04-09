@@ -28,18 +28,6 @@
     </div>
     <div class="license-view" v-if="activeUser">
       <h3>{{ activeUser.name }}</h3>
-      <div class="license-ctrl">
-        <AacButton
-          :inline="true"
-          borderless
-          rect
-          theme="blue"
-          text="신규발급"
-          size="xs"
-          muted
-          @click="popupModal"
-        ></AacButton>
-      </div>
       <div class="licenses" v-if="licenses && licenses.length > 0">
         <LicenseConfigView
           :readOnly="true"
@@ -173,6 +161,7 @@ export default {
     padding-right: 8px;
     h3 {
       font-size: 1.25rem;
+      margin: 8px 0;
     }
     .license-ctrl {
       display: flex;

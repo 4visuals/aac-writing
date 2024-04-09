@@ -2,19 +2,6 @@
   <div class="lcs-config-view">
     <div class="dimmer" v-if="slideMenuRef.visible" @click="hideMenu"></div>
     <div class="lcs-view" v-if="slideMenuRef.visible">
-      <div class="order-lcs" v-if="readOnly">
-        <h4>읽기 전용 모드</h4>
-        <p>이 화면은 사용자의 수강증, 학생 정보를 보여줍니다.</p>
-      </div>
-      <div class="order-lcs" v-else>
-        <p>수강증이 더 필요하신가요?</p>
-        <FormButton
-          icon="sell"
-          text="수강증 추가 구매"
-          size="sm"
-          @click="showLcsPurchase"
-        />
-      </div>
       <LicenseItem
         v-for="lcs in licenses"
         :students="students"
