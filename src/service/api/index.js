@@ -112,10 +112,11 @@ const order = {
   prepare: (orderUuid) => POST(`/order/${orderUuid}/prepare`),
   createBeta: (productCode, quantity) =>
     POST("/order/beta", { productCode, quantity }),
-  create: (productCode, delivery) =>
+  create: (productCode, delivery, qtt) =>
     POST("/order", {
       productCode,
       delivery: delivery ? delivery.toDto() : undefined,
+      qtt,
     }),
   cancel: (orderUuid) => PUT("/order", { orderUuid }),
   get: (orderUuid) => GET(`/order/${orderUuid}`),

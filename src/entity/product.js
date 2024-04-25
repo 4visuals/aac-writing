@@ -15,9 +15,19 @@ class Product {
       this[prop] = data[prop];
     });
   }
+  get taxFree() {
+    const { tax } = this;
+    if (!tax) {
+      throw new Error("tax is required. 'Y' or 'N'");
+    }
+    return tax === "N";
+  }
   get offline() {
     return this.digitalType === "N";
   }
+  /**
+   * 최종 상품 금액(상품가 - 할인가)
+   */
   get price() {
     const { discountKrWon, priceKrWon } = this;
     return priceKrWon - discountKrWon;
@@ -28,6 +38,17 @@ class Product {
   get discountRate() {
     const { discountKrWon, priceKrWon } = this;
     return (discountKrWon / priceKrWon) * 100;
+  }
+  /**
+   * 면세가액 반환
+   * @returns 면세 상품이면 전체 상품 금액 반환, 과세 상품이면 0 반환
+   */
+  getTaxAmount() {
+    if (this.taxFree) {
+      return this.price;
+    } else {
+      return 0;
+    }
   }
   getActivatedDate(format) {
     const d = new Date(this.activatedAt);

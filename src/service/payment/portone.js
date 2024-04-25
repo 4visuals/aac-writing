@@ -16,12 +16,20 @@ export class PortOne {
   constructor(param) {
     this.param = param;
   }
+  /**
+   * 포트원에 결제 검증 요청을 먼저 전송함.
+   * @returns
+   */
   sendVerificationCode() {
     const { order } = this.param;
     return api.order.prepare(order.getUuid()).then(() => {
       return this;
     });
   }
+  /**
+   * 포트원 결제 진행 시작
+   * @returns
+   */
   startPayment() {
     const { loginUser, product, order, method } = this.param;
     const imp = window.IMP;
@@ -30,6 +38,8 @@ export class PortOne {
     const { origin } = document.location;
     const redirectUrl = `${origin}/purchase/order/checking`;
     return new Promise((resolve, failed) => {
+      const tax_free = order.resolveTax();
+      console.log(tax_free);
       imp.request_pay(
         {
           // param
@@ -38,6 +48,7 @@ export class PortOne {
           merchant_uid,
           name: product.name,
           amount: order.totalAmount,
+          tax_free,
           buyer_email: loginUser.email,
           buyer_name: loginUser.name,
           m_redirect_url: redirectUrl,

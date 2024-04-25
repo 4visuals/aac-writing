@@ -8,6 +8,7 @@
     <h5>
       <span :class="['sales', order.product.salesType]"
         ><span v-if="order.product.salesType === 'GB'">공동구매</span
+        ><span v-else-if="order.product.tax === 'N'">연습공책</span
         ><span v-else>단체구매</span></span
       ><span class="pay" :class="[order.getPaymentClass()]">{{
         order.getPaymentText()
@@ -24,7 +25,7 @@
       <p v-if="order.product.salesType === 'GB'">
         {{ teacher.name }}님이 신청하신 공동구매 결제를 완료해주세요.
       </p>
-      <p v-else>이용권 : {{ order.licenseQtt }} 매</p>
+      <!-- <p v-else>{{ order.licenseQtt }} 매</p> -->
       <p style="text-align: center">
         <FormButton
           v-if="order.isPendingOrder()"

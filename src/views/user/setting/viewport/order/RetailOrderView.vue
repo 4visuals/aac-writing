@@ -9,7 +9,9 @@
       </a>
     </div>
     <h5>
-      <span class="sales">이용권</span
+      <span class="sales"
+        ><span v-if="order.product.tax === 'N'">연습공책</span
+        ><span v-else>이용권</span></span
       ><span class="pay" :class="[order.getPaymentClass()]">{{
         order.getPaymentText()
       }}</span

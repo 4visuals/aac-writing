@@ -17,7 +17,9 @@
         />
         <div class="inline buy">
           <button
-            :disabled="!user || (product.offline && !deliveryInfo)"
+            :disabled="
+              !user || (product.offline && !deliveryInfo) || amount.total === 0
+            "
             class="btn-purchase nude blue"
             @click="startOrder('card')"
           >
@@ -47,21 +49,24 @@
           </div>
           <div class="hr"></div>
         </div>
-        <section class="guide">
-          <h3>{{ info.usage.title }}</h3>
-          <ul>
-            <li v-for="(elem, idx) in info.usage.elems" :key="idx">
-              {{ elem }}
-            </li>
-          </ul>
-        </section>
-        <section class="refound">
-          <h3>{{ info.refund.title }}</h3>
-          <ul>
-            <li v-for="(elem, idx) in info.refund.elems" :key="idx">
-              {{ elem }}
-            </li>
-          </ul>
+        <section v-if="product.offline" class="refound">
+          <h3>수량 및 결제금액</h3>
+          <p v-if="amount.total === 0" class="alert">수량을 선택해주세요.</p>
+          <div class="total-amount">
+            <div class="qtt">
+              <select class="field" v-model="amount.qtt">
+                <option value="0">수량 선택</option>
+                <option v-for="cnt in amount.option" :key="cnt" :value="cnt">
+                  {{ cnt }}세트
+                </option>
+              </select>
+            </div>
+            <div class="p">
+              <h3>
+                총 <span class="price">{{ format(amount.total) }}</span> 원
+              </h3>
+            </div>
+          </div>
         </section>
         <section v-if="product.offline" class="refound">
           <h3>배송 정보 입력</h3>
@@ -86,7 +91,9 @@
         </section>
         <section class="buy">
           <button
-            :disabled="!user || (product.offline && !deliveryInfo)"
+            :disabled="
+              !user || (product.offline && !deliveryInfo) || amount.total === 0
+            "
             class="btn-purchase nude blue"
             @click="startOrder('card')"
           >
@@ -96,6 +103,30 @@
             <AppIcon icon="phone_android" /><span>휴대폰 결제</span>
           </button> -->
         </section>
+        <section v-if="product.offline" class="guide">
+          <h3>{{ info.offline.title }}</h3>
+          <ul>
+            <li v-for="(elem, idx) in info.offline.elems" :key="idx">
+              {{ elem }}
+            </li>
+          </ul>
+        </section>
+        <section v-if="!product.offline" class="guide">
+          <h3>{{ info.usage.title }}</h3>
+          <ul>
+            <li v-for="(elem, idx) in info.usage.elems" :key="idx">
+              {{ elem }}
+            </li>
+          </ul>
+        </section>
+        <section v-if="!product.offline" class="refound">
+          <h3>{{ info.refund.title }}</h3>
+          <ul>
+            <li v-for="(elem, idx) in info.refund.elems" :key="idx">
+              {{ elem }}
+            </li>
+          </ul>
+        </section>
         <div v-if="!user" class="alert">로그인 후 결제 가능합니다.</div>
       </div>
     </div>
@@ -103,7 +134,7 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef } from "vue";
+import { computed, ref, shallowRef, reactive, watch } from "vue";
 import ProductView from "../../components/product/ProductView.vue";
 import ActionIcon from "../../components/form/ActionIcon.vue";
 import { OrderForm } from "./order-form";
@@ -123,6 +154,11 @@ const user = computed(() => store.getters["user/currentUser"]);
 /** @type {import('vue').Ref<OrderForm>} */
 const order = ref(null);
 const product = computed(() => order.value && order.value.product);
+const amount = reactive({
+  qtt: 0,
+  total: 0,
+  option: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+});
 const deliveryInfo = shallowRef(undefined);
 
 const info = {
@@ -139,6 +175,16 @@ const info = {
     elems:
       `환불 요청은 승인일로 부터 7일 이내에 제기해 주셔야 하며, 이 경우 결제와 동일한 수단으로 환불됩니다.
 콘텐츠의 내용이 표시 ・ 광고 내용과 다르거나 계약 내용과 다르게 이행된 경우에는 당해 콘텐츠를 공급받은 날로 부터 3월 이내, 그 사실을 안 날 또는 알 수 있었던 날로부터 30일 이내에 환불 받으실 수 있으며 납입한 금액의 2/3에 대해서 환불합니다.`.split(
+        "\n"
+      ),
+  },
+  offline: {
+    title: "교환 및 환불정책 안내",
+    elems:
+      `제품 불량으로 인한 교환 및 환불은 제품 수령 후 7일까지 무상으로 가능합니다. (7일 이후 요청 시 왕복 택배비 고객 부담)
+단순 변심에 의한 환불은 제품 수령 후 7일까지만 가능하며, 왕복 배송비는 고객 부담입니다.
+훼손 또는 사용 시 교환 및 환불은 불가능합니다.
+인쇄상 발생한 동일 색상의 미세한 색상 차이는 불량이 아니며, 이로 인한 교환 및 환불은 단순 변심으로 처리되어 왕복 배송비가 발생되며 이는 고객 부담입니다.`.split(
         "\n"
       ),
   },
@@ -164,9 +210,10 @@ const startPgOrder = () => {
   const loginUser = store.getters["user/currentUser"];
   const prod = product.value;
   const { origin } = document.location;
-
   const redirectUrl = `${origin}/purchase/order/checking`;
 
+  const amount = order.value.getPaidAmount();
+  const tax_free = order.value.getTaxAmount();
   imp.request_pay(
     {
       // param
@@ -174,7 +221,8 @@ const startPgOrder = () => {
       pay_method: method,
       merchant_uid,
       name: prod.name,
-      amount: prod.price,
+      amount,
+      tax_free,
       buyer_email: loginUser.email,
       buyer_name: loginUser.name,
       m_redirect_url: redirectUrl,
@@ -193,8 +241,9 @@ const startPgOrder = () => {
 };
 
 const startOrder = (method) => {
+  const { qtt, total } = amount;
   order.value
-    .prepare(method, deliveryInfo.value)
+    .prepare(method, deliveryInfo.value, qtt, total)
     .then(startPgOrder)
     .catch((e) => {
       console.log(e);
@@ -222,10 +271,29 @@ const loadAddressMap = () => {
 OrderForm.load(route.params.code)
   .then((orderForm) => {
     order.value = orderForm;
+    const { product } = orderForm;
+    if (product.digital) {
+      amount.qtt = 1;
+      amount.total = product.price;
+    }
   })
   .catch((err) => {
     toast.error("@" + err.cause, "상품 정보 오류", 10);
   });
+
+watch(
+  () => amount.qtt,
+  () => {
+    amount.total = amount.qtt * product.value.price;
+    console.log(amount.total);
+  }
+);
+watch(order, (orderForm) => {
+  if (orderForm.product.tax === "Y") {
+    amount.qtt = 1;
+    amount.total = orderForm.product.price;
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -351,6 +419,18 @@ OrderForm.load(route.params.code)
       border-radius: 4px;
       padding: 4px;
       font-size: 1.2rem;
+    }
+  }
+  .total-amount {
+    display: flex;
+    column-gap: 8px;
+    align-items: center;
+    h3 {
+      color: #ae0000;
+      margin: 0;
+      font-weight: 900;
+      font-family: Tahoma;
+      // text-align: right;
     }
   }
   .alert {

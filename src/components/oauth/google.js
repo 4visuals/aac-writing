@@ -19,21 +19,23 @@ const initGoogleSignIn = (callback, failedCallback, showPrompt = false) => {
     client_id: env.GOOGLE_CLIENT_ID,
     callback,
     state_cookie_domain: env.HOST,
+    cancel_on_tap_outside: false,
     scope:
       "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
     ux_mode: "popup",
   });
   if (showPrompt) {
-    window.google.accounts.id.prompt((notification) => {
-      if (
-        notification.isNotDisplayed() &&
-        notification.getNotDisplayedReason() === "opt_out_or_no_session"
-      ) {
-        failedCallback(notification.getNotDisplayedReason());
-      }
-    });
+    window.google.accounts.id.prompt();
+    // window.google.accounts.id.prompt((notification) => {
+    //   if (
+    //     notification.isNotDisplayed() &&
+    //     notification.getNotDisplayedReason() === "opt_out_or_no_session"
+    //   ) {
+    //     failedCallback(notification.getNotDisplayedReason());
+    //   }
+    // });
   }
-  return Promise.resolve(true);
+  // return Promise.resolve(true);
 };
 export default {
   resolveUrl,

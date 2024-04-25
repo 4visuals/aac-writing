@@ -13,11 +13,11 @@
         placeholder="상세주소"
         @input="(e) => searchResponse.delivery.setDetailAddress(e.target.value)"
       />
-      <label>받는사람</label>
+      <label>받는사람(전화번호)</label>
       <input
         class="field"
         type="text"
-        placeholder="택배수령인 이름"
+        placeholder="택배수령인 이름(전화 번호 필수 입력)"
         @input="(e) => searchResponse.delivery.setReceiverName(e.target.value)"
       />
       <div>

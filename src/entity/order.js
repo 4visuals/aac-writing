@@ -1,3 +1,5 @@
+import Product from "./product";
+
 const statesMap = {
   ATV: { class: "atv", ko: "결제완료" },
   RDY: { class: "rdy", ko: "결제준비" },
@@ -5,6 +7,9 @@ const statesMap = {
 export default class Order {
   constructor(orderDto) {
     this._dto = orderDto;
+    if (this._dto.product) {
+      this._dto.product = new Product(this._dto.product);
+    }
     const props = new Set(["receipt_url"]);
     const getters = new Set([
       "isDigitalType",
@@ -16,6 +21,7 @@ export default class Order {
       "getUuid",
       "getPaymentClass",
       "getPaymentText",
+      "resolveTax",
     ]);
     return new Proxy(this, {
       get(target, property, receiver) {
@@ -32,6 +38,9 @@ export default class Order {
   }
   get receipt_url() {
     return this._dto.transactionDetail?.receipt_url;
+  }
+  get product() {
+    return this._dto.product;
   }
   isDigitalType() {
     return this._dto.product.digitalType === "Y";
@@ -82,5 +91,10 @@ export default class Order {
    */
   isPendingOrder() {
     return this._dto.orderState === "RDY";
+  }
+
+  resolveTax() {
+    const { taxFree } = this.product;
+    return taxFree ? this.totalAmount : 0;
   }
 }
