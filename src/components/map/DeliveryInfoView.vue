@@ -1,9 +1,12 @@
 <template>
   <div class="delivery-info">
+    <p>
+      <span class="zip">{{ deliveryInfo.zipCode }}</span>
+    </p>
     <p>{{ deliveryInfo.baseAddress }} {{ deliveryInfo.detailAddress }}</p>
     <p>{{ deliveryInfo.receiverName }}</p>
     <p>
-      <span class="zip">{{ deliveryInfo.zipCode }}</span>
+      <span class="phone">{{ deliveryInfo.phoneNumber }}</span>
     </p>
   </div>
 </template>

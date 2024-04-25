@@ -1,6 +1,9 @@
 <template>
   <section>
     <div class="field">
+      <button class="nude floating" @click="$emit('close')">
+        <AppIcon icon="close" fsize="14px" /><span>닫기</span>
+      </button>
       <input
         class="field"
         type="text"
@@ -72,6 +75,7 @@ const fillAddress = () => {
   const { delivery } = searchResponsRef.value;
   emits("delivery", delivery);
 };
+
 onMounted(() => {
   console.log(mapEl.value);
   var options = {
@@ -86,11 +90,14 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 section {
   position: relative;
-  height: 600px;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
+
   & > .field {
     position: absolute;
     top: 0px;
@@ -100,6 +107,19 @@ section {
     padding: 8px;
     display: flex;
     z-index: 10;
+    display: flex;
+    column-gap: 4px;
+    .floating {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
+      border: 1px solid #5ba2ff;
+      color: #5ba2ff;
+      border-radius: 8px;
+      font-size: 1rem;
+      padding: 6px;
+    }
   }
   .map-wrapper {
     flex: 1 1 auto;

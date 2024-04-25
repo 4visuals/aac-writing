@@ -1,3 +1,5 @@
+import util from "../../service/util";
+
 export class DeliveryInfo {
   legacy;
   /** @type {{address_name: string, building_name: string, zone_no: string}} 도로명 주소 */
@@ -6,6 +8,12 @@ export class DeliveryInfo {
   detailAddress;
   /** @type {string} 받는 사람 */
   receiverName;
+  /**
+   * @type {string} 사용자가 입력한 기본주소. 검색한 기본주소 대신에 쓰임
+   */
+  _userDefinedBaseAddress;
+  /** @type {string} */
+  phoneNumber;
   constructor(legacy, road) {
     this.legacy = legacy;
     this.road = road;
@@ -17,7 +25,9 @@ export class DeliveryInfo {
   }
   get baseAddress() {
     const { road } = this;
-    if (road) {
+    if (this._userDefinedBaseAddress) {
+      return this._userDefinedBaseAddress;
+    } else if (road) {
       const { address_name, building_name } = road;
       return `${address_name} ${building_name}`;
     } else {
@@ -34,9 +44,29 @@ export class DeliveryInfo {
   setReceiverName(/** @type {string} */ receiverName) {
     this.receiverName = receiverName;
   }
+  /**
+   * 검색한 기본 주소를 수정함
+   * @param {string} baseAddress
+   */
+  setBaseAddress(/** @type {string} */ baseAddress) {
+    this._userDefinedBaseAddress = baseAddress;
+  }
+  setPhoneNumber(/** @type {string} */ phoneNumber) {
+    this.phoneNumber = phoneNumber.trim();
+  }
+  checkForm() {
+    if (!this.phoneNumber) {
+      return false;
+    }
+    if (!util.phone.checkFormat(this.phoneNumber)) {
+      return false;
+    }
+    return true;
+  }
   toDto() {
-    const { baseAddress, detailAddress, receiverName, zipCode } = this;
-    return { baseAddress, detailAddress, receiverName, zipCode };
+    const { baseAddress, detailAddress, receiverName, zipCode, phoneNumber } =
+      this;
+    return { baseAddress, detailAddress, receiverName, zipCode, phoneNumber };
   }
 }
 export class AddressSearchResponse {

@@ -297,6 +297,11 @@ const chapter = {
     }${suffix}`;
   },
 };
+const phone = {
+  checkFormat: (/** @type{string} */ phoneNumber) => {
+    return /^01(?:0|1|[6-9])-(?:\d{3}|\d{4})-\d{4}$/.test(phoneNumber);
+  },
+};
 export { key, path, time, host, logger, arr, vue, valid, currency, pick };
 export default {
   key,
@@ -310,4 +315,5 @@ export default {
   currency,
   pick,
   chapter,
+  phone,
 };

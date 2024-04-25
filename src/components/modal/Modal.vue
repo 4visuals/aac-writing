@@ -46,6 +46,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/resizer";
 .modals {
   .fade-enter-from,
   .fade-leave-to {
@@ -97,6 +98,17 @@ export default {
     width: 100%;
     display: flex;
     flex-direction: column;
+    @include mobile {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      transform: none;
+      display: flex;
+      flex-direction: column;
+    }
   }
   &.rect {
     border-radius: 0;

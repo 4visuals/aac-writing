@@ -72,11 +72,12 @@
           <h3>배송 정보 입력</h3>
           <div class="delivery">
             <div v-if="deliveryInfo" class="info">
+              <p>우){{ deliveryInfo.zipCode }}</p>
               <p>
                 {{ deliveryInfo.baseAddress }} {{ deliveryInfo.detailAddress }}
               </p>
               <p>{{ deliveryInfo.receiverName }}</p>
-              <p>우){{ deliveryInfo.zipCode }}</p>
+              <p>{{ deliveryInfo.phoneNumber }}</p>
               <button class="nude sm blue" @click="resetDelivery">
                 재입력
               </button>
@@ -264,7 +265,7 @@ const updateDeliveryInfo = (
 const loadAddressMap = () => {
   modal.showModal(AddressMapView, {
     width: "md",
-    fill: false,
+    fill: true,
     events: { delivery: updateDeliveryInfo },
   });
 };

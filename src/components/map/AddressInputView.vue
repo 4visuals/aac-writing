@@ -6,25 +6,45 @@
         <span class="zipcode">{{ searchResponse.delivery.zipCode }}</span
         ><span class="base">{{ searchResponse.delivery.baseAddress }}</span>
       </p>
-      <label>상세주소</label>
+      <label>기본주소</label>
       <input
         class="field"
         type="text"
         placeholder="상세주소"
-        @input="(e) => searchResponse.delivery.setDetailAddress(e.target.value)"
+        :value="searchResponse.delivery.baseAddress"
+        @input="(e) => searchResponse.delivery.setBaseAddress(e.target.value)"
       />
-      <label>받는사람(전화번호)</label>
+      <label
+        >상세주소
+        <span class="more"
+          >상세주소가 없으면 "1층"으로 입력해주세요.</span
+        ></label
+      >
       <input
         class="field"
         type="text"
-        placeholder="택배수령인 이름(전화 번호 필수 입력)"
+        placeholder="상세주소(없으면 '1층'입력)"
+        @input="(e) => searchResponse.delivery.setDetailAddress(e.target.value)"
+      />
+      <label>받는사람</label>
+      <input
+        class="field"
+        type="text"
+        placeholder="택배수령인 이름"
         @input="(e) => searchResponse.delivery.setReceiverName(e.target.value)"
+      />
+      <label>전화번호</label>
+      <input
+        class="field"
+        type="text"
+        placeholder="010-0000-0000"
+        @input="(e) => searchResponse.delivery.setPhoneNumber(e.target.value)"
       />
       <div>
         <button
           class="nude blue"
           :disabled="!searchResponse.delivery.valid()"
-          @click="$emit('success')"
+          @click="checkForm"
         >
           배송지 입력
         </button>
@@ -41,9 +61,20 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { defineProps, defineEmits } from "vue";
+import toast from "../toast";
 
-defineProps(["searchResponse"]);
+const props = defineProps(["searchResponse"]);
+const emit = defineEmits(["success"]);
+
+const checkForm = () => {
+  const { delivery } = props.searchResponse;
+  if (!delivery.checkForm()) {
+    toast.error("전화번호를 올바로 입력해주세요");
+    return;
+  }
+  emit("success");
+};
 </script>
 
 <style lang="scss" scoped>
@@ -71,10 +102,19 @@ section.addr {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
+    label {
+      display: flex;
+      align-items: center;
+      .more {
+        color: crimson;
+        margin-left: 8px;
+      }
+    }
     p {
       font-size: 1.3rem;
       display: flex;
       align-items: center;
+      column-gap: 8px;
       .zipcode {
         background-color: darkgreen;
         color: white;
