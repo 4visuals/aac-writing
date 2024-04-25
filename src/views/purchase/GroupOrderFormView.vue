@@ -40,6 +40,7 @@
           v-if="editMode"
           :formModel="form"
           :readOnly="form.wid === 'senderEmail'"
+          :focus="form.selected"
           @value="updateForm"
         >
           <template #title
@@ -182,6 +183,7 @@ const initForm = () => {
       value: "",
       required: true,
       placeholder: "소속 기관명을 입력해주세요.",
+      selected: true,
     }),
     new InputForm({
       wid: "senderName",
@@ -312,33 +314,10 @@ watch(activeTab, (tab) => {
   if (cmd === "license") {
     router.push("/purchase");
   } else if (cmd === "book") {
-    router.push("/purchase");
+    const book = store.getters["product/bookProduct"];
+    router.push(`/purchase/order/${book.code}`);
   }
 });
-
-// export default {
-//   components: {
-//     TextFieldView,
-//     ProductTabNav,
-//   },
-//   setup() {
-
-//     return {
-//       userRef,
-//       forms,
-//       papers,
-//       memo,
-//       editMode,
-//       formSent,
-//       productTabs,
-//       showPreview,
-//       showEdit,
-//       sendForm,
-//       updateForm,
-//       delegateLogin,
-//     };
-//   },
-// };
 </script>
 
 <style lang="scss" scoped>

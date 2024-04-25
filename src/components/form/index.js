@@ -24,6 +24,7 @@ class InputForm {
     placeholder,
     filter,
     readOnly = false,
+    selected = false,
   }) {
     this.wid = wid;
     this.title = title;
@@ -36,6 +37,7 @@ class InputForm {
     this.placeholder = placeholder;
     this.filter = filter || DEFAULT_FILTER;
     this.readOnly = readOnly;
+    this.selected = selected;
   }
   getErrorMessage() {
     if (!this.error) {

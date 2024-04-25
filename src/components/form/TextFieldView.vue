@@ -13,6 +13,7 @@
         :type="valueVisible ? 'text' : formModel.type || 'text'"
         :placeholder="formModel.placeholder || ''"
         ref="inputEl"
+        :autofocus="formModel.selected"
         :disabled="readOnly"
         @input="valueTyped"
         @blur="rollback"
@@ -41,6 +42,7 @@ export default {
   props: {
     formModel: { type: InputForm },
     readOnly: { type: Boolean, default: false },
+    focus: { type: Boolean, default: true },
   },
   setup(props, { emit }) {
     const debounceTime = 1000;
@@ -105,7 +107,9 @@ export default {
     onMounted(() => {
       if (inputEl.value) {
         inputEl.value.value = props.formModel.value;
-        setFocus();
+        if (props.focus) {
+          setFocus();
+        }
       }
     });
     return {
