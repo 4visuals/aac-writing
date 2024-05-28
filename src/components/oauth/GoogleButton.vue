@@ -32,7 +32,7 @@ export default {
         });
     };
 
-    onMounted(() => {
+    const initButton = () => {
       window.google.accounts.id.initialize({
         client_id: env.GOOGLE_CLIENT_ID,
         callback: handleResponse,
@@ -51,6 +51,17 @@ export default {
           shape,
         } // customization attributes
       );
+    };
+
+    const awaitScriptLoading = () => {
+      if (window?.google?.accounts) {
+        initButton();
+      } else {
+        setTimeout(awaitScriptLoading, 100);
+      }
+    };
+    onMounted(() => {
+      awaitScriptLoading();
     });
     return { btnRef };
   },

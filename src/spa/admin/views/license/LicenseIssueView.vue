@@ -31,12 +31,11 @@
       <div class="licenses" v-if="licenses && licenses.length > 0">
         <LicenseConfigView
           :readOnly="true"
+          :orders="orders"
           :licenses="licenses"
           :students="students"
+          @update-expiry="updateExpiry"
         />
-      </div>
-      <div class="empty-lcs">
-        <p>사용자에게 발급된 라이선스가 없습니다.</p>
       </div>
     </div>
     <teleport to="body" v-if="modal">
@@ -51,99 +50,82 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import LicenseConfigView from "@/components/admin/LicenseConfigView.vue";
-import NewLicenseForm from "./NewLicenseForm.vue";
 import { DropDown } from "@/components/form";
 import { ref, shallowRef } from "@vue/reactivity";
 import adminApi from "../../service/admin-api";
 import { time } from "@/service/util";
 import License from "@/entity/license";
+import Order from "../../../../entity/order";
+import toast from "../../../../components/toast";
 /**
  * 라이선스 발급 화면
  */
-export default {
-  components: {
-    DropDown,
-    LicenseConfigView,
-    NewLicenseForm,
-  },
-  setup() {
-    const users = ref([]);
-    const focusedUserRef = shallowRef(null);
-    const activeUser = ref(null);
-    const licenses = ref([]);
-    const students = ref([]);
-    const modal = shallowRef(null);
-    const userSelected = (user) => {
-      adminApi.member.licenses(user.seq).then((res) => {
-        res.students.forEach((student) => {
-          const ymd = student.birth.split("-");
-          student.birth = time.birthToDate(ymd);
-        });
-        licenses.value = res.licenses.map((lcs) => new License(lcs));
-        students.value = res.students;
-        activeUser.value = user;
-      });
-    };
-    const search = (keyword) => {
-      if (keyword.trim().length === 0) {
-        return;
-      }
-      adminApi.member.search(keyword).then((res) => {
-        users.value = res.members;
-      });
-    };
-    const clearSearch = () => {
-      users.value = null;
-    };
-    const licenseCreated = (newLicenses) => {
-      licenses.value.push(...newLicenses);
-    };
-    const popupModal = () => {
-      modal.value = {
-        comp: NewLicenseForm,
-        args: { user: activeUser.value },
-        events: { created: licenseCreated },
-      };
-    };
-    const startNavigation = () => {
-      focusedUserRef.value = users.value[0];
-    };
-    const moveBy = (delta) => {
-      if (!focusedUserRef.value) {
-        return;
-      }
-      const userList = users.value;
-      const focused = focusedUserRef.value;
-      const idx = userList.findIndex((user) => user === focused);
-      const nextIdx = (idx + delta + userList.length) % userList.length;
-      focusedUserRef.value = userList[nextIdx];
-    };
-    const showUserDetail = (e) => {
-      if (!focusedUserRef.value) {
-        return;
-      }
-      userSelected(focusedUserRef.value);
-      clearSearch();
-      e.setText(focusedUserRef.value.email, true);
-    };
-    return {
-      users,
-      focusedUserRef,
-      activeUser,
-      licenses,
-      students,
-      modal,
-      userSelected,
-      search,
-      clearSearch,
-      popupModal,
-      startNavigation,
-      moveBy,
-      showUserDetail,
-    };
-  },
+const users = ref([]);
+const focusedUserRef = shallowRef(null);
+const activeUser = ref(null);
+const orders = shallowRef([]);
+/** @type {Ref<License[]>} */
+const licenses = shallowRef([]);
+const students = ref([]);
+const modal = shallowRef(null);
+const userSelected = (user) => {
+  adminApi.member.licenses(user.seq).then((res) => {
+    orders.value = res.orders.map((order) => new Order(order));
+    res.students.forEach((student) => {
+      const ymd = student.birth.split("-");
+      student.birth = time.birthToDate(ymd);
+    });
+    licenses.value = res.licenses.map((lcs) => new License(lcs));
+    students.value = res.students;
+    activeUser.value = user;
+  });
+};
+const search = (keyword) => {
+  if (keyword.trim().length === 0) {
+    return;
+  }
+  adminApi.member.search(keyword).then((res) => {
+    users.value = res.members;
+  });
+};
+const clearSearch = () => {
+  users.value = null;
+};
+const startNavigation = () => {
+  focusedUserRef.value = users.value[0];
+};
+const moveBy = (delta) => {
+  if (!focusedUserRef.value) {
+    return;
+  }
+  const userList = users.value;
+  const focused = focusedUserRef.value;
+  const idx = userList.findIndex((user) => user === focused);
+  const nextIdx = (idx + delta + userList.length) % userList.length;
+  focusedUserRef.value = userList[nextIdx];
+};
+const showUserDetail = (e) => {
+  if (!focusedUserRef.value) {
+    return;
+  }
+  userSelected(focusedUserRef.value);
+  clearSearch();
+  e.setText(focusedUserRef.value.email, true);
+};
+const updateExpiry = (e) => {
+  const { order, expDate } = e;
+  console.log(expDate, order);
+  const utcTimeText = order.replaceExpiryDate(expDate);
+  adminApi.order.group
+    .updateExpiration(order.order.seq, order.orderUuid, utcTimeText)
+    .then(() => {
+      order.setExpiredTime(utcTimeText);
+      const value = licenses.value;
+      licenses.value = value;
+      toast.success(`[성공] 만료일 변경`);
+    });
 };
 </script>
 

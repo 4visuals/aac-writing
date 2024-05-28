@@ -158,8 +158,11 @@ export default {
       googleLogin.initGoogleSignIn(
         handleLoginRespone,
         googleSignInFailed,
-        true
+        false
       );
+    };
+    const showOneTab = () => {
+      googleLogin.showOneTab();
     };
 
     const doLogout = (cmd) => {
@@ -188,6 +191,7 @@ export default {
     provide("appProvider", {
       logout: confirmLogout,
       login: startGoogleLogin,
+      showOneTab,
     });
 
     watch(

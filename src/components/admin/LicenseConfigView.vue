@@ -2,17 +2,15 @@
   <div class="lcs-config-view">
     <div class="dimmer" v-if="slideMenuRef.visible" @click="hideMenu"></div>
     <div class="lcs-view" v-if="slideMenuRef.visible">
-      <LicenseItem
-        v-for="lcs in licenses"
+      <LicenseByOrder
+        v-for="order in groupByOrder"
+        :key="order.orderNum"
+        :order="order"
         :students="students"
-        :lcs="lcs"
-        :current="current"
-        :active="active === lcs"
-        :key="lcs.seq"
-        size="sm"
-        @click="showStudentDetail(lcs)"
-      >
-      </LicenseItem>
+        :active="active"
+        @license-click="showStudentDetail"
+        @edit-order="showOrderEditForm"
+      />
     </div>
     <div class="btn-show-menu" v-else @click="slideMenuRef.visible = true">
       <AppIcon icon="menu" fsize="16px" />
@@ -91,29 +89,33 @@
 </template>
 
 <script>
-import LicenseItem from "./LicenseItem.vue";
+// import LicenseItem from "./LicenseItem.vue";
 import StudentRegForm from "./StudentRegForm.vue";
 import NewStudentForm from "./NewStudentForm.vue";
 import { ref, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
 import toast from "../../components/toast";
 import LicenseOrderForm from "../license/LicenseOrderForm.vue";
+import LicenseByOrder from "./LicenseByOrder.vue";
 import { time } from "@/service/util";
+import { LicenseGroup } from "./license-group";
+import { shallowRef } from "vue";
+import modal from "@/components/modal";
+import OrderEditForm from "./OrderEditForm.vue";
 export default {
-  props: ["license", "licenses", "students", "readOnly"],
+  props: ["license", "orders", "licenses", "students", "readOnly"],
   components: {
-    LicenseItem,
     NewStudentForm,
     StudentRegForm,
     LicenseOrderForm,
+    LicenseByOrder,
   },
-  setup(props) {
+  setup(props, { emit }) {
     const store = useStore();
     const active = ref(props.license || props.licenses[0]);
     const studentInUse = ref(null);
     const error = ref(null);
     const assignables = ref(null);
-    const current = ref(new Date().getTime());
     const newStudForm = ref(false);
     const viewMode = ref("STUD");
     const slideMenuRef = ref({ visible: true });
@@ -121,6 +123,27 @@ export default {
       USING: "사용중",
       EXPIRED: "만료됨",
       READY: "대기중",
+    };
+
+    /** @type{import('./license-group').LicenseGroup[] } */
+    const groupByOrder = shallowRef([]);
+
+    const groupLicenses = (licenses) => {
+      const { orders } = props;
+      const groupMap = new Map();
+      licenses.forEach((lcs) => {
+        const order = orders.find((order) => order.seq === lcs.orderRef);
+        const orderNum = lcs.orderRef || 0;
+        let group = groupMap.get(orderNum);
+        if (!group) {
+          group = new LicenseGroup(orderNum, order);
+          groupMap.set(orderNum, group);
+        }
+        group.add(lcs);
+      });
+      const groups = [...groupMap.values()];
+      groups.sort((a, b) => -1 * (a.orderNum - b.orderNum));
+      groupByOrder.value = groups;
     };
 
     const studentReg = ref({
@@ -155,17 +178,6 @@ export default {
       );
     };
 
-    const bindStudent = (student) => {
-      if (!active.value) {
-        return;
-      }
-      store
-        .dispatch("user/bindStudent", { license: active.value, student })
-        .then((res) => {
-          active.value.studentRef = res.curStud;
-          updateUse();
-        });
-    };
     const registerStudent = (student) => {
       const { name, userId, birth, pass, editing } = student; // studentReg.value;
       console.log(name, userId, birth, pass, editing);
@@ -202,9 +214,29 @@ export default {
         : "사용 전입니다. 햑생을 등록해주세요";
     };
 
+    const showOrderEditForm = (e) => {
+      console.log(e);
+      modal.showModal(OrderEditForm, {
+        width: "sm",
+        props: { order: e },
+        events: {
+          commit: (e) => {
+            console.log(e);
+            emit("update-expiry", e);
+          },
+        },
+      });
+    };
+
     watch(() => active.value, updateUse, { immediate: true });
+    watch(
+      () => props.licenses,
+      (licenses) => {
+        groupLicenses(licenses);
+      },
+      { immediate: true }
+    );
     return {
-      current,
       active,
       error,
       studentInUse,
@@ -214,7 +246,7 @@ export default {
       viewMode,
       slideMenuRef,
       status,
-      bindStudent,
+      groupByOrder,
       showStudentDetail,
       registerStudent,
       openStudenEditor,
@@ -222,6 +254,7 @@ export default {
       showLcsPurchase,
       hideMenu,
       timeText,
+      showOrderEditForm,
     };
   },
 };
@@ -248,7 +281,6 @@ export default {
   }
   .lcs-view {
     flex: 0 0 220px;
-    padding: 0 16px 16px;
     background-color: white;
     .order-lcs {
       margin: 16px 0 16px;

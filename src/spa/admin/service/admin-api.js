@@ -84,6 +84,11 @@ const order = {
       sendManual: (uuid, body) =>
         POST(`/admin/sms/group-order/${uuid}/manual`, { body }),
     },
+    updateExpiration: (groupOrderSeq, orderUuid, expiredAt) =>
+      PUT(`/admin/group-orders/${groupOrderSeq}/expiredAt`, {
+        orderUuid,
+        expiredAt,
+      }),
   },
   /**
    * 공동 구매 관련 api

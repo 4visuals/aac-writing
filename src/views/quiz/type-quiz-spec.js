@@ -52,6 +52,7 @@ class QuizSpec {
   }
   write() {
     storage.session.write("quizSpec", this);
+    storage.session.write("quizSpec.origin", this.seqs);
   }
   reload(section, ranges, sentenceFilter, retryMode, failedOnly) {
     retryMode = retryMode === undefined ? this.retry : retryMode;

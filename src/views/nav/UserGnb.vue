@@ -33,25 +33,23 @@
   </nav>
 </template>
 
-<script>
-import { computed, inject } from "vue";
+<script setup>
+import { computed, inject, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import LogoView from "../../components/LogoView.vue";
 
-export default {
-  setup() {
-    const store = useStore();
-    const loginUser = computed(() => store.getters["user/currentUser"]);
-    const router = useRouter();
-    const appProvider = inject("appProvider");
-    const goTo = (uri) => router.push(uri);
-    const delegateLogin = () => appProvider.login();
-    const delegateLogout = () => appProvider.logout();
-    return { loginUser, goTo, delegateLogin, delegateLogout };
-  },
-  components: { LogoView },
-};
+const store = useStore();
+const loginUser = computed(() => store.getters["user/currentUser"]);
+const router = useRouter();
+const appProvider = inject("appProvider");
+const goTo = (uri) => router.push(uri);
+const delegateLogin = () => appProvider.showOneTab();
+const delegateLogout = () => appProvider.logout();
+
+onMounted(() => {
+  appProvider.login();
+});
 </script>
 
 <style lang="scss" scoped>

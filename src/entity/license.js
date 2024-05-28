@@ -5,7 +5,7 @@ const copyProps = (obj, lcs) => {
     obj[prop] = lcs[prop];
   });
 };
-class License {
+export class License {
   constructor(lcs) {
     this._src = lcs;
     copyProps(this, lcs);

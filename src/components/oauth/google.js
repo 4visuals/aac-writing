@@ -17,27 +17,25 @@ const resolveUrl = (option) => {
 const initGoogleSignIn = (callback, failedCallback, showPrompt = false) => {
   window.google.accounts.id.initialize({
     client_id: env.GOOGLE_CLIENT_ID,
+    context: "signin",
     callback,
-    state_cookie_domain: env.HOST,
     cancel_on_tap_outside: false,
     scope:
       "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
     ux_mode: "popup",
   });
   if (showPrompt) {
-    window.google.accounts.id.prompt();
-    // window.google.accounts.id.prompt((notification) => {
-    //   if (
-    //     notification.isNotDisplayed() &&
-    //     notification.getNotDisplayedReason() === "opt_out_or_no_session"
-    //   ) {
-    //     failedCallback(notification.getNotDisplayedReason());
-    //   }
-    // });
+    setTimeout(() => {
+      window.google.accounts.id.prompt();
+    });
   }
   // return Promise.resolve(true);
+};
+const showOneTab = () => {
+  window.google.accounts.id.prompt();
 };
 export default {
   resolveUrl,
   initGoogleSignIn,
+  showOneTab,
 };

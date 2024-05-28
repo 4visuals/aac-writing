@@ -43,9 +43,10 @@ export default {
     formModel: { type: InputForm },
     readOnly: { type: Boolean, default: false },
     focus: { type: Boolean, default: true },
+    delay: { type: Number, default: 1000 },
   },
   setup(props, { emit }) {
-    const debounceTime = 1000;
+    const debounceTime = props.delay || 1000;
     const inputEl = ref(null);
     const valueVisible = ref(false);
     let timer = null;

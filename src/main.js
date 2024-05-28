@@ -9,17 +9,11 @@ import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
 import "./assets/global.scss";
-import GooglgAuth from "vue3-google-oauth2";
-import env from "@/service/env";
 import quizHistoryStore from "./dao/quiz-history-store";
 import request from "./service/api/request";
 
 const app = createApp(App);
-app.use(store).use(router).use(GooglgAuth, {
-  clientId: env.GOOGLE_CLIENT_ID,
-  scope: "profile email",
-  prompt: "consent",
-});
+app.use(store).use(router);
 /**
  * installing global components
  */
