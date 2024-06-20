@@ -19,18 +19,20 @@
 import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { onMounted } from "@vue/runtime-core";
+import { onUnmounted } from "vue";
 export default {
   setup() {
     const store = useStore();
     const wave = ref(null);
     const heights = [];
+    let timer = undefined;
     const repaint = (barEls, heights) => {
       barEls.forEach((el, index) => {
         let { height } = heights[index];
         height += 20 * Math.random() - 10;
         el.style.height = `${height}%`;
       });
-      setTimeout(repaint, 200, barEls, heights);
+      timer = setTimeout(repaint, 200, barEls, heights);
     };
     onMounted(() => {
       const bars = wave.value.querySelectorAll(".bar");
@@ -39,6 +41,9 @@ export default {
         heights.push({ index, height });
       });
       repaint(bars, heights);
+    });
+    onUnmounted(() => {
+      clearTimeout(timer);
     });
     return { store, wave };
   },

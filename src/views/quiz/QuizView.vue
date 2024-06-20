@@ -134,12 +134,23 @@ export default {
     store.commit("ui/hideMenu");
     store.commit("quiz/hideHint");
     store.commit("ui/setNavVisible", false);
-    quiz.loadQuiz();
     /**
      * 모바일에서 soft keyboard가 내려갔다 올라가는 불편을 방지하기 위해서
      * dummy로 집어넣은 inpupt[type=text]에 포커스를 옮겨둠.
      */
     const holdSoftKeyboard = () => focusing.value.focus();
+
+    const speakNextQuestion = (sentences) => {
+      if (sentences && sentences.length > 0) {
+        setTimeout(() => {
+          tts
+            .speak(sentences[0].sentence, { clearPending: true })
+            .catch((e) => {
+              console.log("[stop tts]", e);
+            });
+        }, 500);
+      }
+    };
 
     const moveQuiz = (dir) => {
       // if (!ctx.value.isReadingMode()) {
@@ -200,6 +211,7 @@ export default {
       failedOnly = false
     ) => {
       const config = quizContext.value.config; // 지우기 전에 미리 받아놓음.
+      speakNextQuestion(sentences);
       store.dispatch("quiz/closeQuiz").then(() => {
         const quizSpec = config.options;
         quizSpec
@@ -292,12 +304,13 @@ export default {
       }
       if (nextSegment) {
         const failedOnly = false;
+        const nextSetences = nextSegment.getSentences();
         // 맨 마지막 chapter의 마지막 section은 다음 section이 없음
         startQuiz(
           ctx,
           nextSegment,
           nextSection,
-          nextSegment.getSentences(),
+          nextSetences,
           RetryMode.SEG,
           failedOnly
         );
@@ -344,6 +357,7 @@ export default {
       store.commit("ui/setBackgroundVisible", true);
       store.commit("ui/setNavVisible", true);
     });
+    quiz.loadQuiz();
     watch(
       ctx,
       () => {
@@ -357,6 +371,9 @@ export default {
             : "sentence";
           if (ctx.value.isTrialQuiz()) {
             navbarTheme.value = "trial";
+          }
+          if (ctx.value.ranges && ctx.value.ranges[0] === 0) {
+            speak();
           }
         }
       },

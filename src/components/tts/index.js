@@ -69,6 +69,7 @@ class PollyTts {
     audio.playbackRate = 0.9;
     ttsStore.setSpeaking(true);
     return new Promise((done, failed) => {
+      console.log(text, document.activeElement);
       audio.onended = (e) => {
         ttsStore.setSpeaking(false);
         this.pendingAudio = undefined;
@@ -89,11 +90,16 @@ class PollyTts {
           });
         }, option.delay);
       } else {
-        audio.play().catch((e) => {
-          console.log(`[${e.name}]`, e);
-          ttsStore.setSpeaking(false);
-          this.pendingAudio = undefined;
-        });
+        audio
+          .play()
+          .then(() => {
+            console.log("[play done]");
+          })
+          .catch((e) => {
+            console.log(`[${e.name}]`, e);
+            ttsStore.setSpeaking(false);
+            this.pendingAudio = undefined;
+          });
       }
       this.pendingAudio = audio;
     });

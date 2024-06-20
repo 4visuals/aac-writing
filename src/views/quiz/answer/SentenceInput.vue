@@ -175,7 +175,7 @@ export default {
       }
     );
     onMounted(() => {
-      speackAndFocus(500);
+      // speackAndFocus(500);
     });
     return {
       field,
