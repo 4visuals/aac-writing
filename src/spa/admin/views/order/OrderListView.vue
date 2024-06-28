@@ -1,6 +1,24 @@
 <template>
   <div class="order-view">
-    <h3>구매 내역</h3>
+    <div class="sticky">
+      <h3>구매 내역</h3>
+      <div class="header">
+        <nav>
+          <button
+            v-for="tab in tabs"
+            :key="tab.type"
+            class="nude tab-item"
+            :class="{ active: activeTab.type === tab.type }"
+            @click="setTab(tab)"
+          >
+            {{ tab.text }}
+          </button>
+        </nav>
+        <nav>
+          <label><input type="checkbox" v-model="trialIncude" />평가판</label>
+        </nav>
+      </div>
+    </div>
     <div class="orders">
       <div v-for="order in ordersRef" :key="order.orderUuid" class="order">
         <span class="state" :class="[order.orderState]">{{
@@ -30,38 +48,107 @@
 import { time } from "@/service/util";
 
 import api from "../../service/admin-api";
-import { ref } from "vue";
+import { ref, shallowRef, watch } from "vue";
 import Order from "../../../../entity/order";
 import DeliveryInfoView from "../../../../components/map/DeliveryInfoView.vue";
+import util from "../../../../service/util";
 
 const stateTextMap = {
-  RDY: "결제 대기",
   ATV: "결제 완료",
   CNU: "사용자 취소",
   CNE: "결제 오류",
+  RDY: "결제 대기",
 };
+
+const trialIncude = ref(true);
+const tabs = Object.keys(stateTextMap).map((type) => ({
+  type,
+  text: stateTextMap[type],
+}));
+const activeTab = shallowRef(tabs[0]);
 const ordersRef = ref(null);
+const setTab = (tab) => {
+  activeTab.value = tab;
+};
+/**
+ * @type {Map<string, Order>}
+ */
+let orderGroupMap = undefined;
 
 const toTimeText = (millis) => time.toYMD(Date.parse(millis));
 const loadOrders = () => {
   api.order.list().then((res) => {
+    const orders = res.orders.map((order) => new Order(order));
+    orderGroupMap = util.arr.groupByMap(
+      orders,
+      (odr) => odr.orderState,
+      () => [],
+      (holder, odr) => {
+        holder.push(odr);
+      }
+    );
     ordersRef.value = res.orders.map((order) => new Order(order));
   });
 };
 const stateText = (order) => {
   return stateTextMap[order.orderState] || order.orderState;
 };
+/**
+ *
+ * @param {'ATV'|'CNU'|'CNE'|'PND'} orderType
+ */
+const drawOrders = (orderType) => {
+  if (orderGroupMap) {
+    const orders = orderGroupMap.get(orderType);
+    ordersRef.value = trialIncude.value
+      ? orders
+      : orders.filter((odr) => !odr.trialOrder);
+  }
+};
 loadOrders();
-// export default {
-//   setup() {
 
-//     return { ordersRef, toTimeText, stateText };
-//   },
-// };
+watch(
+  activeTab,
+  (tab) => {
+    console.log("[tab]", tab);
+    drawOrders(tab.type);
+  },
+  {
+    immediate: true,
+  }
+);
+watch(trialIncude, () => {
+  drawOrders(activeTab.value.type);
+});
 </script>
 
 <style lang="scss" scoped>
 .order-view {
+  .sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    border-bottom: 1px solid;
+    .header {
+      display: flex;
+      nav {
+        display: flex;
+        align-items: center;
+        label {
+          display: flex;
+          align-items: center;
+          font-size: 1.2rem;
+        }
+        .nude {
+          &.active {
+            background-color: var(--bs-blue);
+            color: white;
+          }
+        }
+      }
+    }
+  }
   .orders {
     display: flex;
     flex-direction: column;
@@ -69,6 +156,7 @@ loadOrders();
     margin-top: 16px;
     padding: 0 8px;
     max-width: 400px;
+
     .order {
       position: relative;
       padding: 4px;
