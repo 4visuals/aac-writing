@@ -34,6 +34,7 @@
           :orders="orders"
           :licenses="licenses"
           :students="students"
+          :teacher="activeUser"
           @update-expiry="updateExpiry"
         />
       </div>

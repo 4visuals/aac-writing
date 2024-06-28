@@ -172,4 +172,10 @@ const voice = {
       (res) => new VoiceFile(res.voice)
     ),
 };
-export default { admin, member, license, order, product, voice };
+
+const student = {
+  transfer: (transferDto) => {
+    return PUT(`/admin/student/${transferDto.studentSeq}`, transferDto);
+  },
+};
+export default { admin, member, license, order, product, voice, student };

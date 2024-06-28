@@ -78,6 +78,19 @@
           학생 등록 시작
         </button>
       </div>
+      <div class="transfer">
+        <button
+          class="nude blue"
+          :disabled="!studentInUse || active.isExpired()"
+          @click="showStudentTransferView"
+        >
+          {{ studentInUse?.name }} 학생 이동
+        </button>
+        <p v-if="!studentInUse" class="error">
+          이용권에 등록된 학생이 없습니다.
+        </p>
+      </div>
+      <p v-if="active.isExpired()" class="error">만료된 이용권입니다.</p>
     </div>
     <div v-else-if="viewMode === 'LCS'" class="stud-view">
       <LicenseOrderForm />
@@ -89,6 +102,7 @@
 </template>
 
 <script>
+import StudentTransferView from "./StudentTransferView.vue";
 // import LicenseItem from "./LicenseItem.vue";
 import StudentRegForm from "./StudentRegForm.vue";
 import NewStudentForm from "./NewStudentForm.vue";
@@ -103,7 +117,7 @@ import { shallowRef } from "vue";
 import modal from "@/components/modal";
 import OrderEditForm from "./OrderEditForm.vue";
 export default {
-  props: ["license", "orders", "licenses", "students", "readOnly"],
+  props: ["license", "orders", "licenses", "students", "readOnly", "teacher"],
   components: {
     NewStudentForm,
     StudentRegForm,
@@ -227,6 +241,22 @@ export default {
         },
       });
     };
+    const showStudentTransferView = () => {
+      // console.log("done?", );
+      modal.showModal(StudentTransferView, {
+        width: "sm",
+        props: {
+          license: active,
+          student: studentInUse,
+          teacher: props.teacher,
+        },
+        events: {
+          commit: (e) => {
+            console.log(e);
+          },
+        },
+      });
+    };
 
     watch(() => active.value, updateUse, { immediate: true });
     watch(
@@ -255,6 +285,7 @@ export default {
       hideMenu,
       timeText,
       showOrderEditForm,
+      showStudentTransferView,
     };
   },
 };
