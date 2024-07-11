@@ -51,7 +51,7 @@ export default {
     const activeSen = ref(null);
     const columns = [];
     for (let i = 0; i < 50; i++) {
-      columns.push({ text: (i < 10 ? "0" : "") + (i + 1), level: i + 1 });
+      columns.push({ text: (i < 9 ? "0" : "") + (i + 1), level: i + 1 });
     }
     const activeCell = ref({ sen: null, col: null });
     const countByLevel = (sen, levelText) => {

@@ -27,7 +27,7 @@ export default {
     const chars = ref([]);
     const splitToChar = () => {
       const arr = props.levelData.text.split("").map((ch, idx) => ({
-        idx,
+        idx: idx * 3,
         ch,
       }));
       chars.value = arr;

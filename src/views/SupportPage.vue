@@ -197,7 +197,7 @@ export default {
           {
             type: "thumbnail",
             imageUrl: "4-2.png",
-            desc: `1,2학년 국어 교과서의 단원별 문장이 공부할 수 있어요.`,
+            desc: `1,2학년 국어 교과서의 단원별 문장을 공부할 수 있어요.`,
           },
         ],
       },
@@ -240,7 +240,7 @@ export default {
           {
             type: "thumbnail",
             imageUrl: "6-2.png",
-            desc: `받아쓰기 성취도를 한 눈에 볼 수 있어요요.`,
+            desc: `받아쓰기 성취도를 한 눈에 볼 수 있어요.`,
           },
         ],
       },
