@@ -57,11 +57,14 @@ export default {
        */
       const chapterDesc = section.chapter.desc;
       // eslint-disable-next-line no-unused-vars
-      const [_, year, semester] = chapterDesc
-        .split(" ")
-        .map((token) => token.substring(0, 1));
-
-      return `[${year}-${semester}] ${desc}`;
+      const pos = chapterDesc.indexOf("학년 ");
+      if (pos > 0) {
+        const year = chapterDesc.substring(pos - 1, pos);
+        const semester = chapterDesc.substring(pos + 3, pos + 4);
+        return `[${year}-${semester}] ${desc}`;
+      } else {
+        return "?-?";
+      }
     };
 
     return { overviewVisible, title };

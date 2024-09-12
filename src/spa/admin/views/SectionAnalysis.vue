@@ -39,6 +39,8 @@ export default {
 <style lang="scss" scoped>
 .analysis {
   padding-left: 16px;
+  position: sticky;
+  top: 8px;
   .sentences {
     .sentence {
       cursor: pointer;

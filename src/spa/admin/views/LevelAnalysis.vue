@@ -168,7 +168,7 @@ export default {
     }
     .section-analysis {
       flex: 1 1 auto;
-      overflow-y: auto;
+      // overflow-y: auto;
     }
   }
 }

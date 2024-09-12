@@ -96,6 +96,24 @@ const assignNext = (chapters) => {
     prevSection = section;
   });
 };
+/**
+ * 교과서 챕터 제목 보정
+ * ```
+ * seq: 15 (새) 국어 1학년 1학기 => (새) 1학년 1학기
+ * seq: 16 (새) 국어 1학년 2학기 => (새) 1학년 2학기
+ * ```
+ * @param {*} bookChapters
+ */
+const reviseChapterName = (bookChapters) => {
+  bookChapters.forEach((chapter) => {
+    const { seq } = chapter;
+    if (seq >= 15 && seq <= 18) {
+      if (chapter.desc) {
+        chapter.desc = "국어 " + chapter.desc.replace(/국어 /gi, "");
+      }
+    }
+  });
+};
 export default {
   namespaced: true,
   state: () => ({ chapters }),
@@ -138,6 +156,8 @@ export default {
       assignLevel(state.chapters.books);
       assignNext(state.chapters.levels);
       assignNext(state.chapters.books);
+      // chapter name 보정
+      reviseChapterName(state.chapters.books);
     },
   },
   actions: {

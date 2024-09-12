@@ -51,88 +51,68 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import SectionButton from "@/components/SectionButton.vue";
 import { useStore } from "vuex";
 import { computed, ref, watch } from "vue";
 import { ParaText, SpanText } from "../../components/text";
 import { ActionIcon } from "../../components/form";
 import { listingViewHelper } from "../app-state-validator";
-import util from "@/service/util";
+// import util from "@/service/util";
 
-export default {
-  components: {
-    SectionButton,
-    ParaText,
-    SpanText,
-    ActionIcon,
-  },
-  setup() {
-    const store = useStore();
-    const activeChapter = ref(null);
-    const chapters = computed(() => store.state.course.chapters.books);
-    const sectionRecordMap = computed(() => store.state.record.perfectMap);
-    const perfectInfo = ref({ mod: 0 });
+const store = useStore();
+const activeChapter = ref(null);
+const chapters = computed(() => store.state.course.chapters.books);
+const sectionRecordMap = computed(() => store.state.record.perfectMap);
+const perfectInfo = ref({ mod: 0 });
 
-    const toggleActiveChapter = (chapter) => {
-      let seq = null;
-      if (activeChapter.value === chapter) {
-        activeChapter.value = null;
-      } else {
-        activeChapter.value = chapter;
-        seq = chapter.seq;
-      }
-      store.commit("ui/setActiveChapter", { group: "book", seq });
-    };
-
-    const { findActiveChapter, resolvePerfectChapters, isPerfectChapter } =
-      listingViewHelper();
-
-    const chapterText = (chapter) => util.chapter.rangeText(chapter, "단계");
-    watch(
-      () => chapters.value,
-      (chapters) => {
-        if (!chapters) {
-          return;
-        }
-        activeChapter.value = findActiveChapter({ store, chapters });
-        perfectInfo.value = resolvePerfectChapters({
-          chapters,
-          sectionRecordMap: sectionRecordMap.value,
-        });
-      },
-      {
-        immediate: true,
-      }
-    );
-    watch(
-      () => sectionRecordMap.value,
-      () => {
-        const _chapters = chapters.value;
-        activeChapter.value = findActiveChapter({ store, chapters: _chapters });
-        perfectInfo.value = resolvePerfectChapters({
-          chapters: _chapters,
-          sectionRecordMap: sectionRecordMap.value,
-        });
-        resolvePerfectChapters({
-          store,
-          chapters: chapters.value,
-          sectionRecordMap: sectionRecordMap.value,
-        });
-      },
-      { immediate: true }
-    );
-    return {
-      activeChapter,
-      chapters,
-      perfectInfo,
-      moveTo,
-      toggleActiveChapter,
-      chapterText,
-      isPerfectChapter,
-    };
-  },
+const toggleActiveChapter = (chapter) => {
+  let seq = null;
+  if (activeChapter.value === chapter) {
+    activeChapter.value = null;
+  } else {
+    activeChapter.value = chapter;
+    seq = chapter.seq;
+  }
+  store.commit("ui/setActiveChapter", { group: "book", seq });
 };
+
+const { findActiveChapter, resolvePerfectChapters } = listingViewHelper();
+
+// const chapterText = (chapter) => util.chapter.rangeText(chapter, "단계");
+watch(
+  () => chapters.value,
+  (chapters) => {
+    if (!chapters) {
+      return;
+    }
+    activeChapter.value = findActiveChapter({ store, chapters });
+    perfectInfo.value = resolvePerfectChapters({
+      chapters,
+      sectionRecordMap: sectionRecordMap.value,
+    });
+  },
+  {
+    immediate: true,
+  }
+);
+watch(
+  () => sectionRecordMap.value,
+  () => {
+    const _chapters = chapters.value;
+    activeChapter.value = findActiveChapter({ store, chapters: _chapters });
+    perfectInfo.value = resolvePerfectChapters({
+      chapters: _chapters,
+      sectionRecordMap: sectionRecordMap.value,
+    });
+    resolvePerfectChapters({
+      store,
+      chapters: chapters.value,
+      sectionRecordMap: sectionRecordMap.value,
+    });
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>

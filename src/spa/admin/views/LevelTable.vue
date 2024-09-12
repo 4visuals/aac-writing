@@ -33,8 +33,12 @@ export default {
       chars.value = arr;
     };
     const matched = (level, index) => {
+      const endIdx = index + 3;
       const found = level.ranges.filter(
-        (range) => range[0] <= index && index < range[1]
+        (range) =>
+          (index <= range[0] && range[0] < endIdx) ||
+          (index < range[1] && range[1] <= endIdx) ||
+          (range[0] < index && index < range[1])
       );
       return found.length > 0;
     };
