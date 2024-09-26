@@ -17,6 +17,7 @@
                 :assigned="asn"
                 @edit="showStudentForm(asn.student)"
                 @del-student="$emit('del-student', asn.student)"
+                @diagnosis="showAssessmentView"
             /></SectionBox>
           </div>
         </div>
@@ -25,7 +26,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import SectionBox from "@/components/SectionBox.vue";
@@ -33,53 +34,52 @@ import SectionBox from "@/components/SectionBox.vue";
 import modal from "@/components/modal";
 import StudentRegForm from "@/components/admin/StudentRegForm.vue";
 import StudentCard from "../components/StudentCard.vue";
+import AssessmentView from "@/components/stats/assessment/AssessmentView.vue";
 
-export default {
-  components: {
-    SectionBox,
-    StudentCard,
-  },
-  setup() {
-    const store = useStore();
-    const students = computed(() => store.getters["user/students"]);
-    const licenses = computed(() =>
-      store.state.user.membership.licenses.filter((lcs) => lcs.isAvailable())
-    );
-    const assignees = ref(null);
+const store = useStore();
+const students = computed(() => store.getters["user/students"]);
+const licenses = computed(() =>
+  store.state.user.membership.licenses.filter((lcs) => lcs.isAvailable())
+);
+const assignees = ref(null);
 
-    const buildAssignees = () => {
-      assignees.value = students.value.map((student) => ({
-        student,
-        license: licenses.value.find((lcs) => lcs.studentRef === student.seq),
-      }));
-    };
-
-    const showStudentForm = (student) => {
-      modal.showModal(StudentRegForm, {
-        width: "sm",
-        padding: "16px",
-        props: {
-          student,
-          exclude: [],
-        },
-      });
-    };
-    // const ymd = (birth) => time.toYMD(birth);
-
-    const licenseOf = (student) =>
-      licenses.value.find((lcs) => lcs.student === student.seq);
-
-    watch(students, buildAssignees, { immediate: true, deep: true });
-    return {
-      students,
-      licenses,
-      // ymd,
-      showStudentForm,
-      licenseOf,
-      assignees,
-    };
-  },
+const buildAssignees = () => {
+  assignees.value = students.value.map((student) => ({
+    student,
+    license: licenses.value.find((lcs) => lcs.studentRef === student.seq),
+  }));
 };
+
+const showStudentForm = (student) => {
+  modal.showModal(StudentRegForm, {
+    width: "sm",
+    padding: "16px",
+    props: {
+      student,
+      exclude: [],
+    },
+  });
+};
+
+const showAssessmentView = (assigned) => {
+  const { student, license } = assigned;
+  modal.showModal(AssessmentView, {
+    width: "",
+    fill: true,
+    props: {
+      assignees,
+      student,
+      license,
+    },
+    events: {
+      close: (e) => {
+        console.log(e);
+      },
+    },
+  });
+};
+
+watch(students, buildAssignees, { immediate: true, deep: true });
 </script>
 
 <style lang="scss" scoped>

@@ -25,6 +25,27 @@ const student = {
   updateProp: (studentSeq, prop, value) =>
     PUT(`/student/${studentSeq}`, { studentSeq, prop, value }),
   delete: (studentSeq) => DELETE(`/student/${studentSeq}`),
+  getDiagnosis: (studentSeq) =>
+    GET(`/diagnosis/student/${studentSeq}`).then(
+      (/** @type {diagnosis: any, exams: any[]} */ res) => {
+        const { diagnosis, exams } = res;
+        const quizes = [...diagnosis.v1, ...diagnosis.v2];
+        quizes.forEach((quiz) => {
+          if (quiz.answer) {
+            const analysis = JSON.parse(quiz.answer.analysis);
+            quiz.answer.analysis = analysis;
+          }
+        });
+        exams.forEach((exam) => {
+          exam.submissions.forEach((sbm) => {
+            if (sbm.analysis) {
+              sbm.analysis = JSON.parse(sbm.analysis);
+            }
+          });
+        });
+        return res;
+      }
+    ),
 };
 const chapter = {
   list: (origin) => GET(`/chapters/origin/${origin}`),
@@ -151,6 +172,22 @@ const setting = {
   },
   unsubscribe: () => DELETE("/setting/unsubscribe"),
 };
+/**
+ * 진단 평가 관련
+ */
+const diagnosis = {
+  put: (studentSeq, quizSeq, answer) =>
+    POST(`/diagnosis/${quizSeq}/student/${studentSeq}`, { answer }).then(
+      (answer) => {
+        if (answer.analysis) {
+          answer.analysis = JSON.parse(answer.analysis);
+        }
+        return answer;
+      }
+    ),
+  commit: (studentSeq, diagnosisVersion) =>
+    PUT(`/diagnosis/student/${studentSeq}`, { version: diagnosisVersion }),
+};
 export { section };
 
 export default {
@@ -166,4 +203,5 @@ export default {
   order,
   policy,
   setting,
+  diagnosis,
 };

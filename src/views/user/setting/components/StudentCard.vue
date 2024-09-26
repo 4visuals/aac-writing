@@ -1,5 +1,9 @@
 <template>
-  <div class="student" v-if="assigned.student">
+  <div
+    class="student"
+    v-if="assigned.student"
+    :data-stud="assigned.student.seq"
+  >
     <div class="stud-info">
       <nav>
         <div class="logo">
@@ -61,24 +65,25 @@
       <div v-else class="license">
         <button class="nude red">이용권 없음</button>
       </div>
+      <div class="license">
+        <button class="nude history" @click="$emit('diagnosis', assigned)">
+          학습정보
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { time } from "@/service/util";
 import { SpanText } from "../../../../components/text";
 import Pavicon from "../../../../components/Pavicon.vue";
-import { inject } from "vue";
-export default {
-  props: ["assigned"],
-  setup() {
-    const ymd = (birth) => time.toYMD(birth);
-    const provider = inject("settingNav");
-    return { provider, ymd };
-  },
-  components: { SpanText, Pavicon },
-};
+import { inject, defineProps, defineEmits } from "vue";
+
+defineProps(["assigned"]);
+defineEmits(["diagnosis"]);
+const ymd = (birth) => time.toYMD(birth);
+const provider = inject("settingNav");
 </script>
 
 <style lang="scss" scoped>
@@ -118,6 +123,8 @@ export default {
   }
   .lcs {
     flex: 0;
+    display: flex;
+    justify-content: space-between;
   }
   .label {
     white-space: nowrap;
@@ -154,6 +161,10 @@ export default {
     }
     &.using {
       background-color: #1db270;
+      color: white;
+    }
+    &.history {
+      background-color: #003ac0;
       color: white;
     }
   }

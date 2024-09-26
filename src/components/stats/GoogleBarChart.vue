@@ -5,8 +5,8 @@
   </div>
 </template>
 
-<script>
-import { onMounted, shallowRef, watch } from "vue";
+<script setup>
+import { onMounted, shallowRef, watch, defineProps, defineEmits } from "vue";
 const colors = [
   "#FBA037",
   "#E62E7B",
@@ -70,74 +70,80 @@ const options = {
 
   // height: 500,
 };
+const props = defineProps(["chartFormat"]);
+const emits = defineEmits(["select"]);
+const chartEl = shallowRef(null);
+const chart = shallowRef(null);
 
-export default {
-  emits: ["select"],
-  props: ["chartFormat"],
-  setup(props, { emit }) {
-    const chartEl = shallowRef(null);
-    const chart = shallowRef(null);
-
-    const renderChart = () => {
-      const { view, chartOption } = chart.value;
-      const { data, options } = props.chartFormat;
-      const model = new google.visualization.DataTable(data);
-      const width = chartEl.value.offsetWidth;
-      const height = chartEl.value.offsetHeight;
-      chartOption.chartArea = {
-        left: 20,
-        top: 40,
-        width: width - 40,
-        height: height - 100,
-      };
-      chartOption.width = width;
-      chartOption.height = height;
-      chartOption.title = options?.title;
-      chartOption.colors = options?.colors || colors;
-      // const chartOption = Object.assign({}, options);
-      view.draw(model, chartOption);
-      chart.value.model = model;
-    };
-    const installListener = (view) => {
-      google.visualization.events.addListener(view, "select", () => {
-        const sels = view.getSelection();
-        if (sels.length === 0) {
-          return;
-        }
-        const { row, column } = sels[0];
-        if (row === null || column === null) {
-          return;
-        }
-        const { model } = chart.value;
-        const property = model.getProperties(row, column);
-        // console.log(property);
-        property.resourceType = props.chartFormat.type;
-        emit("select", property);
-      });
-    };
-    const buildChart = () => {
-      const el = chartEl.value.querySelector(".chart");
-      const view = new google.visualization.ColumnChart(el);
-      const chartOption = Object.assign({}, options);
-      installListener(view);
-      return { chartOption, view };
-    };
-
-    watch(props, () => {
-      if (!props.chartFormat) {
-        chart.value.view.clearChart();
-      } else {
-        renderChart();
-      }
-    });
-    onMounted(() => {
-      chart.value = buildChart();
-    });
-    return {
-      chartEl,
-    };
-  },
+const renderChart = () => {
+  const { view, chartOption } = chart.value;
+  const { data, options } = props.chartFormat;
+  const model = new google.visualization.DataTable(data);
+  const width = chartEl.value.offsetWidth;
+  const height = chartEl.value.offsetHeight;
+  chartOption.chartArea = {
+    left: 20,
+    top: 40,
+    width: width - 40,
+    height: height - 100,
+  };
+  chartOption.width = width;
+  chartOption.height = height;
+  chartOption.title = options?.title;
+  // chartOption.colors = options?.colors || colors;
+  // const chartOption = Object.assign({}, options);
+  view.draw(model, chartOption);
+  chart.value.model = model;
 };
+const installListener = (view) => {
+  google.visualization.events.addListener(view, "select", () => {
+    const sels = view.getSelection();
+    if (sels.length === 0) {
+      return;
+    }
+    const { row, column } = sels[0];
+    if (row === null || column === null) {
+      return;
+    }
+    const { model } = chart.value;
+    const property = model.getProperties(row, column);
+    // console.log(property);
+    property.resourceType = props.chartFormat.type;
+    emits("select", property);
+  });
+};
+const buildChart = () => {
+  const el = chartEl.value.querySelector(".chart");
+  const view = new google.visualization.ColumnChart(el);
+  const chartOption = Object.assign({}, options);
+  installListener(view);
+  return { chartOption, view };
+};
+
+watch(props, () => {
+  if (!props.chartFormat) {
+    chart.value.view.clearChart();
+  } else {
+    renderChart();
+  }
+});
+onMounted(() => {
+  chart.value = buildChart();
+  if (props.chartFormat?.data.rows) {
+    renderChart();
+  }
+});
+
+// export default {
+//   emits: ["select"],
+//   props: ["chartFormat"],
+//   setup(props, { emit }) {
+
+//     return {
+//       chartEl,
+//     };
+//   },
+// };
 </script>
 
 <style lang="scss" scoped>

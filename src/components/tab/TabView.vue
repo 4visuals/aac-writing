@@ -6,14 +6,10 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import TabBody from "./TabBody.vue";
 import TabNav from "./TabNav.vue";
-export default {
-  props: ["model"],
-  components: {
-    TabNav,
-    TabBody,
-  },
-};
+import { defineProps } from "vue";
+
+defineProps(["model"]);
 </script>
