@@ -1,11 +1,12 @@
 <template>
   <div class="box">
     <button
-      v-for="chapter in chapters"
+      v-for="(chapter, index) in chapters"
       :key="chapter.seq"
-      @click="showSectionControl(chapter)"
-      class="nude"
+      @click="setActiveChapter(chapter)"
+      class="nude chapter-btn"
       :class="{ active: activeChapter === chapter }"
+      :style="`--chapter-btn-color: ${scoreMap.chapters[index].webColor};`"
     >
       {{ chapter.desc.substring(0, 1) }}
     </button>
@@ -14,16 +15,20 @@
     <button
       class="nude"
       :class="{ active: activeSection === undefined }"
-      @click="flushChart(undefined)"
+      @click="setActiveSections(activeChapter.sections)"
     >
       전체
     </button>
     <button
       v-for="section in activeChapter.sections.filter((sec) => sec.level > 0)"
       :key="section.seq"
-      @click="flushChart(section)"
+      @click="setActiveSections([section], section)"
       class="nude"
-      :class="{ active: activeSection === section }"
+      :class="{
+        active: activeSection === section,
+        empty: !markMap.hasMark(section.level),
+      }"
+      :disabled="!markMap.hasMark(section.level)"
     >
       <span class="level">{{ section.level }}</span
       ><span class="desc">{{ section.description }}</span>
@@ -36,7 +41,17 @@
  * course(가 ~ 차)별 조회 메뉴
  */
 import { useStore } from "vuex";
-import { computed, ref, defineEmits, defineProps, reactive, watch } from "vue";
+import {
+  computed,
+  ref,
+  defineEmits,
+  defineProps,
+  reactive,
+  watch,
+  onMounted,
+} from "vue";
+import { LevelScore, MarkMap } from "./level-score";
+// import { LevelScore } from "./level-score.js";
 
 /** @type { Readonly<{
     exams?: import('./exam-paper').StudentExamList ;
@@ -49,28 +64,96 @@ const emit = defineEmits({
 const store = useStore();
 const chapters = computed(() => store.getters["course/levels"]);
 console.log(chapters);
+const scoreMap = LevelScore.getScoreList();
+const markMap = MarkMap.buildMarkMap(scoreMap);
+console.log(markMap);
 
 const activeChapter = ref(undefined);
 const activeSection = ref(undefined);
 /**
- * @type {{ exams?: import('./exam-paper').StudentExamList}}
+ * @type {{ exams?: import('./exam-paper').StudentExamList, sectionSet: Set<number>}}
  */
 const chartData = reactive({
   exams: undefined,
+  sectionSet: new Set(),
 });
-const flushChart = (section) => {
-  const cols = [
-    { id: "legend", type: "string", label: "Segments" },
-    {
-      id: "score",
-      type: "number",
-      label: "점수",
+const BARCHART_OPTION = {
+  // legend: { position: "bottom" },
+  // axisTitlesPosition: "in",
+  selectionMode: "single",
+  dataOpacity: 1,
+  fontSize: 10,
+  chartArea: {},
+  hAxis: {
+    format: "M/d",
+    title: null,
+    textPosition: "out", // X축 아래에 날짜 표시
+    viewWindow: null, // {min, max}
+    minorGridlines: {
+      color: "#fff",
     },
-    { id: "percent-text", type: "string", role: "annotation" },
-  ];
-  const exams = section
-    ? chartData.exams.mapBy((examPaper) => examPaper.sectionRef === section.seq)
-    : chartData.exams;
+  },
+  interpolateNulls: true,
+
+  pointSize: 8,
+  slantedText: true,
+  theme: "material",
+  tooltip: {
+    isHtml: true,
+    textStyle: { color: "#444" },
+    showColorCode: true,
+    trigger: "focus", // "selection",
+  },
+  vAxis: {
+    minValue: 0,
+    maxValue: 100,
+    title: null,
+    // viewWindowMode: "pretty",
+    textPosition: "in",
+    minorGridlines: {
+      color: "#fff",
+    },
+    // ticks: [0, 20, 40, 60, 80, 100],
+  },
+};
+const cols = [
+  { id: "legend", type: "string", label: "Segments" },
+  {
+    id: "score",
+    type: "number",
+    label: "점수",
+  },
+  { id: "bar-style", type: "string", role: "style" },
+  { id: "percent-text", type: "string", role: "annotation" },
+];
+const groupByLevels = () => {
+  markMap.reset();
+  const { exams } = chartData;
+  const recent = exams.getRecentDate();
+  const vs = exams.getValuesByMonth(recent, 12);
+  vs.forEach(({ submissions }) => {
+    markMap.flushSubmissions(submissions);
+  });
+  // vs.map(({ submissions }) => {
+  // const marks = submissions.flatMap((sbm) => Object.entries(sbm.analysis));
+  // marks.reduce((levelMap, mark) => {
+  //   const [Lnn, score] = mark;
+  //   const lvl = parseInt(Lnn.substring(1));
+  //   levelMap.get(lvl).marks.push(score);
+  //   return levelMap;
+  // }, markMap);
+  // });
+  console.log(markMap);
+};
+/**
+ */
+const buildRows = () => {
+  const { exams, sectionSet } = chartData;
+  const chr = activeChapter.value.desc.substring(0, 1); // 가, 나, 다, ...
+  const chapterScore = scoreMap.scores.find((score) => score.group === chr);
+  /**
+   * 1년치로 잘라낸 후 챕터별로 모두 뿌려줌
+   */
   const recent = exams.getRecentDate();
   const vs = exams.getValuesByMonth(recent, 12);
   const rows = vs.map(({ date, submissions }) => {
@@ -78,52 +161,80 @@ const flushChart = (section) => {
     const year = date[1] === 1 ? `${date[0]}년` : "";
     const month = { v: `${year}${date[1]}월` };
     const scoreData = { solved: 0, total: 0 };
-    submissions
-      .map((sbm) => Object.values(sbm.analysis))
-      .reduce((data, scores) => {
-        scores.forEach(([solved, total]) => {
-          data.solved += solved / total;
-          data.total += 1;
-        });
-        return data;
-      }, scoreData);
-
-    // const total = submissions.length;
-    // const solved =
-    //   total > 0 ? submissions.filter((sbm) => sbm.correct).length : 0;
-    // const score = { v: total === 0 ? 0 : (solved / total) * 100 };
+    const marks = submissions.flatMap((sbm) => Object.entries(sbm.analysis));
+    /*
+     * marks: [
+     *   {L01: [2, 5]},
+     *   {L17: [3, 10]},
+     *   {L01: [8, 8]},
+     *   ...
+     * ]
+     */
+    marks.reduce((data, mark) => {
+      const [Lnn, [solved, total]] = mark;
+      const lvl = parseInt(Lnn.substring(1));
+      // const solved = score[0];
+      // const total = score[1];
+      if (sectionSet.has(lvl)) {
+        data.solved += solved;
+        data.total += total;
+      }
+      return data;
+    }, scoreData);
     const value =
       scoreData.total === 0 ? null : (scoreData.solved / scoreData.total) * 100;
     const score = {
       v: value || 0,
     };
+    const style = { v: `color: ${chapterScore.webColor}; font-size: 12px;` };
     const annotation = {
       v: value !== null ? `${value.toFixed(1)}%` : "없음",
     };
-    activeSection.value = section;
-    return { c: [month, score, annotation] };
+    console.log(month, scoreData);
+    return { c: [month, score, style, annotation] };
   });
-  emit("chart", { section, cols, rows });
+  return rows;
 };
-const showSectionControl = (chapter) => {
-  const { exams } = props;
-  const sectionSet = chapter.sections.reduce((set, section) => {
-    set.add(section.seq);
+const resolveChartTile = () => {
+  if (activeSection.value) {
+    const { level, description } = activeSection.value;
+    return `${level}. ${description}`;
+  } else {
+    return activeChapter.value.desc;
+  }
+};
+const setActiveSections = (sections, selectedSection) => {
+  const { sectionSet } = chartData;
+  sectionSet.clear();
+  sections.reduce((set, section) => {
+    set.add(section.level);
     return set;
-  }, new Set());
-  const courseExam = exams.mapBy(
-    (/** @type {import('./exam-paper').ExamPaper}*/ paper) =>
-      sectionSet.has(paper.sectionRef)
-  );
-  console.log(chapter, courseExam);
+  }, sectionSet);
+  // 종합평가는 제외함
+  sectionSet.delete(-1);
+  activeSection.value = selectedSection;
+  const rows = buildRows();
+
+  const chartOption = Object.assign({}, BARCHART_OPTION);
+  chartOption.title = resolveChartTile();
+  emit("chart", { activeSection, chartOption, cols, rows });
+};
+const setActiveChapter = (chapter) => {
   activeChapter.value = chapter;
-  chartData.exams = courseExam;
-  flushChart(undefined);
+  setActiveSections(chapter.sections, undefined);
 };
 watch(
   () => props.exams,
-  () => showSectionControl(activeChapter.value)
+  (exams) => {
+    chartData.exams = exams;
+    groupByLevels();
+    setActiveChapter(activeChapter.value);
+  }
 );
+onMounted(() => {
+  chartData.exams = props.exams;
+  groupByLevels();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -134,12 +245,14 @@ watch(
   padding: 6px;
   box-shadow: 0 0 4px #0000004d;
   border-radius: 8px;
+  gap: 2px;
   .nude {
-    color: #777;
+    color: var(--chapter-btn-color);
     border-radius: 6px;
+    border: 1px solid;
     &.active {
       color: white;
-      background-color: #0038bc;
+      background-color: var(--chapter-btn-color);
     }
   }
 }
@@ -165,6 +278,10 @@ watch(
     }
     &:active {
       transform: translate(1px, 1px);
+    }
+    &.emity {
+      color: #777;
+      background-color: #ececec;
     }
     .desc {
       white-space: nowrap;

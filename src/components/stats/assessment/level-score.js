@@ -15,18 +15,23 @@ export class LevelScore {
   index;
   /** @type {string} '가'~'차` */
   group;
-  /** @type {number} */
+  levelStart;
+  /** @type {number} 1단계 ~ 50 단계*/
   level;
   /** @type {number} number of solved levels */
   solved;
   /** @type {number} total levels */
   total;
-  constructor(index, group, level) {
+  constructor(index, group, levelStart, levelEnd) {
     this.index = index;
     this.group = group;
-    this.level = level;
+    this.levelStart = levelStart;
+    this.level = levelEnd;
     this.solved = 0;
     this.total = 0;
+  }
+  get levelEnd() {
+    return this.level;
   }
   get webColor() {
     const idx = this.index % colors.length;
@@ -36,13 +41,16 @@ export class LevelScore {
     this.solved = 0;
     this.total = 0;
   }
+  isEmpty() {
+    return this.total === 0;
+  }
   /**
    * 소수점 자릿수
    * @param {number} digit (default: 1)
    */
   getPercent(digit = 1) {
     const { solved, total } = this;
-    if (total === 0) {
+    if (this.isEmpty()) {
       return 0;
     } else {
       const percent = (solved / total) * 100;
@@ -55,8 +63,11 @@ export class LevelScore {
 export class LevelScoreList {
   /** @type {LevelScore[]} */
   scores;
+  /** @type {LevelScore[]} */
+  chapters;
   constructor(scores) {
     this.scores = scores;
+    this.chapters = scores;
   }
   get length() {
     return this.scores.length;
@@ -73,17 +84,33 @@ export class LevelScoreList {
     });
   }
   /**
-   * section 번호에 대응하는 chater(가, 나, 다, ...)의 맵핑 반환
-   * @return Record<int, string> - key(sectionSeq), value(chapterName)
+   * section level(1~50)에 대응하는 LevelScore 맵핑 정보
+   * @returns {Map<number, {score: LevelScore,  marks: {solved: number, total: number}[]}}>}
+   */
+  getLevelMap() {
+    let level = 1;
+    const markMap = this.scores.reduce((map, score) => {
+      while (level < score.level) {
+        map.set(level, { score, marks: [] });
+        level++;
+      }
+      map.set(level, { score, marks: [] });
+      return map;
+    }, new Map());
+    return markMap;
+  }
+  /**
+   * section level(1~50)l에 대응하는 chater(가, 나, 다, ...)의 맵핑 반환
+   * @return Record<int, string> - key(section level: number), value(chapterName)
    */
   buildSectionMap() {
-    let limit = 1;
+    let level = 1;
     return this.scores.reduce((map, score) => {
-      while (limit < score.level) {
-        map[limit] = score.group;
-        limit++;
+      while (level < score.level) {
+        map[level] = score.group;
+        level++;
       }
-      map[limit] = score.group;
+      map[level] = score.group;
       return map;
     }, {});
   }
@@ -91,14 +118,75 @@ export class LevelScoreList {
 
 LevelScore.getScoreList = () =>
   new LevelScoreList([
-    new LevelScore(0, "가", 5),
-    new LevelScore(1, "나", 13),
-    new LevelScore(2, "다", 16),
-    new LevelScore(3, "라", 22),
-    new LevelScore(4, "마", 27),
-    new LevelScore(5, "바", 29),
-    new LevelScore(6, "사", 32),
-    new LevelScore(7, "아", 38),
-    new LevelScore(8, "자", 42),
-    new LevelScore(9, "차", 50),
+    new LevelScore(0, "가", 1, 4 + 1),
+    new LevelScore(1, "나", 4 + 1, 13 + 1),
+    new LevelScore(2, "다", 13 + 1, 16 + 1),
+    new LevelScore(3, "라", 16 + 1, 22 + 1),
+    new LevelScore(4, "마", 22 + 1, 27 + 1),
+    new LevelScore(5, "바", 27 + 1, 29 + 1),
+    new LevelScore(6, "사", 29 + 1, 32 + 1),
+    new LevelScore(7, "아", 32 + 1, 38 + 1),
+    new LevelScore(8, "자", 38 + 1, 42 + 1),
+    new LevelScore(9, "차", 42 + 1, 50 + 1),
   ]);
+
+export class Marklet {
+  mark;
+  examTime;
+  sectionRef;
+  level;
+  chapterRef;
+}
+export class MarkMap {
+  /**
+   * @type {Map<number, {score: LevelScore,  marks: {solved: number, total: number}[]}}>}
+   */
+  map;
+  scoreList;
+  constructor(map) {
+    this.map = map;
+    this.scoreList = LevelScore.getScoreList();
+  }
+  reset() {
+    this.map.forEach((entry) => {
+      entry.marks = [];
+      //marks.clear();
+    });
+  }
+  flushSubmissions(submissions) {
+    const marks = submissions.flatMap((sbm) => Object.entries(sbm.analysis));
+    marks.reduce((levelMap, mark) => {
+      const [Lnn, score] = mark;
+      const lvl = parseInt(Lnn.substring(1));
+      levelMap.get(lvl).marks.push(score);
+      const scoreData = this.scoreList.scores.find(
+        (score) => score.levelStart <= lvl && lvl < score.levelEnd
+      );
+      scoreData.total += score[1];
+      return levelMap;
+    }, this.map);
+  }
+  hasMark(level) {
+    const { marks } = this.map.get(level);
+    console.log(`level ${level}`, marks.length);
+    return marks.length > 0;
+  }
+  /**
+   *
+   * @param {LevelScoreList} scoreList
+   * @returns {MarkMap}
+   */
+  static buildMarkMap(scoreList) {
+    let level = 1;
+    const marks = scoreList.scores.reduce((map, score) => {
+      while (level < score.level) {
+        map.set(level, { score, marks: [] });
+        level++;
+      }
+      map.set(level, { score, marks: [] });
+      return map;
+    }, new Map());
+
+    return new MarkMap(marks);
+  }
+}

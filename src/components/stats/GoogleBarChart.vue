@@ -17,7 +17,7 @@ const colors = [
   "#444444",
 ];
 
-const options = {
+const DEFAULT_CHART_OPTION = {
   legend: { position: "bottom" },
   // axisTitlesPosition: "in",
   aggregationTarget: "series",
@@ -70,9 +70,12 @@ const options = {
 
   // height: 500,
 };
-const props = defineProps(["chartFormat"]);
+const props = defineProps(["chartFormat", "chartOption"]);
 const emits = defineEmits(["select"]);
 const chartEl = shallowRef(null);
+/**
+ * @type {{chartOption: any, view: DataView}}
+ */
 const chart = shallowRef(null);
 
 const renderChart = () => {
@@ -89,7 +92,9 @@ const renderChart = () => {
   };
   chartOption.width = width;
   chartOption.height = height;
-  chartOption.title = options?.title;
+  if (options?.title) {
+    chartOption.title = options?.title;
+  }
   // chartOption.colors = options?.colors || colors;
   // const chartOption = Object.assign({}, options);
   view.draw(model, chartOption);
@@ -115,12 +120,18 @@ const installListener = (view) => {
 const buildChart = () => {
   const el = chartEl.value.querySelector(".chart");
   const view = new google.visualization.ColumnChart(el);
-  const chartOption = Object.assign({}, options);
+  const chartOption = Object.assign(
+    {},
+    props.chartOption || DEFAULT_CHART_OPTION
+  );
   installListener(view);
   return { chartOption, view };
 };
 
 watch(props, () => {
+  if (props.chartOption) {
+    chart.value.chartOption = Object.assign({}, props.chartOption);
+  }
   if (!props.chartFormat) {
     chart.value.view.clearChart();
   } else {

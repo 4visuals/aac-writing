@@ -164,6 +164,12 @@ export class StudentExamList {
     const papers = this.papers.filter(fnPaperFilter);
     return new StudentExamList(papers);
   }
+  /**
+   *
+   * @param {Date} recent 기준 시간
+   * @param {*} numOfMonth recent로부터 조회할 달. 12 이면 recent에서 1년치 과거 데이터를 의미함
+   * @returns {{date: [number, number, number], submissions: SubmissionResult[] }[]}
+   */
   getValuesByMonth(recent, numOfMonth = 12) {
     const date = recent || new Date();
     date.setDate(1);
@@ -201,11 +207,12 @@ export class StudentExamList {
       (sbm) => {
         const paper = papers.find((paper) => paper.seq === sbm.examRef);
         const section = fnSectionGetter(paper.sectionRef);
-        return sectionMap[section.level];
+        return section ? sectionMap[section.level] : "none";
       },
       () => [],
       (list, sbm) => list.push(sbm)
     );
+    map.delete("none"); // 종합 평가는 제외함
     return map;
   }
   getSubmissions() {

@@ -59,13 +59,14 @@ const flushChart = () => {
       label: "점수",
       type: "number",
     },
+    { id: "bar-style", type: "string", role: "style" },
+    { id: "percent-text", type: "string", role: "annotation" },
   ];
   scoreMap.reset();
   const mapByChaterName = chartData.exams.getValueByChapter(
     scoreMap,
     (sectionSeq) => findSection(sectionSeq)
   );
-  console.log(mapByChaterName);
   const rows = scoreMap.scores.map((score) => {
     const submissions = mapByChaterName.get(score.group);
     if (submissions) {
@@ -77,8 +78,12 @@ const flushChart = () => {
         return score;
       }, score);
     }
+    const group = { v: score.group };
+    const score2 = { v: score.getPercent() };
+    const style = { v: `color: ${score.webColor}; font-size: 12px;` };
+    const annotation = { v: score.isEmpty() ? "없음" : `${score2.v}%` };
     return {
-      c: [{ v: score.group }, { v: score.getPercent() }],
+      c: [group, score2, style, annotation],
     };
   });
   console.log(cols, rows);

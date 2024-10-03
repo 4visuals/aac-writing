@@ -13,7 +13,11 @@
     </div>
     <div class="chart">
       <div class="half">
-        <GoogleBarChart :chartFormat="chartData" @select="showDetail" />
+        <GoogleBarChart
+          :chartOption="chartOption"
+          :chartFormat="chartData"
+          @select="showDetail"
+        />
       </div>
     </div>
   </div>
@@ -24,7 +28,7 @@ import { TabModel, TabView } from "@/components/tab";
 import CourseControlMenu from "./CourseControlMenu.vue";
 import DateControlMenu from "./DateControlMenu.vue";
 import GoogleBarChart from "../GoogleBarChart.vue";
-import { reactive, ref, defineProps, watch } from "vue";
+import { reactive, ref, defineProps, watch, shallowRef } from "vue";
 
 const props = defineProps(["exams"]);
 const tabModel = TabModel.create([
@@ -34,12 +38,14 @@ const tabModel = TabModel.create([
 const { activeTab } = tabModel;
 const visible = ref(false);
 
+const chartOption = shallowRef(undefined);
 const chartData = reactive({
   option: { title: "날짜별" },
   area: { width: 600, height: 400 },
   data: { cols: undefined, rows: undefined },
 });
 const showChart = (e) => {
+  chartOption.value = e.chartOption;
   chartData.data.cols = e.cols;
   chartData.data.rows = e.rows;
   visible.value = false;
