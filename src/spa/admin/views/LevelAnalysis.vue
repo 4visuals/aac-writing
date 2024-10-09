@@ -45,71 +45,63 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import SectionAnalysis from "./SectionAnalysis.vue";
 import { ActionIcon } from "@/components/form";
 import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { computed, watch } from "@vue/runtime-core";
-export default {
-  components: {
-    ActionIcon,
-    SectionAnalysis,
-  },
-  setup() {
-    const store = useStore();
-    const chapterLoaded = computed(() => store.getters["course/ready"]);
-    let courses = [];
-    const currentCourse = ref(null);
-    const expanded = ref(new Set());
-    const isExpanded = (chapter) => expanded.value.has(chapter);
-    const toggleChapter = (chapter) => {
-      const existing = expanded.value.has(chapter);
-      if (existing) {
-        expanded.value.delete(chapter);
-      } else {
-        expanded.value.add(chapter);
-      }
-    };
-    const activeSection = ref(null);
-    const showSection = (secion) => {
-      activeSection.value = secion;
-    };
-    watch(currentCourse, () => {
-      activeSection.value = null;
-    });
-    watch(
-      () => chapterLoaded.value,
-      (loaded) => {
-        if (!loaded) {
-          return;
-        }
-        courses.push({ id: "none", name: "[선택]", chapters: [] });
-        courses.push({
-          id: "level",
-          name: "단계별 학습",
-          chapters: store.getters["course/levels"],
-        });
-        courses.push({
-          id: "book",
-          name: "교과서",
-          chapters: store.getters["course/books"],
-        });
-        currentCourse.value = courses[0];
-      },
-      { immediate: true }
-    );
-    return {
-      chapterLoaded,
-      courses,
-      currentCourse,
-      activeSection,
-      toggleChapter,
-      isExpanded,
-      showSection,
-    };
-  },
+const store = useStore();
+const chapterLoaded = computed(() => store.getters["course/ready"]);
+let courses = [];
+const currentCourse = ref(null);
+const expanded = ref(new Set());
+const isExpanded = (chapter) => expanded.value.has(chapter);
+const toggleChapter = (chapter) => {
+  const existing = expanded.value.has(chapter);
+  if (existing) {
+    expanded.value.delete(chapter);
+  } else {
+    expanded.value.add(chapter);
+  }
 };
+const activeSection = ref(null);
+const showSection = (secion) => {
+  activeSection.value = secion;
+};
+watch(currentCourse, () => {
+  activeSection.value = null;
+});
+watch(
+  () => chapterLoaded.value,
+  async (loaded) => {
+    if (!loaded) {
+      return;
+    }
+    courses.push({ id: "none", name: "[선택]", chapters: [] });
+    courses.push({
+      id: "level",
+      name: "단계별 학습",
+      chapters: store.getters["course/levels"],
+    });
+    courses.push({
+      id: "book",
+      name: "교과서",
+      chapters: store.getters["course/books"],
+    });
+    courses.push({
+      id: "diagnosis",
+      name: "진단평가",
+      chapters: [],
+    });
+    store.dispatch("course/loadDiagnosisChapter").then((res) => {
+      const course = courses.find((course) => course.id === "diagnosis");
+      course.chapters.push(res.chapter);
+    });
+    currentCourse.value = courses[0];
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>

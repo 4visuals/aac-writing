@@ -187,6 +187,7 @@ const diagnosis = {
     ),
   commit: (studentSeq, diagnosisVersion) =>
     PUT(`/diagnosis/student/${studentSeq}`, { version: diagnosisVersion }),
+  asChapter: () => GET(`/diagnosis/chapter-form`),
 };
 export { section };
 

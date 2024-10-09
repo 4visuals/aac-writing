@@ -166,5 +166,12 @@ export default {
         ctx.commit("setChapter", { data: res.chapters });
       });
     },
+    /**
+     * 진단 평가를 레빌 분석 테이블에 보여주기 위해서 가상의 chapter로 감싸서 반환함.
+     * @returns
+     */
+    loadDiagnosisChapter() {
+      return api.diagnosis.asChapter();
+    },
   },
 };

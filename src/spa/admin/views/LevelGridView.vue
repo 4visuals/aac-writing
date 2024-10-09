@@ -67,9 +67,20 @@ export default {
       return ranges && ranges.length > 0 ? ranges.length : "";
     };
     const analyzeSection = (section) => {
-      GET(`/admin/section/${section.seq}/difficulties`).then((res) => {
-        difficulty.value = res.df;
-      });
+      /**
+       * 진단평가를 레벨 분석에 보여주기 위해서 백엔드에서 지정한 가상의 seq 번호
+       * 이 값을 고치지 마쇼!!(100,000으로 고정했음)
+       */
+      const DIAGNOSIS_SECTION_SEQ = 100000;
+      if (section.seq >= DIAGNOSIS_SECTION_SEQ) {
+        GET(`/diagnosis/difficulties`).then((res) => {
+          difficulty.value = res;
+        });
+      } else {
+        GET(`/admin/section/${section.seq}/difficulties`).then((res) => {
+          difficulty.value = res.df;
+        });
+      }
     };
     const activateAt = (col, sen) => {
       if (activeCell.value.col) {
