@@ -196,7 +196,7 @@ export class StudentExamList {
   /**
    *
    * @param {import('./level-score').LevelScoreList} scoreMap
-   * @returns  Map<string, SubmissionResult[]> submissions by chapterName(가, 나, 다, ..)
+   * @returns {Map<string, SubmissionResult[]>} submissions by chapterName(가, 나, 다, ..)
    */
   getValueByChapter(scoreMap, fnSectionGetter) {
     const sectionMap = scoreMap.buildSectionMap();

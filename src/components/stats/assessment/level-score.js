@@ -131,11 +131,47 @@ LevelScore.getScoreList = () =>
   ]);
 
 export class Marklet {
+  /** @type { [number, number]} [solved, total] */
   mark;
+  /**
+   * @type {[number, number, number]} [year, month, date]
+   */
   examTime;
+  /**
+   * @type {number} sectionSeq
+   */
   sectionRef;
+  /**
+   * @type {number} level number
+   */
   level;
+  /**
+   * @type {number} chapterSeq
+   */
+
   chapterRef;
+  constructor(mark, examTime, sectionRef, level, chapterRef) {
+    this.mark = mark;
+    this.examTime = examTime;
+    this.sectionRef = sectionRef;
+    this.level = level;
+    this.chapterRef = chapterRef;
+  }
+  get solved() {
+    return this.mark[0];
+  }
+  get total() {
+    return this.mark[1];
+  }
+  /**
+   *
+   * @param {[number, number, number]} time [year, month, date]
+   * @returns
+   */
+  isSameDate(time) {
+    const [year, month] = this.examTime;
+    return year === time[0] && month === time[1];
+  }
 }
 export class MarkMap {
   /**
@@ -143,17 +179,27 @@ export class MarkMap {
    */
   map;
   scoreList;
+  /**
+   * @type {Marklet[]}
+   */
+  marklets;
   constructor(map) {
     this.map = map;
     this.scoreList = LevelScore.getScoreList();
+    this.marklets = [];
   }
   reset() {
     this.map.forEach((entry) => {
       entry.marks = [];
-      //marks.clear();
     });
+    this.marklets = [];
   }
-  flushSubmissions(submissions) {
+  /**
+   *
+   * @param {[number, number, number]} date - [year, month, date]
+   * @param {SubmissionResult[]} submissions
+   */
+  flushSubmissions(date, submissions) {
     const marks = submissions.flatMap((sbm) => Object.entries(sbm.analysis));
     marks.reduce((levelMap, mark) => {
       const [Lnn, score] = mark;
@@ -163,6 +209,11 @@ export class MarkMap {
         (score) => score.levelStart <= lvl && lvl < score.levelEnd
       );
       scoreData.total += score[1];
+      const scoreIndex = this.scoreList.chapters.findIndex(
+        (chapterScore) =>
+          chapterScore.levelStart <= lvl && lvl < chapterScore.levelEnd
+      );
+      this.marklets.push(new Marklet(score, date, undefined, lvl, scoreIndex));
       return levelMap;
     }, this.map);
   }
@@ -170,6 +221,25 @@ export class MarkMap {
     const { marks } = this.map.get(level);
     console.log(`level ${level}`, marks.length);
     return marks.length > 0;
+  }
+  /**
+   *
+   * @param {number} year
+   * @param {number} month - not monthIndex
+   */
+  hasMarkByDate(year, month) {
+    const found = this.marklets.find(({ examTime }) => {
+      return examTime[0] === year && examTime[1] === month;
+    });
+    return !!found;
+  }
+  /**
+   *
+   * @param {(marketlet: Marklet) => boolean} fnPredicate
+   * @returns {Marklet[]}
+   */
+  filterBy(fnPredicate) {
+    return this.marklets.filter(fnPredicate);
   }
   /**
    *

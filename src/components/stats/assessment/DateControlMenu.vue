@@ -1,9 +1,9 @@
 <template>
   <div class="box">
     <div class="year-form">
-      <ActionIcon icon="arrow_left" fsize="22px" />
+      <ActionIcon icon="arrow_left" fsize="22px" @click="shiftYear(-1)" />
       <span>{{ year }}</span>
-      <ActionIcon icon="arrow_right" fsize="22px" />
+      <ActionIcon icon="arrow_right" fsize="22px" @click="shiftYear(+1)" />
     </div>
     <div class="month-form">
       <button
@@ -11,7 +11,11 @@
         :key="m"
         @click="setActiveMonth(m)"
         class="nude"
-        :class="{ active: activeMonth === m }"
+        :class="{
+          active: activeMonth === m,
+          empty: !markMap.hasMarkByDate(year, m),
+        }"
+        :disabled="!markMap.hasMarkByDate(year, m)"
       >
         {{ m }}월
       </button>
@@ -22,15 +26,12 @@
 <script setup>
 import ActionIcon from "@/components/form/ActionIcon.vue";
 import { reactive, ref, defineEmits, defineProps, watch } from "vue";
-import { LevelScore } from "./level-score.js";
-import { useStore } from "vuex";
+import { LevelScore, MarkMap } from "./level-score.js";
 /** @type { Readonly<{
     exams?: import('./exam-paper').StudentExamList ;
 }>} */
 const props = defineProps(["exams"]);
 const emits = defineEmits(["chart"]);
-const store = useStore();
-const findSection = store.getters["course/section"];
 
 /**
  * @type {{ exams?: import('./exam-paper').StudentExamList}}
@@ -38,11 +39,22 @@ const findSection = store.getters["course/section"];
 const chartData = reactive({
   exams: undefined,
 });
+const cols = [
+  { id: "legend", label: "Segments", type: "string" },
+  {
+    id: "score",
+    label: "점수",
+    type: "number",
+  },
+  { id: "bar-style", type: "string", role: "style" },
+  { id: "percent-text", type: "string", role: "annotation" },
+];
 const current = new Date();
 const year = ref(current.getFullYear());
 const monthes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 const scoreMap = LevelScore.getScoreList();
+const markMap = MarkMap.buildMarkMap(scoreMap);
 
 const activeMonth = ref(undefined);
 const getDateRange = (year, month) => {
@@ -51,33 +63,24 @@ const getDateRange = (year, month) => {
   end.setMonth(month);
   return [start, end];
 };
+
 const flushChart = () => {
-  const cols = [
-    { id: "legend", label: "Segments", type: "string" },
-    {
-      id: "score",
-      label: "점수",
-      type: "number",
-    },
-    { id: "bar-style", type: "string", role: "style" },
-    { id: "percent-text", type: "string", role: "annotation" },
-  ];
   scoreMap.reset();
-  const mapByChaterName = chartData.exams.getValueByChapter(
-    scoreMap,
-    (sectionSeq) => findSection(sectionSeq)
-  );
+  const current = [year.value, activeMonth.value, undefined];
+
+  // '가' ~ '차' 까지 데이터 생성함
   const rows = scoreMap.scores.map((score) => {
-    const submissions = mapByChaterName.get(score.group);
-    if (submissions) {
-      submissions.reduce((score, sbm) => {
-        Object.values(sbm.analysis).forEach(([solved, total]) => {
-          score.solved += solved;
-          score.total += total;
-        });
-        return score;
-      }, score);
+    const marklets = markMap.filterBy(
+      (marklet) =>
+        marklet.chapterRef === score.index && marklet.isSameDate(current)
+    );
+    if (marklets && marklets.length > 0) {
+      marklets.forEach((marklet) => {
+        score.solved += marklet.solved;
+        score.total += marklet.total;
+      });
     }
+    console.log(score.group, marklets);
     const group = { v: score.group };
     const score2 = { v: score.getPercent() };
     const style = { v: `color: ${score.webColor}; font-size: 12px;` };
@@ -102,14 +105,46 @@ const setActiveMonth = (month) => {
   chartData.exams = courseExam;
   flushChart();
 };
+/**
+ * 주어진 연도의 marklet을 수집함(yyyy년 1월부터 12월까지 모두 수집)
+ * @param {import('./exam-paper.js').StudentExamList} exams
+ */
+const prepareMarkMap = (exams) => {
+  markMap.reset();
+  exams.papers
+    .filter((paper) => {
+      const y = paper.startTime.getFullYear();
+      return year.value === y;
+    })
+    .forEach((paper) => {
+      const { submissions, startTime } = paper;
+      const time = [
+        startTime.getFullYear(),
+        startTime.getMonth() + 1,
+        startTime.getDate(),
+      ];
+      markMap.flushSubmissions(time, submissions);
+    });
+};
+const shiftYear = (delta) => {
+  const y = year.value;
+  year.value = y + delta;
+  activeMonth.value = undefined;
+  prepareMarkMap(props.exams);
+};
 watch(
   () => props.exams,
   (exams) => {
     console.log("[student changed]", exams);
     year.value = exams.getRecentDate().getFullYear();
+    prepareMarkMap(props.exams);
   },
   { immediate: true }
 );
+// onMounted(() => {
+//   chartData.exams = props.exams;
+//   prepareMarkMap(props.exams);
+// });
 </script>
 
 <style lang="scss" scoped>
@@ -132,6 +167,9 @@ watch(
       &.active {
         color: white;
         background-color: #0038bc;
+      }
+      &.empty {
+        color: #ddd;
       }
     }
   }

@@ -66,7 +66,6 @@ const chapters = computed(() => store.getters["course/levels"]);
 console.log(chapters);
 const scoreMap = LevelScore.getScoreList();
 const markMap = MarkMap.buildMarkMap(scoreMap);
-console.log(markMap);
 
 const activeChapter = ref(undefined);
 const activeSection = ref(undefined);
@@ -77,6 +76,7 @@ const chartData = reactive({
   exams: undefined,
   sectionSet: new Set(),
 });
+
 const BARCHART_OPTION = {
   // legend: { position: "bottom" },
   // axisTitlesPosition: "in",
@@ -116,6 +116,7 @@ const BARCHART_OPTION = {
     // ticks: [0, 20, 40, 60, 80, 100],
   },
 };
+
 const cols = [
   { id: "legend", type: "string", label: "Segments" },
   {
@@ -131,19 +132,9 @@ const groupByLevels = () => {
   const { exams } = chartData;
   const recent = exams.getRecentDate();
   const vs = exams.getValuesByMonth(recent, 12);
-  vs.forEach(({ submissions }) => {
-    markMap.flushSubmissions(submissions);
+  vs.forEach(({ date, submissions }) => {
+    markMap.flushSubmissions(date, submissions);
   });
-  // vs.map(({ submissions }) => {
-  // const marks = submissions.flatMap((sbm) => Object.entries(sbm.analysis));
-  // marks.reduce((levelMap, mark) => {
-  //   const [Lnn, score] = mark;
-  //   const lvl = parseInt(Lnn.substring(1));
-  //   levelMap.get(lvl).marks.push(score);
-  //   return levelMap;
-  // }, markMap);
-  // });
-  console.log(markMap);
 };
 /**
  */
@@ -156,31 +147,21 @@ const buildRows = () => {
    */
   const recent = exams.getRecentDate();
   const vs = exams.getValuesByMonth(recent, 12);
-  const rows = vs.map(({ date, submissions }) => {
+  const rows = vs.map(({ date }) => {
     date.push(10, 0, 0); // 10:00:00
     const year = date[1] === 1 ? `${date[0]}년` : "";
     const month = { v: `${year}${date[1]}월` };
     const scoreData = { solved: 0, total: 0 };
-    const marks = submissions.flatMap((sbm) => Object.entries(sbm.analysis));
-    /*
-     * marks: [
-     *   {L01: [2, 5]},
-     *   {L17: [3, 10]},
-     *   {L01: [8, 8]},
-     *   ...
-     * ]
-     */
-    marks.reduce((data, mark) => {
-      const [Lnn, [solved, total]] = mark;
-      const lvl = parseInt(Lnn.substring(1));
-      // const solved = score[0];
-      // const total = score[1];
-      if (sectionSet.has(lvl)) {
-        data.solved += solved;
-        data.total += total;
-      }
-      return data;
-    }, scoreData);
+
+    markMap
+      .filterBy((marklet) => {
+        return sectionSet.has(marklet.level) && marklet.isSameDate(date);
+      })
+      .reduce((data, mark) => {
+        data.solved += mark.solved;
+        data.total += mark.total;
+        return data;
+      }, scoreData);
     const value =
       scoreData.total === 0 ? null : (scoreData.solved / scoreData.total) * 100;
     const score = {
