@@ -20,7 +20,15 @@
       </li>
     </ul>
     <div v-if="ready" class="chart">
-      <GoogleBarChart :chartFormat="chartData" />
+      <div class="half">
+        <GoogleBarChart :chartFormat="chartData" @select="showSectionChart" />
+      </div>
+      <div class="half" :key="sectionData.data.rows">
+        <GoogleBarChart
+          :chartFormat="sectionData"
+          :chartOption="sectionData.option"
+        />
+      </div>
     </div>
     <div v-else class="commit">
       <AppButton
@@ -37,9 +45,13 @@ import GoogleBarChart from "../GoogleBarChart.vue";
 import { computed, defineProps, reactive, ref, watch } from "vue";
 import { LevelScore } from "./level-score.js";
 import { AppButton } from "../../form";
+import { arr } from "@/service/util";
+import { useStore } from "vuex";
 
 const props = defineProps(["type", "diagnosis"]);
 
+const store = useStore();
+const chapters = store.getters["course/levels"];
 const questions = computed(() => props.diagnosis.questions);
 const ready = computed(() => props.diagnosis.ready);
 const title = computed(() =>
@@ -47,7 +59,7 @@ const title = computed(() =>
 );
 const answerAllfilled = ref(false);
 const chartData = reactive({
-  option: { title: "날짜별" },
+  option: { title: "날짜별", legend: "none" },
   area: { width: 600, height: 400 },
   data: {
     cols: [
@@ -59,6 +71,36 @@ const chartData = reactive({
       },
       { id: "bar-style", type: "string", role: "style" },
       { id: "percent-text", type: "string", role: "annotation" },
+    ],
+    rows: undefined,
+  },
+});
+
+const sectionData = reactive({
+  option: {
+    title: "챕터별",
+    vAxis: {
+      minValue: 0,
+      maxValue: 100,
+      title: null,
+      textPosition: "out",
+      minorGridlines: {
+        color: "#fff",
+      },
+    },
+  },
+  area: { width: 600, height: 400 },
+  data: {
+    cols: [
+      { id: "legend", type: "string", label: "Segments" },
+      {
+        id: "score",
+        type: "number",
+        label: "점수",
+      },
+      { id: "bar-style", type: "string", role: "style" },
+      { id: "percent-text", type: "string", role: "annotation" },
+      { id: "tooltip-text", type: "string", role: "tooltip" },
     ],
     rows: undefined,
   },
@@ -93,6 +135,7 @@ const prepareChart = () => {
     const column = { v: [score.group] };
     const value = {
       v: score.getPercent(),
+      p: { group: score.group, chater: score.index },
     };
     const style = { v: `color: ${score.webColor}; font-size: 12px;` };
     const annotation = { v: `${score.getPercent()}%` };
@@ -101,6 +144,59 @@ const prepareChart = () => {
   if (ready.value) {
     chartData.data.rows = rows;
   }
+};
+/**
+ * 선택한 챕터 상세보기 차트. 각 section별로 보여줌
+ * @param {{group: string, chapter: number}} e
+ */
+const showSectionChart = (e) => {
+  const { group, chater: chapterIndex } = e;
+  const marks = questions.value.flatMap((q) =>
+    Object.entries(q.answer.analysis)
+  );
+  const chapter = chapters[chapterIndex];
+  const chapterScore = scoreMap.scores.find((score) => score.group === group);
+  const filteredMarks = chapterScore.filterMarks(marks);
+  /** @type {Map<string, {solved:number, total:number}>} */
+  const map = arr.groupByMap(
+    filteredMarks,
+    (mark) => mark[0],
+    () => ({ solved: 0, total: 0 }),
+    (elem, mark) => {
+      elem.solved += mark[1][0];
+      elem.total += mark[1][1];
+    }
+  );
+  chapterScore.forEachLevel((_, label) => {
+    if (!map.has(label)) {
+      map.set(label, { solved: 0, total: 0 });
+    }
+  });
+  const chartValues = [...map.entries()].sort((a, b) =>
+    a[0].localeCompare(b[0])
+  );
+  const rows = chartValues.map(([lvlName, score]) => {
+    const level = parseInt(lvlName.substring(1));
+    const { solved, total } = score;
+    const column = { v: lvlName };
+    const percentage = (total ? solved / total : 0) * 100;
+    const value = {
+      v: percentage,
+      p: { level, score: { solved, total } },
+    };
+    const style = { v: `color: ${chapterScore.webColor}; font-size: 12px;` };
+
+    const annoText = total ? `${percentage.toFixed(0)}%` : "없음";
+    const annotation = { v: annoText };
+
+    const section = chapter.sections.find((section) => section.level === level);
+    const { description } = section;
+    const tooltipText = { v: `${description} - ${annoText}` };
+
+    return { c: [column, value, style, annotation, tooltipText] };
+  });
+  sectionData.option.title = chapter.desc;
+  sectionData.data.rows = rows;
 };
 watch(
   questions,
@@ -183,6 +279,8 @@ ul {
 .show-chart {
   display: flex;
   column-gap: 8px;
+  height: 100%;
+  align-items: stretch;
   ul {
     flex: 0 0 25%;
   }
@@ -190,6 +288,13 @@ ul {
     flex: 0 0 75%;
     display: flex;
     flex-direction: column;
+    .half {
+      flex: 1 1 50%;
+      height: 50%;
+      .chart-view {
+        height: 100%;
+      }
+    }
   }
 }
 </style>

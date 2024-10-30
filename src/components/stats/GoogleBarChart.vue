@@ -74,7 +74,7 @@ const props = defineProps(["chartFormat", "chartOption"]);
 const emits = defineEmits(["select"]);
 const chartEl = shallowRef(null);
 /**
- * @type {{chartOption: any, view: DataView}}
+ * @type {{chartOption: any, view: DataView, model: DataTable }}
  */
 const chart = shallowRef(null);
 
@@ -85,7 +85,7 @@ const renderChart = () => {
   const width = chartEl.value.offsetWidth;
   const height = chartEl.value.offsetHeight;
   chartOption.chartArea = {
-    left: 20,
+    left: 40,
     top: 40,
     width: width - 40,
     height: height - 100,
@@ -95,10 +95,9 @@ const renderChart = () => {
   if (options?.title) {
     chartOption.title = options?.title;
   }
-  // chartOption.colors = options?.colors || colors;
-  // const chartOption = Object.assign({}, options);
   view.draw(model, chartOption);
   chart.value.model = model;
+  chart.value.chartOption = chartOption;
 };
 const installListener = (view) => {
   google.visualization.events.addListener(view, "select", () => {

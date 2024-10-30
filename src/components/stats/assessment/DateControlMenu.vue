@@ -55,7 +55,11 @@ const monthes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 const scoreMap = LevelScore.getScoreList();
 const markMap = MarkMap.buildMarkMap(scoreMap);
-
+/**
+ * chapter별 score
+ * @type {Record<number, Marklet[]>} key(chapter index)
+ */
+let marksByScore = {};
 const activeMonth = ref(undefined);
 const getDateRange = (year, month) => {
   const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
@@ -66,6 +70,7 @@ const getDateRange = (year, month) => {
 
 const flushChart = () => {
   scoreMap.reset();
+  marksByScore = {};
   const current = [year.value, activeMonth.value, undefined];
 
   // '가' ~ '차' 까지 데이터 생성함
@@ -80,9 +85,13 @@ const flushChart = () => {
         score.total += marklet.total;
       });
     }
+    marksByScore[score.index] = marklets;
     console.log(score.group, marklets);
     const group = { v: score.group };
-    const score2 = { v: score.getPercent() };
+    const score2 = {
+      v: score.getPercent(),
+      p: { group: score.group, chater: score.index },
+    };
     const style = { v: `color: ${score.webColor}; font-size: 12px;` };
     const annotation = { v: score.isEmpty() ? "없음" : `${score2.v}%` };
     return {
@@ -90,7 +99,7 @@ const flushChart = () => {
     };
   });
   console.log(cols, rows);
-  emits("chart", { cols, rows });
+  emits("chart", { cols, rows, marksMap: marksByScore });
 };
 const setActiveMonth = (month) => {
   activeMonth.value = month;
@@ -135,16 +144,12 @@ const shiftYear = (delta) => {
 watch(
   () => props.exams,
   (exams) => {
-    console.log("[student changed]", exams);
     year.value = exams.getRecentDate().getFullYear();
     prepareMarkMap(props.exams);
+    setActiveMonth(activeMonth.value);
   },
   { immediate: true }
 );
-// onMounted(() => {
-//   chartData.exams = props.exams;
-//   prepareMarkMap(props.exams);
-// });
 </script>
 
 <style lang="scss" scoped>
@@ -154,7 +159,7 @@ watch(
   justify-content: center;
 }
 .box {
-  margin: 8px 0;
+  margin: 8px 4px;
   box-shadow: 0 0 4px #0000004d;
   border-radius: 8px;
   padding: 6px;

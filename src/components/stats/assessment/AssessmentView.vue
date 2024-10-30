@@ -30,7 +30,12 @@
           <AssessmentStatView :exams="diagnosisRef.exams" />
         </div>
         <div v-else-if="activeTab.cmd === 'survey1'" class="survey">
-          <AssessmentForm type="after" :diagnosis="diagnosisRef.after" />
+          <AssessmentForm
+            type="after"
+            :diagnosis="diagnosisRef.after"
+            @answer="pushAnswer"
+            @commit="commitDiagnosis"
+          />
         </div>
         <div v-else>Error</div>
       </div>
@@ -130,6 +135,7 @@ section {
       padding-top: 16px;
       .survey {
         height: 100%;
+        padding-bottom: 16px;
       }
     }
   }

@@ -12,13 +12,13 @@
     </button>
   </div>
   <div v-if="activeChapter" class="section">
-    <button
+    <!-- <button
       class="nude"
       :class="{ active: activeSection === undefined }"
       @click="setActiveSections(activeChapter.sections)"
     >
       전체
-    </button>
+    </button> -->
     <button
       v-for="section in activeChapter.sections.filter((sec) => sec.level > 0)"
       :key="section.seq"
@@ -63,7 +63,6 @@ const emit = defineEmits({
 
 const store = useStore();
 const chapters = computed(() => store.getters["course/levels"]);
-console.log(chapters);
 const scoreMap = LevelScore.getScoreList();
 const markMap = MarkMap.buildMarkMap(scoreMap);
 
@@ -171,7 +170,6 @@ const buildRows = () => {
     const annotation = {
       v: value !== null ? `${value.toFixed(1)}%` : "없음",
     };
-    console.log(month, scoreData);
     return { c: [month, score, style, annotation] };
   });
   return rows;
@@ -198,7 +196,8 @@ const setActiveSections = (sections, selectedSection) => {
 
   const chartOption = Object.assign({}, BARCHART_OPTION);
   chartOption.title = resolveChartTile();
-  emit("chart", { activeSection, chartOption, cols, rows });
+  const eventName = selectedSection ? "sectionChart" : "chart";
+  emit(eventName, { activeSection, chartOption, cols, rows });
 };
 const setActiveChapter = (chapter) => {
   activeChapter.value = chapter;
@@ -222,7 +221,7 @@ onMounted(() => {
 .box {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin: 8px 0;
+  margin: 8px 2px;
   padding: 6px;
   box-shadow: 0 0 4px #0000004d;
   border-radius: 8px;
@@ -241,6 +240,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   row-gap: 4px;
+  margin: 0 2px;
   .nude {
     width: 100%;
     font-weight: 400;

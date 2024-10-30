@@ -37,6 +37,19 @@ export class LevelScore {
     const idx = this.index % colors.length;
     return colors[idx || 0];
   }
+  /**
+   *
+   * @param {(level:number, label:string) => void} fnConsumer
+   */
+  forEachLevel(fnConsumer) {
+    const { levelStart, levelEnd } = this;
+    let lvl = levelStart;
+    while (lvl < levelEnd) {
+      const label = `L${lvl < 10 ? "0" : ""}${lvl}`;
+      fnConsumer(lvl, label);
+      lvl++;
+    }
+  }
   reset() {
     this.solved = 0;
     this.total = 0;
@@ -57,6 +70,19 @@ export class LevelScore {
       const decimal = Math.pow(10, digit);
       return parseInt(percent * decimal) / decimal;
     }
+  }
+  /**
+   *
+   * @param {[string, [number, number]][]} marks
+   * @returns
+   */
+  filterMarks(marks) {
+    const { levelStart, levelEnd } = this;
+    return marks.filter((mark) => {
+      const label = mark[0]; // L00, L10
+      const lvl = parseInt(label.substring(1));
+      return levelStart <= lvl && lvl < levelEnd;
+    });
   }
 }
 
@@ -131,7 +157,7 @@ LevelScore.getScoreList = () =>
   ]);
 
 export class Marklet {
-  /** @type { [number, number]} [solved, total] */
+  /** @type {[string, [number, number]]}  */
   mark;
   /**
    * @type {[number, number, number]} [year, month, date]
@@ -158,10 +184,10 @@ export class Marklet {
     this.chapterRef = chapterRef;
   }
   get solved() {
-    return this.mark[0];
+    return this.mark[1][0];
   }
   get total() {
-    return this.mark[1];
+    return this.mark[1][1];
   }
   /**
    *
@@ -204,7 +230,7 @@ export class MarkMap {
     marks.reduce((levelMap, mark) => {
       const [Lnn, score] = mark;
       const lvl = parseInt(Lnn.substring(1));
-      levelMap.get(lvl).marks.push(score);
+      levelMap.get(lvl).marks.push(mark);
       const scoreData = this.scoreList.scores.find(
         (score) => score.levelStart <= lvl && lvl < score.levelEnd
       );
@@ -213,13 +239,12 @@ export class MarkMap {
         (chapterScore) =>
           chapterScore.levelStart <= lvl && lvl < chapterScore.levelEnd
       );
-      this.marklets.push(new Marklet(score, date, undefined, lvl, scoreIndex));
+      this.marklets.push(new Marklet(mark, date, undefined, lvl, scoreIndex));
       return levelMap;
     }, this.map);
   }
   hasMark(level) {
     const { marks } = this.map.get(level);
-    console.log(`level ${level}`, marks.length);
     return marks.length > 0;
   }
   /**
