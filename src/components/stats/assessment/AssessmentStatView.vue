@@ -34,6 +34,9 @@
           :chartOption="detailChart.option"
         />
       </div>
+      <div v-if="emptyChart" class="guide">
+        <h3>챕터 또는 월을 선택하세요.</h3>
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +48,7 @@ import DateControlMenu from "./DateControlMenu.vue";
 import GoogleBarChart from "../GoogleBarChart.vue";
 import {
   reactive,
+  ref,
   defineProps,
   watch,
   onMounted,
@@ -65,6 +69,7 @@ const tabModel = TabModel.create([
 const { activeTab } = tabModel;
 // const visible = ref(false);
 
+const emptyChart = ref(true);
 const scoreMap = LevelScore.getScoreList();
 
 // const chartOption = shallowRef(undefined);
@@ -124,9 +129,15 @@ const showChart = (e, chartData) => {
   }
   detailChart.visible = false;
   chartData.visible = false;
+  emptyChart.value = false;
   setTimeout(() => {
     chartData.visible = true;
   });
+};
+const hideCharts = () => {
+  chartData.visible = false;
+  detailChart.visible = false;
+  emptyChart.value = true;
 };
 const redrawChart = () => {
   if (chartData.visible) {
@@ -185,7 +196,9 @@ const showDetailChart = (e) => {
       };
       const style = { v: `color: ${chapterScore.webColor}; font-size: 12px;` };
 
-      const annoText = total ? `${percentage.toFixed(0)}%` : "없음";
+      const annoText = total
+        ? `${percentage.toFixed(0)}%\n(${solved}/${total})`
+        : "없음";
       const annotation = { v: annoText };
 
       const section = chapter.sections.find(
@@ -201,15 +214,11 @@ const showDetailChart = (e) => {
     detailChart.data.rows = rows;
   }
 };
-watch(
-  () => props.exams,
-  (exams) => {
-    console.log("[exam]", exams);
-  }
-);
+watch(() => props.exams, hideCharts);
 watch(activeTab, () => {
   chartData.visible = false;
   detailChart.visible = false;
+  emptyChart.value = true;
 });
 let chartEl = shallowRef(null);
 let resizer;
@@ -257,6 +266,7 @@ onUnmounted(() => {
     }
   }
   .chart {
+    position: relative;
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
@@ -264,6 +274,24 @@ onUnmounted(() => {
       height: 50%;
       display: flex;
       flex-direction: column;
+    }
+    .guide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 4px dashed #ccc;
+      border-radius: 16px;
+      h3 {
+        font-size: 2rem;
+        font-family: "NanumSquareRound", "Noto Sans KR", sans-serif;
+        color: #aaa;
+      }
     }
   }
 }

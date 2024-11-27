@@ -21,17 +21,64 @@
       </button>
     </div>
   </div>
+  <div v-if="!activeMonth" class="guide">선택된 월이 없습니다.</div>
 </template>
 
 <script setup>
 import ActionIcon from "@/components/form/ActionIcon.vue";
-import { reactive, ref, defineEmits, defineProps, watch } from "vue";
+import { reactive, ref, defineEmits, defineProps, watch, onMounted } from "vue";
 import { LevelScore, MarkMap } from "./level-score.js";
 /** @type { Readonly<{
     exams?: import('./exam-paper').StudentExamList ;
 }>} */
 const props = defineProps(["exams"]);
 const emits = defineEmits(["chart"]);
+
+const BARCHART_OPTION = {
+  selectionMode: "single",
+  dataOpacity: 1,
+  fontSize: 10,
+  chartArea: {},
+  hAxis: {
+    format: "M/d",
+    title: null,
+    textPosition: "out",
+    viewWindow: null,
+    minorGridlines: {
+      color: "#fff",
+    },
+  },
+  interpolateNulls: true,
+
+  pointSize: 8,
+  slantedText: true,
+  theme: "material",
+  tooltip: {
+    isHtml: true,
+    textStyle: { color: "#444" },
+    showColorCode: true,
+    trigger: "focus", // "selection",
+  },
+  annotations: {
+    textStyle: {
+      fontSize: 16,
+      color: "#444", // The color of the text.
+      auraColor: "#fff", // The color of the text outline.
+      opacity: 1, // The transparency of the text.
+    },
+  },
+  vAxis: {
+    minValue: 0,
+    maxValue: 100,
+    title: null,
+    // viewWindowMode: "pretty",
+    textPosition: "in",
+    minorGridlines: {
+      color: "#fff",
+    },
+    ticks: [0, 20, 40, 60, 80, 100],
+  },
+};
 
 /**
  * @type {{ exams?: import('./exam-paper').StudentExamList}}
@@ -49,8 +96,9 @@ const cols = [
   { id: "bar-style", type: "string", role: "style" },
   { id: "percent-text", type: "string", role: "annotation" },
 ];
-const current = new Date();
-const year = ref(current.getFullYear());
+// const current = new Date();
+const year = ref(0);
+const activeMonth = ref(undefined);
 const monthes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 const scoreMap = LevelScore.getScoreList();
@@ -60,7 +108,6 @@ const markMap = MarkMap.buildMarkMap(scoreMap);
  * @type {Record<number, Marklet[]>} key(chapter index)
  */
 let marksByScore = {};
-const activeMonth = ref(undefined);
 const getDateRange = (year, month) => {
   const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
   const end = new Date(start);
@@ -86,20 +133,24 @@ const flushChart = () => {
       });
     }
     marksByScore[score.index] = marklets;
-    console.log(score.group, marklets);
     const group = { v: score.group };
     const score2 = {
       v: score.getPercent(),
       p: { group: score.group, chater: score.index },
     };
     const style = { v: `color: ${score.webColor}; font-size: 12px;` };
-    const annotation = { v: score.isEmpty() ? "없음" : `${score2.v}%` };
+    const annotation = {
+      v: score.isEmpty()
+        ? "없음"
+        : `${score2.v}%\n(${score.solved}/${score.total})`,
+    };
     return {
       c: [group, score2, style, annotation],
     };
   });
-  console.log(cols, rows);
-  emits("chart", { cols, rows, marksMap: marksByScore });
+  const chartOption = Object.assign({}, BARCHART_OPTION);
+  chartOption.title = `${year.value}년 ${activeMonth.value}월`;
+  emits("chart", { chartOption, cols, rows, marksMap: marksByScore });
 };
 const setActiveMonth = (month) => {
   activeMonth.value = month;
@@ -141,15 +192,28 @@ const shiftYear = (delta) => {
   activeMonth.value = undefined;
   prepareMarkMap(props.exams);
 };
+const examChanged = (renderChart) => {
+  const { exams } = props;
+  if (exams) {
+    if (exams.papers.length > 0) {
+      year.value = exams.getRecentDate().getFullYear();
+      activeMonth.value = undefined;
+      prepareMarkMap(exams);
+      if (renderChart) {
+        setActiveMonth(activeMonth.value);
+      }
+    } else {
+      year.value = new Date().getFullYear();
+    }
+  }
+};
 watch(
   () => props.exams,
-  (exams) => {
-    year.value = exams.getRecentDate().getFullYear();
-    prepareMarkMap(props.exams);
-    setActiveMonth(activeMonth.value);
-  },
-  { immediate: true }
+  () => examChanged(false)
 );
+onMounted(() => {
+  examChanged(false);
+});
 </script>
 
 <style lang="scss" scoped>

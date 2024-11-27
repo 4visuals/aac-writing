@@ -34,6 +34,7 @@
       ><span class="desc">{{ section.description }}</span>
     </button>
   </div>
+  <div v-else class="guide">선택된 챕터가 없습니다.</div>
 </template>
 
 <script setup>
@@ -77,8 +78,6 @@ const chartData = reactive({
 });
 
 const BARCHART_OPTION = {
-  // legend: { position: "bottom" },
-  // axisTitlesPosition: "in",
   selectionMode: "single",
   dataOpacity: 1,
   fontSize: 10,
@@ -86,8 +85,8 @@ const BARCHART_OPTION = {
   hAxis: {
     format: "M/d",
     title: null,
-    textPosition: "out", // X축 아래에 날짜 표시
-    viewWindow: null, // {min, max}
+    textPosition: "out",
+    viewWindow: null,
     minorGridlines: {
       color: "#fff",
     },
@@ -103,6 +102,14 @@ const BARCHART_OPTION = {
     showColorCode: true,
     trigger: "focus", // "selection",
   },
+  annotations: {
+    textStyle: {
+      fontSize: 16,
+      color: "#444", // The color of the text.
+      auraColor: "#fff", // The color of the text outline.
+      opacity: 1, // The transparency of the text.
+    },
+  },
   vAxis: {
     minValue: 0,
     maxValue: 100,
@@ -112,7 +119,7 @@ const BARCHART_OPTION = {
     minorGridlines: {
       color: "#fff",
     },
-    // ticks: [0, 20, 40, 60, 80, 100],
+    ticks: [0, 20, 40, 60, 80, 100],
   },
 };
 
@@ -166,9 +173,12 @@ const buildRows = () => {
     const score = {
       v: value || 0,
     };
-    const style = { v: `color: ${chapterScore.webColor}; font-size: 12px;` };
+    const style = { v: `color: ${chapterScore.webColor}; font-size: 14px;` };
     const annotation = {
-      v: value !== null ? `${value.toFixed(1)}%` : "없음",
+      v:
+        value !== null
+          ? `${value.toFixed(1)}%\n(${scoreData.solved}/${scoreData.total})`
+          : "없음",
     };
     return { c: [month, score, style, annotation] };
   });
