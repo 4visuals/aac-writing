@@ -5,7 +5,13 @@
         <h4 :class="{ list: ready }">{{ title }}</h4>
       </li>
       <li v-for="q in questions" :key="q.seq">
+        <AssessmentQnA
+          v-if="diagnosis.ready"
+          :question="q"
+          :activeLevel="activeLevel"
+        />
         <input
+          v-else
           type="text"
           :class="`q ${q?.answer?.answer ? 'has' : ''}`"
           :readonly="ready"
@@ -27,6 +33,7 @@
         <GoogleBarChart
           :chartFormat="sectionData"
           :chartOption="sectionData.option"
+          @select="markLevelData"
         />
       </div>
     </div>
@@ -47,16 +54,16 @@ import { LevelScore } from "./level-score.js";
 import { AppButton } from "../../form";
 import { arr } from "@/service/util";
 import { useStore } from "vuex";
+import AssessmentQnA from "./AssessmentQnA.vue";
 
 const props = defineProps(["type", "diagnosis"]);
 
 const store = useStore();
 const chapters = store.getters["course/levels"];
 const questions = computed(() => props.diagnosis.questions);
+const activeLevel = ref(undefined);
 const ready = computed(() => props.diagnosis.ready);
-const title = computed(() =>
-  props.type === "before" ? "진단평가" : "종합평가"
-);
+const title = computed(() => (props.type === "before" ? "평가1" : "평가2"));
 const answerAllfilled = ref(false);
 const chartData = reactive({
   option: { title: "날짜별", legend: "none" },
@@ -197,6 +204,15 @@ const showSectionChart = (e) => {
   });
   sectionData.option.title = chapter.desc;
   sectionData.data.rows = rows;
+};
+/**
+ *
+ * @param e
+ */
+const markLevelData = (
+  /** @type {level: number, score: {solved:number, total: number}} */ e
+) => {
+  activeLevel.value = e.level;
 };
 watch(
   questions,

@@ -32,6 +32,11 @@ export default {
       }));
       chars.value = arr;
     };
+    /**
+     *
+     * @param level
+     * @param index 글자 단위 index
+     */
     const matched = (level, index) => {
       const endIdx = index + 3;
       const found = level.ranges.filter(

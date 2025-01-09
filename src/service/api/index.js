@@ -35,6 +35,9 @@ const student = {
             const analysis = JSON.parse(quiz.answer.analysis);
             quiz.answer.analysis = analysis;
           }
+          if (quiz.analysis) {
+            quiz.analysis = JSON.parse(quiz.analysis);
+          }
         });
         exams.forEach((exam) => {
           exam.submissions.forEach((sbm) => {

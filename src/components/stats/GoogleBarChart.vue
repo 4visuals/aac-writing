@@ -105,12 +105,16 @@ const installListener = (view) => {
     if (sels.length === 0) {
       return;
     }
-    const { row, column } = sels[0];
+    let { row, column } = sels[0];
     if (row === null || column === null) {
       return;
     }
     const { model } = chart.value;
-    const property = model.getProperties(row, column);
+    if (column === 3) {
+      // annotation을 클릭하면 3이 나온다.
+      column = 1;
+    }
+    const property = model.getProperties(row, 1);
     // console.log(property);
     property.resourceType = props.chartFormat.type;
     emits("select", property);

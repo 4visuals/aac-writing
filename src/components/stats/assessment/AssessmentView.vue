@@ -57,9 +57,9 @@ const activeAsignee = shallowRef(
   props.assignees.find((ans) => ans.student.seq === props.student.seq)
 );
 const tabModel = TabModel.create([
-  { text: "진단평가", cmd: "survey0", clazz: "retail" },
   { text: "학습이력", cmd: "history", clazz: "gbuying" },
-  { text: "종합평가", cmd: "survey1", clazz: "gbuying" },
+  { text: "평가1", cmd: "survey0", clazz: "retail" },
+  { text: "평가2", cmd: "survey1", clazz: "gbuying" },
 ]);
 const { activeTab } = tabModel;
 const diagnosisRef = reactive({
