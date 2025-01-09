@@ -178,4 +178,18 @@ const student = {
     return PUT(`/admin/student/${transferDto.studentSeq}`, transferDto);
   },
 };
-export default { admin, member, license, order, product, voice, student };
+const level = {
+  analyze: (sentence) => {
+    return POST("/admin/level/analyze", { sentence });
+  },
+};
+export default {
+  admin,
+  member,
+  license,
+  order,
+  product,
+  voice,
+  student,
+  level,
+};
