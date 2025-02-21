@@ -18,6 +18,14 @@
     <div class="content">
       <TabView :model="tabModel"></TabView>
       <div class="tab-body">
+        <div v-if="activeTab.cmd === 'basic'" class="survey">
+          <AssessmentForm
+            type="basic"
+            :diagnosis="diagnosisRef.basic"
+            @answer="pushAnswer"
+            @commit="commitDiagnosis"
+          />
+        </div>
         <div v-if="activeTab.cmd === 'survey0'" class="survey">
           <AssessmentForm
             type="before"
@@ -58,11 +66,16 @@ const activeAsignee = shallowRef(
 );
 const tabModel = TabModel.create([
   { text: "학습이력", cmd: "history", clazz: "gbuying" },
+  { text: "진단평가", cmd: "basic", clazz: "retail" },
   { text: "평가1", cmd: "survey0", clazz: "retail" },
   { text: "평가2", cmd: "survey1", clazz: "gbuying" },
 ]);
 const { activeTab } = tabModel;
 const diagnosisRef = reactive({
+  basic: {
+    questions: undefined,
+    ready: false,
+  },
   before: {
     questions: undefined,
     ready: false,
@@ -89,6 +102,8 @@ const updateDiagnosis = () => {
   const { student } = activeAsignee.value;
   api.student.getDiagnosis(student.seq).then((res) => {
     const { diagnosis, exams } = res;
+    diagnosisRef.basic.questions = diagnosis.v0;
+    diagnosisRef.basic.ready = diagnosis.v0Ready;
     diagnosisRef.before.questions = diagnosis.v1;
     diagnosisRef.before.ready = diagnosis.v1Ready;
     diagnosisRef.after.questions = diagnosis.v2;

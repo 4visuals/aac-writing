@@ -29,7 +29,7 @@ const student = {
     GET(`/diagnosis/student/${studentSeq}`).then(
       (/** @type {diagnosis: any, exams: any[]} */ res) => {
         const { diagnosis, exams } = res;
-        const quizes = [...diagnosis.v1, ...diagnosis.v2];
+        const quizes = [...diagnosis.v0, ...diagnosis.v1, ...diagnosis.v2];
         quizes.forEach((quiz) => {
           if (quiz.answer) {
             const analysis = JSON.parse(quiz.answer.analysis);
