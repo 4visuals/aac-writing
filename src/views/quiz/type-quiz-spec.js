@@ -195,7 +195,36 @@ QuizSpec.prepareLevelQuiz = (
     failedOnly
   );
 };
-
+/**
+ *
+ * @param {Object} section
+ * @param {Function} sentenceFilter
+ * @param {[number, number]} ranges
+ * @returns
+ */
+QuizSpec.prepareWriting = (section, sentenceFilter, ranges) => {
+  const prevPage = {
+    chapter: "LevelListingView",
+    section: `/level/section`,
+  };
+  const quizMode = "WRITING";
+  const answerType = "NULL";
+  const quizResource = "W";
+  const seqs = sentenceFilter(section).map((sen) => sen.seq);
+  const retry = RetryMode.SEG; // not used
+  const failedOnly = false;
+  return prepareQuiz(
+    quizMode,
+    answerType,
+    section.seq,
+    quizResource,
+    prevPage,
+    seqs,
+    ranges,
+    retry,
+    failedOnly
+  );
+};
 QuizSpec.loadQuizSpec = () => {
   const obj = storage.session.read("quizSpec");
   return new QuizSpec(obj);

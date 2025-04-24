@@ -107,8 +107,8 @@
     <div class="elem">
       <h5>약정 금액</h5>
       <p>고객이 납부할 금액을 입력합니다.</p>
-      <p><input type="number" v-model="contractPrice" /></p>
-      <p>
+      <p><input type="number" v-model="contractPrice" step="1000" /></p>
+      <p class="payment">
         <span>{{ currency.read(contractPrice) }}원</span>
       </p>
     </div>
@@ -126,66 +126,58 @@
         borderless
         theme="gold"
         :text="`총 ${cnt} 매 결제링크 생성`"
+        :disabled="cnt < 2"
         size="lg"
         muted
         @click="generateGroupOrder"
       ></AacButton>
+      <p v-if="cnt === 1" class="warn">* 단체 구매는 2매 이상 입력해주세요.</p>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import adminApi from "../../service/admin-api";
 import util from "../../../../service/util";
-import { ref, shallowRef } from "vue";
+import { ref, shallowRef, computed, defineProps } from "vue";
 import toast from "../../../../components/toast";
-export default {
-  props: ["order", "products"],
-  setup(props) {
-    const cnt = ref(0);
-    /**
-     * 선택한 상품
-     */
-    const activeProduct = shallowRef(props.products[0]);
-    /**
-     * 고객이 납부할 금액
-     */
-    const contractPrice = ref(0);
-    const generateGroupOrder = () => {
-      adminApi.order.group
-        .issueGroupOrderLink(
-          props.order.seq,
-          activeProduct.value.code,
-          cnt.value,
-          contractPrice.value
-        )
-        .then(() => {
-          toast.success("[성공] 사용자에게 결제 링크를 전송했습니다.");
-        })
-        .catch((e) => {
-          toast.error("[실패]" + e.cause, 10 * 1000);
-        });
-    };
-    const inc = (qtt) => {
-      cnt.value = Math.max(0, cnt.value + qtt);
-    };
-    const oneYearProduct = props.products.find(
-      (prod) => prod.durationInHours === 24 * 365
-    );
-    if (oneYearProduct) {
-      activeProduct.value = oneYearProduct;
-    }
-    return {
-      cnt,
-      activeProduct,
-      contractPrice,
-      user: props.order.sender,
-      generateGroupOrder,
-      inc,
-      currency: util.currency,
-    };
-  },
+
+const props = defineProps(["order", "products"]);
+const cnt = ref(0);
+const user = computed(() => props.order.sender);
+const { currency } = util;
+/**
+ * 선택한 상품
+ */
+const activeProduct = shallowRef(props.products[0]);
+/**
+ * 고객이 납부할 금액
+ */
+const contractPrice = ref(0);
+const generateGroupOrder = () => {
+  adminApi.order.group
+    .issueGroupOrderLink(
+      props.order.seq,
+      activeProduct.value.code,
+      cnt.value,
+      contractPrice.value
+    )
+    .then(() => {
+      toast.success("[성공] 사용자에게 결제 링크를 전송했습니다.");
+    })
+    .catch((e) => {
+      toast.error("[실패]" + e.cause, 10 * 1000);
+    });
 };
+const inc = (qtt) => {
+  cnt.value = Math.max(0, cnt.value + qtt);
+};
+const oneYearProduct = props.products.find(
+  (prod) => prod.durationInHours === 24 * 365
+);
+if (oneYearProduct) {
+  activeProduct.value = oneYearProduct;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -208,6 +200,35 @@ export default {
         display: grid;
         grid-template-columns: minmax(80px, 120px) 1fr;
         grid-template-rows: auto;
+      }
+      &.warn {
+        color: crimson;
+      }
+      &.payment {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+      input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        color: #333;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s, box-shadow 0.3s;
+
+        &:focus {
+          border-color: #92bbff;
+          box-shadow: 0 0 5px rgba(146, 187, 255, 0.5);
+          outline: none;
+        }
+
+        &::placeholder {
+          color: #aaa;
+          font-style: italic;
+        }
       }
       .paper {
         display: flex;

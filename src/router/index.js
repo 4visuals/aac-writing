@@ -11,6 +11,7 @@ import { PolicyWrapper, PolicyView } from "../components/policy";
 import LoginPage from "../views/LoginPage.vue";
 import JoinPage from "../views/JoinPage.vue";
 import { QuizView } from "../views/quiz";
+import { WritingView } from "../views/writing";
 import SupportPage from "../views/SupportPage.vue";
 import {
   PurchaseWrapper,
@@ -75,6 +76,12 @@ const routes = [
     name: "QuizView",
     props: true,
     component: QuizView,
+  },
+  {
+    path: "/writing/:seq",
+    name: "WritingView",
+    props: true,
+    component: WritingView,
   },
   {
     path: "/console",

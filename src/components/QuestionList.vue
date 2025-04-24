@@ -1,5 +1,5 @@
 <template>
-  <div class="q-list">
+  <div class="q-list" :class="quizMode">
     <div class="label" :class="theme">
       <SpanText>{{ examDesc }}</SpanText>
     </div>
@@ -201,6 +201,7 @@ export default {
   flex: 1 1 25%;
   width: 80%;
   margin: 0 auto;
+
   @include mobile {
     flex-direction: column;
     width: 100%;

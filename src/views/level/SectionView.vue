@@ -64,18 +64,30 @@
           :recordVisible="false"
           @choosen="startSentenceQuiz"
         />
+        <QuestionList
+          v-if="wordMode"
+          quizMode="WRITING"
+          answerType="NULL"
+          :theme="theme"
+          :wordMode="wordMode"
+          :section="cate"
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          :recordVisible="false"
+          @choosen="startWritingMode"
+        />
       </div>
     </template>
   </div>
 </template>
 
-<script>
+<script setup>
 import { path } from "@/service/util";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, defineEmits } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { quizDao } from "@/dao";
+// import { quizDao } from "@/dao";
 import QuestionList from "@/components/QuestionList.vue";
-import { QuizModeText } from "@/components/quiz/text-map";
+// import { QuizModeText } from "@/components/quiz/text-map";
 import { useStore } from "vuex";
 import Slide from "@/components/slide/Slide.vue";
 import LevelNavBar from "./LevelNavBar.vue";
@@ -83,211 +95,220 @@ import QuizSpec from "../quiz/type-quiz-spec";
 import { checkAppState } from "../app-state-validator";
 import { RetryMode } from "../../components/quiz/retry-mode";
 
-export default {
-  components: {
-    Slide,
-    QuestionList,
-    LevelNavBar,
-  },
-  setup(props, { emit }) {
-    const store = useStore();
-    const route = useRoute();
-    const router = useRouter();
-    const activeLicense = computed(() => store.getters["exam/activeLicense"]);
-    const wordMode = ref(true);
-    const sentencesRef = ref([]);
-    const examDesc = ref(null);
-    const sectionHistories = ref([]);
-    const chapters = computed(() => store.state.course.chapters.levels);
-    const cate = ref(null);
-    const records = computed(() =>
-      store.getters["record/wrongAnswers"](cate.value)
-    );
-    const theme = ref("word");
+const emits = defineEmits([]);
+const store = useStore();
+const route = useRoute();
+const router = useRouter();
+const activeLicense = computed(() => store.getters["exam/activeLicense"]);
+const wordMode = ref(true);
+const sentencesRef = ref([]);
+// const examDesc = ref(null);
+const sectionHistories = ref([]);
+const chapters = computed(() => store.state.course.chapters.levels);
+const cate = ref(null);
+const records = computed(() =>
+  store.getters["record/wrongAnswers"](cate.value)
+);
+const theme = ref("word");
 
-    const overviewVisible = ref(false);
+const overviewVisible = ref(false);
 
-    /**
-     * 보고쓰기("READING"), 연습하기('LEARNING') 또는 받아쓰기('QUIZ')
-     */
-    const quizModeRef = ref(null);
-    /**
-     * 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
-     */
-    const answerTypeRef = ref(null);
+/**
+ * 보고쓰기("READING"), 연습하기('LEARNING') 또는 받아쓰기('QUIZ')
+ */
+// const quizModeRef = ref(null);
+/**
+ * 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
+ */
+// const answerTypeRef = ref(null);
 
-    checkAppState({ router });
-    const setActiveSection = () => {
-      if (chapters.value.length === 0) {
-        return;
-      }
-      const sectionSeq = Number.parseInt(route.params.sectionSeq);
-      cate.value = store.getters["course/section"](sectionSeq);
-      if (cate.value.level === -1) {
-        wordMode.value = false;
-      }
-    };
-    const title = () => {
-      const { level } = cate.value;
-      return level >= 0 ? level + "단계" : "도전";
-    };
-    const desc = () => cate.value.description;
-
-    const startSentenceQuiz = (e) => {
-      const { group, quizMode, answerType } = e;
-      if (!activeLicense.value) {
-        alert("학생을 선택해주세요");
-        return;
-      }
-
-      const sectionSeq = cate.value.seq;
-      const quizResource = wordMode.value ? "W" : "S";
-      const failedOnly = false;
-      QuizSpec.prepareLevelQuiz(
-        quizMode,
-        answerType,
-        cate.value,
-        quizResource,
-        () => group.sentences,
-        [group.start, group.end],
-        RetryMode.SEG,
-        failedOnly
-      )
-        .then(() => {
-          router.push(`/quiz/${sectionSeq}`);
-        })
-        .catch((e) => {
-          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
-        });
-    };
-    /**
-     * 오답 연습
-     *
-     * section을 구성하는 segment들마다 틀린 문제들을 모두 모아서 풀기.
-     * 받아쓰기를 모두 틀리면 section의 모든 문제가 다 포함될 수 있음.
-     * @param {*} e
-     */
-    const tryFailedQuestion = (e) => {
-      const { quizMode, answerType } = e;
-      const quizResource = wordMode.value ? "W" : "S";
-      const retryMode = RetryMode.FAILED; // 오답 연습
-      const section = cate.value;
-      const sentenceSeqs = records.value
-        .filter((record) => record.type === quizResource)
-        .flatMap((record) => record.paper.submissions.flatMap((sbm) => sbm))
-        .filter((submission) => !submission.correct)
-        .map((submission) => submission.sentenceRef);
-      const sentences = section.sentences.filter((sen) =>
-        sentenceSeqs.includes(sen.seq)
-      );
-      const failedOnly = false;
-      QuizSpec.prepareLevelQuiz(
-        quizMode,
-        answerType,
-        cate.value,
-        quizResource,
-        () => sentences,
-        [0, sentences.length],
-        retryMode,
-        failedOnly
-      )
-        .then(() => {
-          router.push(`/quiz/${section.seq}`);
-        })
-        .catch((e) => {
-          alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
-        });
-    };
-
-    const findQuizHistories = () => {
-      const quizResource = wordMode.value ? "W" : "S";
-      const mode = quizModeRef.value;
-      return quizDao.findByQuiz(
-        activeLicense.value.uuid,
-        cate.value.seq,
-        quizResource,
-        mode
-      );
-    };
-
-    const replace = (arrayRef, elems) => {
-      arrayRef.value.splice(0, arrayRef.value.length);
-      arrayRef.value.push(...elems);
-    };
-    /**
-     * @param quizMode 보고쓰기("READING"), 연습하기('LEARNING') 또는 받아쓰기('QUIZ')
-     * @param answerType 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
-     */
-    const listQuestions = (quizMode, answerType) => {
-      if (!activeLicense.value) {
-        alert("학생을 선택해주세요");
-        return;
-      }
-      if (cate.value.level === -1) {
-        wordMode.value = false;
-      }
-      quizModeRef.value = quizMode;
-      answerTypeRef.value = answerType;
-      const quizResource = wordMode.value ? "W" : "S";
-      const sentences = cate.value.sentences.filter(
-        (sen) => sen.type === quizResource
-      );
-      examDesc.value = QuizModeText[quizMode];
-      findQuizHistories().then((histories) => {
-        replace(sectionHistories, histories);
-        replace(sentencesRef, sentences);
-      });
-    };
-
-    const hideQuestionList = () => {
-      sentencesRef.value.length = 0;
-    };
-    const sourceText = () => (wordMode.value ? "낱말" : "문장");
-
-    const showOverview = () => {
-      overviewVisible.value = !overviewVisible.value;
-    };
-    const moveBack = () => {
-      if (overviewVisible.value) {
-        overviewVisible.value = false;
-      } else {
-        emit("back");
-      }
-    };
-
-    watch(
-      () => wordMode.value,
-      () => {
-        const themValue = wordMode.value ? "word" : "sentence";
-        theme.value = themValue;
-        sentencesRef.value.splice(0, sentencesRef.value.length);
-      }
-    );
-    watch(() => chapters.value, setActiveSection, { immediate: true });
-    return {
-      overviewVisible,
-      cate,
-      records,
-      theme,
-      // quizOnly,
-      path,
-      title,
-      desc,
-      wordMode,
-      examDesc,
-      quizModeRef,
-      sentencesRef,
-      sectionHistories,
-      startSentenceQuiz,
-      tryFailedQuestion,
-      listQuestions,
-      hideQuestionList,
-      sourceText,
-      showOverview,
-      moveBack,
-    };
-  },
+checkAppState({ router });
+const setActiveSection = () => {
+  if (chapters.value.length === 0) {
+    return;
+  }
+  const sectionSeq = Number.parseInt(route.params.sectionSeq);
+  cate.value = store.getters["course/section"](sectionSeq);
+  if (cate.value.level === -1) {
+    wordMode.value = false;
+  }
 };
+// const title = () => {
+//   const { level } = cate.value;
+//   return level >= 0 ? level + "단계" : "도전";
+// };
+// const desc = () => cate.value.description;
+
+const startSentenceQuiz = (e) => {
+  const { group, quizMode, answerType } = e;
+  if (!activeLicense.value) {
+    alert("학생을 선택해주세요");
+    return;
+  }
+
+  const sectionSeq = cate.value.seq;
+  const quizResource = wordMode.value ? "W" : "S";
+  const failedOnly = false;
+  QuizSpec.prepareLevelQuiz(
+    quizMode,
+    answerType,
+    cate.value,
+    quizResource,
+    () => group.sentences,
+    [group.start, group.end],
+    RetryMode.SEG,
+    failedOnly
+  )
+    .then(() => {
+      router.push(`/quiz/${sectionSeq}`);
+    })
+    .catch((e) => {
+      alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
+    });
+};
+const startWritingMode = (e) => {
+  const { group } = e;
+  const section = cate.value;
+  const ranges = [group.start, group.end];
+  QuizSpec.prepareWriting(section, () => group.sentences, ranges);
+  router.push(`/writing/${section.seq}`);
+};
+/**
+ * 오답 연습
+ *
+ * section을 구성하는 segment들마다 틀린 문제들을 모두 모아서 풀기.
+ * 받아쓰기를 모두 틀리면 section의 모든 문제가 다 포함될 수 있음.
+ * @param {*} e
+ */
+const tryFailedQuestion = (e) => {
+  const { quizMode, answerType } = e;
+  const quizResource = wordMode.value ? "W" : "S";
+  const retryMode = RetryMode.FAILED; // 오답 연습
+  const section = cate.value;
+  const sentenceSeqs = records.value
+    .filter((record) => record.type === quizResource)
+    .flatMap((record) => record.paper.submissions.flatMap((sbm) => sbm))
+    .filter((submission) => !submission.correct)
+    .map((submission) => submission.sentenceRef);
+  const sentences = section.sentences.filter((sen) =>
+    sentenceSeqs.includes(sen.seq)
+  );
+  const failedOnly = false;
+  QuizSpec.prepareLevelQuiz(
+    quizMode,
+    answerType,
+    cate.value,
+    quizResource,
+    () => sentences,
+    [0, sentences.length],
+    retryMode,
+    failedOnly
+  )
+    .then(() => {
+      router.push(`/quiz/${section.seq}`);
+    })
+    .catch((e) => {
+      alert(`[${e.cause}]이용 가능한 문제가 없습니다`);
+    });
+};
+
+// const findQuizHistories = () => {
+//   const quizResource = wordMode.value ? "W" : "S";
+//   const mode = quizModeRef.value;
+//   return quizDao.findByQuiz(
+//     activeLicense.value.uuid,
+//     cate.value.seq,
+//     quizResource,
+//     mode
+//   );
+// };
+
+// const replace = (arrayRef, elems) => {
+//   arrayRef.value.splice(0, arrayRef.value.length);
+//   arrayRef.value.push(...elems);
+// };
+/**
+ * @param quizMode 보고쓰기("READING"), 연습하기('LEARNING') 또는 받아쓰기('QUIZ')
+ * @param answerType 정답 입력에 사용할 컴포넌트 종류('EJ' | 'SEN')
+ */
+// const listQuestions = (quizMode, answerType) => {
+//   if (!activeLicense.value) {
+//     alert("학생을 선택해주세요");
+//     return;
+//   }
+//   if (cate.value.level === -1) {
+//     wordMode.value = false;
+//   }
+//   quizModeRef.value = quizMode;
+//   answerTypeRef.value = answerType;
+//   const quizResource = wordMode.value ? "W" : "S";
+//   const sentences = cate.value.sentences.filter(
+//     (sen) => sen.type === quizResource
+//   );
+//   examDesc.value = QuizModeText[quizMode];
+//   findQuizHistories().then((histories) => {
+//     replace(sectionHistories, histories);
+//     replace(sentencesRef, sentences);
+//   });
+// };
+
+// const hideQuestionList = () => {
+//   sentencesRef.value.length = 0;
+// };
+// const sourceText = () => (wordMode.value ? "낱말" : "문장");
+
+const showOverview = () => {
+  overviewVisible.value = !overviewVisible.value;
+};
+const moveBack = () => {
+  if (overviewVisible.value) {
+    overviewVisible.value = false;
+  } else {
+    emits("back");
+  }
+};
+
+watch(
+  () => wordMode.value,
+  () => {
+    const themValue = wordMode.value ? "word" : "sentence";
+    theme.value = themValue;
+    sentencesRef.value.splice(0, sentencesRef.value.length);
+  }
+);
+watch(() => chapters.value, setActiveSection, { immediate: true });
+// export default {
+//   components: {
+//     Slide,
+//     QuestionList,
+//     LevelNavBar,
+//   },
+//   setup(props, { emit }) {
+
+//     return {
+//       overviewVisible,
+//       cate,
+//       records,
+//       theme,
+//       // quizOnly,
+//       path,
+//       title,
+//       desc,
+//       wordMode,
+//       examDesc,
+//       quizModeRef,
+//       sentencesRef,
+//       sectionHistories,
+//       startSentenceQuiz,
+//       tryFailedQuestion,
+//       listQuestions,
+//       hideQuestionList,
+//       sourceText,
+//       showOverview,
+//       moveBack,
+//     };
+//   },
+// };
 </script>
 
 <style lang="scss" scoped>

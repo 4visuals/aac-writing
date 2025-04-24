@@ -26,7 +26,8 @@ export default {
     const styles = reactive({ topPadding: 0 });
     const updatePadding = () => {
       const { path } = route;
-      const padding = path.startsWith("/quiz") ? 16 : 0;
+      const padding =
+        path.startsWith("/quiz") || path.startsWith("/writing") ? 16 : 0;
       styles.topPadding = padding;
     };
     watch(route, () => {

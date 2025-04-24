@@ -21,6 +21,7 @@
         <div v-if="activeTab.cmd === 'basic'" class="survey">
           <AssessmentForm
             type="basic"
+            :title="activeTab.text"
             :diagnosis="diagnosisRef.basic"
             @answer="pushAnswer"
             @commit="commitDiagnosis"
@@ -29,6 +30,7 @@
         <div v-if="activeTab.cmd === 'survey0'" class="survey">
           <AssessmentForm
             type="before"
+            :title="activeTab.text"
             :diagnosis="diagnosisRef.before"
             @answer="pushAnswer"
             @commit="commitDiagnosis"
@@ -40,6 +42,7 @@
         <div v-else-if="activeTab.cmd === 'survey1'" class="survey">
           <AssessmentForm
             type="after"
+            :title="activeTab.text"
             :diagnosis="diagnosisRef.after"
             @answer="pushAnswer"
             @commit="commitDiagnosis"
@@ -117,7 +120,12 @@ const commitDiagnosis = (e) => {
   if (!diagnosis) {
     throw new Error("invalid type: " + type);
   }
-  const version = type === "before" ? "2024_v1" : "2024_v2";
+  const anyQuestion = diagnosis.questions[0];
+  if (!anyQuestion) {
+    alert("[BUG] no question in diagnosis");
+    return;
+  }
+  const { version } = anyQuestion;
   api.diagnosis.commit(props.student.seq, version).then(() => {
     diagnosis.ready = true;
   });
