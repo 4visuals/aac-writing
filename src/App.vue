@@ -1,7 +1,14 @@
 <template>
   <Background />
   <div class="app-wrapper" ref="wrapperEl">
-    <Nav v-if="route.path == '/level' || route.path == '/book'" ref="nav" />
+    <Nav
+      v-if="
+        route.path == '/level' ||
+        route.path == '/book' ||
+        route.path == '/kowriting'
+      "
+      ref="nav"
+    />
     <LayoutWrapper :height="route.path === '/support' ? '100%' : undefined">
       <router-view v-slot="{ Component }">
         <transition

@@ -28,6 +28,7 @@ import {
   SettingStudent,
   SettingOrder,
 } from "../views/user/setting/viewport";
+import KoWritingView from "../views/kowriting/KoWritingView.vue";
 
 const routes = [
   {
@@ -65,6 +66,11 @@ const routes = [
         component: BookSectionView,
       },
     ],
+  },
+  {
+    path: "/kowriting",
+    name: "KoWritingView",
+    component: KoWritingView,
   },
   {
     path: "/stat",
