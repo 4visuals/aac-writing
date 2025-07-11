@@ -20,9 +20,13 @@
       </div>
       <div class="reg-stud">
         <p>
-          새로운 학생을 추가하려면
-          <a href="#" @click.prevent="goTo('/setting/student')">학생 추가</a>를
-          눌러주세요.
+          학생 관리 페이지에서 학생을 등록할 수 있습니다.
+          <button
+            class="nude blue round"
+            @click.prevent="goTo('/setting/student')"
+          >
+            이동
+          </button>
         </p>
       </div>
     </div>
@@ -63,12 +67,12 @@ export default {
   }
   .list {
     padding: 4px 0;
-    cursor: pointer;
     .each {
       display: flex;
       align-items: center;
       padding: 0px 16px;
       height: 40px;
+      cursor: pointer;
       &.active,
       &:hover {
         background-color: #a4dcff;

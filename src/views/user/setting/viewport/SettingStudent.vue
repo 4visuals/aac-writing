@@ -17,8 +17,19 @@
                 :assigned="asn"
                 @edit="showStudentForm(asn.student)"
                 @del-student="$emit('del-student', asn.student)"
+                @reg-license="showBindingForm"
                 @diagnosis="showAssessmentView"
             /></SectionBox>
+          </div>
+          <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+            <SectionBox class="fill-h">
+              <div class="new-student">
+                <button class="btn-new nude blue" @click="$emit('new-student')">
+                  <span class="material-icons-outlined">add</span>
+                  <span>학생 추가</span>
+                </button>
+              </div>
+            </SectionBox>
           </div>
         </div>
       </div>
@@ -35,6 +46,8 @@ import modal from "@/components/modal";
 import StudentRegForm from "@/components/admin/StudentRegForm.vue";
 import StudentCard from "../components/StudentCard.vue";
 import AssessmentView from "@/components/stats/assessment/AssessmentView.vue";
+import LicenseMappingList from "../components/LicenseMappingList.vue";
+import toast from "@/components/toast";
 
 const store = useStore();
 const students = computed(() => store.getters["user/students"]);
@@ -78,6 +91,33 @@ const showAssessmentView = (assigned) => {
     },
   });
 };
+const bindStudent = (student, license) => {
+  store.dispatch("user/bindStudent", { license, student }).then(() => {
+    buildAssignees();
+    toast.success(
+      `수강증에 [${student.name}] 학생을 등록했습니다. `,
+      "등록 완료",
+      10
+    );
+  });
+  modal.closeModal();
+};
+const showBindingForm = (e) => {
+  modal.showModal(LicenseMappingList, {
+    width: "sm",
+    props: {
+      student: e.student,
+    },
+    events: {
+      "bind-license": (e) => {
+        bindStudent(e.student, e.license);
+      },
+      close: (e) => {
+        console.log(e);
+      },
+    },
+  });
+};
 
 watch(students, buildAssignees, { immediate: true, deep: true });
 </script>
@@ -90,6 +130,19 @@ watch(students, buildAssignees, { immediate: true, deep: true });
     }
     .fill-h {
       height: 100%;
+    }
+    .new-student {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      .btn-new {
+        display: flex;
+        flex-direction: column;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        box-shadow: 0 0 24px #00238a4d, 0 0 6px #00238a8d;
+      }
     }
   }
   .none {

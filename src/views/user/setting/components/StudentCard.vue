@@ -63,7 +63,9 @@
         <!-- <button :disabled="true" class="nude history">학습 결과</button> -->
       </div>
       <div v-else class="license">
-        <button class="nude red">이용권 없음</button>
+        <button class="nude red" @click="$emit('reg-license', assigned)">
+          이용권 없음
+        </button>
       </div>
       <div class="license">
         <button class="nude history" @click="$emit('diagnosis', assigned)">
@@ -81,7 +83,7 @@ import Pavicon from "../../../../components/Pavicon.vue";
 import { inject, defineProps, defineEmits } from "vue";
 
 defineProps(["assigned"]);
-defineEmits(["diagnosis"]);
+defineEmits(["diagnosis", "reg-license"]);
 const ymd = (birth) => time.toYMD(birth);
 const provider = inject("settingNav");
 </script>

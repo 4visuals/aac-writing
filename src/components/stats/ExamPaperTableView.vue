@@ -24,6 +24,7 @@
           v-for="(pair, idx) in sheets"
           :key="pair.paper.seq"
           :class="idx % 2 == 1 ? 'even' : 'odd'"
+          :data-time="pair.paper.startTime"
           @click.stop="$emit('view-submissions', pair)"
         >
           <td class="min w60 align-center">
@@ -172,12 +173,20 @@ export default {
     const showSubmissions = (paper) => {
       console.log("[입력 상세 정보]", paper);
     };
+    const sortByDate = (pairs) => {
+      pairs.sort((a, b) => {
+        const aDate = a.paper.startTime;
+        const bDate = b.paper.startTime;
+        return aDate.localeCompare(bDate);
+      });
+    };
     const initSheet = () => {
       const pairs = [];
       props.papers.forEach((paper) => {
         const section = store.getters["course/section"](paper.sectionRef);
         pairs.push({ paper, section });
       });
+      sortByDate(pairs);
       sheets.value = pairs;
     };
     const formatChapterTitle = (chapter) => {
