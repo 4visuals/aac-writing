@@ -116,6 +116,7 @@ export default {
     onMounted(() => {
       store.commit("quiz/hideHint");
       if (
+        ctx.isWritingMode() ||
         ctx.isTrialQuiz() ||
         ctx.isListenMode() ||
         ctx.retryMode === RetryMode.FAILED

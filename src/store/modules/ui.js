@@ -25,6 +25,7 @@ const themes = {
     level: "blue",
     book: "brown",
     stat: "purple",
+    writing: "blue",
   },
   none: {
     name: "none",

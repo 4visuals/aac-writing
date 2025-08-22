@@ -20,6 +20,18 @@
       </div>
       <div class="body" v-else>
         <QuestionList
+          v-if="wordMode"
+          quizMode="WRITING"
+          answerType="NULL"
+          :theme="theme"
+          :wordMode="wordMode"
+          :section="cate"
+          :histories="sectionHistories"
+          :sentences="sentencesRef"
+          :recordVisible="false"
+          @choosen="startWritingMode"
+        />
+        <QuestionList
           quizMode="READING"
           answerType="EJ"
           :theme="theme"
@@ -63,18 +75,6 @@
           :sentences="sentencesRef"
           :recordVisible="false"
           @choosen="startSentenceQuiz"
-        />
-        <QuestionList
-          v-if="wordMode"
-          quizMode="WRITING"
-          answerType="NULL"
-          :theme="theme"
-          :wordMode="wordMode"
-          :section="cate"
-          :histories="sectionHistories"
-          :sentences="sentencesRef"
-          :recordVisible="false"
-          @choosen="startWritingMode"
         />
       </div>
     </template>

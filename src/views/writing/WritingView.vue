@@ -6,30 +6,36 @@
         :resourceType="ctx.resourceType"
         @back="closeQuiz"
       />
-      <Numbering @speak="speak" :theme="navbarTheme" />
-      <div class="question">
-        <ko-writing-node
-          v-if="words.length > 0"
-          :words="words"
-          :index="index"
-          @dir="onWordChanged"
-        />
-      </div>
+      <QuizResult v-if="quizFinished" />
+      <template v-else>
+        <Numbering @speak="speak" :theme="navbarTheme" />
+        <div class="question">
+          <ko-writing-node
+            v-if="words.length > 0"
+            :words="words"
+            :index="index"
+            @dir="onWordChanged"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
 import quiz from "@/views/quiz";
-import { computed, onUnmounted, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch, provide } from "vue";
 import { useStore } from "vuex";
 import LevelNavBar from "../level/LevelNavBar.vue";
 import Numbering from "@/views/quiz/Numbering.vue";
+import QuizResult from "../quiz/result/QuizResult.vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import "../../assets/writing/ko-writing.js";
 import quizStore from "../quiz/quizStore";
 import { tts } from "@/components/tts";
 import { path } from "../../service/util.js";
+import { RetryMode } from "../../components/quiz/retry-mode.js";
+import { Segment } from "../quiz/index.js";
 
 const store = useStore();
 const router = useRouter();
@@ -40,6 +46,8 @@ store.commit("quiz/hideHint");
 store.commit("ui/setNavVisible", false);
 const words = ref([]);
 const index = ref(0);
+const quizFinished = computed(() => store.state.quiz.finished);
+store.commit("ui/setTheme", ["writing"]);
 quiz.loadQuiz();
 
 /**
@@ -60,7 +68,7 @@ const moveQuiz = (dir) => {
   // }
   if (dir > 0) {
     quizStore.moveNext();
-    index.value = Math.min(10, index.value + 1);
+    index.value = Math.min(9, index.value + 1);
   } else {
     quizStore.movePrev();
     index.value = Math.max(0, index.value - 1);
@@ -97,6 +105,150 @@ watch(
     immediate: true,
   }
 );
+watch(quizFinished, (finished) => {
+  index.value = 0;
+  console.log("오냐?");
+});
+/**
+ * 새로운 퀴즈 시작
+ * @param {QuizContext} quizContext - quiz/index.js
+ * @param {Segment} segment - quiz/index.js
+ * @param {object} section,
+ * @param {object[]} sentences
+ * @param {RetryMode} retryMode 현재 segment인지, 오답연습인지
+ * @param {Boolean} failedOnly segment에서 틀린 문제만 다시 풀기
+ */
+const startQuiz = (
+  quizContext,
+  segment,
+  section,
+  sentences,
+  retryMode,
+  failedOnly = false
+) => {
+  const config = quizContext.value.config; // 지우기 전에 미리 받아놓음.
+  // speakNextQuestion(sentences);
+  store.dispatch("quiz/closeQuiz").then(() => {
+    const quizSpec = config.options;
+    quizSpec
+      .reload(
+        section,
+        [segment.start, segment.end],
+        () => sentences,
+        retryMode,
+        failedOnly
+      )
+      .then(() => {
+        store.commit("ui/hideMenu");
+        store.commit("quiz/hideHint");
+        quiz.loadQuiz();
+      });
+  });
+};
+/**
+ * 현재 퀴즈를 다시 한번
+ *
+ * @param {RetryMode} retryMode - 'SEG'이면 현재 segment를, 'FAILED'이면 section의 오답들을 다시 풀기
+ */
+const retry = () => {
+  /**
+   * 최초에 특정 segment를 풀고 난 후
+   * 뭔지 모르겠다.
+   */
+  const quizContext = ctx.value;
+  const [s, e] = quizContext.ranges;
+  let segment = { start: s, end: e }; // = segments.find((seg) => seg.start === s && seg.end === e);
+  let sentences = quizContext.getRetrySentences();
+  const { retryMode } = quizContext;
+  const failedOnly = retryMode === RetryMode.FAILED;
+  startQuiz(
+    ctx,
+    segment,
+    quizContext.section,
+    sentences,
+    retryMode,
+    failedOnly
+  );
+};
+/**
+ * 틀린 문제 다시 풀기
+ * - [오답 연습]과 다름
+ * - 현재 진행중인 시험 문제에서 틀린 문제만 다시 시도함.
+ * @param {import("./result/scoring").default} scoring
+ */
+const tryFailedQuestion = (scoring) => {
+  const quizContext = ctx.value;
+  let segment;
+  let sentences = scoring.trials
+    .filter((trial) => !trial.correct)
+    .map((trial) => trial.sentence);
+  if (quizContext.retryMode === RetryMode.SEG) {
+    let segments = quizContext.getSegments();
+    const [s, e] = quizContext.ranges;
+    segment = segments.find((seg) => seg.start === s && seg.end === e);
+  } else {
+    segment = { start: 0, end: sentences.length };
+  }
+  const failedOnly = true;
+  startQuiz(
+    ctx,
+    segment,
+    quizContext.section,
+    sentences,
+    RetryMode.FAILED,
+    failedOnly
+  );
+};
+/**
+ * 다음 퀴즈를 시작함.
+ *
+ */
+const startNext = () => {
+  const { section, ranges } = ctx.value;
+  const e = ranges[1];
+  let segments = ctx.value.getSegments();
+  let nextSection = section;
+  let nextSegment = segments.find((seg) => seg.start === e);
+  if (!nextSegment) {
+    nextSection = nextSection.next;
+    if (nextSection.level === -1 && ctx.value.isWord()) {
+      // "낱말"인 경우, 다음 section이 도전인 경우(level -1)그 다음 section을 사용함
+      nextSection = nextSection.next;
+    }
+    segments = Segment.createSegments(nextSection, ctx.value.resourceType);
+    nextSegment = segments[0];
+  }
+  if (nextSegment) {
+    const failedOnly = false;
+    const nextSetences = nextSegment.getSentences();
+    // 맨 마지막 chapter의 마지막 section은 다음 section이 없음
+    startQuiz(
+      ctx,
+      nextSegment,
+      nextSection,
+      nextSetences,
+      RetryMode.SEG,
+      failedOnly
+    );
+  } else {
+    alert("마지막 퀴즈입니다.");
+  }
+};
+/**
+ * provide
+ * @method quizProvider.retry - [다시 하기] 현재 퀴즈를 다시
+ * @method quizProvider.tryFailedQuestion - 현재 퀴즈에서 틀린 문제만
+ * @method quizProvider.startNext - [다음 단계] 다음 문제 시작
+ * @method quizProvider.gotoSection - [학습선택] section 상세 페이지로 이동
+ * @method quizProvider.gotoChapter - 종료. "/level", "/book"으로 이동
+ */
+provide("quizProvider", {
+  retry,
+  tryFailedQuestion,
+  startNext,
+  gotoSection,
+  gotoChapter,
+});
 onBeforeRouteLeave(() => {
   store.dispatch("quiz/closeQuiz");
   return true;

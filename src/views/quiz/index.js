@@ -346,6 +346,13 @@ class QuizContext {
     return this.options.mode !== "QUIZ";
   }
   /**
+   * 따라쓰기(WRITING) 모드
+   * @returns
+   */
+  isWritingMode() {
+    return this.options.mode === "WRITING";
+  }
+  /**
    * 받아쓰기(QUIZ)모드인지 나타냄
    * @returns {Boolean}
    */
