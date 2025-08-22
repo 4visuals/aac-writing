@@ -28,10 +28,12 @@ import Numbering from "@/views/quiz/Numbering.vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import "../../assets/writing/ko-writing.js";
 import quizStore from "../quiz/quizStore";
+import { tts } from "@/components/tts";
 import { path } from "../../service/util.js";
 
 const store = useStore();
 const router = useRouter();
+const navbarTheme = ref("word");
 const ctx = computed(() => store.state.quiz.quizContext);
 store.commit("ui/hideMenu");
 store.commit("quiz/hideHint");
@@ -77,6 +79,9 @@ const closeQuiz = (dir) => {
 const onWordChanged = (e) => {
   moveQuiz(e.detail);
 };
+const speak = () => {
+  return tts.speak(ctx.value.currentQuestion.text);
+};
 watch(
   ctx,
   () => {
@@ -85,6 +90,7 @@ watch(
         text: q.text,
         picture: path.aacweb.symbol(q.eojeols[0].picturePath.split(":")[1]),
       }));
+      speak();
     }
   },
   {
