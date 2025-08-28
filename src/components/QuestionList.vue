@@ -151,9 +151,13 @@ export default {
       /**
        * https://github.com/4visuals/aac-writing/issues/123
        */
-      const { ranges, questions } = history;
+      const { mode, ranges, questions } = history;
       const numOfQuiz = ranges[1] - ranges[0];
-      if (numOfQuiz === questions.length) {
+      if (mode === "WRITING" || numOfQuiz === questions.length) {
+        /**
+         * 따라쓰기(mode === 'WRITING') 는 무조건 표시함
+         * https://github.com/4visuals/aac-writing/issues/167
+         */
         // questions.length : 제출한 답안 갯수
         return bgMap[props.theme];
       } else {
