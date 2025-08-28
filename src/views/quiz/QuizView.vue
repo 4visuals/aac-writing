@@ -140,18 +140,6 @@ export default {
      */
     const holdSoftKeyboard = () => focusing.value.focus();
 
-    const speakNextQuestion = (sentences) => {
-      if (sentences && sentences.length > 0) {
-        setTimeout(() => {
-          tts
-            .speak(sentences[0].sentence, { clearPending: true })
-            .catch((e) => {
-              console.log("[stop tts]", e);
-            });
-        }, 500);
-      }
-    };
-
     const moveQuiz = (dir) => {
       // if (!ctx.value.isReadingMode()) {
       //   holdSoftKeyboard();
@@ -211,7 +199,6 @@ export default {
       failedOnly = false
     ) => {
       const config = quizContext.value.config; // 지우기 전에 미리 받아놓음.
-      speakNextQuestion(sentences);
       store.dispatch("quiz/closeQuiz").then(() => {
         const quizSpec = config.options;
         quizSpec
@@ -371,6 +358,10 @@ export default {
             : "sentence";
           if (ctx.value.isTrialQuiz()) {
             navbarTheme.value = "trial";
+          }
+          if (ctx.value.isSentence() && !ctx.value.isQuizMode()) {
+            // 문장 받아쓰기가 아닌 경우 EojeolInput에서 tts를 호출하므로 두 번 읽게 된다.
+            return;
           }
           if (ctx.value.ranges && ctx.value.ranges[0] === 0) {
             speak();
