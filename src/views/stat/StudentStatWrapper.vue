@@ -74,8 +74,8 @@ const loadData = () => {
   if (dataLoaded || !loginUser.value || !license.value) {
     return;
   }
-  dataLoaded = true;
   return api.exam.queryBySegments(license.value.uuid).then((res) => {
+    dataLoaded = true;
     exams.value = res.quiz;
     const examMap = createExamMap(exams.value);
     chapterStats.level = createChapterStats(examMap, levels.value);

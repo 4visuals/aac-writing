@@ -1,5 +1,6 @@
 <template>
   <div class="calendar">
+    <Loading v-if="pending" :pending="pending" />
     <div class="weeks">
       <div class="seven-days">
         <div class="day border-rb" v-for="day in days" :key="day">
@@ -43,100 +44,107 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { logger } from "@/service/util";
-import { computed } from "@vue/reactivity";
-import { shallowRef, watch } from "vue";
+import { computed, ref } from "@vue/reactivity";
+import { shallowRef, watch, defineProps, defineEmits } from "vue";
 import { useStore } from "vuex";
 import { Day, fromDate } from ".";
-export default {
-  emits: ["exams", "today"],
-  props: { current: Day },
-  setup(props, { emit }) {
-    const days = "일월화수목금토".split("");
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    const today = props.current;
-    const month = shallowRef(fromDate(props.current));
-    const store = useStore();
-    const historyMap = computed(() => store.state.exam.histories);
-    const monthMap = shallowRef(null);
-    const loginUser = computed(() => store.getters["user/currentUser"]);
-    const license = computed(() => store.getters["exam/activeLicense"]);
-    /**
-     * 새로고침에도 대응해야함.
-     */
-    let dataLoaded = false;
-    const loadExamData = () => {
-      if (!dataLoaded && loginUser.value && license.value) {
-        dataLoaded = true;
-        store.dispatch("exam/queryExams");
-      }
-    };
+import Loading from "@/components/Loading.vue";
 
-    const countBy = (day) => {
-      const ymd = day.toYMD();
-      const ym = ymd.substring(0, "yyyy-mm".length);
-      const examsInMonth = historyMap.value.get(ym);
-      if (!examsInMonth || examsInMonth.length === 0) {
-        return [];
-      }
-      const exams = examsInMonth.filter((exam) => exam.ymd === ymd);
-      return exams;
-    };
-    const updateMonthData = () => {
-      const weeks = month.value.currentWeeks;
-      const map = new Map();
-      weeks.forEach((week) => {
-        week.days.forEach((date) => {
-          const ymd = date.toYMD();
-          map.set(ymd, countBy(date));
-        });
-      });
-      monthMap.value = map;
-    };
-    const notifyTodayData = () => {
-      const cur = props.current;
-      const papers = monthMap.value.get(cur.toYMD());
-      logger.log(papers);
-      emit("today", papers);
-    };
-
-    const countExams = (_, date) => {
-      return _.get(date.toYMD()).length;
-    };
-    const hasData = (_, date) => _ && countExams(_, date) > 0;
-
-    const showDetail = (day) => {
-      const papers = monthMap.value.get(day.toYMD());
-      emit("exams", { day, papers });
-    };
-    watch(historyMap, (histories) => {
-      logger.log(histories);
-      updateMonthData();
-      notifyTodayData();
+const props = defineProps(["current"]);
+const emit = defineEmits(["exams", "today"]);
+const days = "일월화수목금토".split("");
+// eslint-disable-next-line vue/no-setup-props-destructure
+const today = props.current;
+const month = shallowRef(fromDate(props.current));
+const store = useStore();
+const historyMap = computed(() => store.state.exam.histories);
+const monthMap = shallowRef(null);
+const loginUser = computed(() => store.getters["user/currentUser"]);
+const license = computed(() => store.getters["exam/activeLicense"]);
+const pending = ref({ error: false, state: "LOADING" });
+/**
+ * 새로고침에도 대응해야함.
+ */
+let dataLoaded = false;
+const loadExamData = () => {
+  if (!dataLoaded && loginUser.value && license.value) {
+    dataLoaded = true;
+    store.dispatch("exam/queryExams").then(() => {
+      pending.value = undefined;
     });
-    watch(loginUser, loadExamData, { immediate: true });
-    watch(license, loadExamData, { immediate: true });
-    watch(
-      () => props.current,
-      () => {
-        month.value = props.current;
-        updateMonthData();
-      }
-    );
-
-    return {
-      days,
-      today,
-      monthMap,
-      month,
-      countBy,
-      hasData,
-      countExams,
-      showDetail,
-    };
-  },
+  }
 };
+
+const countBy = (day) => {
+  const ymd = day.toYMD();
+  const ym = ymd.substring(0, "yyyy-mm".length);
+  const examsInMonth = historyMap.value.get(ym);
+  if (!examsInMonth || examsInMonth.length === 0) {
+    return [];
+  }
+  const exams = examsInMonth.filter((exam) => exam.ymd === ymd);
+  return exams;
+};
+const updateMonthData = () => {
+  const weeks = month.value.currentWeeks;
+  const map = new Map();
+  weeks.forEach((week) => {
+    week.days.forEach((date) => {
+      const ymd = date.toYMD();
+      map.set(ymd, countBy(date));
+    });
+  });
+  monthMap.value = map;
+};
+const notifyTodayData = () => {
+  const cur = props.current;
+  const papers = monthMap.value.get(cur.toYMD());
+  logger.log(papers);
+  emit("today", papers);
+};
+
+const countExams = (_, date) => {
+  return _.get(date.toYMD()).length;
+};
+const hasData = (_, date) => _ && countExams(_, date) > 0;
+
+const showDetail = (day) => {
+  const papers = monthMap.value.get(day.toYMD());
+  emit("exams", { day, papers });
+};
+watch(historyMap, (histories) => {
+  logger.log(histories);
+  updateMonthData();
+  notifyTodayData();
+});
+watch(loginUser, loadExamData, { immediate: true });
+watch(license, loadExamData, { immediate: true });
+watch(
+  () => props.current,
+  () => {
+    month.value = props.current;
+    updateMonthData();
+  }
+);
+// export default {
+//   emits: ["exams", "today"],
+//   props: { current: Day },
+//   setup(props, { emit }) {
+
+//     return {
+//       days,
+//       today,
+//       monthMap,
+//       month,
+//       countBy,
+//       hasData,
+//       countExams,
+//       showDetail,
+//     };
+//   },
+// };
 </script>
 
 <style lang="scss" scoped>

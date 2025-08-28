@@ -127,7 +127,7 @@ export default {
     },
     queryExams(ctx) {
       const license = ctx.getters["activeLicense"];
-      api.exam.queryExams(license.uuid).then((res) => {
+      return api.exam.queryExams(license.uuid).then((res) => {
         const { papers, learnings } = res;
         papers.push(...learnings);
         papers.forEach((paper) => {
